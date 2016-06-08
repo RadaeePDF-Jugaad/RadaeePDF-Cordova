@@ -64,13 +64,13 @@ RadaeePDFPlugin.open(
 
 - **Example**:
 
-```javascript
-url: "file:///mnt/sdcard/Download/Test.pdf", //in case of pdf is in the device file system
-```
+	```javascript
+	url: "file:///mnt/sdcard/Download/Test.pdf", //in case of pdf is in the device file system
+	```
 
-```javascript
-url: "http://www.radaeepdf.com/documentation/MRBrochoure.pdf", //in case of pdf is on a remote server
-```
+	```javascript
+	url: "http://www.radaeepdf.com/documentation/MRBrochoure.pdf", //in case of pdf is on a remote server
+	```
 
 ### Open PDF from assets
 
