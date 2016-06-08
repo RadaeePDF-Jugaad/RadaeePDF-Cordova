@@ -100,4 +100,8 @@ RadaeePDFPlugin.openFromAssets(
 RadaeePDF library version included:
 - Android: v3.6.2b
 
+Contributors:
+- This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
+   www.paolomessina.it, il mio indirizzo mail è paolo.messina.it@gmail.com
+
 More information about RadaeePDF SDK on http://www.radaeepdf.com.
