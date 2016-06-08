@@ -28,21 +28,21 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 
 ### License Activation
 
-    ```javascript
-    RadaeePDFPlugin.activateLicense(
-        {
-            licenseType: 1, //0: for standard license, 1: for professional license, 2: for premium license
-			company: "", //the company name you entered during license activation
-			email: "", //the email you entered during license activation
-			key: "" //you license activation key
-		},
-		function(message) { // _Callback for successful opening._
-			 console.log("Success: " + message);
-		},
-		function(err){ // _Callback in case of error._
-			console.log("Failure: " + err);
-        });
-    ```
+```javascript
+RadaeePDFPlugin.activateLicense(
+	{
+		licenseType: 1, //0: for standard license, 1: for professional license, 2: for premium license
+		company: "", //the company name you entered during license activation
+		email: "", //the email you entered during license activation
+		key: "" //you license activation key
+	},
+	function(message) { // _Callback for successful opening._
+		 console.log("Success: " + message);
+	},
+	function(err){ // _Callback in case of error._
+		console.log("Failure: " + err);
+	});
+```
 
 RadaeePDF library version included:
 - Android: v3.6.2b
