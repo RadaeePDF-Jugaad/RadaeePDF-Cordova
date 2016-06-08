@@ -18,13 +18,20 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 ### Android
 
 1. Create the app using the demo package name, to be able to test all the features (standard, professional and premium).
+
 	cordova create RadaeePDF-Cordova com.radaee.reader RadaeePDF-Cordova
+	
 2. Add the android platform
+
 	cd RadaeePDF-Cordova
 	cordova platform add android --save
+	
 3. Add the plugin
+
 	cordova plugin add http://192.168.0.95:8668/git/nermeen/RadaeePDF-Cordova.git --save
+	
 4. Build the app.
+
 	cordova build android
 	
 After doing these steps, you will have a ready to use project.
