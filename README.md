@@ -28,8 +28,8 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 
 ### License Activation
 
-	You need to call this only when you have your own license, as the demo project already have a demo-premium license.
-
+You need to call this only when you have your own license, as the demo project already have a demo-premium license.
+	
 ```javascript
 RadaeePDFPlugin.activateLicense(
 	{
