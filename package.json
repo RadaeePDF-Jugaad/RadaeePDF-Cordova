@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://192.168.0.95:8668/git/nermeen/RadaeePDF-Cordova.git"
+    "url": "https://github.com/gearit/RadaeePDF-Cordova.git"
   },
   "keywords": [
     "cordova",
