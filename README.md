@@ -30,7 +30,8 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 4. Build the app.  
    `cordova build android`
 	
-   After doing these steps, you will have a ready to use project.
+
+After doing these steps, you will have a ready to use project.
 
 ## The JavaScript Interfaces
 
