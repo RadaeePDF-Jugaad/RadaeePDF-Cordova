@@ -27,21 +27,48 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 ## The JavaScript Interfaces
 
 ### License Activation
+	You need to call this only when you have your own license, as the demo project already have a demo-premium license.
 
 ```javascript
 RadaeePDFPlugin.activateLicense(
 	{
-		licenseType: 1, //0: for standard license, 1: for professional license, 2: for premium license
+		licenseType: 0, //0: for standard license, 1: for professional license, 2: for premium license
 		company: "", //the company name you entered during license activation
 		email: "", //the email you entered during license activation
 		key: "" //you license activation key
 	},
-	function(message) { // _Callback for successful opening._
+	function(message) { // Callback for successful opening.
 		 console.log("Success: " + message);
 	},
-	function(err){ // _Callback in case of error._
+	function(err){ // Callback in case of error.
 		console.log("Failure: " + err);
 	});
+```
+
+### Open PDF from file system
+
+```javascript
+RadaeePDFPlugin.open(
+	{
+		url: "", //The path of the pdf to open
+		password: "" //password if needed
+	},
+	function(message) {
+		 console.log("Success: " + message);
+	},
+	function(err){
+		console.log("Failure: " + err);
+    });
+```
+
+####Example:
+
+```javascript
+url: "file:///mnt/sdcard/Download/Test.pdf", //in case of pdf is in the device file system
+```
+
+```javascript
+url: "http://www.radaeepdf.com/documentation/MRBrochoure.pdf", //in case of pdf is on a remote server
 ```
 
 RadaeePDF library version included:
