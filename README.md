@@ -27,6 +27,7 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 ## The JavaScript Interfaces
 
 ### License Activation
+
 	You need to call this only when you have your own license, as the demo project already have a demo-premium license.
 
 ```javascript
@@ -61,7 +62,7 @@ RadaeePDFPlugin.open(
     });
 ```
 
-####Example:
+- **Example**:
 
 ```javascript
 url: "file:///mnt/sdcard/Download/Test.pdf", //in case of pdf is in the device file system
@@ -71,5 +72,23 @@ url: "file:///mnt/sdcard/Download/Test.pdf", //in case of pdf is in the device f
 url: "http://www.radaeepdf.com/documentation/MRBrochoure.pdf", //in case of pdf is on a remote server
 ```
 
+### Open PDF from assets
+
+```javascript
+RadaeePDFPlugin.openFromAssets(
+	{
+		url: "Test.PDF", //the pdf name
+		password: "" //password if needed
+	},
+	function(message) {
+		 console.log("Success: " + message);
+	},
+	function(err){
+		console.log("Failure: " + err);
+    });
+```
+
 RadaeePDF library version included:
 - Android: v3.6.2b
+
+More information about RadaeePDF SDK on http://www.radaeepdf.com.
