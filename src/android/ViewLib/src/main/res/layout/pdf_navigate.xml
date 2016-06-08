@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/lay_bar"
+        android:background="@color/bar_bg_color"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <com.radaee.util.RDImgView
+            android:id="@+id/btn_up"
+            android:src="@drawable/ic_grid_folder1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true" />
+
+        <com.radaee.util.RDImgView
+            android:id="@+id/btn_refresh"
+            android:src="@drawable/ic_grid_folder2"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/btn_up" />
+
+        <TextView
+            android:id="@+id/txt_path"
+            android:paddingTop="2dp"
+            android:paddingLeft="4dp"
+            android:textSize="18dp"
+            android:textColor="@color/bar_text_color"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/btn_refresh" />
+        <TextView
+            android:id="@+id/txt_ftype"
+            android:paddingLeft="4dp"
+            android:textSize="12dp"
+            android:text="File Type: *.pdf"
+            android:textColor="@color/bar_text_color"
+            android:layout_width="match_parent"
+            android:layout_height="22dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/txt_path"
+            android:layout_toLeftOf="@id/btn_refresh" />
+    </RelativeLayout>
+
+    <com.radaee.util.RDGridView
+        android:id="@+id/vw_grid"
+        android:background="@color/panel_bg_color"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/lay_bar" />
+</RelativeLayout>

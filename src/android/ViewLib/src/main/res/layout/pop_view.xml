@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/actual_content"
+        android:layout_alignTop="@+id/actual_content"
+        android:layout_alignRight="@+id/actual_content"
+        android:layout_alignBottom="@+id/actual_content"
+        android:background="@drawable/bg_menu"/>
+
+<LinearLayout
+    android:id="@+id/actual_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp" >
+
+    <LinearLayout
+        android:id="@+id/view_vert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true" >
+
+        <ImageView
+            android:id="@+id/view_vert_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/btn_view_vert" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="6dp"
+            android:text="@string/vertical" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/view_horz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true" >
+
+        <ImageView
+            android:id="@+id/view_horz_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/btn_view_horz" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="6dp"
+            android:text="@string/horizontal" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/view_single"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true" >
+
+        <ImageView
+            android:id="@+id/view_single_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/btn_view_single" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="6dp"
+            android:text="@string/single_page" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/view_dual"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true" >
+
+        <ImageView
+            android:id="@+id/view_dual_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/btn_view_dual" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="6dp"
+            android:text="@string/dual_page" />
+
+    </LinearLayout>
+
+</LinearLayout>
+</RelativeLayout>

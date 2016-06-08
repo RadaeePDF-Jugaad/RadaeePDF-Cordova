@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp" android:layout_height="120dp">
+    <ImageView
+        android:id="@+id/img_page"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"/>
+    <ImageView
+        android:id="@+id/img_rotate"
+        android:src="@drawable/btn_redo"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/img_page"
+        android:layout_width="20dp"
+        android:layout_height="20dp"/>
+    <ImageView
+        android:id="@+id/img_delete"
+        android:src="@drawable/btn_remove"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/img_page"
+        android:layout_width="20dp"
+        android:layout_height="20dp"/>
+</RelativeLayout>

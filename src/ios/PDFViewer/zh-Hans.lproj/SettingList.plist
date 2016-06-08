@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>查找设定</key>
+	<array>
+		<string>大小写匹配</string>
+		<string>全字匹配</string>
+	</array>
+	<key>阅读设定</key>
+	<array>
+		<string>下划线颜色</string>
+		<string>渲染质量</string>
+		<string>删除线颜色</string>
+		<string>默认阅读模式</string>
+		<string>高亮颜色</string>
+		<string>选择文字右对齐</string>
+		<string>禁止关闭屏幕</string>
+		<string>划线标记颜色</string>
+		<string>划线标记宽度</string>
+		<string>线框标记颜色</string>
+		<string>椭圆标记颜色</string>
+		<string>恢复默认设定</string>
+		<string>自动保存</string>
+	</array>
+</dict>
+</plist>

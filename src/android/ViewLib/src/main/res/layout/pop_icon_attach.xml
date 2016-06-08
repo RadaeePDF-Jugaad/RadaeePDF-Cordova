@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_menu"
+    android:orientation="vertical"
+    android:padding="4dp" >
+
+    <LinearLayout
+        android:id="@+id/view_00"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:clickable="true" >
+        <ImageView
+            android:id="@+id/img_00"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/btn_view_vert" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="PushPin" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/view_01"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:clickable="true" >
+        <ImageView
+            android:id="@+id/img_01"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/btn_view_horz" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Graph" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/view_02"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:clickable="true" >
+
+        <ImageView
+            android:id="@+id/img_02"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/btn_view_single" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:text="Paperclip" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/view_03"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:clickable="true" >
+        <ImageView
+            android:id="@+id/img_03"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/btn_view_dual" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:text="Tag" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="com.radaee.cordova" version="1.6.8">
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <name>RadaeePDF-Cordova</name>
+    <author>Jugaad s.r.l.</author>
+    <description>RadaeePDF SDK Plugin for Cordova. The best PDF rendering engine with annotation, form, page creation features. Support forum, java and objective-c sources are available on www.radaeepdf.com</description>
+    <license>Apache</license>
+    <keywords>pdf, open, inapppdf, radaee, cordova, radaeepdf, android, ios</keywords>
+
+    <js-module src="www/RadaeePDFPlugin.js" name="RadaeePDFPlugin">
+        <clobbers target="RadaeePDFPlugin" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="RadaeePDFPlugin" >
+                <param name="android-package" value="com.radaee.cordova.RadaeePDFPlugin"/>
+				<param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+		<config-file target="AndroidManifest.xml" parent="application">
+			<activity android:name="com.radaee.reader.PDFViewAct" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar"/>
+            <activity android:name="com.radaee.reader.PDFGLViewAct" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar"/>
+			<activity android:configChanges="orientation|keyboardHidden|screenSize" android:name="com.radaee.util.PopupEditAct" android:theme="@android:style/Theme.Translucent" />
+			<activity android:name="com.radaee.reader.PDFPagerAct" android:configChanges="orientation|keyboardHidden|screenSize" android:label="@string/app_name" />
+			<activity android:name="com.radaee.reader.PDFPagesAct" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar" />
+			<activity
+            android:name="com.radaee.util.CaptureSignature"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog"/>
+            <meta-data android:name="DefaultFont" android:value="Roboto-Black.ttf" />
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </config-file>
+
+        <!-- Plugin source -->
+        <source-file src="src/android/RadaeePDFPlugin.java" target-dir="src/com/radaee/cordova" />
+
+        <!-- Radaee source - java.com.radaee.pdf -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/adv/Obj.java" target-dir="src/com/radaee/pdf/adv" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/adv/Ref.java" target-dir="src/com/radaee/pdf/adv" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/BMDatabase.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/BMP.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/DIB.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Document.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Global.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/HWriting.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Ink.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Matrix.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Page.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/PageContent.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Path.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/SuperDoc.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/SuperPage.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResFont.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResForm.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResGState.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResImage.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Sign.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/VNBlock.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/VNCache.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/VNPage.java" target-dir="src/com/radaee/pdf" />
+
+        <!-- Radaee source - java.com.radaee.reader -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFBotBar.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFLayoutOPStack.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFLayoutView.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFMainAct.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFMenu.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFTopBar.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFNavAct.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFViewAct.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFViewController.java" target-dir="src/com/radaee/reader" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFPagerAct.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/GLCanvas.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/GLView.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFGLLayoutView.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFGLViewAct.java" target-dir="src/com/radaee/reader" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFPagesAct.java" target-dir="src/com/radaee/reader" />
+
+        <!-- Radaee source - java.com.radaee.util -->
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboList.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboListAdt.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CommonUtil.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/FileBrowserAdt.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/FileBrowserView.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/OutlineList.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/OutlineListAdt.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFAESStream.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFAssetStream.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFFileStream.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridItem.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridThread.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridView.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFHttpStream.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFMemStream.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFPageGridAdt.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFPageGridView.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PopupEditAct.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePluginCallback.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDBGView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDExpView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDFilesItem.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDFilesView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDGridItem.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDGridView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDImgView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDLinearLayout.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDLockerSet.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRecent.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRecentItem.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRecentView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRelativeLayout.java" target-dir="src/com/radaee/util" />
+
+		<!-- Radaee source - java.com.radaee.view -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayout.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutCurl.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual2.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDualV.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutReflow.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowBlock.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowCanvas.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/ILayoutView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayout.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFPageView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVCache.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVFinder.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewCurl.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewPager.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewReflow.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewThumb.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVSel.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VFinder.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VSel.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VThread.java" target-dir="src/com/radaee/view"/>
+
+        <!-- Annot UI -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlg.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgComm.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgIcon.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgLine.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgMarkup.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgPopup.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSign.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSignProp.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotMenu.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPop.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopCombo.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopEdit.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIColorButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIIconButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadView.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleView.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UISignView.java" target-dir="src/com/radaee/annotui"/>
+
+        <!-- Radaee source - java.com.radaee.util -->
+
+        <source-file src="src/android/ViewLib/src/main/jniLibs/arm64-v8a/librdpdf.so" target-dir="libs/arm64-v8a" />
+        <source-file src="src/android/ViewLib/src/main/jniLibs/armeabi-v7a/librdpdf.so" target-dir="libs/armeabi-v7a" />
+        <source-file src="src/android/ViewLib/src/main/jniLibs/x86/librdpdf.so" target-dir="libs/x86" />
+        <source-file src="src/android/ViewLib/src/main/jniLibs/x86_64/librdpdf.so" target-dir="libs/x86_64" />
+
+        <!-- Import to include guava dependency -->
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+
+        <!-- Project layout -->
+
+        <!-- Radaee layout -->
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_act.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_annot.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_cmd.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_find.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_seek.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_popup_menu.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_row.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_popup.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_comm.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_icon.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_line.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_markup.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_signature.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_signprop.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_browser.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_note.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_outline.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_pswd.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_text.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_outline.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/item_page.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_curl.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_fragment.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pdf_gllayout.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_layout.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_nav.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pdf_pages.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_annot.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_color.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_combo.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_edit.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_attach.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_text.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lhead.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lstyle.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_more.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_view.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_dir_list.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_file_list.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_thumb_grid_view.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_bookmark_menu.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_menu_file.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_recent.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_menu_recent.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_main.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_thumb_view.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_file_grid.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_bookmark.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_files.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_navigate.xml" target-dir="res/layout" />
+
+        <!-- Radaee raw -->
+        <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/arimo" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/arimob" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/arimobi" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/arimoi" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/cmaps.dat" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/cmyk_rgb.dat" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/cousine" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/cousineb" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/cousinebi" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/cousinei" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/rdf013" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgy.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgyb.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgybi.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgyi.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/symbol" target-dir="res/raw" />
+		<source-file src="src/android/ViewLib/src/main/res/raw/umaps.dat" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/radaee_test.pfx" target-dir="res/raw" />
+
+        <!-- Project drawable -->
+        <source-file src="src/android/res/drawable/bar_back_image.png" target-dir="res/drawable" />
+
+        <!-- Radaee drawable -->
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_add_bookmark.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_editbox.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_ellipse.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_ink.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_line.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_note.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_polygon.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_polyline.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_rect.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_stamp.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annots.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_back.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_cancel.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_done.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_left.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_more.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_outline.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_perform.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_print.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_redo.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_remove.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_right.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_save.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_search.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_select.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_settings.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_share.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_show_bookmarks.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_undo.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_dual.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_horz.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_single.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_vert.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_custom_stamp.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_file.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_folder0.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_folder1.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_folder2.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/pt_end.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/pt_start.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_btn_menu.xml" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_background.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_menu.png" target-dir="res/drawable" />
+
+		<!-- Radaee values -->
+		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
+		<source-file src="src/android/ViewLib/src/main/res/values/bools.xml" target-dir="res/values" />
+		<source-file src="src/android/ViewLib/src/main/res/values-v11/styles.xml" target-dir="res/values-v11" />
+		<source-file src="src/android/ViewLib/src/main/res/values-v14/styles.xml" target-dir="res/values-v14" />
+		<source-file src="src/android/ViewLib/src/main/res/values-v21/styles.xml" target-dir="res/values-v21" />
+		<source-file src="src/android/ViewLib/src/main/res/values-ar/strings.xml" target-dir="res/values-ar" />
+		<source-file src="src/android/ViewLib/src/main/res/values-es-rES/strings.xml" target-dir="res/values-es-rES" />
+		<source-file src="src/android/ViewLib/src/main/res/values-fr-rFR/strings.xml" target-dir="res/values-fr-rFR" />
+		<source-file src="src/android/ViewLib/src/main/res/values-it/strings.xml" target-dir="res/values-it" />
+		<source-file src="src/android/ViewLib/src/main/res/values-sw600dp/bools.xml" target-dir="res/values-sw600dp" />
+		<source-file src="src/android/ViewLib/src/main/res/values-xlarge/bools.xml" target-dir="res/values-xlarge" />
+		<!-- <source-file src="src/android/ViewLib/src/main/res/values/colors.xml" target-dir="res/values" /> -->
+		<source-file src="src/android/ViewLib/src/main/res/values/dimens.xml" target-dir="res/values" />
+        <source-file src="src/android/ViewLib/src/main/res/anim/anim_popup_end.xml" target-dir="res/anim" />
+        <source-file src="src/android/ViewLib/src/main/res/anim/anim_popup_start.xml" target-dir="res/anim" />
+
+		<!-- Radaee res -->
+		<source-file src="src/android/ViewLib/src/main/res/AMIRI_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/ARIMO_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/COUSINE_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/FONT-LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/GUST e-foundry License.txt" target-dir="res" />
+
+        <!-- Fonts -->
+        <source-file src="fonts/Roboto-Black.ttf" target-dir="assets/fonts" />
+        <source-file src="fonts/Roboto-Bold.ttf" target-dir="assets/fonts" />
+        <source-file src="fonts/Roboto-Light.ttf" target-dir="assets/fonts" />
+        <source-file src="fonts/Roboto-Medium.ttf" target-dir="assets/fonts" />
+        <source-file src="fonts/Roboto-Regular.ttf" target-dir="assets/fonts" />
+        <source-file src="fonts/Roboto-RegularItalic.ttf" target-dir="assets/fonts" />
+
+        <!-- Radaee test document -->
+        <source-file src="src/android/ViewLib/src/main/assets/test.pdf" target-dir="assets" />
+
+        <config-file target="res/values/colors.xml" parent="/resources">
+            <color name="annot_menu_bg_color">#280B08</color>
+            <color name="btn_disabled_color">#80050505</color>
+            <color name="btn_pressed_color">#FFFFFF</color>
+            <color name="toolbar_bg_color">#280B08</color>
+            <color name="toolbar_icon_color">#FF9040</color>
+            <color name="gridview_icon_color">#FF9040</color>
+            <color name="tab_bg_color">#E0E0E0</color>
+            <color name="tab_text_color">#202020</color>
+            <color name="menu_bg_color">#E0E0E0</color>
+            <color name="menu_text_color">#202020</color>
+            <color name="bar_bg_color">#F0F0F0</color>
+            <color name="bar_text_color">#202020</color>
+            <color name="panel_bg_color">#202020</color>
+            <color name="panel_text_color">#E0E0E0</color>
+        </config-file>
+
+		<!-- plugman cannot merge - prepare manual merge -->
+        <config-file target="res/values/strings.xml" parent="/resources">
+            <string name="failed_invalid_password">Open Failed: Invalid Password</string>
+            <string name="failed_invalid_format">Open Failed: Damaged or Invalid PDF file</string>
+            <string name="failed_encryption">Open Failed: Unknown Encryption</string>
+            <string name="failed_invalid_path">Open Failed: Access denied or Invalid path</string>
+            <string name="failed_unknown">Open Failed: Unknown Error</string>
+            <string name="please_wait">Please wait</string>
+            <string name="no_more_found">No more found</string>
+
+            <string name="thumbnail_creation_running">Thumbnail creation is running…</string>
+            <string name="exiting">Exiting</string>
+            <string name="no">No</string>
+            <string name="yes">Yes</string>
+            <string name="annotation_failed">Add annotation failed!</string>
+            <string name="cannot_write_or_encrypted">Cannot write or encrypted!</string>
+            <string name="copy_text_to_clipboard">Copy text to clipboard</string>
+            <string name="highlight_texts">Highlight texts</string>
+            <string name="underline">Underline</string>
+            <string name="strikeout">StrikeOut</string>
+            <string name="squiggly">Squiggly</string>
+            <string name="process_selected_text">Process selected text</string>
+            <string name="cancel">Cancel</string>
+            <string name="no_more_redo">No more redo.</string>
+            <string name="no_more_undo">No more undo.</string>
+            <string name="pdf_outline">PDF Outlines</string>
+            <string name="single_page">Single Page</string>
+            <string name="vertical">Vertical</string>
+            <string name="horizontal">Horizontal</string>
+            <string name="dual_page">Dual Page</string>
+            <string name="curl" translatable="false">Curl</string>
+            <string name="reflow">Text reflow</string>
+            <string name="save_msg">Document modified.\nDo you want to save it?</string>
+            <string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
+
+            <string name="read_only_annotation">Read only annotation</string>
+            <string name="note_content">Note Content</string>
+            <string name="note_subject">Subject:</string>
+            <string name="note_text">Content:</string>
+            <string name="show_password">Show password</string>
+            <string name="input_password">Input Password</string>
+            <string name="loading_pdf">Loading PDF file…</string>
+            <string name="browse_open_file">Browse And Open File(CPU)</string>
+            <string name="view_pager">ViewPager</string>
+            <string name="open_asset">Open From Assets (ReadOnly)</string>
+            <string name="open_sdcard">Open From sdcard</string>
+            <string name="open_http">Open Http Link (INTERNET access)</string>
+            <string name="using_RGB_565">RGB_565 (CPU)</string>
+            <string name="using_RGB_4444">RGB_4444 (CPU)</string>
+            <string name="simple_open_gl">Simple OpenGL</string>
+            <string name="curl_pages">Curl Pages</string>
+            <string name="advance">Advance</string>
+            <string name="create_pdf">CreatePDF</string>
+            <string name="javascript">JavaScript</string>
+            <string name="about">About</string>
+
+            <string name="ok">OK</string>
+            <string name="todo_open_url">todo: open url: </string>
+            <string name="todo_java_script">todo: execute java script</string>
+            <string name="todo_play_movie">todo: play movie</string>
+            <string name="todo_play_sound">todo: play sound</string>
+            <string name="todo_attachment">todo: treat attachment</string>
+            <string name="todo_3d">todo: play 3D module</string>
+            <string name="file_not_exist">File not exists: </string>
+            <string name="file_not_exist_error">%1$s not exists or not a file.</string>
+            <string name="file_not_opened">Cannot open %1$s.</string>
+            <string name="catalog_not_found">Catalog object is not a dictionary.</string>
+            <string name="edit_catalog_failed">Edit catalog failed.</string>
+
+            <string name="no_pdf_outlines">PDF does not contain outlines</string>
+            <string name="pdf_print_not_available">PDF File is not available for print.</string>
+            <string name="pdf_print_calculation_failed">Page count calculation failed.</string>
+
+            <string name="pdf_share_not_available">PDF File is not available for share.</string>
+
+            <string name="copy_text">Text copied to clipboard: %1$s</string>
+
+            <string name="print">Print</string>
+            <string name="share">Share</string>
+            <string name="bookmark_label">Page: %1$d</string>
+            <string name="bookmark_already_added">Bookmark already exists</string>
+            <string name="bookmark_error">Error: Cannot add bookmark</string>
+            <string name="bookmark_remove_error">Error: Cannot delete bookmark</string>
+            <string name="bookmark_success">Bookmark (%1$s) added successfully.</string>
+            <string name="bookmark_add">Add to Bookmarks</string>
+            <string name="bookmark_show">Show Bookmarks</string>
+            <string name="bookmarks">Bookmarks</string>
+            <string name="no_bookmarks">No bookmarks to show</string>
+            <string name="loading">Loading…</string>
+            <string name="delete">Delete</string>
+            <string name="confirm">Confirm</string>
+            <string name="clear">Clear</string>
+            <string name="save">Save</string>
+            <string name="saved_message">Document saved</string>
+            <string name="delete_signature_message">A signature is already present, do you want to delete it?</string>
+            <string name="warning">Warning</string>
+
+			<string name="no_search_reflow">Search not supported in Reflow mode!</string>
+			<string name="pages_list">Pages List</string>
+            <string name="annot_perform">Perform</string>
+            <string name="annot_edit">poptext</string>
+            <string name="annot_remove">remove</string>
+            <string name="annot_property">property</string>
+            <string name="line_width">Line width</string>
+            <string name="line_style">Line style</string>
+            <string name="line_color">Line color</string>
+            <string name="line_start">Line start</string>
+            <string name="line_end">Line end</string>
+            <string name="fill_color">Fill color</string>
+            <string name="annot_color">Color</string>
+            <string name="icon">icon</string>
+            <string name="annot_lock">Lock</string>
+            <string name="alpha">Alpha</string>
+
+            <string name="sign_certificate_hand" translatable="false">Handwrite</string>
+            <string name="sign_certificate_password" translatable="false">Password:</string>
+            <string name="sign_certificate" translatable="false">Certificate:</string>
+            <string name="sign_certificate_select" translatable="false">Open</string>
+            <string name="browser_file_delete_confirm" translatable="false">Do you want to delete file</string>
+            <string name="browser_file_delete" translatable="false">Delete File</string>
+            <string name="browser_file_delete_recent" translatable="false">Remove from recent</string>
+            <string name="browser_file_share" translatable="false">Share file</string>
+            <string name="tag_recent">Recent</string>
+            <string name="tag_files">Files</string>
+            <string name="tag_navigate">Navigate</string>
+            <string name="txt_no_recent">There is no recent files.</string>
+            <string name="browser_file_recent" translatable="false">Recent file:</string>
+            <string name="browser_file_delete_recent_list_confirm" translatable="false">Do you want to clear recent list?</string>
+            <string name="sign_select_certificate" translatable="false">Please select cert file:</string>
+            <string name="sign_certificate_filetype" translatable="false">File type p12 or pfx</string>
+            <string name="sign_error_fail_certificate" translatable="false">Sign failed, can\'t open the certificate file.</string>
+            <string name="sign_error_fail" translatable="false">Sign failed. General error.</string>
+            <string name="txt_no_files">There is no files on storage.</string>
+            <string name="txt_files_title">Files on Device:</string>
+            <!-- <string name="activity_name">Radaee PDF Reader</string> -->
+            <!-- <string name="launcher_name">Radaee PDF Reader</string> -->
+		</config-file>
+
+        <!-- Hooks -->
+        <hook type="after_prepare" src="src/android/hooks/configure-android.js"/>
+
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="RadaeePDFPlugin">
+                <param name="ios-package" value="RadaeePDFPlugin"/>
+            </feature>
+        </config-file>
+        <framework src="CoreMedia.framework" />
+        <framework src="QuartzCore.framework" />
+        <framework src="libc++.dylib" />
+
+        <!-- Plugin sources and resources -->
+        <resource-file src="src/ios/PDFViewer/Images.xcassets" />
+
+        <!-- Radaee sources -->
+        <source-file src="src/ios/RadaeePDFPlugin.m" />
+        <header-file src="src/ios/RadaeePDFPlugin.h" />
+
+        <header-file src="src/ios/PDFViewer/RDToolBar.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/RDToolBar.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/RDMenu.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/RDMenu.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/UILElement.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/UILElement.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/UILShadowView.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/UILShadowView.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/UINavigationController+autoRotate.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/UINavigationController+autoRotate.m" target-dir="ios/PDFViewer"/>
+
+        <source-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropIcon.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropIcon.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropLine.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropLine.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropMarkup.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropMarkup.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuAnnot.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuAnnot.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuAnnotOp.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuAnnotOp.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuCombo.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuCombo.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuSearch.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuSearch.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuTool.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuTool.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuVMode.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuVMode.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDAnnotPickerViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDAnnotPickerViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDExtendedSearch.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDExtendedSearch.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDMetaDataViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDMetaDataViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDPageViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDPageViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDSinglePageViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDSinglePageViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UIColorBtn.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UIColorBtn.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UIIconView.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UIIconView.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UILHeadView.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UILHeadView.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UILStyleView.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UILStyleView.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropIcon.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropMarkup.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.storyboard" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDAnnotPickerViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDMetaDataViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDPageViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+
+        <source-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <header-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <source-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeTableViewCell.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <header-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeTableViewCell.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <source-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <header-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <resource-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.xib" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+
+        <source-file src="src/ios/PDFViewer/PDFView/ActionStackManager.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/ActionStackManager.h" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFDelegate.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFDialog.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFDialog.h" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFGridView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFGridView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFPopupCtrl.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFPopupCtrl.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFReflowView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFReflowView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFThumbView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFThumbView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/RDPDFView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/RDPDFView.h" target-dir="ios/PDFViewer/PDFView"/>
+
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDUtils.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDUtils.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVLayout.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVLayout.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVCanvas.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVCanvas.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVCache.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVCache.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVFinder.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVFinder.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVGlobal.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVGlobal.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVPage.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVPage.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVThread.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVThread.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVSel.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVSel.h" target-dir="ios/PDFViewer/PDFLayout"/>
+
+        <source-file src="src/ios/PDFViewer/PDFLib/PDFHttpStream.m" target-dir="ios/PDFViewer/PDFLib"/>
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFHttpStream.h" target-dir="ios/PDFViewer/PDFLib"/>
+        <source-file src="src/ios/PDFViewer/PDFLib/PDFObjc.m" target-dir="ios/PDFViewer/PDFLib"/>
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFObjc.h" target-dir="ios/PDFViewer/PDFLib"/>
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFIOS.h" target-dir="ios/PDFViewer/PDFLib"/>
+        <source-file src="src/ios/PDFViewer/PDFLib/libRDPDFLib.a" framework="true" target-dir="ios/PDFViewer/PDFLib"/>
+
+        <source-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.m" target-dir="ios/PDFViewer/PDFPages"/>
+        <header-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.h" target-dir="ios/PDFViewer/PDFPages"/>
+        <source-file src="src/ios/PDFViewer/PDFPages/PDFPagesView.m" target-dir="ios/PDFViewer/PDFPages"/>
+        <header-file src="src/ios/PDFViewer/PDFPages/PDFPagesView.h" target-dir="ios/PDFViewer/PDFPages"/>
+        <source-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.m" target-dir="ios/PDFViewer/PDFPages"/>
+        <header-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.h" target-dir="ios/PDFViewer/PDFPages"/>
+        <resource-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.storyboard" target-dir="ios/PDFViewer/PDFPages"/>
+        <resource-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.xib" target-dir="ios/PDFViewer/PDFPages"/>
+
+        <source-file src="src/ios/PDFViewer/RDPlugin/RDFormManager.m" target-dir="ios/PDFViewer/RDPlugin"/>
+        <header-file src="src/ios/PDFViewer/RDPlugin/RDFormManager.h" target-dir="ios/PDFViewer/RDPlugin"/>
+
+        <source-file src="src/ios/PDFViewer/RDSignature/SignatureViewController.m" target-dir="ios/PDFViewer/RDSignature"/>
+        <header-file src="src/ios/PDFViewer/RDSignature/SignatureViewController.h" target-dir="ios/PDFViewer/RDSignature"/>
+        <source-file src="src/ios/PDFViewer/RDSignature/UviSignatureView.m" target-dir="ios/PDFViewer/RDSignature"/>
+        <header-file src="src/ios/PDFViewer/RDSignature/UviSignatureView.h" target-dir="ios/PDFViewer/RDSignature"/>
+        <!--
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIAuthenticationDialog.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIAuthenticationDialog.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASICacheDelegate.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDataCompressor.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDataCompressor.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDownloadCache.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDownloadCache.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIFormDataRequest.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIFormDataRequest.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequest.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequest.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequestConfig.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequestDelegate.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIInputStream.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIInputStream.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASINetworkQueue.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASINetworkQueue.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIProgressDelegate.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/Reachability.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/Reachability.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        -->
+
+        <resource-file src="src/ios/PDFViewer/PDFRes" target-dir="ios/PDFViewer"/>
+        <resource-file src="src/ios/PDFViewer/en.lproj" target-dir="ios/PDFViewer"/>
+        <resource-file src="src/ios/PDFViewer/it.lproj" target-dir="ios/PDFViewer"/>
+        <resource-file src="src/ios/PDFViewer/zh-Hans.lproj" target-dir="ios/PDFViewer"/>
+
+        <!-- fonts -->
+        <resource-file src="fonts/Roboto-Black.ttf" />
+        <resource-file src="fonts/Roboto-Bold.ttf" />
+        <resource-file src="fonts/Roboto-Light.ttf" />
+        <resource-file src="fonts/Roboto-Medium.ttf" />
+        <resource-file src="fonts/Roboto-Regular.ttf" />
+        <resource-file src="fonts/Roboto-RegularItalic.ttf" />
+        <config-file target="*-Info.plist" parent="Fonts provided by application">
+			<array>
+        		<string>Roboto-Black.ttf</string>
+        		<string>Roboto-Bold.ttf</string>
+        		<string>Roboto-Light.ttf</string>
+        		<string>Roboto-Medium.ttf</string>
+        		<string>Roboto-Regular.ttf</string>
+        		<string>Roboto-RegularItalic.ttf</string>
+			</array>
+		</config-file>
+
+        <!-- hooks -->
+        <!--
+        <hook type="before_compile" src="hooks/configure-ios.js"/>
+        -->
+    </platform>
+
+</plugin>

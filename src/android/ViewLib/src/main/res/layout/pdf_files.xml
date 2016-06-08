@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:background="@color/bar_bg_color"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <com.radaee.util.RDImgView
+                android:id="@+id/btn_refresh"
+                android:src="@drawable/ic_grid_folder2"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true" />
+            <TextView
+                android:paddingTop="2dp"
+                android:textSize="18sp"
+                android:textColor="@color/bar_text_color"
+                android:paddingStart="4dp"
+                android:layout_toStartOf="@id/btn_refresh"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:text="@string/txt_files_title" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/txt_no_files"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:text="@string/txt_no_files"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </TextView>
+            <com.radaee.util.RDFilesView
+                android:id="@+id/vw_files"
+                android:background="@color/panel_bg_color"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

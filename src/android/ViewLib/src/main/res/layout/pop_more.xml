@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/actual_content"
+        android:layout_alignTop="@+id/actual_content"
+        android:layout_alignRight="@+id/actual_content"
+        android:layout_alignBottom="@+id/actual_content"
+        android:background="@drawable/bg_menu"/>
+
+
+    <LinearLayout
+        android:id="@+id/actual_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="4dp">
+
+        <LinearLayout
+            android:id="@+id/edit_pages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/edit_pages_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_view_dual"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/pages_list"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_bookmark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/add_bookmark_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_add_bookmark"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/bookmark_add"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/show_bookmarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/show_bookmarks_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_show_bookmarks"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/bookmark_show"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/save_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_save"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/save"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/print"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/print_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_print"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/print"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/share_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_share"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/share"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

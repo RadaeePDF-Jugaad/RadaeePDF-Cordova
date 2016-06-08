@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dlg_show_note"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+	android:padding="10dp">
+
+    <RadioGroup
+        android:id="@+id/rad_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/rad_copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/copy_text_to_clipboard" />
+
+        <RadioButton
+            android:id="@+id/rad_highlight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/highlight_texts" />
+
+        <RadioButton
+            android:id="@+id/rad_underline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/underline" />
+
+        <RadioButton
+            android:id="@+id/rad_strikeout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/strikeout" />
+
+	    <RadioButton
+	        android:id="@+id/rad_squiggly"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/squiggly" />
+	        </RadioGroup>
+
+
+</LinearLayout>

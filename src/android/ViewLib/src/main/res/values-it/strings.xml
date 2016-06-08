@@ -1,0 +1,122 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+           tools:ignore="MissingTranslation">
+
+    <string name="failed_invalid_password">Apertura Fallita: Password non valida</string>
+    <string name="failed_invalid_format">Apertura Fallita: PDF danneggiato o non valido</string>
+    <string name="failed_encryption">Apertura Fallita: Crittografia sconosciuta</string>
+    <string name="failed_invalid_path">Apertura Fallita: Accesso negato o percorso non valido</string>
+    <string name="failed_unknown">Apertura Fallita: Errore Sconosciuto</string>
+    <string name="please_wait">Attendere prego</string>
+    <string name="no_more_found">Nessun altro risultato trovato</string>
+
+    <string name="thumbnail_creation_running">Creazione delle miniature in corso…</string>
+    <string name="exiting">Uscita</string>
+    <string name="no">No</string>
+    <string name="yes">Si</string>
+    <string name="annotation_failed">Aggiunta della nota fallita!</string>
+    <string name="cannot_write_or_encrypted">Non è possibile modificare o crittografare!</string>
+    <string name="copy_text_to_clipboard">Testo copiato negli appunti</string>
+    <string name="highlight_texts">Testo evidenziato</string>
+    <string name="underline">Testo Sottolineato</string>
+    <string name="strikeout">Testo Barrato</string>
+    <string name="squiggly">Testo Ondulato</string>
+    <string name="process_selected_text">Elabora il testo selezionato</string>
+    <string name="cancel">Annulla</string>
+    <string name="no_more_redo">Non ci sono più modifiche da ripristinare.</string>
+    <string name="no_more_undo">Non ci sono più modifiche da annullare.</string>
+    <string name="pdf_outline">Indice del PDF</string>
+    <string name="single_page">Pagina Singola</string>
+    <string name="vertical">Verticale</string>
+    <string name="horizontal">Orizzontale</string>
+    <string name="dual_page">Pagina Doppia</string>
+    <string name="curl">Sfoglia</string>
+    <string name="reflow">Modalità testo</string>
+    <string name="save_msg">Documento modificato.\nVuoi salvarlo?</string>
+    <string name="page_change_block">Non è possibile modificare la pagina mentre la pagina è ingrandita, fai uno Zoom-out prima!</string>
+
+    <string name="read_only_annotation">La nota è in sola lettura</string>
+	<string name="note_content">Contenuto della Nota</string>
+    <string name="note_subject">Oggetto:</string>
+    <string name="show_password">Mostra password</string>
+    <string name="note_text">Testo:</string>
+	<string name="input_password">Inserire la Password</string>
+	<string name="loading_pdf">Caricamento PDF in corso…</string>
+	<string name="browse_open_file">Sfoglia e Apri il File</string>
+	<string name="view_pager">ViewPager</string>
+    <string name="open_asset">Apri dall\'Asset (sola lettura)</string>
+    <string name="open_sdcard">Apri dall\'sdcard</string>
+    <string name="open_http">Apri Link Http (accesso a INTERNET)</string>
+    <string name="using_RGB_565">Usando RGB_565</string>
+    <string name="using_RGB_4444">Usando RGB_4444</string>
+    <string name="simple_open_gl">Simple OpenGL</string>
+    <string name="curl_pages">Pagine Curl</string>
+    <string name="advance">Avanzate</string>
+    <string name="create_pdf">Crea PDF</string>
+    <string name="javascript">JavaScript</string>
+    <string name="about">About</string>
+
+    <string name="ok">OK</string>
+    <string name="todo_open_url">todo: Apri url: </string>
+    <string name="todo_java_script">todo: eseguire lo script java</string>
+    <string name="todo_play_movie">todo: riprodurre film</string>
+    <string name="todo_play_sound">todo: riprodurre suono</string>
+    <string name="todo_attachment">todo: allegato</string>
+    <string name="todo_3d">todo: riprodurre modulo 3D</string>
+    <string name="copy_text">Il testo è stato copiato negli appunti: %1$s</string>
+    <string name="file_not_exist">File non esiste: </string>
+    <string name="file_not_exist_error">%1$s non esiste o non è un file.</string>
+    <string name="file_not_opened">Impossibile aprire %1$s.</string>
+    <string name="catalog_not_found">Oggetto catalogo non è un dizionario.</string>
+    <string name="edit_catalog_failed">Modifica catalogo fallito.</string>
+
+    <string name="sign_title">Firma il documento</string>
+    <string name="sign_certificate_hand">Firma autografa</string>
+    <string name="sign_certificate">Certificato:</string>
+    <string name="sign_certificate_select">Apri</string>
+    <string name="sign_certificate_password">Password:</string>
+    <string name="sign_select_certificate">Scegli il certificato di firma:</string>
+    <string name="sign_certificate_filetype">Certificati di tipo p12 o pfx</string>
+    <string name="sign_is_empty">La firma è vuota</string>
+    <string name="sign_error_fail_certificate">Non è stato possibile firmare il documento\nper un problema sul certificato.</string>
+    <string name="sign_error_fail" translatable="false">Non è stato possibile firmare il documento.</string>
+
+    <string name="no_pdf_outlines">Il file non contiene un elenco di contenuti</string>
+    <string name="pdf_print_not_available">File PDF non è disponibile per la stampa.</string>
+    <string name="pdf_print_calculation_failed">Impossibile contare le pagine.</string>
+    <string name="pdf_share_not_available">File PDF non è disponibile per la condivisione.</string>
+    <string name="confirm">Conferma</string>
+    <string name="clear">Elimina</string>
+    <string name="delete">Elimina</string>
+    <string name="save">Salva</string>
+    <string name="saved_message">Documento salvato</string>
+    <string name="delete_signature_message">È già presente una firma, vuoi cancellarla?</string>
+    <string name="warning">Avviso</string>
+
+    <string name="annot_perform">Applica</string>
+    <string name="annot_edit">poptext</string>
+    <string name="annot_remove">rimuovi</string>
+    <string name="annot_property">proprietà</string>
+    <string name="line_width">Spessore</string>
+    <string name="line_style">Stile</string>
+    <string name="line_color">Colore</string>
+    <string name="line_start">Inizio</string>
+    <string name="line_end">Fine</string>
+    <string name="fill_color">Riempimento</string>
+    <string name="annot_color">Colore</string>
+    <string name="icon">icona</string>
+    <string name="annot_lock">Blocca</string>
+    <string name="alpha">Trasparenza</string>
+
+    <string name="tag_recent">Recenti</string>
+    <string name="tag_files">File</string>
+    <string name="tag_navigate">Naviga</string>
+    <string name="txt_no_recent">Non ci sono file recenti.</string>
+    <string name="txt_files_title">File sul dispositivo:</string>
+    <string name="txt_no_files">Non ci sono file riconosciuti.</string>
+    <string name="button_ok_label">OK</string>
+    <string name="text_cancel_label">Annulla</string>
+    <string name="permission_dialog_title">E\' necessaria l\'autorizzazione</string>
+    <string name="permission_dialog_content">Per motivi di privacy, a partire da Android 11 è necessario autorizzare l\'accesso all\'applicazione. Cortesemente, premi OK e autorizza l\'applicazione.</string>
+    <string name="permission_denied_content">Senza le autorizzazioni di accesso l\'applicazione è limitata.</string>
+
+</resources>

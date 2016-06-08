@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RDBookmarkViewController">
+            <connections>
+                <outlet property="bookmarkTitle" destination="Qqo-iR-7Us" id="0Hx-MB-kza"/>
+                <outlet property="tableView" destination="wki-lA-FlM" id="ZId-jz-pbd"/>
+                <outlet property="tableViewHeight" destination="8ki-od-zSX" id="YzZ-jZ-HpT"/>
+                <outlet property="view" destination="acA-Gt-ueE" id="KMH-BT-VVd"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="acA-Gt-ueE">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CgN-Sx-dO6">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <connections>
+                        <action selector="dismissView:" destination="-1" eventType="touchUpInside" id="mzb-3y-VcU"/>
+                    </connections>
+                </button>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d66-GU-WuO">
+                    <rect key="frame" x="76.5" y="304.5" width="261" height="287"/>
+                    <subviews>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="wki-lA-FlM">
+                            <rect key="frame" x="0.0" y="37" width="261" height="250"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <color key="tintColor" name="iconTint"/>
+                            <constraints>
+                                <constraint firstAttribute="height" priority="900" constant="250" id="8ki-od-zSX"/>
+                                <constraint firstAttribute="height" relation="lessThanOrEqual" constant="400" id="A8I-tN-ck2"/>
+                            </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                    <integer key="value" value="10"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </tableView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Bookmarks" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qqo-iR-7Us">
+                            <rect key="frame" x="8" y="8" width="245" height="21"/>
+                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                            <color key="textColor" name="iconTint"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" name="systemWhiteColor"/>
+                    <constraints>
+                        <constraint firstItem="wki-lA-FlM" firstAttribute="leading" secondItem="d66-GU-WuO" secondAttribute="leading" id="72R-sC-FOy"/>
+                        <constraint firstAttribute="width" constant="261" id="Qq4-Rv-vUt"/>
+                        <constraint firstItem="Qqo-iR-7Us" firstAttribute="leading" secondItem="d66-GU-WuO" secondAttribute="leading" constant="8" id="WX3-bS-y0Q"/>
+                        <constraint firstItem="Qqo-iR-7Us" firstAttribute="top" secondItem="d66-GU-WuO" secondAttribute="top" constant="8" id="XVm-RU-iRA"/>
+                        <constraint firstAttribute="bottom" secondItem="wki-lA-FlM" secondAttribute="bottom" id="nFT-C4-vkJ"/>
+                        <constraint firstItem="wki-lA-FlM" firstAttribute="top" secondItem="Qqo-iR-7Us" secondAttribute="bottom" constant="8" id="pDm-qU-4tG"/>
+                        <constraint firstAttribute="trailing" secondItem="Qqo-iR-7Us" secondAttribute="trailing" constant="8" id="rQJ-iH-CWO"/>
+                        <constraint firstAttribute="trailing" secondItem="wki-lA-FlM" secondAttribute="trailing" id="yku-wh-a8F"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="point" keyPath="layer.shadowOffset">
+                            <point key="value" x="0.0" y="0.0"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowRadius">
+                            <integer key="value" value="10"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowOpacity">
+                            <real key="value" value="0.25"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="NO"/>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="10"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="clipToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="JYm-bY-Vue"/>
+            <color key="backgroundColor" white="0.0" alpha="0.25307684079999998" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="CgN-Sx-dO6" secondAttribute="trailing" id="0Zl-Z1-8lh"/>
+                <constraint firstAttribute="bottom" secondItem="CgN-Sx-dO6" secondAttribute="bottom" id="5cl-sh-5cG"/>
+                <constraint firstItem="CgN-Sx-dO6" firstAttribute="top" secondItem="acA-Gt-ueE" secondAttribute="top" id="Ghi-Gb-u3w"/>
+                <constraint firstItem="CgN-Sx-dO6" firstAttribute="leading" secondItem="acA-Gt-ueE" secondAttribute="leading" id="fhB-Za-bLC"/>
+                <constraint firstItem="d66-GU-WuO" firstAttribute="centerY" secondItem="acA-Gt-ueE" secondAttribute="centerY" id="hDk-JY-fh8"/>
+                <constraint firstItem="d66-GU-WuO" firstAttribute="centerX" secondItem="acA-Gt-ueE" secondAttribute="centerX" id="jB5-qm-0ya"/>
+            </constraints>
+            <point key="canvasLocation" x="136.23188405797103" y="140.625"/>
+        </view>
+    </objects>
+    <resources>
+        <namedColor name="iconTint">
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="systemWhiteColor">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

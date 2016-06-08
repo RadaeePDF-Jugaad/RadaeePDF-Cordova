@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/txt_lwidth"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/line_width" />
+
+    <EditText
+        android:id="@+id/edit_lwidth"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/txt_lwidth"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/txt_lstyle"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_lwidth"
+        android:layout_marginTop="16dp"
+        android:text="@string/line_style" />
+
+    <com.radaee.annotui.UILStyleButton
+        android:id="@+id/btn_lstyle"
+        android:layout_width="80dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/txt_lwidth"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@id/txt_lstyle"
+        android:background="#000000"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/txt_icon"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_lstyle"
+        android:layout_marginTop="16dp"
+        android:text="@string/line_color" />
+
+    <com.radaee.annotui.UIColorButton
+        android:id="@+id/btn_lcolor"
+        android:layout_width="80dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/txt_lstyle"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@id/txt_icon"
+        android:background="#000000"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/txt_fcolor"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_icon"
+        android:layout_marginTop="16dp"
+        android:text="@string/fill_color" />
+
+    <com.radaee.annotui.UIColorButton
+        android:id="@+id/btn_fcolor"
+        android:layout_width="80dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/txt_icon"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@id/txt_fcolor"
+        android:background="#000000"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/txt_lhead1"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_fcolor"
+        android:layout_marginTop="16dp"
+        android:text="@string/line_start" />
+
+    <com.radaee.annotui.UILHeadButton
+        android:id="@+id/btn_lhead1"
+        android:layout_width="80dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/txt_fcolor"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@id/txt_lhead1"
+        android:background="#000000"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/txt_lhead2"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_lhead1"
+        android:layout_marginTop="16dp"
+        android:text="@string/line_end" />
+
+    <com.radaee.annotui.UILHeadButton
+        android:id="@+id/btn_lhead2"
+        android:layout_width="80dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/txt_lhead1"
+        android:layout_marginTop="14dp"
+        android:layout_toRightOf="@id/txt_lhead2"
+        android:background="#000000"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/txt_alpha"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_lhead2"
+        android:layout_marginTop="16dp"
+        android:text="@string/alpha" />
+
+    <SeekBar
+        android:id="@+id/seek_alpha"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_below="@id/txt_lhead2"
+        android:layout_marginTop="18dp"
+        android:layout_toLeftOf="@+id/txt_alpha_val"
+        android:layout_toRightOf="@id/txt_alpha"
+        android:paddingStart="7dp" />
+
+    <TextView
+        android:id="@+id/txt_alpha_val"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/txt_alpha"
+        android:layout_marginLeft="5dp"
+        android:layout_alignParentEnd="true"/>
+
+    <CheckBox
+        android:id="@+id/chk_lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seek_alpha"
+        android:layout_marginTop="5dp"
+        android:text="@string/annot_lock"
+        android:textSize="12sp" />
+
+</RelativeLayout>

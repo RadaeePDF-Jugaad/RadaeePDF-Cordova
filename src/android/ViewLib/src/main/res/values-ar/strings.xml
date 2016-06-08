@@ -1,0 +1,71 @@
+<resources xmlns:tools="http://schemas.android.com/tools"
+           tools:ignore="MissingTranslation">
+
+    <string name="failed_invalid_password">غير قابل للفتح: كلمة المرور غير صالحة</string>
+    <string name="failed_invalid_format">غير قابل للفتح: ملف PDF تالف أو غير صالح</string>
+    <string name="failed_encryption">غير قابل للفتح: التشفير غير معروف</string>
+    <string name="failed_invalid_path">غير قابل للفتح: تم رفض الوصول أو مسار غير صالح</string>
+    <string name="failed_unknown">غير قابل للفتح: خطأ غير معروف</string>
+    <string name="please_wait">يرجى الانتظار</string>
+    <string name="no_more_found">لم يتم العثور على مزيد من التطابقات</string>
+
+    <string name="thumbnail_creation_running">جاري انشاء الصور المصغرة</string>
+    <string name="exiting">الخروج</string>
+    <string name="no">لا</string>
+    <string name="yes">نعم</string>
+    <string name="annotation_failed">فشل إضافة تعليق توضيحي!</string>
+    <string name="cannot_write_or_encrypted">لا يمكن الكتابة أو الملف مشفر!</string>
+    <string name="copy_text_to_clipboard">نسخ النص إلى الحافظة</string>
+    <string name="highlight_texts">تسليط الضوء على النص</string>
+    <string name="underline">خط</string>
+    <string name="strikeout">يتوسطه خط</string>
+    <string name="squiggly">خط متعرج</string>
+    <string name="process_selected_text">معالجة النص المحدد</string>
+    <string name="cancel">إلغاء</string>
+    <string name="no_more_redo">لا مزيد من الإعادة</string>
+    <string name="no_more_undo">لا مزيد من التراجع</string>
+    <string name="pdf_outline">قائمة المحتويات للملف</string>
+    <string name="single_page">صفحة وحيدة</string>
+    <string name="vertical">رأسي</string>
+    <string name="horizontal">أفقي</string>
+    <string name="dual_page">صفحة مزدوجة</string>
+    <string name="save_msg">ملف معدل. هل تريد حفظه؟</string>
+    <string name="page_change_block">لا يمكنك تغيير الصفحة عندما تكون في وضع التكبير ،يجب التصغير أولاً!</string>
+
+    <string name="note_content">محتوى الملاحظة</string>
+    <string name="input_password">إدخال كلمة المرور</string>
+    <string name="loading_pdf">تحميل الملف …</string>
+    <string name="browse_open_file">تصفح وفتح الملف</string>
+    <string name="view_pager">ViewPager</string>
+    <string name="open_asset">فتح من assets (للقراءة فقط)</string>
+    <string name="open_sdcard">فتح من Sdcard</string>
+    <string name="open_http">مفتوحة من رابط HTTP (خدمة الإنترنت مطلوبة)</string>
+    <string name="using_RGB_565">استخدام RGB_565</string>
+    <string name="using_RGB_4444">استخدام RGB_4444</string>
+    <string name="simple_open_gl">برنامج OpenGL بسيط</string>
+    <string name="curl_pages">Curl Pages</string>
+    <string name="advance">متقدم</string>
+    <string name="create_pdf">إنشاء ملف</string>
+    <string name="javascript">جافا سكريبت</string>
+    <string name="about">من نحن</string>
+
+    <string name="ok">موافق</string>
+    <string name="todo_open_url">ما يجب عمله: فتح رابط:</string>
+    <string name="todo_java_script">ما يجب عمله: تنفيذ جافا سكريبت</string>
+    <string name="todo_play_movie">ما يجب عمله: تشغيل الفيلم</string>
+    <string name="todo_play_sound">ما يجب عمله: تشغيل الصوت</string>
+    <string name="todo_attachment">ما يجب عمله: مرفق</string>
+    <string name="todo_3d">ما يجب عمله: تشغيل 3D</string>
+    <string name="copy_text">ما يجب عمله: نسخ النص:: %1$s</string>
+    <string name="file_not_exist">الملف غير موجود:</string>
+    <string name="file_not_exist_error">%1$s ليس موجود أو ليس ملف</string>
+    <string name="file_not_opened">لا يمكن فتح %1$s</string>
+    <string name="catalog_not_found">الكتالوج لا ينتمي للقاموس</string>
+    <string name="edit_catalog_failed">لا يمكن تعديل الكتالوج.</string>
+
+    <string name="no_pdf_outlines">الملف لا يحتوي على قائمة محتويات</string>
+    <string name="pdf_print_not_available">الملف غير متاح للطباعة.</string>
+    <string name="pdf_print_calculation_failed">فشل في إحصاء الصفحات.</string>
+
+    <string name="pdf_share_not_available">الملف غير متاح للطباعة.</string>
+</resources>

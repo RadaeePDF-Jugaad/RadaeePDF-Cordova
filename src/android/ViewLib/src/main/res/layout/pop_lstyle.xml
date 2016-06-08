@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.radaee.annotui.UILStyleView
+        android:id="@+id/vw_lsolid"
+        android:layout_width="80dp"
+        android:layout_height="25dp" />
+
+    <com.radaee.annotui.UILStyleView
+        android:id="@+id/vw_ldash11"
+        android:layout_width="80dp"
+        android:layout_height="25dp" />
+
+    <com.radaee.annotui.UILStyleView
+        android:id="@+id/vw_ldash22"
+        android:layout_width="80dp"
+        android:layout_height="25dp" />
+
+    <com.radaee.annotui.UILStyleView
+        android:id="@+id/vw_ldash44"
+        android:layout_width="80dp"
+        android:layout_height="25dp" />
+
+    <com.radaee.annotui.UILStyleView
+        android:id="@+id/vw_ldash4222"
+        android:layout_width="80dp"
+        android:layout_height="25dp" />
+
+    <com.radaee.annotui.UILStyleView
+        android:id="@+id/vw_ldash16242"
+        android:layout_width="80dp"
+        android:layout_height="25dp" />
+</LinearLayout>

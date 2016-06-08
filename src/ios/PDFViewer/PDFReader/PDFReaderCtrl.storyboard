@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment version="2048" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Reader Ctrl-->
+        <scene sceneID="WVs-ZY-ywz">
+            <objects>
+                <viewController storyboardIdentifier="rdpdfreader" id="mBb-4B-dlD" customClass="PDFReaderCtrl" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="OhZ-WU-WWi"/>
+                        <viewControllerLayoutGuide type="bottom" id="D8c-RA-JbJ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="ekw-zO-aoJ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t7w-Xn-IiW" customClass="RDPDFView">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pyy-35-6l3" customClass="RDPDFThumb">
+                                <rect key="frame" x="0.0" y="667" width="375" height="75"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="75" id="NlQ-Qd-Vm5"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="point" keyPath="layer.shadowOffset">
+                                        <point key="value" x="0.0" y="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowOpacity">
+                                        <real key="value" value="0.25"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="NO"/>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yd3-3g-E5Y">
+                                <rect key="frame" x="0.0" y="667" width="375" height="64"/>
+                                <subviews>
+                                    <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="jeR-kv-sX4">
+                                        <rect key="frame" x="8" y="17" width="273" height="31"/>
+                                    </slider>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4wm-3s-FgR">
+                                        <rect key="frame" x="289" y="17" width="76" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="76" id="MUr-gY-PVO"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="4wm-3s-FgR" firstAttribute="leading" secondItem="jeR-kv-sX4" secondAttribute="trailing" constant="10" id="6Tf-Tk-xBQ"/>
+                                    <constraint firstItem="jeR-kv-sX4" firstAttribute="top" secondItem="yd3-3g-E5Y" secondAttribute="top" constant="17" id="9bo-aP-GUr"/>
+                                    <constraint firstAttribute="bottom" secondItem="4wm-3s-FgR" secondAttribute="bottom" constant="17" id="OLO-M0-EpL"/>
+                                    <constraint firstAttribute="trailing" secondItem="4wm-3s-FgR" secondAttribute="trailing" constant="10" id="RHK-JF-oCL"/>
+                                    <constraint firstItem="jeR-kv-sX4" firstAttribute="leading" secondItem="yd3-3g-E5Y" secondAttribute="leading" constant="10" id="Zsp-JB-Hjh"/>
+                                    <constraint firstItem="4wm-3s-FgR" firstAttribute="top" secondItem="yd3-3g-E5Y" secondAttribute="top" constant="17" id="o1I-qZ-ACf"/>
+                                    <constraint firstAttribute="bottom" secondItem="jeR-kv-sX4" secondAttribute="bottom" constant="17" id="umE-eD-F4p"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="point" keyPath="layer.shadowOffset">
+                                        <point key="value" x="0.0" y="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowOpacity">
+                                        <real key="value" value="0.25"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="NO"/>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mlr-QQ-yRK" userLabel="MBar None Bottom" customClass="RDToolbar">
+                                <rect key="frame" x="62.5" y="607" width="250" height="50"/>
+                                <subviews>
+                                    <toolbar opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aaL-2N-4TG">
+                                        <rect key="frame" x="0.0" y="0.0" width="250" height="50"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <items>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="gtk-PE-U9H"/>
+                                            <barButtonItem image="btn_ink" id="I2n-lL-O2g" userLabel="Annot">
+                                                <connections>
+                                                    <action selector="annot_pressed:" destination="mBb-4B-dlD" id="6tl-8a-FAj"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="g5R-Cp-9Ut"/>
+                                            <barButtonItem image="btn_view" id="3td-Zb-C2r" userLabel="Mode">
+                                                <connections>
+                                                    <action selector="mode_pressed:" destination="mBb-4B-dlD" id="z3p-Ou-2I4"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="Ltw-JX-4q1"/>
+                                            <barButtonItem image="btn_thumb" id="Ssh-bs-SC6" userLabel="Thumb">
+                                                <connections>
+                                                    <action selector="thumb_pressed:" destination="mBb-4B-dlD" id="4oT-2O-Xnd"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="dlo-LG-YPE"/>
+                                            <barButtonItem image="btn_more" id="v4J-h2-hT8">
+                                                <connections>
+                                                    <action selector="tool_pressed:" destination="mBb-4B-dlD" id="fOz-lM-9tt"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="4Tv-az-QRD"/>
+                                        </items>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </toolbar>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="250" id="0if-YG-nw4"/>
+                                    <constraint firstAttribute="height" constant="50" id="2Nw-AL-x01"/>
+                                    <constraint firstAttribute="bottom" secondItem="aaL-2N-4TG" secondAttribute="bottom" id="5Is-cB-GLd"/>
+                                    <constraint firstItem="aaL-2N-4TG" firstAttribute="leading" secondItem="Mlr-QQ-yRK" secondAttribute="leading" id="c49-41-D7X"/>
+                                    <constraint firstAttribute="trailing" secondItem="aaL-2N-4TG" secondAttribute="trailing" id="cAC-ip-Ekf"/>
+                                    <constraint firstItem="aaL-2N-4TG" firstAttribute="top" secondItem="Mlr-QQ-yRK" secondAttribute="top" id="j3I-rj-r7k"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="point" keyPath="layer.shadowOffset">
+                                        <point key="value" x="0.0" y="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowOpacity">
+                                        <real key="value" value="0.25"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="NO"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <outlet property="toolbar" destination="aaL-2N-4TG" id="jUH-sT-xqg"/>
+                                </connections>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eeF-15-HFR" userLabel="MBar Annot" customClass="RDToolbar">
+                                <rect key="frame" x="112.5" y="607" width="150" height="50"/>
+                                <subviews>
+                                    <toolbar opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6CJ-Ec-rUe">
+                                        <rect key="frame" x="0.0" y="0.0" width="150" height="50"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <items>
+                                            <barButtonItem image="btn_done" id="cOe-oG-gwi">
+                                                <connections>
+                                                    <action selector="annot_ok:" destination="mBb-4B-dlD" id="O6S-zu-kgh"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="dWP-HJ-mR1"/>
+                                            <barButtonItem systemItem="stop" id="f7b-gn-CF3">
+                                                <connections>
+                                                    <action selector="annot_cancel:" destination="mBb-4B-dlD" id="us1-9t-JCe"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="Nmu-cd-VeK"/>
+                                            <barButtonItem image="btn_prop" id="VA9-hg-O4P">
+                                                <connections>
+                                                    <action selector="annot_color:" destination="mBb-4B-dlD" id="B28-bG-c5m"/>
+                                                </connections>
+                                            </barButtonItem>
+                                        </items>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="layer.borderColor">
+                                                <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </toolbar>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="6CJ-Ec-rUe" secondAttribute="bottom" id="Dyc-xD-9Rf"/>
+                                    <constraint firstItem="6CJ-Ec-rUe" firstAttribute="leading" secondItem="eeF-15-HFR" secondAttribute="leading" id="Ncf-Th-hBJ"/>
+                                    <constraint firstItem="6CJ-Ec-rUe" firstAttribute="top" secondItem="eeF-15-HFR" secondAttribute="top" id="Ppm-rS-FSs"/>
+                                    <constraint firstAttribute="width" constant="150" id="UQA-1Q-tI5"/>
+                                    <constraint firstAttribute="height" constant="50" id="aXA-94-6fd"/>
+                                    <constraint firstAttribute="trailing" secondItem="6CJ-Ec-rUe" secondAttribute="trailing" id="xIp-8S-C5H"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="point" keyPath="layer.shadowOffset">
+                                        <point key="value" x="0.0" y="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowOpacity">
+                                        <real key="value" value="0.25"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="NO"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <outlet property="toolbar" destination="6CJ-Ec-rUe" id="nkc-zZ-pPy"/>
+                                </connections>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jm5-e6-Yqj" userLabel="MBar Search Bottom" customClass="RDToolbar">
+                                <rect key="frame" x="87.5" y="607" width="200" height="50"/>
+                                <subviews>
+                                    <toolbar opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eai-Go-Iil">
+                                        <rect key="frame" x="0.0" y="0.0" width="200" height="50"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <items>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="PV1-nZ-Hd3"/>
+                                            <barButtonItem image="btn_search_results" style="plain" id="hj7-x0-nPH" userLabel="Results">
+                                                <connections>
+                                                    <action selector="search_result_pressed:" destination="mBb-4B-dlD" id="mwa-Mq-Mfl"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="lDI-wP-0sK"/>
+                                            <barButtonItem image="btn_left" id="6wR-oJ-vbC">
+                                                <connections>
+                                                    <action selector="search_backward:" destination="mBb-4B-dlD" id="IbQ-mq-zM7"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="1F3-rl-NFQ"/>
+                                            <barButtonItem image="btn_right" id="OWE-W2-4i1">
+                                                <connections>
+                                                    <action selector="search_forward:" destination="mBb-4B-dlD" id="O6U-la-r2i"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="OUH-5B-iMM"/>
+                                            <barButtonItem image="btn_prop" width="1" style="plain" id="W7n-bX-h9S">
+                                                <connections>
+                                                    <action selector="search_tool_pressed:" destination="mBb-4B-dlD" id="Zzm-2l-t3a"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="Q3v-Ls-5jI"/>
+                                        </items>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="layer.borderColor">
+                                                <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </toolbar>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="eai-Go-Iil" firstAttribute="top" secondItem="jm5-e6-Yqj" secondAttribute="top" id="7tW-2I-eFS"/>
+                                    <constraint firstItem="eai-Go-Iil" firstAttribute="centerY" secondItem="jm5-e6-Yqj" secondAttribute="centerY" id="BB6-fx-Zai"/>
+                                    <constraint firstAttribute="width" constant="200" id="Q4b-wI-qIo"/>
+                                    <constraint firstAttribute="trailing" secondItem="eai-Go-Iil" secondAttribute="trailing" id="WWI-lv-B45"/>
+                                    <constraint firstItem="eai-Go-Iil" firstAttribute="leading" secondItem="jm5-e6-Yqj" secondAttribute="leading" id="uNL-Y7-nWp"/>
+                                    <constraint firstAttribute="height" constant="50" id="zX7-ql-hvx"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="point" keyPath="layer.shadowOffset">
+                                        <point key="value" x="0.0" y="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.shadowOpacity">
+                                        <real key="value" value="0.25"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="NO"/>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <outlet property="toolbar" destination="eai-Go-Iil" id="KJp-Sb-l8U"/>
+                                </connections>
+                            </view>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2bB-Zq-hCZ">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="Wgg-KC-nM9"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem systemItem="stop" id="PAS-DW-NYi" userLabel="Back">
+                                        <connections>
+                                            <action selector="back_pressed:" destination="mBb-4B-dlD" id="Dan-gy-fjA"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="lHh-kx-2FX"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="gBf-Bd-33y"/>
+                                    <barButtonItem style="plain" id="y3I-Ea-Gf0">
+                                        <view key="customView" contentMode="scaleToFill" id="ZVZ-4A-X1G">
+                                            <rect key="frame" x="114" y="6.5" width="147" height="37"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YdH-go-WoI">
+                                                    <rect key="frame" x="0.0" y="0.0" width="147" height="37"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                                    <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="YdH-go-WoI" secondAttribute="bottom" id="CzZ-Ad-b73"/>
+                                                <constraint firstItem="YdH-go-WoI" firstAttribute="leading" secondItem="ZVZ-4A-X1G" secondAttribute="leading" id="F1A-Cc-RJp"/>
+                                                <constraint firstItem="YdH-go-WoI" firstAttribute="top" secondItem="ZVZ-4A-X1G" secondAttribute="top" id="cco-6M-1Nc"/>
+                                                <constraint firstAttribute="trailing" secondItem="YdH-go-WoI" secondAttribute="trailing" id="gu9-De-4fl"/>
+                                            </constraints>
+                                        </view>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="6YA-L2-wu1"/>
+                                    <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="QM9-Vp-WFl"/>
+                                    <barButtonItem image="btn_search" id="he3-Yp-Klw" userLabel="Search">
+                                        <connections>
+                                            <action selector="search_pressed:" destination="mBb-4B-dlD" id="VvK-O2-dvf"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hPB-5X-urH">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="vAW-MY-PKj"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem systemItem="stop" id="8hN-ix-Ctq">
+                                        <connections>
+                                            <action selector="search_cancel:" destination="mBb-4B-dlD" id="Z6P-zG-9t8"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="9Ax-8Y-kTO"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="ciF-kR-faF"/>
+                                    <barButtonItem style="plain" id="iWZ-te-mV8">
+                                        <textField key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Search" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" id="x2h-zZ-Wab">
+                                            <rect key="frame" x="63" y="8" width="250" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <textInputTraits key="textInputTraits"/>
+                                        </textField>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="7fH-nA-bY8"/>
+                                    <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="isW-xo-YDa"/>
+                                    <barButtonItem title="Item" image="btn_search" style="plain" id="9En-lW-GSC" userLabel="Search">
+                                        <connections>
+                                            <action selector="search_forward:" destination="mBb-4B-dlD" id="ao8-BT-EGI"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="t7w-Xn-IiW" firstAttribute="trailing" secondItem="ekw-zO-aoJ" secondAttribute="trailing" id="0Rk-P8-O4b"/>
+                            <constraint firstItem="t7w-Xn-IiW" firstAttribute="leading" secondItem="ekw-zO-aoJ" secondAttribute="leading" id="0mj-2s-jRL"/>
+                            <constraint firstItem="Pyy-35-6l3" firstAttribute="leading" secondItem="ekw-zO-aoJ" secondAttribute="leading" id="1H9-dq-RXI"/>
+                            <constraint firstItem="hPB-5X-urH" firstAttribute="leading" secondItem="ekw-zO-aoJ" secondAttribute="leading" id="1il-pI-bAI"/>
+                            <constraint firstItem="Pyy-35-6l3" firstAttribute="trailing" secondItem="ekw-zO-aoJ" secondAttribute="trailing" id="3Dj-CI-I3v"/>
+                            <constraint firstItem="Mlr-QQ-yRK" firstAttribute="centerX" secondItem="ekw-zO-aoJ" secondAttribute="centerX" id="6T8-iC-CTN"/>
+                            <constraint firstItem="yd3-3g-E5Y" firstAttribute="top" secondItem="t7w-Xn-IiW" secondAttribute="bottom" id="7jn-aO-i4J"/>
+                            <constraint firstAttribute="trailing" secondItem="hPB-5X-urH" secondAttribute="trailing" id="A1b-QN-8CF"/>
+                            <constraint firstItem="D8c-RA-JbJ" firstAttribute="top" secondItem="eeF-15-HFR" secondAttribute="bottom" constant="10" id="BYl-uy-N86"/>
+                            <constraint firstItem="D8c-RA-JbJ" firstAttribute="top" secondItem="jm5-e6-Yqj" secondAttribute="bottom" constant="10" id="He8-h0-7hA"/>
+                            <constraint firstItem="yd3-3g-E5Y" firstAttribute="leading" secondItem="ekw-zO-aoJ" secondAttribute="leading" id="MIu-fC-VBm"/>
+                            <constraint firstItem="2bB-Zq-hCZ" firstAttribute="top" secondItem="OhZ-WU-WWi" secondAttribute="bottom" id="UBD-fu-1PE"/>
+                            <constraint firstItem="t7w-Xn-IiW" firstAttribute="top" secondItem="OhZ-WU-WWi" secondAttribute="bottom" id="Vu0-jS-7ae"/>
+                            <constraint firstItem="jm5-e6-Yqj" firstAttribute="centerX" secondItem="ekw-zO-aoJ" secondAttribute="centerX" id="ZfZ-AE-j68"/>
+                            <constraint firstItem="D8c-RA-JbJ" firstAttribute="top" secondItem="Mlr-QQ-yRK" secondAttribute="bottom" constant="10" id="ZsM-Y4-wwx"/>
+                            <constraint firstItem="2bB-Zq-hCZ" firstAttribute="leading" secondItem="ekw-zO-aoJ" secondAttribute="leading" id="bIi-m3-F2x"/>
+                            <constraint firstItem="t7w-Xn-IiW" firstAttribute="bottom" secondItem="Pyy-35-6l3" secondAttribute="top" id="crm-IX-Sxh"/>
+                            <constraint firstAttribute="trailing" secondItem="yd3-3g-E5Y" secondAttribute="trailing" id="hlb-HG-KbK"/>
+                            <constraint firstItem="eeF-15-HFR" firstAttribute="centerX" secondItem="ekw-zO-aoJ" secondAttribute="centerX" id="lvi-1G-3JP"/>
+                            <constraint firstItem="OhZ-WU-WWi" firstAttribute="bottom" secondItem="hPB-5X-urH" secondAttribute="top" id="my6-Tu-ML0"/>
+                            <constraint firstAttribute="trailing" secondItem="2bB-Zq-hCZ" secondAttribute="trailing" id="s5V-01-wV2"/>
+                            <constraint firstAttribute="bottom" secondItem="t7w-Xn-IiW" secondAttribute="bottom" id="scy-wJ-q8z"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="annotItem" destination="I2n-lL-O2g" id="k6L-bk-KJW"/>
+                        <outlet property="fileName" destination="YdH-go-WoI" id="Rv9-r2-zao"/>
+                        <outlet property="mBarAnnot" destination="eeF-15-HFR" id="2oV-x6-tRe"/>
+                        <outlet property="mBarAnnotColorButton" destination="VA9-hg-O4P" id="QPk-I7-6Uy"/>
+                        <outlet property="mBarAnnotDoneButton" destination="cOe-oG-gwi" id="nUm-KF-xcN"/>
+                        <outlet property="mBarNoneBottom" destination="Mlr-QQ-yRK" id="lbk-bi-Kar"/>
+                        <outlet property="mBarNoneBottomWidthConstraint" destination="0if-YG-nw4" id="itU-ud-ZCS"/>
+                        <outlet property="mBarNoneTop" destination="2bB-Zq-hCZ" id="OAx-mv-kug"/>
+                        <outlet property="mBarSearchBottom" destination="jm5-e6-Yqj" id="hPL-JT-9XG"/>
+                        <outlet property="mBarSearchResults" destination="hj7-x0-nPH" id="Nbd-dC-lkm"/>
+                        <outlet property="mBarSearchTop" destination="hPB-5X-urH" id="d40-aQ-u9T"/>
+                        <outlet property="mBarThumbButton" destination="Ssh-bs-SC6" id="BUl-cv-zaV"/>
+                        <outlet property="mBtnNext" destination="OWE-W2-4i1" id="4MO-0B-0kj"/>
+                        <outlet property="mBtnPrev" destination="6wR-oJ-vbC" id="Oaq-Zq-Hej"/>
+                        <outlet property="mSearchText" destination="x2h-zZ-Wab" id="joS-dG-ZN6"/>
+                        <outlet property="mSlider" destination="jeR-kv-sX4" id="1rq-xf-Azj"/>
+                        <outlet property="mSliderLabel" destination="4wm-3s-FgR" id="MlA-t2-92l"/>
+                        <outlet property="mSliderView" destination="yd3-3g-E5Y" id="ZzT-fi-Z6m"/>
+                        <outlet property="mThumb" destination="Pyy-35-6l3" id="GDq-EF-3AB"/>
+                        <outlet property="mView" destination="t7w-Xn-IiW" id="AWk-Ke-IFn"/>
+                        <outlet property="searchItem" destination="he3-Yp-Klw" id="WJg-mh-F0H"/>
+                        <outlet property="thumbHeightConstraint" destination="NlQ-Qd-Vm5" id="uRM-iS-Q7p"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="q2E-IY-4iK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="130.40000000000001" y="131.78410794602701"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="btn_done" width="32" height="32"/>
+        <image name="btn_ink" width="32" height="32"/>
+        <image name="btn_left" width="32" height="32"/>
+        <image name="btn_more" width="32" height="32"/>
+        <image name="btn_prop" width="32" height="32"/>
+        <image name="btn_right" width="32" height="32"/>
+        <image name="btn_search" width="32" height="32"/>
+        <image name="btn_search_results" width="32" height="32"/>
+        <image name="btn_thumb" width="32" height="32"/>
+        <image name="btn_view" width="32" height="32"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

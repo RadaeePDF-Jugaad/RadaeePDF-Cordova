@@ -1,0 +1,59 @@
+/*
+ Localizable.strings
+ PDFViewer
+ 
+ Created by radaee on 13-1-7.
+ Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+ */
+"All Files" = "所有文档";
+"PDF File" = "PDF文档";
+"Marks" = "书签";
+"Setting" = "设置";
+"More" = "更多";
+"Swipe Speed" = "划屏速度";
+"Render Quality" = "渲染质量";
+"Swipe Distance" = "划屏距离";
+"View Mode" = "阅读模式";
+"Zooming Ratio" = "缩放比例";
+"Ink Width" = "划线宽度";
+"Alert" = "提示";
+"Click OK to reset all properties to default" = "点击确定重置默认选项";
+"OK" = "确定";
+"Cancel" = "取消";
+"BookMark Already Exist" = "书签已存在";
+"Page " = "页码";
+"Add BookMark Success!" = "添加书签成功!";
+"Ink Color" = "画线颜色";
+"Rect Color" = "画框颜色";
+"Draw Line on file" = "画线标记";
+"Draw Rect on file" = "画框标记";
+"This Document is readonly" = "此文档为只读";
+"Outline" = "目录大纲";
+"Please Enter PassWord" = "请输入密码";
+"PassWord" = "密码";
+"Error PassWord" = "密码错误";
+"Error Document,Can't open" = "错误文档，无法打开";
+"Do you want to open:" = "是否要打开网站:";
+"Underline Color" = "下划线颜色";
+"Strikeout Color" = "删除线颜色";
+"Text Annot" = "文本注释";
+"Highlight Color" = "高亮颜色";
+"Oval Color" = "椭圆颜色";
+"Add Bookmark" = "Add Bookmark";
+"Bookmark List" = "Bookmark List";
+"View Mode" = "View Mode";
+"Save" = "Save";
+"Print" = "Print";
+"Reached first occurrence" = "Reached first occurrence";
+"Reached last occurrence" = "Reached last occurrence";
+"Searching... (%i)" = "Searching... (%i)";
+"%i occurrences" = "%i occurrences";
+/*
+ 
+ 
+ 
+ 
+ "Swipe Distance" = "划屏距离";
+ "View Mode" = "阅读模式";
+ "Zooming Ratio" = "缩放比例";
+ "Ink Width" = "划线宽度";*/

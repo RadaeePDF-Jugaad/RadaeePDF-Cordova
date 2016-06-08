@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="NXZ-zr-zkK" customClass="RDFileCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fuz-bb-MeU">
+                        <rect key="frame" x="40" y="7" width="120" height="120"/>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KZU-ly-5gj">
+                        <rect key="frame" x="30" y="132" width="140" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="8VK-tE-yMC"/>
+                            <constraint firstAttribute="width" constant="140" id="WCm-Ky-4eu"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cbs-0A-a46">
+                        <rect key="frame" x="70" y="152" width="60" height="44"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="60" id="Fr0-Bq-wta"/>
+                            <constraint firstAttribute="height" constant="44" id="srj-HS-vOL"/>
+                        </constraints>
+                        <state key="normal" image="btn_prop"/>
+                        <connections>
+                            <action selector="moreButtonTapped:" destination="NXZ-zr-zkK" eventType="touchUpInside" id="SIs-0r-6Km"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="KZU-ly-5gj" firstAttribute="leading" secondItem="UHG-gF-hoi" secondAttribute="leading" constant="30" id="5Se-2L-iBm"/>
+                <constraint firstItem="cbs-0A-a46" firstAttribute="top" secondItem="KZU-ly-5gj" secondAttribute="bottom" id="ISH-GN-5JQ"/>
+                <constraint firstItem="UHG-gF-hoi" firstAttribute="trailing" secondItem="fuz-bb-MeU" secondAttribute="trailing" constant="40" id="ViV-LM-o7y"/>
+                <constraint firstItem="fuz-bb-MeU" firstAttribute="leading" secondItem="UHG-gF-hoi" secondAttribute="leading" constant="40" id="ja9-Aa-JOK"/>
+                <constraint firstItem="UHG-gF-hoi" firstAttribute="trailing" secondItem="KZU-ly-5gj" secondAttribute="trailing" constant="30" id="jgN-lA-T7t"/>
+                <constraint firstItem="UHG-gF-hoi" firstAttribute="bottom" secondItem="fuz-bb-MeU" secondAttribute="bottom" constant="73" id="nxW-MM-rPY"/>
+                <constraint firstAttribute="top" secondItem="fuz-bb-MeU" secondAttribute="top" constant="-7" id="oFG-tl-fYd"/>
+                <constraint firstItem="cbs-0A-a46" firstAttribute="centerX" secondItem="NXZ-zr-zkK" secondAttribute="centerX" id="rfo-At-SC3"/>
+                <constraint firstItem="KZU-ly-5gj" firstAttribute="top" secondItem="fuz-bb-MeU" secondAttribute="bottom" constant="5" id="yjE-c9-dW9"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="UHG-gF-hoi"/>
+            <size key="customSize" width="338" height="428"/>
+            <connections>
+                <outlet property="fileName" destination="KZU-ly-5gj" id="J7O-Kf-Svg"/>
+                <outlet property="imgPreview" destination="fuz-bb-MeU" id="lQb-fU-Jwi"/>
+                <outlet property="moreButton" destination="cbs-0A-a46" id="amM-ps-a9j"/>
+            </connections>
+            <point key="canvasLocation" x="89.855072463768124" y="133.92857142857142"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="btn_prop" width="32" height="32"/>
+    </resources>
+</document>

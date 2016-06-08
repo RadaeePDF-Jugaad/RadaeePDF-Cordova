@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txt_issue"
+        android:text="Issue:"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_subject"
+        android:text="Subject:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_issue"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_version"
+        android:text="Version:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_subject"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_reason"
+        android:text="Reason:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_version"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_location"
+        android:text="Location:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_reason"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_contact"
+        android:text="Contact:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_location"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_mod"
+        android:text="SignTime:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_contact"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/txt_verify"
+        android:text="Verify:"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txt_mod"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+</RelativeLayout>

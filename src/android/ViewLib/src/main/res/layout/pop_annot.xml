@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/annot_menu_btn_size"
+    android:background="@color/annot_menu_bg_color"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/btn_annot_perform"
+        android:layout_width="@dimen/annot_menu_btn_size"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/annot_perform"
+        android:background="@drawable/bg_btn_menu"
+        android:scaleType="fitXY"
+        android:src="@drawable/btn_perform"/>
+
+    <ImageButton
+        android:id="@+id/btn_annot_edit"
+        android:layout_width="@dimen/annot_menu_btn_size"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/annot_edit"
+        android:background="@drawable/bg_btn_menu"
+        android:scaleType="fitXY"
+        android:src="@drawable/btn_annot_note"/>
+
+    <ImageButton
+        android:id="@+id/btn_annot_remove"
+        android:layout_width="@dimen/annot_menu_btn_size"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_btn_menu"
+        android:scaleType="fitXY"
+        android:src="@drawable/btn_remove"
+        android:contentDescription="@string/annot_remove"/>
+
+    <ImageButton
+        android:id="@+id/btn_annot_property"
+        android:layout_width="@dimen/annot_menu_btn_size"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_btn_menu"
+        android:scaleType="fitCenter"
+        android:src="@drawable/btn_settings"
+        android:contentDescription="@string/annot_property"/>
+
+</LinearLayout>
