@@ -28,7 +28,7 @@ http://www.radaeepdf.com/ecommerce/technical-specification
    `cordova plugin add http://192.168.0.95:8668/git/nermeen/RadaeePDF-Cordova.git --save`
 	
 4. Build the app.  
-   `cordova build android`
+   `cordova build android`  
 	
 After doing these steps, you will have a ready to use project.
 
