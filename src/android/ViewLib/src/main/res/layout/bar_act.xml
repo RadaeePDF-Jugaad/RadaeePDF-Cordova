@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bar_back" >
+
+	<ImageView
+	    android:id="@+id/btn_back"
+	    android:layout_width="40dp"
+	    android:layout_height="40dp"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_margin="2dp"
+	    android:clickable="true"
+	    android:src="@drawable/btn_back" />
+
+	<ImageView
+	    android:id="@+id/btn_edit"
+	    android:layout_width="40dp"
+	    android:layout_height="40dp"
+	    android:layout_alignParentTop="true"
+	    android:layout_toRightOf="@+id/btn_back"
+        android:layout_margin="2dp"
+	    android:clickable="true"
+	    android:src="@drawable/btn_annot_note" />
+
+	<ImageView
+	    android:id="@+id/btn_perform"
+	    android:layout_width="40dp"
+	    android:layout_height="40dp"
+	    android:layout_alignParentTop="true"
+	    android:layout_toRightOf="@+id/btn_edit"
+        android:layout_margin="2dp"
+	    android:clickable="true"
+	    android:src="@drawable/btn_perform" />
+
+	<ImageView
+	    android:id="@+id/btn_remove"
+	    android:layout_width="40dp"
+	    android:layout_height="40dp"
+	    android:layout_alignParentTop="true"
+	    android:layout_toRightOf="@+id/btn_perform"
+        android:layout_margin="2dp"
+	    android:clickable="true"
+	    android:src="@drawable/btn_remove" />
+	
+</RelativeLayout>

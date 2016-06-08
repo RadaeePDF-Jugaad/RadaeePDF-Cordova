@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bar_back" >
+
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="2dp"
+	    android:clickable="true"
+        android:src="@drawable/btn_back" />
+
+    <ImageView
+        android:id="@+id/btn_right"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="2dp"
+	    android:clickable="true"
+        android:src="@drawable/btn_right" />
+
+    <ImageView
+        android:id="@+id/btn_left"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_margin="2dp"
+        android:layout_toLeftOf="@+id/btn_right"
+	    android:clickable="true"
+        android:src="@drawable/btn_left" />
+
+    <EditText
+        android:id="@+id/txt_find"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/btn_left"
+        android:layout_toRightOf="@+id/btn_back"
+        android:ems="10" />
+
+</RelativeLayout>
