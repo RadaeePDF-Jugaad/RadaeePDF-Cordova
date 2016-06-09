@@ -1,7 +1,7 @@
 //  RadaeePDFPlugin
 //  GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
-//
 //  Created by Nermeen Solaiman on 06/06/16.
+//  v1
 
 var argscheck = require('cordova/argscheck'),
     exec      = require('cordova/exec');
