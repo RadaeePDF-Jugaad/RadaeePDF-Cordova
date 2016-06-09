@@ -1,5 +1,5 @@
 //  RadaeePDFPlugin
-//  Gear.it
+//  GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 //
 //  Created by Nermeen Solaiman on 06/06/16.
 
