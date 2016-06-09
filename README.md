@@ -11,14 +11,14 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 
 ## Installation
 
-    cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git
+    cordova plugin add https://github.com/gearit/RadaeePDF-Cordova-Android.git
     
 ## Usage
 
 ### Android
 
 1. Create the app using the demo package name, to be able to test all the features (standard, professional and premium).  
-   `cordova create RadaeePDF-Cordova com.radaee.reader RadaeePDF-Cordova`
+   `cordova create RadaeePDF-Cordova-Android com.radaee.reader RadaeePDF-Cordova-Android`
 	
 2. Add the android platform.  
    `cd RadaeePDF-Cordova  
@@ -100,7 +100,7 @@ RadaeePDFPlugin.openFromAssets(
 RadaeePDF library version included:
 - Android: v3.6.2b
 
-Contributors:
+Original development:
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
    www.paolomessina.it, email: paolo.messina.it@gmail.com
 
