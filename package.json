@@ -1,6 +1,6 @@
 {
   "name": "com.radaee.cordova",
-  "version": "1.2.2",
+  "version": "1.0",
   "description": "RadaeePDF reader cordova plugin",
   "cordova": {
     "platforms": [
@@ -19,7 +19,7 @@
   ],
   "engines": [
     {
-      "name": "cordova-android",
+      "name": "cordova-radaee",
       "version": ">=3.0.0"
     }
   ],

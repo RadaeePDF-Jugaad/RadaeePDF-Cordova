@@ -15,20 +15,18 @@ http://www.radaeepdf.com/ecommerce/technical-specification
     
 ## Usage
 
-### Android
-
 1. Create the app using the demo package name, to be able to test all the features (standard, professional and premium).  
    `cordova create RadaeePDF-Cordova com.radaee.reader RadaeePDF-Cordova`
 	
-2. Add the android platform.  
-   `cd RadaeePDF-Cordova  
-	cordova platform add android --save`
+2. Add the android/iOS platform.  
+   `cd RadaeePDF-Cordova    
+	cordova platform add android --save` and/or `cordova platform add ios --save`
 	
 3. Add the plugin.  
    `cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git --save`
 	
 4. Build the app.  
-   `cordova build android`
+   `cordova build`
 	
 
 After doing these steps, you will have a ready to use project.
@@ -37,7 +35,8 @@ After doing these steps, you will have a ready to use project.
 
 ### License Activation
 
-You need to call this only when you have your own license, as the demo project already have a demo-premium license.
+For Android, you need to call this only when you have your own license, as the demo project already have a demo-premium license.
+For iOS, you have to call it before calling any other interface.
 	
 ```javascript
 RadaeePDFPlugin.activateLicense(
@@ -99,8 +98,9 @@ RadaeePDFPlugin.openFromAssets(
 
 RadaeePDF library version included:
 - Android: v3.6.2b
+- iOS: v3.6.6
 
-Contributors:
+Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
    www.paolomessina.it, email: paolo.messina.it@gmail.com
 

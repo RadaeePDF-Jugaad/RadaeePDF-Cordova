@@ -1,3 +1,9 @@
+/* 	
+	RadaeePDF-Cordova for Android
+	GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
+	Nermeen Solaiman
+	v1
+*/
 package com.radaee.cordova;
 
 import android.content.Context;
