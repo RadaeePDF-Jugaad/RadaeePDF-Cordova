@@ -1,7 +1,9 @@
 # RadaeePDF-Cordova Plugin
 
-This plugin uses the RadaeePDF native library for open PDF files, the plugin wrap the most important library features.
-    
+The repository has been moved to https://github.com/gearit/RadaeePDF-Cordova
+
+The new one contains sources for both Android and iOS.
+
 ## License
 
 This plugin is released under the Apache 2.0 license
