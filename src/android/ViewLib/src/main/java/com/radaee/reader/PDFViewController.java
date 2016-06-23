@@ -1,6 +1,18 @@
 package com.radaee.reader;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintDocumentInfo;
+import android.print.PrintManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.radaee.pdf.Global;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.util.OutlineList;
 import com.radaee.util.OutlineListAdt;
@@ -19,21 +32,26 @@ import com.radaee.util.PDFThumbView;
 import com.radaee.view.PDFViewThumb;
 import com.radaee.viewlib.R;
 
-public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChangeListener {
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChangeListener
+{
 	public interface PDFViewControllerListener
 	{
 		public void OnCtrlSelect(boolean set);
 	}
-
 	private int m_bar_status = 0;
-	private int mNavigationMode = NAVIGATION_THUMBS; //Nermeen
+	private int mNavigationMode = NAVIGATION_SEEK;
 	static public final int BAR_NONE = 0;
 	static public final int BAR_CMD = 1;
 	static public final int BAR_ANNOT = 2;
 	static public final int BAR_FIND = 3;
 	static public final int BAR_ACT = 4;
-	static public final int NAVIGATION_THUMBS = 0; //Nermeen
-	static public final int NAVIGATION_SEEK = 1; //Nermeen
+	static public final int NAVIGATION_THUMBS = 0;
+	static public final int NAVIGATION_SEEK = 1;
 	private RelativeLayout m_parent;
 	private PDFLayoutView m_view;
 	private PDFTopBar m_bar_act;
@@ -41,7 +59,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	private PDFTopBar m_bar_find;
 	private PDFTopBar m_bar_annot;
 	private PDFBotBar m_bar_seek;
-	private PDFBotBar m_thumb_view; //Nermeen
+	private PDFBotBar m_thumb_view;
 	private PDFMenu   m_menu_view;
 	private ImageView btn_view;
 	private ImageView btn_find;
@@ -50,6 +68,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     private ImageView btn_outline;
     private ImageView btn_undo;
     private ImageView btn_redo;
+    private ImageView btn_print;
 	private ImageView btn_find_back;
 	private ImageView btn_find_prev;
 	private ImageView btn_find_next;
@@ -71,7 +90,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	private View	view_single;
 	private View	view_dual;
 	private boolean m_set = false;
-	private PDFThumbView mThumbView; //Nermeen
+	private PDFThumbView mThumbView;
 
 	public PDFViewController(RelativeLayout parent, PDFLayoutView view)
 	{
@@ -90,6 +109,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_outline = (ImageView)layout.findViewById(R.id.btn_outline);
         btn_undo = (ImageView)layout.findViewById(R.id.btn_undo);
         btn_redo = (ImageView)layout.findViewById(R.id.btn_redo);
+        btn_print = (ImageView)layout.findViewById(R.id.btn_print);
 		layout = (RelativeLayout)m_bar_find.BarGetView();
 		btn_find_back = (ImageView)layout.findViewById(R.id.btn_back);
 		btn_find_prev = (ImageView)layout.findViewById(R.id.btn_left);
@@ -120,6 +140,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_outline.setOnClickListener(this);
         btn_undo.setOnClickListener(this);
         btn_redo.setOnClickListener(this);
+        btn_print.setOnClickListener(this);
 		btn_find_back.setOnClickListener(this);
 		btn_find_prev.setOnClickListener(this);
 		btn_find_next.setOnClickListener(this);
@@ -137,10 +158,27 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		view_vert.setOnClickListener(this);
 		view_single.setOnClickListener(this);
 		view_dual.setOnClickListener(this);
-
 		SetBtnEnabled(btn_annot, m_view.PDFCanSave());
 
-		//Nermeen
+		//Nermeen, show/hide buttons based on license type
+		if(Global.isLicenseActivated()) {
+			if (Global.mLicenseType == 0) {
+				btn_annot.setVisibility(View.GONE);
+				btn_select.setVisibility(View.GONE);
+				btn_undo.setVisibility(View.GONE);
+				btn_redo.setVisibility(View.GONE);
+			}
+		} else {
+			btn_find.setVisibility(View.GONE);
+			btn_annot.setVisibility(View.GONE);
+			btn_select.setVisibility(View.GONE);
+			btn_undo.setVisibility(View.GONE);
+			btn_redo.setVisibility(View.GONE);
+		}
+
+		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
+			btn_print.setVisibility(View.GONE);
+
 		if(mNavigationMode == NAVIGATION_THUMBS) {
 			m_thumb_view = new PDFBotBar(m_parent, R.layout.thumb_view);
 			layout1 = (LinearLayout) m_thumb_view.BarGetView();
@@ -187,17 +225,15 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		}
 		m_set = check;
 	}
-
 	/**
 	 * Set the navigation mode between (thumb view or seekbar)
 	 * @param navigationMode, the navigation mode must be one of the following values:
 	 *                        0 (NAVIGATION_THUMBS) for Thumb view mode
 	 *                        1 (NAVIGATION_SEEK) for seekbar mode
      */
-	private void setNavigationMode(int navigationMode) { //Nermeen
+	public void setNavigationMode(int navigationMode) {
 		mNavigationMode = navigationMode;
 	}
-
 	public void OnAnnotTapped(Annotation annot)
 	{
 		switch(m_bar_status)
@@ -213,7 +249,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			if( annot != null )
 			{
 				m_bar_cmd.BarSwitch(m_bar_act);
-				//Nermeen
+
 				if(mNavigationMode == NAVIGATION_THUMBS)
 					m_thumb_view.BarHide();
 				else if(mNavigationMode == NAVIGATION_SEEK)
@@ -251,7 +287,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		{
 		case BAR_NONE:
 			m_bar_cmd.BarShow();
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -265,7 +301,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		case BAR_CMD:
 			m_menu_view.MenuDismiss();
 			m_bar_cmd.BarHide();
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarHide();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -305,7 +341,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		m_view.PDFGotoPage(arg0.getProgress());
 	}
 	public void OnPageChanged(int pageno)
-	{ //Nermeen
+	{
 		if(mNavigationMode == NAVIGATION_SEEK) {
 			lab_page.setText(String.format("%d", pageno + 1));
 			seek_page.setProgress(pageno);
@@ -327,7 +363,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			if(m_set) OnSelectEnd();
 			m_menu_view.MenuDismiss();
 			m_bar_cmd.BarHide();
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarHide();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -399,7 +435,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		else if( arg0 == btn_find )
 		{
 			m_bar_cmd.BarSwitch(m_bar_find);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarHide();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -414,6 +450,9 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         {
             m_view.PDFRedo();
         }
+		else if(arg0 == btn_print) {
+			printPDF();
+		}
 		else if( arg0 == btn_find_prev )
 		{
 			String val = edit_find.getText().toString();
@@ -451,7 +490,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		else if( arg0 == btn_annot )
 		{
 			m_bar_cmd.BarSwitch(m_bar_annot);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarHide();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -607,7 +646,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
 			SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
 			m_bar_annot.BarSwitch(m_bar_cmd);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -617,7 +656,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		else if( arg0 == btn_find_back )
 		{
 			m_bar_find.BarSwitch(m_bar_cmd);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -628,7 +667,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		{
 			m_view.PDFCancelAnnot();
 			m_bar_act.BarSwitch(m_bar_cmd);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -639,7 +678,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		{
 			m_view.PDFEditAnnot();
 			m_bar_act.BarSwitch(m_bar_cmd);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -650,7 +689,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		{
 			m_view.PDFPerformAnnot();
 			m_bar_act.BarSwitch(m_bar_cmd);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -661,7 +700,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		{
 			m_view.PDFRemoveAnnot();
 			m_bar_act.BarSwitch(m_bar_cmd);
-			//Nermeen
+
 			if(mNavigationMode == NAVIGATION_THUMBS)
 				m_thumb_view.BarShow();
 			else if(mNavigationMode == NAVIGATION_SEEK)
@@ -683,5 +722,72 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			m_view.PDFSetView(4);
 			m_menu_view.MenuDismiss();
 		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	private void printPDF() {
+		PrintManager mPrintManager = (PrintManager) m_parent.getContext().getSystemService(Context.PRINT_SERVICE);
+		mPrintManager.print(m_parent.getContext().getString(R.string.app_name) + " PDF Document", new PrintDocumentAdapter() {
+			int mTotalPages = 0;
+
+			@Override
+			public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal,
+								 LayoutResultCallback callback, Bundle extras) {
+				mTotalPages = m_view.PDFGetDoc().GetPageCount();
+
+				if (cancellationSignal.isCanceled() ) { // Respond to cancellation request
+					callback.onLayoutCancelled();
+					return;
+				}
+
+				if (mTotalPages > 0) { // Return print information to print framework
+					PrintDocumentInfo info = new PrintDocumentInfo
+							.Builder("print_output.pdf")
+							.setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+							.setPageCount(mTotalPages)
+							.build();
+					// Content layout reflow is complete
+					callback.onLayoutFinished(info, true);
+				} else { // Otherwise report an error to the print framework
+					callback.onLayoutFailed("Page count calculation failed.");
+				}
+			}
+
+			@Override
+			public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal,
+								WriteResultCallback callback) {
+				InputStream input;
+				OutputStream output;
+				try {
+					String mDocPath = m_view.PDFGetDoc().getDocPath();
+					if(!TextUtils.isEmpty(mDocPath)) {
+						input = new FileInputStream(mDocPath);
+						output = new FileOutputStream(destination.getFileDescriptor());
+						byte[] buf = new byte[1024];
+						int bytesRead;
+
+						// check for cancellation
+						if (cancellationSignal.isCanceled()) {
+							callback.onWriteCancelled();
+							input.close();
+							output.close();
+							return;
+						}
+
+						while ((bytesRead = input.read(buf)) > 0) {
+							output.write(buf, 0, bytesRead);
+						}
+						callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
+
+						input.close();
+						output.close();
+					} else
+						callback.onWriteFailed("PDF File is not available");
+				} catch (Exception e) {
+					e.printStackTrace();
+					callback.onWriteFailed(e.toString());
+				}
+			}
+		}, null);
 	}
 }

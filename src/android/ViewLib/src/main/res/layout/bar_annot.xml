@@ -42,7 +42,7 @@
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_back"
 	    android:clickable="true"
-        android:src="@drawable/btn_ink" />
+        android:src="@drawable/btn_annot_ink" />
 
     <ImageView
         android:id="@+id/btn_back"

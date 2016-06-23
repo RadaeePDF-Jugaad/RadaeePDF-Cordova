@@ -2,7 +2,7 @@
 	RadaeePDF-Cordova for Android
 	GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 	Nermeen Solaiman
-	v1
+	v1.1
 */
 package com.radaee.cordova;
 
@@ -10,9 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
+
+import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.reader.PDFPagerAct;
 import com.radaee.reader.PDFViewAct;
+import com.radaee.util.PDFHttpStream;
 
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
@@ -24,6 +27,7 @@ import org.json.JSONObject;
 
 public class RadaeePDFPlugin extends CordovaPlugin {
 
+    private Document mDocument;
     private boolean showPdfInProgress;
 
 	/**
@@ -53,7 +57,7 @@ public class RadaeePDFPlugin extends CordovaPlugin {
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         Context mContext;
-        CallbackContext mCallbackContext;
+        CallbackContext mCallbackContext = callbackContext;
         JSONObject params;
         if(action.equals("activateLicense")) {
             params = args.getJSONObject(0);
@@ -61,8 +65,12 @@ public class RadaeePDFPlugin extends CordovaPlugin {
             Global.mCompany = params.optString("company");
             Global.mEmail = params.optString("email");
             Global.mKey = params.optString("key");
+			
+			if(Global.Init(cordova.getActivity(), Global.mLicenseType, Global.mCompany, Global.mEmail, Global.mKey))
+                mCallbackContext.success("License activated successfully.");
+            else
+                mCallbackContext.error("License activation failure.");
         } else if(action.equals("openFromAssets")) {
-            mCallbackContext = callbackContext;
             params = args.getJSONObject(0);
 
             String mTarget = params.optString("url");
@@ -76,7 +84,6 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                 mCallbackContext.success("Pdf assets opening success");
             }
         } else if (action.equals("show")) {
-            mCallbackContext = callbackContext;
         	params = args.getJSONObject(0);
             String targetPath = params.optString("url");
 
@@ -97,7 +104,34 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                     showPdfInProgress = false;
                     mCallbackContext.success("Pdf local opening success");
                 } else if(URLUtil.isHttpUrl(targetPath) || URLUtil.isHttpsUrl(targetPath)) {
-                    Intent intent = new Intent(mContext, PDFPagerAct.class);
+					Global.Init(cordova.getActivity());
+                    PDFHttpStream m_http_stream = new PDFHttpStream();
+                    m_http_stream.open(targetPath);
+                    mDocument = new Document();
+                    int ret = mDocument.OpenStreamWithoutLoadingPages(m_http_stream, params.optString("password"));
+                    switch (ret)
+                    {
+                        case -1://need input password
+                            onFail(mCallbackContext, "Open Failed: Invalid Password");
+                            break;
+                        case -2://unknown encryption
+                            onFail(mCallbackContext, "Open Failed: Unknown Encryption");
+                            break;
+                        case -3://damaged or invalid format
+                            onFail(mCallbackContext, "Open Failed: Damaged or Invalid PDF file");
+                            break;
+                        case -10://access denied or invalid file path
+                            onFail(mCallbackContext, "Open Failed: Access denied or Invalid path");
+                            break;
+                        case 0://succeeded, and continue
+                            PDFViewAct.ms_tran_doc = mDocument;
+                            break;
+                        default://unknown error
+                            onFail(mCallbackContext, "Open Failed: Unknown Error");
+                            break;
+                    }
+
+                    Intent intent = new Intent(mContext, PDFViewAct.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra( "PDFHttp", targetPath );
                     intent.putExtra( "PDFPswd", params.optString("password") );
@@ -112,5 +146,11 @@ public class RadaeePDFPlugin extends CordovaPlugin {
             return false;
 
         return true;
+    }
+
+    private void onFail(CallbackContext callbackContext, String msg) { //treat open failed.
+        mDocument.Close();
+        mDocument = null;
+        callbackContext.error(msg);
     }
 }

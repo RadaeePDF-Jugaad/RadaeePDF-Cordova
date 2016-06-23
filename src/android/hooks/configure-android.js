@@ -63,4 +63,8 @@ module.exports = function (ctx) {
             console.error('* missing file:', fullfilename);
         }
     });
+	
+	replace_string_in_file(path.join(platformRoot, 'src/com/radaee/reader/PDFViewController.java'), 'private int mNavigationMode = NAVIGATION_SEEK;', 'private int mNavigationMode = NAVIGATION_THUMBS;');
+	
+	replace_string_in_file(path.join(platformRoot, 'src/com/radaee/reader/PDFViewAct.java'), 'static protected Document ms_tran_doc;', 'static public Document ms_tran_doc;');
 }

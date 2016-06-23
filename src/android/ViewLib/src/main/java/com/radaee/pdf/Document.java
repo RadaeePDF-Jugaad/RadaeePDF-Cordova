@@ -240,6 +240,7 @@ public class Document
 	}
 	protected long hand_val = 0;
 	private int page_count = 0;
+	private String mDocPath; //Nermeen
 	private static native long create( String path );
 	private static native long createForStream( PDFStream stream ) throws Exception;
 	private static native long open( String path, String password ) throws Exception;
@@ -596,8 +597,10 @@ public class Document
 				hand_val = 0;
 				page_count = 0;
 			}
-			else
+			else {
 				page_count = getPageCount(hand_val);
+				mDocPath = path; // Nermeen
+			}
 			return ret;
 		}
 		return 0;
@@ -677,8 +680,10 @@ public class Document
 				hand_val = 0;
 				page_count = 0;
 			}
-			else
+			else {
 				page_count = getPageCount(hand_val);
+				mDocPath = path; // Nermeen
+			}
 			return ret;
 		}
 		return 0;
@@ -1417,4 +1422,8 @@ public class Document
         Close();
         super.finalize();
     }
+
+	public String getDocPath() { //Nermeen
+		return mDocPath;
+	}
 }

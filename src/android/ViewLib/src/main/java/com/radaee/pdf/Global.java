@@ -5,6 +5,7 @@ import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.util.Log;
 
 import com.radaee.viewlib.R;
 
@@ -20,16 +21,16 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 1.1
+ * @version 3.7beta1
  */
 public class Global
 {
-    public static int mLicenseType = 2;
+	public static int mLicenseType = 2;
 	public static String mCompany = "radaee";
 	public static String mEmail = "radaee_com@yahoo.cn";
 	public static String mKey = "LNJFDN-C89QFX-9ZOU9E-OQ31K2-FADG6Z-XEBCAO";
 
-    public static void Init(Activity act)
+	public static void Init(Activity act)
     {
         //second para is license type
         //            0 means standard license.
@@ -39,8 +40,8 @@ public class Global
         //4th para is mail
         //5th para is key string
         //the package name got by native C/C++ library, not by pass parameter.
-        Init( act, mLicenseType, mCompany, mEmail, mKey);
-    }
+		Init( act, mLicenseType, mCompany, mEmail, mKey);
+	}
 	/**
 	 * get version string from library.
 	 * @return version string, like: "201401"
@@ -401,6 +402,7 @@ public class Global
 			ms_init = activeStandard(act, company_name, mail, serial);
 			break;
 		}
+
 		// active library, or WaterMark will displayed on each page.
 		// boolean succeeded = activeStandard(act, "radaee",
 		// "radaee_com@yahoo.cn", "HV8A19-WOT9YC-9ZOU9E-OQ31K2-FADG6Z-XEBCAO");
@@ -423,11 +425,13 @@ public class Global
 		fontfileListStart();//this method create empty font list
 		fontfileListAdd("/system/fonts/DroidSans.ttf");//load from system fonts.
 		fontfileListAdd("/system/fonts/Roboto-Regular.ttf");
+
 		fontfileListAdd("/system/fonts/DroidSansFallback.ttf");
         fontfileListAdd("/system/fonts/NotoSansSC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansTC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansJP-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansKR-Regular.otf");
+
         load_truetype_font( res, R.raw.arimo, new File(files, "arimo.ttf") );//load from APP resource
         load_truetype_font( res, R.raw.arimob, new File(files, "arimob.ttf") );
         load_truetype_font( res, R.raw.arimoi, new File(files, "arimoi.ttf") );
@@ -819,5 +823,9 @@ public class Global
 		catch(Exception e)
 		{
 		}
+	}
+
+	public static boolean isLicenseActivated() { //Nermeen
+		return ms_init;
 	}
 }

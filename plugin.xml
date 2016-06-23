@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.0.0">
+        id="com.radaee.cordova" version="1.0.1">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -184,6 +184,7 @@
         <source-file src="src/android/ViewLib/src/main/res/drawable/pt_start.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_redo.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_undo.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_print.png" target-dir="res/drawable" />
 
         <!-- Fonts -->
         <source-file src="fonts/Roboto-Black.ttf" target-dir="assets/fonts" />
