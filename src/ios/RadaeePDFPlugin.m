@@ -15,40 +15,40 @@
 @implementation RadaeePDFPlugin
 @synthesize cdv_command;
 
-- (instancetype)init
-{
-    if(self = [super init])
-    {
-        inkColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
-        rectColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RectColor"];
-        underlineColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
-        strikeoutColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
-        highlightColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
-        ovalColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"OvalColor"];
-        selColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SelColor"];
-    }
-    
-    return self;
-}
-
 #pragma mark - Cordova Plugin
+
++ (RadaeePDFPlugin *)pluginInit
+{
+    RadaeePDFPlugin *r = [[RadaeePDFPlugin alloc] init];
+    [r pluginInitialize];
+    
+    return r;
+}
 
 - (void)pluginInitialize
 {
-    
+    inkColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
+    rectColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RectColor"];
+    underlineColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
+    strikeoutColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
+    highlightColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
+    ovalColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"OvalColor"];
+    selColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SelColor"];
 }
 
 #pragma mark - Plugin API
 
 - (void)show:(CDVInvokedUrlCommand*)command;
 {
+    NSLog(@"Documents Directory: %@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    
     self.cdv_command = command;
-
+    
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
     if(![[NSURL URLWithString:url] isFileURL]){
-
+        
         NSString *cacheFile = [[NSTemporaryDirectory() stringByAppendingString:@""] stringByAppendingString:@"cacheFile.pdf"];
         
         PDFHttpStream *httpStream = [[PDFHttpStream alloc] init];
@@ -72,11 +72,13 @@
         
         [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
     }
-
+    
 }
 
 - (void)openFromAssets:(CDVInvokedUrlCommand *)command
 {
+    //NSLog(@"Documents Directory: %@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    
     self.cdv_command = command;
     
     // Get user parameters
@@ -106,6 +108,28 @@
     [self showReader];
 }
 
+
+- (void)activateLicense:(CDVInvokedUrlCommand *)command
+{
+    [self pluginInitialize];
+    
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
+    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"company"] forKey:@"actCompany"];
+    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"email"] forKey:@"actEmail"];
+    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"key"] forKey:@"actSerial"];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:[[params objectForKey:@"licenseType"] intValue]] forKey:@"actActivationType"];
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    APP_Init();
+    
+    [self activateLicenseResult:[[NSUserDefaults standardUserDefaults] boolForKey:@"actIsActive"]];
+}
+
 - (void)readerInit
 {
     if( m_pdf == nil )
@@ -117,16 +141,25 @@
     
     [self setReaderViewMode:3];
     [self setPagingEnabled:YES];
-    [self setDoublePageEnabled:YES];
+    [self setDoublePageEnabled:NO];
     
-    [m_pdf setLineImage:[UIImage imageNamed:@"annot_line.png"]];
-    [m_pdf setRectImage:[UIImage imageNamed:@"annot_rect.png"]];
-    [m_pdf setEllipseImage:[UIImage imageNamed:@"annot_ellipse.png"]];
-    [m_pdf setDeleteImage:[UIImage imageNamed:@"annot_delete.png"]];
+    [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
+    [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
+    [m_pdf setLineImage:[UIImage imageNamed:@"btn_annot_ink.png"]];
+    [m_pdf setRectImage:[UIImage imageNamed:@"btn_annot_rect.png"]];
+    [m_pdf setEllipseImage:[UIImage imageNamed:@"btn_annot_ellipse.png"]];
+    [m_pdf setOutlineImage:[UIImage imageNamed:@"btn_outline.png"]];
+    [m_pdf setPrintImage:[UIImage imageNamed:@"btn_print.png"]];
+    
     [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
-    [m_pdf setDoneImage:[UIImage imageNamed:@"annot_done.png"]];
-    [m_pdf setNextImage:[UIImage imageNamed:@"right_arrow.png"]];
-    [m_pdf setPrevImage:[UIImage imageNamed:@"left_arrow.png"]];
+    
+    [m_pdf setPrevImage:[UIImage imageNamed:@"btn_left.png"]];
+    [m_pdf setNextImage:[UIImage imageNamed:@"btn_right.png"]];
+    
+    [m_pdf setPerformImage:[UIImage imageNamed:@"btn_perform.png"]];
+    [m_pdf setDeleteImage:[UIImage imageNamed:@"btn_remove.png"]];
+    
+    [m_pdf setDoneImage:[UIImage imageNamed:@"btn_done.png"]];
     
     /*
      SetColor, Available features
@@ -154,31 +187,25 @@
 
 - (void)showReader
 {
-    [m_pdf PDFThumbNailinit:1];
+    [self pdfChargeDidFinishLoading];
+    
+    //toggle thumbnail/seekbar
+    if (bottomBar < 1)
+        [m_pdf PDFThumbNailinit:1];
+    else
+        [m_pdf PDFSeekBarInit:1];
     
     m_pdf.hidesBottomBarWhenPushed = YES;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:m_pdf];
     [self.viewController presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)activateLicense:(CDVInvokedUrlCommand *)command
-{
-    self.cdv_command = command;
-    
-    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
-    
-    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
-    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"company"] forKey:@"actCompany"];
-    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"email"] forKey:@"actEmail"];
-    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"key"] forKey:@"actSerial"];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:[[params objectForKey:@"licenseType"] intValue]] forKey:@"actActivationType"];
-    
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    APP_Init();
-}
-
 #pragma mark - Settings
+
+- (void)toggleThumbSeekBar:(int)mode
+{
+    bottomBar = mode;
+}
 
 - (void)setPagingEnabled:(BOOL)enabled
 {
@@ -268,7 +295,7 @@
     annotStrikeoutColor = strikeoutColor;
     //annotSquigglyColor = 0xFF00FF00;
     
-    [[NSUserDefaults standardUserDefaults] synchronize];    
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark - load Bookmarks
@@ -324,15 +351,29 @@
 }
 #pragma mark - Delegate Methods
 
-- (void)chargePdfSendResult: (CDVPluginResult*)result
+- (void)activateLicenseResult:(BOOL)success
 {
-    m_pdf = nil;
-    [self.commandDelegate sendPluginResult: result callbackId: [self.cdv_command callbackId]];
+    if (success) {
+        [self.commandDelegate sendPluginResult:[CDVPluginResult
+                                                resultWithStatus:CDVCommandStatus_OK
+                                                messageAsString:@"License activated"] callbackId:[self.cdv_command callbackId]];
+    }
+    else
+    {
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"License NOT activated"] callbackId:[self.cdv_command callbackId]];
+    }
 }
 
-- (void)pdfChargeDidFinishLoading:(int)lenght{
+- (void)chargePdfSendResult:(CDVPluginResult*)result
+{
+    //m_pdf = nil;
+    [self.commandDelegate sendPluginResult:result callbackId: [self.cdv_command callbackId]];
+}
+
+- (void)pdfChargeDidFinishLoading
+{
     [self chargePdfSendResult:[CDVPluginResult
-                               resultWithStatus: CDVCommandStatus_OK
+                               resultWithStatus:CDVCommandStatus_OK
                                messageAsString:@"Pdf Succesfully charged"]];
 }
 

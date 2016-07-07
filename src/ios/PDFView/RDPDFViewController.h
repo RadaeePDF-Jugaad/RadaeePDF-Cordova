@@ -25,17 +25,18 @@
 // define the protocol for the delegate
 @protocol RDPDFViewControllerDelegate
 // define protocol functions that can be used in any class using this delegate
-- (void)pdfChargeDidFinishLoading:(int)dim;
+- (void)pdfChargeDidFinishLoading;
 - (void)pdfChargeDidFailWithError:(NSString*)error andCode:(int)errorCode;
 @end;
 
-@interface RDPDFViewController : UIViewController <UISearchBarDelegate,saveTextAnnotDelegate,PDFViewDelegate,BookmarkTableViewDelegate>
+@interface RDPDFViewController : UIViewController <UISearchBarDelegate,saveTextAnnotDelegate,PDFViewDelegate,BookmarkTableViewDelegate,UIPrintInteractionControllerDelegate>
 {
     //GEAR
     MPMoviePlayerViewController *mpvc;
     //FINE
     PDFView *m_view;
     PDFThumbView *m_Thumbview;
+    UISlider *m_slider;
     PDFDoc *m_doc;
     BOOL b_findStart;
     CGRect recttoolbar;
@@ -71,6 +72,7 @@
 
 #pragma mark - lib features
 
+@property (strong, nonatomic) UIImage *viewModeImage;
 @property (strong, nonatomic) UIImage *searchImage;
 @property (strong, nonatomic) UIImage *bookmarkImage;
 @property (strong, nonatomic) UIImage *bookmarkListImage;
@@ -78,11 +80,13 @@
 @property (strong, nonatomic) UIImage *lineImage;
 @property (strong, nonatomic) UIImage *rectImage;
 @property (strong, nonatomic) UIImage *ellipseImage;
+@property (strong, nonatomic) UIImage *printImage;
 @property (strong, nonatomic) UIImage *deleteImage;
 @property (strong, nonatomic) UIImage *doneImage;
 @property (strong, nonatomic) UIImage *removeImage;
 @property (strong, nonatomic) UIImage *prevImage;
 @property (strong, nonatomic) UIImage *nextImage;
+@property (strong, nonatomic) UIImage *performImage;
 
 // define delegate property
 @property (nonatomic, assign) id delegate;
@@ -136,6 +140,7 @@
 -(void)initbar :(int) pageno;
 -(BOOL)isPortrait;
 -(void)PDFThumbNailinit:(int) pageno;
+- (void)PDFSeekBarInit:(int)pageno;
 
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;

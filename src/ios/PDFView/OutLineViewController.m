@@ -156,7 +156,7 @@ struct OUTLINE_ITEM
     
     if( otl.child)
     {
-        outlineView = [[OutLineViewController alloc] initWithNibName:@"OutLineViewController" bundle:nil];
+        outlineView = [[OutLineViewController alloc] init];
         //第一个参数为父节点，
         [outlineView setList:m_doc :NULL :otl.child];
         UINavigationController *nav = m_jump.navigationController;

@@ -216,15 +216,23 @@
         <source-file src="src/ios/PDFView/RDPDFViewController.m" />
         <header-file src="src/ios/PDFView/RDPDFViewController.h" />
         <resource-file src="src/ios/PDFView/RDPDFViewController.xib" />
-        <resource-file src="src/ios/Resources/backImage.png" />
-        <resource-file src="src/ios/Resources/annot_delete.png" />
-        <resource-file src="src/ios/Resources/annot_done.png" />
-        <resource-file src="src/ios/Resources/annot_ellipse.png" />
-        <resource-file src="src/ios/Resources/annot_line.png" />
-        <resource-file src="src/ios/Resources/annot_rect.png" />
         <resource-file src="src/ios/Resources/annot_remove.png" />
-        <resource-file src="src/ios/Resources/left_arrow.png" />
-        <resource-file src="src/ios/Resources/right_arrow.png" />
+        <resource-file src="src/ios/Resources/backImage.png" />
+        <resource-file src="src/ios/Resources/btn_annot_ellipse.png" />
+        <resource-file src="src/ios/Resources/btn_annot_ink.png" />
+        <resource-file src="src/ios/Resources/btn_annot_rect.png" />
+        <resource-file src="src/ios/Resources/btn_done.png" />
+        <resource-file src="src/ios/Resources/btn_left.png" />
+        <resource-file src="src/ios/Resources/btn_outline.png" />
+        <resource-file src="src/ios/Resources/btn_perform.png" />
+        <resource-file src="src/ios/Resources/btn_print.png" />
+        <resource-file src="src/ios/Resources/btn_remove.png" />
+        <resource-file src="src/ios/Resources/btn_right.png" />
+        <resource-file src="src/ios/Resources/btn_search.png" />
+        <resource-file src="src/ios/Resources/btn_view_dual.png" />
+        <resource-file src="src/ios/Resources/btn_view_single.png" />
+        <resource-file src="src/ios/Resources/btn_view_vert.png" />
+        <resource-file src="src/ios/Resources/btn_view.png" />
 
         <!-- Radaee sources -->
         <source-file src="src/ios/NSObject/NSObject+PerformBlock.m" />
@@ -235,9 +243,10 @@
         <header-file src="src/ios/PDFView/OUTLINE_ITEM.h" />
         <source-file src="src/ios/PDFView/OutLineViewController.m" />
         <header-file src="src/ios/PDFView/OutLineViewController.h" />
-        <resource-file src="src/ios/PDFView/OutLineViewController.xib" />
         <source-file src="src/ios/PDFView/TextAnnotViewController.m" />
         <header-file src="src/ios/PDFView/TextAnnotViewController.h" />
+        <source-file src="src/ios/PDFView/ViewModeTableViewController.m" />
+        <header-file src="src/ios/PDFView/ViewModeTableViewController.h" />
         <source-file src="src/ios/PDFView/PDFReflowView.m" />
         <header-file src="src/ios/PDFView/PDFReflowView.h" />
         <source-file src="src/ios/PDFView/PDFThumbView.m" />

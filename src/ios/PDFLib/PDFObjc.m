@@ -1492,7 +1492,7 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getEmbedFileName:(int)idx
 {
-	Document_getEFName(m_doc, idx);
+	return Document_getEFName(m_doc, idx);
 }
 -(bool)getEmbedFileData:(int)idx :(NSString *)path
 {

@@ -15,6 +15,7 @@ extern uint g_ink_color;
 extern uint g_rect_color;
 extern uint g_oval_color;
 extern bool g_paging_enabled;
+extern bool g_double_page_enabled;
 
 @implementation PDFView
 
@@ -80,16 +81,20 @@ extern bool g_paging_enabled;
             break;
         case 3:
             //for dual view, comment/uncomment also doublePage
-            m_view = [[PDFVDual alloc] init:false :NULL :0 :NULL :0];
-            doublePage = YES;
-            //for single view , comment/uncomment also doublePage
-            //m_view = [[PDFVDual alloc] init:false :NULL :0 :verts :doc.pageCount];
-            //doublePage = NO;
+            doublePage = g_double_page_enabled;
+            
+            if (doublePage) {
+                m_view = [[PDFVDual alloc] init:false :NULL :0 :NULL :0];
+            }
+            else
+            {
+                m_view = [[PDFVDual alloc] init:false :NULL :0 :verts :doc.pageCount];
+            }
             break;
         case 4:
             //for dual view, comment/uncomment also doublePage
             m_view = [[PDFVDual alloc] init:true :NULL :0 :NULL :0];
-            doublePage = YES;
+            doublePage = g_double_page_enabled;
             //for single view, comment/uncomment also doublePage
             //m_view = [[PDFVDual alloc] init:true :NULL :0 :verts :doc.pageCount];
             //doublePage = NO;

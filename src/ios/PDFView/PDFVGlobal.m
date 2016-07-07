@@ -93,7 +93,7 @@ NSMutableString *pdfName;
 NSMutableString *pdfPath;
 
 float g_zoom_level = 5;
-bool g_paging_enabled = false;
+bool g_paging_enabled = true;
 PDF_RENDER_MODE renderQuality = mode_normal;
 
 float g_Ink_Width = 2;
@@ -111,30 +111,57 @@ bool g_double_page_enabled = false;
 
 void APP_Init()
 {
+    BOOL isActive = NO;
     int licenseType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"actActivationType"] intValue];
     NSLog(@"LICENSE: %i", licenseType);
+    NSLog(@"COMPANY: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"]);
+    NSLog(@"EMAIL: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"]);
+    NSLog(@"KEY: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"]);
+    NSLog(@"BUNDLE: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"]);
     
     switch (licenseType) {
         case 0:
-            Global_activeStandard([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
+        {
+            NSLog(@"standard");
+             isActive = Global_activeStandard([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
             break;
-            
+        }
         case 1:
-            Global_activeProfession([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
+        {
+            NSLog(@"professional");
+            isActive = Global_activeProfession([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
             break;
-            
+        }
         case 2:
-            Global_activePremium([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
+        {
+            NSLog(@"premium");
+            isActive = Global_activePremium([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
             break;
+        }
         default:
+        {
+            NSLog(@"default");
+            isActive = NO;
             break;
+        }
     }
+    
+    if (isActive)
+        NSLog(@"ATTIVA");
+    else
+        NSLog(@"NON ATTIVA");
+    
+    
+    [[NSUserDefaults standardUserDefaults] setBool:isActive forKey:@"actIsActive"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat"];
     NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat"];
     NSString *cmyk_path = [[NSBundle mainBundle] pathForResource:@"cmyk_rgb" ofType:@"dat"];
+    
     Global_setCMapsPath([cmaps_path UTF8String], [umaps_path UTF8String]);
     Global_setCMYKProfile([cmyk_path UTF8String]);
+
     NSString *fpath;
     fpath = [[NSBundle mainBundle] pathForResource:@"00" ofType:nil];
     Global_loadStdFont( 0, [fpath UTF8String] );
@@ -167,11 +194,10 @@ void APP_Init()
     
     Global_fontfileListStart();
 
-    //todo: Global_fontfileListAdd("???/argbsn00lp.ttf")
     fpath = [[NSBundle mainBundle] pathForResource:@"argbsn00lp.ttf" ofType:nil];
     if( fpath )
         Global_fontfileListAdd( [fpath UTF8String] );
-    
+   
     fpath = [[NSBundle mainBundle] pathForResource:@"arimo.ttf" ofType:nil];
     Global_fontfileListAdd( [fpath UTF8String] );
     fpath = [[NSBundle mainBundle] pathForResource:@"arimob.ttf" ofType:nil];
@@ -200,7 +226,7 @@ void APP_Init()
     Global_fontfileListAdd( [fpath UTF8String] );
     fpath = [[NSBundle mainBundle] pathForResource:@"tinosi.ttf" ofType:nil];
     Global_fontfileListAdd( [fpath UTF8String] );
-    
+   
     Global_fontfileListEnd();
     
     Global_fontfileMapping("Arial",                    "Arimo");
@@ -329,5 +355,5 @@ void APP_Init()
     g_def_view = 0;
     renderQuality = mode_normal;
     g_zoom_level = 5;
-    g_paging_enabled = false;
+    g_paging_enabled = true;
 }
