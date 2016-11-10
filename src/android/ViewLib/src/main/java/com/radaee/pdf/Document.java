@@ -16,7 +16,7 @@ public class Document
 	public interface PDFFontDelegate
 	{
 		/**
-		 * font delegate, invoked when the Font not found in FontList.
+		 * font delegate, invoked when the Font not found in FontList.g
 		 * @param collection like: "", "GB1", "CNS1", and so on.
 		 * @param fname font name that not found in native library.
 		 * @param flag flag&1 means fixed width font, flag&2 means vertical writing.
@@ -143,7 +143,7 @@ public class Document
 		}
 		/**
 		 * set label of Outline.<br/>
-		 * a premium license is needed for this method.
+		 * a premium license is required for this method.
 		 * @param title title to set
 		 * @return true or false.
 		 */
@@ -203,7 +203,7 @@ public class Document
 		}
 		/**
 		 * insert outline after of this Outline.<br/>
-		 * a premium license is needed for this method.
+		 * a premium license is required for this method.
 		 * @param label label of new outline.
 		 * @param pageno 0 based page NO.
 		 * @param top y in PDF coordinate.
@@ -215,7 +215,7 @@ public class Document
 		}
 		/**
 		 * insert outline as first child of this Outline.<br/>
-		 * a premium license is needed for this method.
+		 * a premium license is required for this method.
 		 * @param label label of new outline.
 		 * @param pageno 0 based page NO.
 		 * @param top y in PDF coordinate.
@@ -228,7 +228,7 @@ public class Document
 		/**
 		 * remove this Outline, and all children of this Outline.<br/>
 		 * this method connect previous Outline and next Outline.<br/>
-		 * a premium license is needed for this method.
+		 * a premium license is required for this method.
 		 * @return true or false.
 		 */
 		public boolean RemoveFromDoc()
@@ -298,6 +298,7 @@ public class Document
 	private static native long newGState(long hand);
 	private static native boolean setGStateStrokeAlpha(long hand, long gstate, int alpha);
 	private static native boolean setGStateFillAlpha(long hand, long gstate, int alpha);
+	private static native boolean setGStateStrokeDash(long hand, long gstate, float[] dash, float phase);
 	private static native long newImage( long hand, Bitmap bmp, boolean has_alpha );
 	private static native long newImageJPEG( long hand, String path );
     private static native long newImageJPEGByArray( long hand, byte[] data, int length );
@@ -336,7 +337,7 @@ public class Document
 
     /**
      * advanced function to get object from Document to edit.<br/>
-     * this method need premium license.<br/>
+     * this method require premium license.<br/>
      * @param ref PDF cross reference ID, which got from:<br/>
      *            Advance_NewIndirectObj()<br/>
      *            Advance_GetCatalog()<br/>
@@ -352,7 +353,7 @@ public class Document
 
     /**
      * advanced function to create an empty indirect object to edit.<br/>
-     * this method need premium license.<br/>
+     * this method require premium license.<br/>
      * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
      */
     public Ref Advance_NewIndirectObj()
@@ -362,7 +363,7 @@ public class Document
 
     /**
      * advanced function to create an indirect object, and then copy source object to this indirect object.<br/>
-     * this method need premium license.<br/>
+     * this method require premium license.<br/>
      * @param obj source object to be copied.
      * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
      */
@@ -374,7 +375,7 @@ public class Document
      * advanced function to create a stream using zflate compression(zlib).<br/>
      * stream byte contents can't modified, once created.<br/>
      * the byte contents shall auto compress and encrypt by native library.<br/>
-     * this method need premium license, and need Document.SetCache() invoked.<br/>
+     * this method require premium license, and need Document.SetCache() invoked.<br/>
      * @param source
      * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
      */
@@ -387,7 +388,7 @@ public class Document
      * if u pass compressed data to this method, u shall modify dictionary of this stream.<br/>
      * like "Filter" and other item from dictionary.<br/>
      * the byte contents shall auto encrypt by native library, if document if encrypted.<br/>
-     * this method need premium license, and need Document.SetCache() invoked.<br/>
+     * this method require premium license, and need Document.SetCache() invoked.<br/>
      * @param source
      * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
      */
@@ -397,7 +398,7 @@ public class Document
     }
     /**
      * advanced function to get reference of catalog object(root object of PDF).<br/>
-     * this method need premium license.<br/>
+     * this method require premium license.<br/>
      * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
      */
     public Ref Advance_GetRef()
@@ -406,7 +407,7 @@ public class Document
     }
     /**
      * advanced function to reload document objects.<br/>
-     * this method need premium license.<br/>
+     * this method require premium license.<br/>
      * all pages object return from Document.GetPage() shall not available, after this method invoked.
      */
     public void Advance_Reload()
@@ -456,6 +457,21 @@ public class Document
 		public boolean SetStrokeAlpha(int alpha)
 		{
 			return Document.setGStateStrokeAlpha(doc.hand_val, hand, alpha);
+		}
+
+		/**
+		 * set dash for stroke operation.
+		 * @param dash dash arra, if null, means set to solid.
+		 * @param phase phase value, mostly, it is 0.
+         * @return true or false.
+		 * eaxmple:<br/>
+		 * [2, 1], 0  means 2 on, 1 off, 2 on, 1 off, …<br/>
+		 * [2, 1], 0.5 means 1.5 on, 1 off, 2 on 1 off, …<br/>
+		 * for more details, plz see PDF-Reference 1.7 (4.3.2) Line Dash Pattern.<br/>
+         */
+		public boolean SetStrokeDash(float[] dash, float phase)
+		{
+			return setGStateStrokeDash(doc.hand_val, hand, dash, phase);
 		}
 	}
 	public class DocImage
@@ -513,7 +529,7 @@ public class Document
         }
 
         /**
-         * add sub-form as resource of form.
+         * add sub-form as resource of form.<br/>
          * @param dform returned by Document.NewForm()
          * @return resource handle
          */
@@ -630,7 +646,7 @@ public class Document
 	}
 	/**
 	 * set cache file to PDF.<br/>
-	 * a premium license is needed for this method.
+	 * a professional or premium license is required for this method.
 	 * @param path a path to save some temporary data, compressed images and so on
 	 * @return true or false
 	 */
@@ -640,7 +656,7 @@ public class Document
 	}
 	/**
 	 * set font delegate to PDF.<br/>
-	 * a professional or premium license is needed for this method.
+	 * a professional or premium license is required for this method.
 	 * @param del delegate for font mapping, or null to remove delegate.
 	 */
 	public void SetFontDel( PDFFontDelegate del )
@@ -787,7 +803,7 @@ public class Document
     }
     /**
      * run javascript, NOTICE:considering some complex js, this method is not thread-safe.<br/>
-     * this method need premium license, it always return false if using other license type.
+     * this method require premium license, it always return false if using other license type.
      * @param js javascript string, can't be null.
      * @param del delegate for javascript running, can't be null.
      * @return if js or del is null, or no premium license actived, return false.<br/>
@@ -801,7 +817,7 @@ public class Document
 
     /**
      * get embed files count, for document level.<br/>
-     * this method need premium license, it always return 0 if using other license type.
+     * this method require premium license, it always return 0 if using other license type.
      * @return count
      */
     public int GetEmbedFilesCount()
@@ -832,7 +848,7 @@ public class Document
 	/**
 	 * get permission of PDF, this value defined in PDF reference 1.7<br/>
 	 * mostly, it means the permission from encryption.<br/>
-	 * this method need a professional or premium license.
+	 * this method require a professional or premium license.
 	 * bit 1-2 reserved<br/>
 	 * bit 3(0x4) print<br/>
 	 * bit 4(0x8) modify<br/>
@@ -847,7 +863,7 @@ public class Document
 	/**
 	 * get permission of PDF, this value defined in "Perm" entry in Catalog object.<br/>
 	 * mostly, it means the permission from signature.<br/>
-	 * this method need a professional or premium license.
+	 * this method require a professional or premium license.
 	 * @return 0 means not defined<br/>
 	 * 1 means can't modify<br/>
 	 * 2 means can modify some form fields<br/>
@@ -859,7 +875,7 @@ public class Document
 	}
 	/**
 	 * export form data as xml string.<br/>
-	 * this method need premium license.
+	 * this method require premium license.
 	 * @return xml string or null.
 	 */
 	public String ExportForm()
@@ -1031,7 +1047,7 @@ public class Document
 	}
 	/**
 	 * save as the document to another file.<br/>
-	 * this method need professional or premium license.
+	 * this method require a professional or premium license.
 	 * @param path path to save.
 	 * @param rem_sec remove security info?
 	 * @return true or false.
@@ -1049,7 +1065,7 @@ public class Document
 	}
 	/**
 	 * encrypt document and save as the document to another file.<br/>
-	 * this method need premium license.
+	 * this method require premium license.
 	 * @param dst path to save， same as path parameter of SaveAs.
 	 * @param upswd user password, can be null.
 	 * @param opswd owner password, can be null.
@@ -1096,7 +1112,7 @@ public class Document
 	}
 	/**
 	 * Start import operations, import page from src<br/>
-	 * a premium license is needed for this method.<br/>
+	 * a premium license is required for this method.<br/>
 	 * you shall maintenance the source Document object until all pages are imported and ImportContext.Destroy() invoked. 
 	 * @param src source Document object that opened.
 	 * @return a context object used in ImportPage. 
@@ -1110,7 +1126,7 @@ public class Document
 	}
 	/**
 	 * import a page to the document.<br/>
-	 * a premium license is needed for this method.<br/>
+	 * a premium license is required for this method.<br/>
 	 * do not forget to invoke ImportContext.Destroy() after all pages are imported.
 	 * @param ctx context object created from ImportStart
 	 * @param srcno 0 based page NO. from source Document that passed to ImportStart.
@@ -1133,7 +1149,7 @@ public class Document
 	 * insert a page to Document<br/>
 	 * if pagheno >= page_count, it do same as append.<br/>
 	 * otherwise, insert to pageno.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param pageno 0 based page NO.
 	 * @param w page width in PDF coordinate
 	 * @param h page height in PDF coordinate
@@ -1152,7 +1168,7 @@ public class Document
 	}
 	/**
 	 * remove page by page NO.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param pageno 0 based page NO.
 	 * @return true or false
 	 */
@@ -1162,7 +1178,7 @@ public class Document
 	}
 	/**
 	 * move the page to other position.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param pageno1 page NO, move from
 	 * @param pageno2 page NO, move to
 	 * @return true or false
@@ -1173,7 +1189,7 @@ public class Document
 	}
 	/**
 	 * create a font object, used to write texts.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param font_name <br/>
 	 * font name exists in font list.<br/>
 	 * using Global.getFaceCount(), Global.getFaceName() to enumerate fonts.
@@ -1198,7 +1214,7 @@ public class Document
 	}
 	/**
 	 * create a ExtGraphicState object, used to set alpha values.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @return DocGState object or null.
 	 */
 	public DocGState NewGState()
@@ -1215,7 +1231,6 @@ public class Document
 	}
 	/**
 	 * create an image from Bitmap object.<br/>
-	 * a premium license is needed for this method.
 	 * @param bmp Bitmap object in ARGB_8888/ARGB_4444/RGB_565 format.
 	 * @param has_alpha generate alpha channel information?
 	 * @return DocImage object or null.
@@ -1237,7 +1252,6 @@ public class Document
 	 * --GRAY<br/>
 	 * --RGB<br/>
 	 * --CMYK<br/>
-	 * a premium license is needed for this method.
 	 * @param path path to JPEG file.
 	 * @return DocImage object or null.
 	 */
@@ -1259,7 +1273,6 @@ public class Document
      * --GRAY<br/>
      * --RGB<br/>
      * --CMYK<br/>
-     * a premium license is needed for this method.
      * @param data byte array include whole jpg file.
      * @param len byte length of data.
      * @return DocImage object or null.
@@ -1277,7 +1290,6 @@ public class Document
     }
 	/**
 	 * create an image from JPX/JPEG 2k file.<br/>
-	 * a premium license is needed for this method.
 	 * @param path path to JPX file.
 	 * @return DocImage object or null.
 	 */
@@ -1292,6 +1304,12 @@ public class Document
 		}
 		else return null;
 	}
+
+	/**
+	 * new a form from Document level.
+	 * this method require SetCache() invoked.
+	 * @return DocForm object or null.
+     */
     public DocForm NewForm()
     {
         long ret = newForm(hand_val);
@@ -1303,7 +1321,7 @@ public class Document
     }
 	/**
 	 * change page rect.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param pageno 0 based page NO.
 	 * @param dl delta to left, page_left += dl;
 	 * @param dt delta to top, page_top += dt;
@@ -1317,7 +1335,7 @@ public class Document
 	}
 	/**
 	 * set page rotate.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param pageno 0 based page NO.
 	 * @param degree rotate angle in degree, must be 90 * n.
 	 * @return true or false

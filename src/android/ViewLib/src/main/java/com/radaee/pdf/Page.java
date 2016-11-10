@@ -22,7 +22,7 @@ public class Page
 		protected Page page;
         /**
          * advanced function to get reference of annotation object.<br/>
-         * this method need premium license.
+         * this method require premium license.
          * @return reference
          */
         public final Ref Advance_GetRef()
@@ -35,7 +35,7 @@ public class Page
 
         /**
          * advanced function to reload annotation object, after advanced methods update annotation object data.<br/>
-         * this method need premium license.
+         * this method require premium license.
          */
         public final void Advance_Reload()
         {
@@ -65,7 +65,7 @@ public class Page
 		}
 		/**
 		 * move annotation to another page.<be/>
-		 * this method valid in professional or premium version.<br/>
+		 * this method require professional or premium license.<br/>
 		 * this method just like invoke Page.CopyAnnot() and Annotation.RemoveFromPage(), but, less data generated.<br/>
 		 * Notice: ObjsStart or RenderXXX shall be invoked for dst_page.
 		 * @param dst_page page to move.
@@ -80,7 +80,7 @@ public class Page
 		}
 		/**
 		 * render an annotation to Bitmap. this method fully scale annotation to bitmap object.<br/>
-		 * this method valid in professional or premium version.<br/>
+		 * this method require professional or premium license.<br/>
 		 * Notice 1: the render result may not correct for some annotation that not used Alpha Color blending.<br/>
 		 * example: highlight annotation may not render correctly.<br/>
 		 * Notice 2: you can invoke Global.hideAnnots() in Global.Init(), and invoke this method to handle Annotations by yourself.
@@ -93,7 +93,7 @@ public class Page
 		}
 		/**
 		 * get annotation field type in acroForm.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return type as these values:<br/>
 		 * 0: unknown<br/>
 		 * 1: button field<br/>
@@ -108,7 +108,7 @@ public class Page
 
         /**
          * get annotation field flag in acroForm.<br/>
-         * this method valid in premium version
+         * this method require premium license
          * @return flag&1 : read-only<br/>
          * flag&2 : is required<br/>
          * flag&4 : no export.
@@ -119,7 +119,7 @@ public class Page
         }
         /**
          * get name of the annotation without NO. a fields group with same name "field#0","field#1"，got to "field".<br/>
-         * this method valid in premium version
+         * this method require premium license
          * @return null if it is not field, or name of the annotation, example: "EditBox1[0]".
          */
         final public String GetFieldName()
@@ -129,7 +129,7 @@ public class Page
 
         /**
          * get name of the annotation.<br/>
-         * this method valid in premium version
+         * this method require premium license
          * @return null if it is not field, or name of the annotation, example: "EditBox1[0]".
          */
         final public String GetFieldNameWithNO()
@@ -138,7 +138,7 @@ public class Page
         }
 		/**
 		 * get name of the annotation.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return null if it is not field, or full name of the annotation, example: "Form1.EditBox1".
 		 */
         final public String GetFieldFullName()
@@ -147,7 +147,7 @@ public class Page
 		}
 		/**
 		 * get full name of the annotation with more details.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return null if it is not field, or full name of the annotation, example: "Form1[0].EditBox1[0]".
 		 */
         final public String GetFieldFullName2()
@@ -156,7 +156,7 @@ public class Page
 		}
 		/**
 		 * get annotation type.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return type as these values:<br/>
 		 * 0:  unknown<br/>
 		 * 1:  text<br/>
@@ -192,7 +192,7 @@ public class Page
 		}
 		/**
 		 * check if position and size of the annotation is locked?<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return true if locked, or not locked.
 		 */
         final public boolean IsLocked()
@@ -209,7 +209,7 @@ public class Page
 		}
 		/**
 		 * check if texts of the annotation is locked?<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return true if locked, or not locked.
 		 */
         final public boolean IsLockedContent()
@@ -226,7 +226,7 @@ public class Page
 		}
 		/**
 		 * get annotation's box rectangle.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return 4 elements: left, top, right, bottom in PDF coordinate system
 		 */
         final public float[] GetRect()
@@ -237,7 +237,7 @@ public class Page
 		}
 		/**
 		 * set annotation's box rectangle.<br/>
-		 * this method valid in professional or premium version.<br/>
+		 * this method require professional or premium license.<br/>
 		 * you shall render page after this invoked, to resize or move annotation.
 		 */
         final public void SetRect( float left, float top, float right, float bottom )
@@ -251,7 +251,7 @@ public class Page
 		}
 		/**
 		 * get markup annotation's boxes.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return float array, container many boxes.<br/>
 		 * each 4 elements defined a box, as [left, top, right, bottom] in PDF coordinate.<br/>
 		 * length of this array must be 4 times.
@@ -262,7 +262,7 @@ public class Page
 		}
 		/**
 		 * set hide status for annotation.
-		 * this method valid in professional or premium version.<br/>
+		 * this method require professional or premium license.<br/>
 		 * you shall render page after this invoked, to hide annotation.
 		 * @param hide true or false.
 		 */
@@ -292,7 +292,7 @@ public class Page
         /**
          * get open status for Popup Annotation.<br/>
          * if this annotation is not popup annotation, it return Popup annotation open status, which associate to this annotation.<br/>
-         * this method valid in professional or premium version.
+         * this method require professional or premium license.
          * @return true or false.
          */
         final public boolean GetPopupOpen()
@@ -302,7 +302,7 @@ public class Page
         /**
          * set open status for Popup Annotation.<br/>
          * if this annotation is not popup annotation, it set Popup annotation open status, which associate to this annotation.<br/>
-         * this method valid in professional or premium version.
+         * this method require professional or premium license.
          * @return true or false.
          */
         final public boolean SetPopupOpen(boolean open)
@@ -312,7 +312,7 @@ public class Page
         /**
          * get annotation's popup text.<br/>
          * if this annotation is popup annotation, it get parent annotation's text.<br/>
-         * this method valid in professional or premium version.
+         * this method require professional or premium license.
          * @return text string or null if failed.
          */
         final public String GetPopupText()
@@ -322,7 +322,7 @@ public class Page
         /**
          * set annotation's popup label, mostly it means the author.<br/>
          * if this annotation is popup annotation, it set parent annotation's text.<br/>
-         * this method valid in professional or premium version
+         * this method require professional or premium license
          * @param val text string
          * @return true or false
          */
@@ -333,7 +333,7 @@ public class Page
         /**
          * get annotation's popup text, mostly it means the author.<br/>
          * if this annotation is popup annotation, it get parent annotation's label.<br/>
-         * this method valid in professional or premium version.
+         * this method require professional or premium license.
          * @return text string or null if failed.
          */
         final public String GetPopupLabel()
@@ -343,7 +343,7 @@ public class Page
         /**
          * set annotation's popup text.<br/>
          * if this annotation is popup annotation, it set parent annotation's label.<br/>
-         * this method valid in professional or premium version
+         * this method require professional or premium license
          * @param val text string
          * @return true or false
          */
@@ -354,7 +354,7 @@ public class Page
 		/**
 		 * get annotation's popup subject.<br/>
          * if this annotation is popup annotation, it get parent annotation's subject.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return subject string or null if failed.
 		 */
         final public String GetPopupSubject()
@@ -364,7 +364,7 @@ public class Page
 		/**
 		 * set annotation's popup subject.<br/>
          * if this annotation is popup annotation, it set parent annotation's subject.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param val subject string
 		 * @return true or false
 		 */
@@ -374,7 +374,7 @@ public class Page
 		}
 		/**
 		 * get annotation's destination.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return 0 based page NO, or -1 if failed.
 		 */
         final public int GetDest()
@@ -384,7 +384,7 @@ public class Page
 
         /**
          * get remote link.<br/>
-         * this method valid in professional or premium version
+         * this method require professional or premium license
          * @return a string format as "path/pageno", example "test.pdf/3", which pageno is 0 based page NO.
          */
         final public String GetRemoteDest()
@@ -393,7 +393,7 @@ public class Page
         }
 		/**
 		 * get annotation's name("NM" entry).<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return name string.
 		 */
         final public String GetName()
@@ -402,7 +402,7 @@ public class Page
 		}
 		/**
 		 * set annotation's name("NM" entry).<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param name name string to be set.
 		 * @return true or false.
 		 */
@@ -412,7 +412,7 @@ public class Page
 		}
 		/**
 		 * get annotation's URL link string.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return string of URL, or null
 		 */
         final public String GetURI()
@@ -421,7 +421,7 @@ public class Page
 		}
 		/**
 		 * get annotation's java-script string.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return string of java-script, or null.
 		 */
         final public String GetJS()
@@ -430,7 +430,7 @@ public class Page
 		}
 		/**
 		 * get annotation's file link path string.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return string of link path, or null
 		 */
         final public String GetFileLink()
@@ -439,7 +439,7 @@ public class Page
 		}
 		/**
 		 * get annotation's 3D object name.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return name of the 3D object, or null
 		 */
         final public String Get3D()
@@ -448,7 +448,7 @@ public class Page
 		}
 		/**
 		 * get annotation's movie name.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return name of the movie, or null
 		 */
         final public String GetMovie()
@@ -457,7 +457,7 @@ public class Page
 		}
 		/**
 		 * get annotation's sound name.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return name of the audio, or null
 		 */
         final public String GetSound()
@@ -466,7 +466,7 @@ public class Page
 		}
 		/**
 		 * get annotation's attachment name.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return name of the attachment, or null
 		 */
         final public String GetAttachment()
@@ -475,7 +475,7 @@ public class Page
 		}
 		/**
 		 * get annotation's 3D data. must be *.u3d format.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param save_file full path name to save data.
 		 * @return true if save_file created, or false.
 		 */
@@ -485,7 +485,7 @@ public class Page
 		}
 		/**
 		 * get annotation's movie data.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param save_file full path name to save data.
 		 * @return true if save_file created, or false.
 		 */
@@ -495,7 +495,7 @@ public class Page
 		}
 		/**
 		 * get annotation's sound data.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param paras paras[0] == 0, if formated audio file(*.mp3 ...).
 		 * @param save_file full path name to save data.
 		 * @return true if save_file created, or false.
@@ -506,7 +506,7 @@ public class Page
 		}
 		/**
 		 * get annotation's attachment data.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param save_file full path name to save data.
 		 * @return true if save_file created, or false.
 		 */
@@ -514,9 +514,113 @@ public class Page
 		{
 			return Page.getAnnotAttachmentData(page.hand, hand, save_file);
 		}
+
+		/**
+		 * get item count of RichMedia annotation.<br/>
+		 * this method require professional or premium license.
+		 * @return count of items, or -1 if not RichMedia annotation, and no premium license actived.
+         */
+		final public int GetRichMediaItemCount()
+		{
+			return Page.getAnnotRichMediaItemCount(page.hand, hand);
+		}
+
+		/**
+		 * get actived item of RichMedia annotation.<br/>
+		 * this method require professional or premium license.
+		 * @return index of actived item, or -1 if not RichMedia annotation, and no premium license actived.
+         */
+		final public int GetRichMediaItemActived()
+		{
+			return Page.getAnnotRichMediaItemActived(page.hand, hand);
+		}
+
+		/**
+		 * get content type of an item of RichMedia annotation.<br/>
+		 * this method require professional or premium license.
+		 * @param idx range in [0, Annot.GetRichMediaItemCount()]
+         * @return type of item:<br/>
+		 * -1: unknown or error.<br/>
+		 * 0: Video.<br/>
+		 * 1：Sound.<br/>
+		 * 2:Flash file object.<br/>
+		 * 3:3D file object.<br/>
+         */
+		final public int GetRichMediaItemType(int idx)
+		{
+			return Page.getAnnotRichMediaItemType(page.hand, hand, idx);
+		}
+
+		/**
+		 * return asset name of content of an item of RichMedia annotation.<br/>
+		 * this method require professional or premium license.
+		 * @param idx range in [0, Annot.GetRichMediaItemCount()]
+         * @return asset name, or null.<br/>
+		 * asset name example: "VideoPlayer.swf"
+         */
+		final public String GetRichMediaItemAsset(int idx)
+		{
+			return Page.getAnnotRichMediaItemAsset(page.hand, hand, idx);
+		}
+
+		/**
+		 * return parameters of an item of RichMedia annotation.<br/>
+		 * this method require professional or premium license.
+		 * @param idx range in [0, Annot.GetRichMediaItemCount()]
+		 * @return parameter string, or null.<br/>
+		 * parameter example: "source=myvideo.mp4&skin=SkinOverAllNoFullNoCaption.swf&skinAutoHide=true&skinBackgroundColor=0x5F5F5F&skinBackgroundAlpha=0.75&volume=1.00"
+         */
+		final public String GetRichMediaItemPara(int idx)
+		{
+			return Page.getAnnotRichMediaItemPara(page.hand, hand, idx);
+		}
+
+		/**
+		 * return source of an item of RichMedia annotation.<br/>
+		 * this method require professional or premium license.
+		 * @param idx range in [0, Annot.GetRichMediaItemCount()]
+		 * @return parameter string, or null.<br/>
+		 * parameter example: "source=myvideo.mp4&skin=SkinOverAllNoFullNoCaption.swf&skinAutoHide=true&skinBackgroundColor=0x5F5F5F&skinBackgroundAlpha=0.75&volume=1.00"<br/>
+		 * the source is "source=myvideo.mp4", return string is "myvideo.mp4"
+         */
+		final public String GetRichMediaItemSource(int idx)
+		{
+			return Page.getAnnotRichMediaItemSource(page.hand, hand, idx);
+		}
+
+		/**
+		 * save source of an item of RichMedia annotation to a file.<br/>
+		 * this method require professional or premium license.
+		 * @param idx range in [0, Annot.GetRichMediaItemCount()]
+		 * @param save_path absolute path to save file, like "/sdcard/app_data/myvideo.mp4"
+         * @return true or false.
+         */
+		final public boolean GetRichMediaItemSourceData(int idx, String save_path)
+		{
+			return Page.getAnnotRichMediaItemSourceData(page.hand, hand, idx, save_path);
+		}
+
+		/**
+		 * save an asset to a file.<br/>
+		 * this method require professional or premium license.
+		 * @param asset asset name in RichMedia assets list.
+		 * @param save_path absolute path to save file, like "/sdcard/app_data/myvideo.mp4"
+         * @return true or false.
+		 * example:<br/>
+		 * GetRichMediaItemAsset(0) return player window named as "VideoPlayer.swf"<br/>
+		 * GetRichMediaItemPara(0) return "source=myvideo.mp4&skin=SkinOverAllNoFullNoCaption.swf&skinAutoHide=true&skinBackgroundColor=0x5F5F5F&skinBackgroundAlpha=0.75&volume=1.00".<br/>
+		 * so we has 3 assets in item[0]:<br/>
+		 * 1."VideoPlayer.swf"<br/>
+		 * 2."myvideo.mp4"<br/>
+		 * 3."SkinOverAllNoFullNoCaption.swf"
+         */
+		final public boolean GetRichMediaData(String asset, String save_path)
+		{
+			return Page.getAnnotRichMediaData(page.hand, hand, asset, save_path);
+		}
 		/**
 		 * get type of edit-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return <br/>-1: this annotation is not text-box.<br/> 1: normal single line.<br/>2: password.<br/>3: MultiLine edit area.
 		 */
         final public int GetEditType()
@@ -525,7 +629,7 @@ public class Page
 		}
 		/**
 		 * get max-len of edit-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return 0 if no limit, great than 0 if has limit.
 		 */
         final public int GetEditMaxlen()
@@ -536,7 +640,7 @@ public class Page
 		 * get position and size of edit-box.<br/>
 		 * for FreeText annotation, position of edit-box is not the position of annotation.<br/>
 		 * so this function is needed for edit-box.
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param rect 4 elements in order: left, top, right, bottom, in PDF coordinate.
 		 * @return true or false
 		 */
@@ -546,7 +650,7 @@ public class Page
 		}
 		/**
 		 * get text size of edit-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return size of text, in PDF coordinate system.
 		 */
         final public float GetEditTextSize()
@@ -555,7 +659,7 @@ public class Page
 		}
 		/**
 		 * get format of edit-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return format of edit-box, mostly a java-script like:<br/>
 		 * AFDate_FormatEx("dd/mm/yy");<br/>
 		 * most common java script function invoked as:
@@ -572,7 +676,7 @@ public class Page
 		}
 		/**
 		 * get format of edit-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return format of edit-box, mostly a java-script like:<br/>
 		 * AFDate_FormatEx("dd/mm/yy");<br/>
 		 * most common java script function invoked as:
@@ -589,7 +693,7 @@ public class Page
 		}
 		/**
 		 * get text color for edit-box annotation.include text field and free-text.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return 0 or color, format as 0xAARRGGBB.
 		 */
         final public int GetEditTextColor()
@@ -598,7 +702,7 @@ public class Page
 		}
 		/**
 		 * set text color for edit-box annotation.include text field and free-text<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param color color format as 0xRRGGBB, alpha channel are ignored.
 		 * @return true or false.
 		 */
@@ -608,7 +712,7 @@ public class Page
 		}
 		/**
 		 * get contents of edit-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return content in edit-box
 		 */
         final public String GetEditText()
@@ -618,7 +722,7 @@ public class Page
 		/**
 		 * set contents of edit-box.<br/>
 		 * you should re-render page to display modified data.<br/>
-		 * this method valid in premium version.<br/>
+		 * this method require premium license.<br/>
 		 * Notice: this method not check format as GetEditTextFormat. developers shall check format by developer self.
 		 * @param text contents to be set.<br/>in MultiLine mode: '\r' or '\n' means change line.<br/>in password mode the edit box always display "*". 
 		 * @return true or false.
@@ -631,7 +735,7 @@ public class Page
         /**
          * set font of edittext.<br/>
          * you should re-render page to display modified data.<br/>
-         * this method valid in premium version.<br/>
+         * this method require premium license.<br/>
          * @param font DocFont object from Document.NewFontCID().
          * @return true or false.
          */
@@ -643,7 +747,7 @@ public class Page
 
 		/**
 		 * get item count of combo-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return -1: this is not combo. otherwise: items count.
 		 */
         final public int GetComboItemCount()
@@ -652,7 +756,7 @@ public class Page
 		}
 		/**
 		 * get an item of combo-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param item 0 based item index. range:[0, GetAnnotComboItemCount()-1]
 		 * @return null if this is not combo-box, "" if no item selected, otherwise the item selected.
 		 */
@@ -662,7 +766,7 @@ public class Page
 		}
 		/**
 		 * get current selected item index of combo-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return -1 if this is not combo-box or no item selected, otherwise the item index that selected.
 		 */
         final public int GetComboItemSel()
@@ -672,7 +776,7 @@ public class Page
 		/**
 		 * set current selected.<br/>
 		 * you should re-render page to display modified data.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param item 0 based item index to set.
 		 * @return true or false.
 		 */
@@ -682,7 +786,7 @@ public class Page
 		}
 		/**
 		 * get item count of list-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return -1: this is not a list. otherwise: items count.
 		 */
         final public int GetListItemCount()
@@ -691,7 +795,7 @@ public class Page
 		}
 		/**
 		 * get an item of list-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param item 0 based item index. range:[0, GetListItemCount()-1]
 		 * @return null if this is not list-box, "" if no item selected, otherwise the item selected.
 		 */
@@ -763,7 +867,7 @@ public class Page
         }
 		/**
 		 * get selected indexes of list-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return null if it is not a list-box, or no items selected.
 		 */
         final public int[] GetListSels()
@@ -772,7 +876,7 @@ public class Page
 		}
 		/**
 		 * set selects of list-box
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param items 0 based indexes of items.
 		 * @return true or false
 		 */
@@ -782,7 +886,7 @@ public class Page
 		}
 		/**
 		 * get status of check-box and radio-box.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return <br/>-1 if annotation is not valid control.<br/>0 if check-box is not checked.<br/>1 if check-box checked.<br/>2 if radio-box is not checked.<br/>3 if radio-box checked.
 		 */
         final public int GetCheckStatus()
@@ -792,7 +896,7 @@ public class Page
 		/**
 		 * set value to check-box.<br/>
 		 * you should re-render page to display modified data.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @param check true or false.
 		 * @return true or false.
 		 */
@@ -803,7 +907,7 @@ public class Page
 		/**
 		 * check the radio-box and deselect others in radio group.<br/>
 		 * you should re-render page to display modified data.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return true or false.
 		 */
         final public boolean SetRadio()
@@ -812,7 +916,7 @@ public class Page
 		}
 		/**
 		 * get status of signature field.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return -1 if this is not signature field<br/>
 		 *  0 if not signed.<br/>
 		 *  1 if signed.
@@ -823,7 +927,7 @@ public class Page
 		}
 		/**
 		 * check if the annotation is reset button?<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return true or false.
 		 */
         final public boolean GetReset()
@@ -833,7 +937,7 @@ public class Page
 		/**
 		 * perform the button and reset the form.<br/>
 		 * you should re-render page to display modified data.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return true or false.
 		 */
         final public boolean SetReset()
@@ -842,7 +946,7 @@ public class Page
 		}
 		/**
 		 * get annotation submit target.<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return null if this is not submit button.
 		 */
         final public String GetSubmitTarget()
@@ -853,7 +957,7 @@ public class Page
 		 * get annotation submit parameters.<br/>
 		 * mail mode: return whole XML string for form data.<br/>
 		 * other mode: url data likes: "para1=xxx&para2=xxx".<br/>
-		 * this method valid in premium version
+		 * this method require premium license
 		 * @return null if this is not submit button.
 		 */
         final public String GetSubmitPara()
@@ -862,7 +966,7 @@ public class Page
 		}
 		/**
 		 * get fill color of square/circle/highlight/line/ploygon/polyline/sticky text/free text/text field annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return color value formatted as 0xAARRGGBB, if 0 returned, means false.
 		 */
         final public int GetFillColor()
@@ -872,7 +976,7 @@ public class Page
 		/**
 		 * set fill color of square/circle/highlight/line/ploygon/polyline/sticky text/free text/text field annotation.<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param color color value formatted as 0xAARRGGBB.
 		 * @return true or false
 		 */
@@ -882,7 +986,7 @@ public class Page
 		}
 		/**
 		 * get stroke color of square/circle/ink/line/underline/Squiggly/strikeout/ploygon/polyline/free text/text field annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return color value formatted as 0xAARRGGBB, if 0 returned, means false.
 		 */
         final public int GetStrokeColor()
@@ -892,7 +996,7 @@ public class Page
 		/**
 		 * set stroke color of square/circle/ink/line/underline/Squiggly/strikeout/ploygon/polyline/free text/text field annotation.<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param color color value formatted as 0xAARRGGBB, if alpha channel is too less or 0, return false.
 		 * @return true or false
 		 */
@@ -903,7 +1007,7 @@ public class Page
 		/**
 		 * get stroke width of square/circle/ink/line/ploygon/polyline/free text/text field annotation.<br/>
 		 * for free text annotation: width of edit-box border<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return width value in PDF coordinate, or 0 if error.
 		 */
         final public float GetStrokeWidth()
@@ -914,7 +1018,7 @@ public class Page
 		 * set stroke width of square/circle/ink/line/ploygon/polyline/free text/text field annotation.<br/>
 		 * for free text annotation: width of edit-box border<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param width stroke width in PDF coordinate.
 		 * @return true or false
 		 */
@@ -923,8 +1027,20 @@ public class Page
 			return Page.setAnnotStrokeWidth(page.hand, hand, width);
 		}
 		/**
+		 * set stroke dash of square/circle/ink/line/ploygon/polyline/free text/text field annotation.<br/>
+		 * for free text or text field annotation: dash of edit-box border<br/>
+		 * you need render page again to show modified annotation.<br/>
+		 * this method require professional or premium license
+		 * @param dash stroke dash units.
+		 * @return true or false
+		 */
+		final public boolean SetStrokeDash(float[] dash)
+		{
+			return Page.setAnnotStrokeDash(page.hand, hand, dash);
+		}
+		/**
 		 * get Path object from Ink annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return a new Path object, you need invoke Path.Destroy() to free memory.
 		 */
         final public Path GetInkPath()
@@ -938,7 +1054,7 @@ public class Page
 		/**
 		 * set Path to Ink annotation.<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param path Path object.
 		 * @return true or false.
 		 */
@@ -949,7 +1065,7 @@ public class Page
 		}
 		/**
 		 * get Path object from Polygon annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return a new Path object, you need invoke Path.Destroy() to free memory.
 		 */
         final public Path GetPolygonPath()
@@ -963,7 +1079,7 @@ public class Page
 		/**
 		 * set Path to Polygon annotation.<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param path Path object.
 		 * @return true or false.
 		 */
@@ -974,7 +1090,7 @@ public class Page
 		}
 		/**
 		 * get Path object from Polyline annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return a new Path object, you need invoke Path.Destroy() to free memory.
 		 */
         final public Path GetPolylinePath()
@@ -988,7 +1104,7 @@ public class Page
 		/**
 		 * set Path to Polyline annotation.<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param path Path object.
 		 * @return true or false.
 		 */
@@ -997,10 +1113,21 @@ public class Page
 			if( path == null ) return false;
 			return Page.setAnnotPolylinePath(page.hand, hand, path.m_hand);
 		}
+
+		/**
+		 * get point from line annotation.<br/>
+		 * this method require professional or premium license
+		 * @param idx 0: start point, others: end point.
+         * @return array as [x,y], or null.
+         */
+		final public float[] GetLinePoint(int idx)
+		{
+			return Page.getAnnotLinePoint(page.hand, hand, idx);
+		}
 		/**
 		 * set icon for sticky text note/file attachment/Rubber Stamp annotation.<br/>
 		 * you need render page again to show modified annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @param icon icon value depends on annotation type.<br/>
 		 * <strong>For sticky text note:</strong><br/>
 		 * 0: Note<br/>
@@ -1061,7 +1188,7 @@ public class Page
 		}
 		/**
 		 * get icon value for sticky text note/file attachment/Rubber Stamp annotation.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return icon value depends on annotation type.<br/>
 		 * <strong>For sticky text note:</strong><br/>
 		 * 0: Note<br/>
@@ -1112,7 +1239,7 @@ public class Page
 		/**
 		 * remove annotation<br/>
 		 * you should re-render page to display modified data.<br/>
-		 * this method valid in professional or premium version
+		 * this method require professional or premium license
 		 * @return true or false
 		 */
         final public boolean RemoveFromPage()
@@ -1251,6 +1378,17 @@ public class Page
 	static private native boolean getAnnotMovieData( long hand, long annot, String save_file );
 	static private native boolean getAnnotSoundData( long hand, long annot, int paras[], String save_file );
 	static private native boolean getAnnotAttachmentData( long hand, long annot, String save_file );
+
+	static private native boolean addAnnotRichMedia(long page, String path_player, String path_content, int type, long dimage, float[] rect);
+	static private native int getAnnotRichMediaItemCount(long page, long annot);
+	static private native int getAnnotRichMediaItemActived(long page, long annot);
+	static private native int getAnnotRichMediaItemType(long page, long annot, int idx);
+	static private native String getAnnotRichMediaItemAsset(long page, long annot, int idx);
+	static private native String getAnnotRichMediaItemPara(long page, long annot, int idx);
+	static private native String getAnnotRichMediaItemSource(long page, long annot, int idx);
+	static private native boolean getAnnotRichMediaItemSourceData(long page, long annot, int idx, String save_path);
+	static private native boolean getAnnotRichMediaData(long page, long annot, String asset, String save_path);
+	
 	static private native int getAnnotEditType( long hand, long annot );
 	static private native int getAnnotEditMaxlen( long hand, long annot );
 	static private native boolean getAnnotEditTextRect( long hand, long annot, float[] rect );
@@ -1291,12 +1429,14 @@ public class Page
 	static private native boolean setAnnotStrokeColor( long hand, long annot, int color );
 	static private native float getAnnotStrokeWidth( long hand, long annot );
 	static private native boolean setAnnotStrokeWidth( long hand, long annot, float width );
+	static private native boolean setAnnotStrokeDash(long hand, long annot, float[] dash);
 	static private native long getAnnotInkPath( long hand, long annot );
 	static private native boolean setAnnotInkPath( long hand, long annot, long path );
 	static private native long getAnnotPolygonPath( long hand, long annot );
 	static private native boolean setAnnotPolygonPath( long hand, long annot, long path );
 	static private native long getAnnotPolylinePath( long hand, long annot );
 	static private native boolean setAnnotPolylinePath( long hand, long annot, long path );
+	static private native float[] getAnnotLinePoint(long hand, long annot, int idx);
 	static private native boolean setAnnotIcon( long hand, long annot, int icon );
 	static private native int getAnnotIcon( long hand, long annot );
 	static private native boolean setAnnotIcon2( long hand, long annot, String name, long content );
@@ -1320,7 +1460,7 @@ public class Page
 	static private native boolean addAnnotRect2( long hand, float[] rect, float width, int color, int fill_color );
 	static private native boolean addAnnotEllipse2( long hand, float[] rect, float width, int color, int fill_color );
 	static private native boolean addAnnotMarkup2( long hand, int cindex1, int cindex2, int color, int type );
-	static private native boolean addAnnotBitmap( long hand, Bitmap bitmap, boolean has_alpha, float[] rect );
+	static private native boolean addAnnotBitmap( long hand, long dimage, float[] rect );
 	static private native boolean addAnnotAttachment( long hand, String path, int icon, float[] rect );
 	static private native boolean addAnnotText( long hand, float[] pt );
 	static private native boolean addAnnotGoto( long hand, float[] rect, int pageno, float top );
@@ -1338,7 +1478,7 @@ public class Page
 
     /**
      * advanced function to get reference of Page object.<br/>
-     * this method need premium license.
+     * this method require premium license.
      * @return reference
      */
     final public Ref Advance_GetRef()
@@ -1351,7 +1491,7 @@ public class Page
     /**
      * advanced function to reload page object, after advanced methods update Page object data.<br/>
      * all annotations return from Page.GetAnnot() or Page.GetAnnotFromPoint() shall not available. after this method invoked.<br/>
-     * this method need premium license.
+     * this method require premium license.
      */
     final public void Advance_Reload()
     {
@@ -1541,7 +1681,7 @@ public class Page
 	}
 	/**
 	 * get text objects to memory.<br/>
-	 * a standard license is needed for this method
+	 * a standard license is required for this method
 	 */
     final public void ObjsStart()
 	{
@@ -1587,7 +1727,7 @@ public class Page
 	}
 	/**
 	 * get chars count in this page. this can be invoked after ObjsStart<br/>
-	 * a standard license is needed for this method
+	 * a standard license is required for this method
 	 * @return count or 0 if ObjsStart not invoked.
 	 */
     final public int ObjsGetCharCount()
@@ -1630,7 +1770,7 @@ public class Page
 	/**
 	 * get annotations count in this page.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @return count
 	 */
     final public int GetAnnotCount()
@@ -1640,7 +1780,7 @@ public class Page
 	/**
 	 * get annotations by index.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param index 0 based index value. range:[0, GetAnnotCount()-1]
 	 * @return handle of annotation, valid until Close invoked.
 	 */
@@ -1656,7 +1796,7 @@ public class Page
 	/**
 	 * get annotation by PDF point.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param x x value in PDF coordinate system.
 	 * @param y y value in PDF coordinate system.
 	 * @return Annotation object, valid until Page.Close invoked.
@@ -1673,7 +1813,7 @@ public class Page
 	/**
 	 * get annotation by name.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param name name string in "NM" entry of annotation.
 	 * @return Annotation object, valid until Page.Close invoked.
 	 */
@@ -1690,7 +1830,7 @@ public class Page
 	 * add goto-page link to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param rect link area rect [left, top, right, bottom] in PDF coordinate.
 	 * @param pageno 0 based pageno to goto.
 	 * @param top y coordinate in PDF coordinate, page.height is top of page. and 0 is bottom of page.
@@ -1705,7 +1845,7 @@ public class Page
 	 * add URL link to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param rect link area rect [left, top, right, bottom] in PDF coordinate.
 	 * @param uri url address, example: "http://www.radaee.com/en"
 	 * @return true or false.<br/>
@@ -1719,7 +1859,7 @@ public class Page
 	 * add an Rubber Stamp to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param rect icon area rect [left, top, right, bottom] in PDF coordinate.
 	 * @param icon predefined value as below:<br/>
 	 *  0: "Draft"(default icon)<br/>
@@ -1758,7 +1898,7 @@ public class Page
 	 * add hand-writing to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param ink Ink object
 	 * @param orgx origin x coordinate in page. in DIB coordinate system
@@ -1775,7 +1915,7 @@ public class Page
 	 * add hand-writing to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param hwriting hand writing object
 	 * @param orgx origin x coordinate in page. in DIB coordinate system
@@ -1792,7 +1932,7 @@ public class Page
 	 * add a user-defined glyph to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param path Path object.
 	 * @param color text color, formated as 0xAARRGGBB.
@@ -1809,7 +1949,7 @@ public class Page
 	 * add rectangle to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param rect 4 elements for left, top, right, bottom in DIB coordinate system
 	 * @param width line width
@@ -1827,7 +1967,7 @@ public class Page
 	 * add line to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param pt1 start point, 2 elements for x,y
 	 * @param pt2 end point, 2 elements for x,y
@@ -1858,7 +1998,7 @@ public class Page
 	 * add ellipse to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param rect 4 elements for left, top, right, bottom in DIB coordinate system
 	 * @param width line width
@@ -1881,7 +2021,7 @@ public class Page
 	 * add a text-markup annotation to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param mat Matrix for Render function.
 	 * @param rects 4 * n rectangles, each 4 elements: left, top, right, bottom in DIB coordinate system. n is decided by length of array.
 	 * @param type 0: Highlight, 1: Underline, 2: StrikeOut, 3: Highlight without round corner.
@@ -1901,7 +2041,7 @@ public class Page
 	 * add hand-writing to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param ink Ink object in PDF coordinate.
 	 * @return true or false.<br/>
 	 * the added annotation can be obtained by Page.GetAnnot(Page.GetAnnotCount() - 1), if this method return true.
@@ -1915,7 +2055,7 @@ public class Page
 	 * add line to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param pt1 start point in PDF coordinate, 2 elements for x,y
 	 * @param pt2 end point in PDF coordinate, 2 elements for x,y
 	 * @param style1 style for start point:<br/>
@@ -1944,7 +2084,7 @@ public class Page
 	 * add rectangle to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param rect 4 elements for left, top, right, bottom in PDF coordinate system
 	 * @param width line width in PDF coordinate.
 	 * @param color rectangle color, formated as 0xAARRGGBB
@@ -1960,7 +2100,7 @@ public class Page
 	 * add ellipse to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param rect 4 elements for left, top, right, bottom in PDF coordinate system
 	 * @param width line width in PDF coordinate
 	 * @param color ellipse color, formated as 0xAARRGGBB
@@ -1976,7 +2116,7 @@ public class Page
 	 * add an edit-box on page.<br/>
 	 * the font of edit box is set by Global.setTextFont in Global.Init().<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in premium version.
+	 * this method require premium license.
 	 * @param rect 4 elements: left, top, right, bottom in PDF coordinate system.
 	 * @param line_clr color of border line, formated as 0xAARRGGBB.
 	 * @param line_w width of border line.
@@ -1994,7 +2134,7 @@ public class Page
 	 * add polygon to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param path must be a closed contour.
 	 * @param color stroke color formated as 0xAARRGGBB.
 	 * @param fill_color fill color, formated as 0xAARRGGBB. if AA == 0, no fill operations, otherwise alpha value is same to stroke color. 
@@ -2011,7 +2151,7 @@ public class Page
 	 * add polyline to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param path must be a set of unclosed lines. do not container any move-to operation except the first point in the path.
 	 * @param style1 style for start point:<br/>
 	 * 0: None<br/>
@@ -2040,7 +2180,7 @@ public class Page
 	 * add a text-markup annotation to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be only invoked after ObjsStart.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param cindex1 first char index
 	 * @param cindex2 second char index
 	 * @param type type as following:<br/>
@@ -2064,22 +2204,39 @@ public class Page
 	 * add a bitmap object as an annotation to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version, and Document.SetCache() invoked.
+	 * this method require professional or premium license, and Document.SetCache() invoked.
+	 * @param image DocImage object return from Document.NewImage*();
+	 * @param rect 4 elements: left, top, right, bottom in PDF coordinate system.
+	 * @return true or false.<br/>
+	 * the added annotation can be obtained by Page.GetAnnot(Page.GetAnnotCount() - 1), if this method return true.
+	 */
+    final public boolean AddAnnotBitmap( DocImage image, float[] rect )
+	{
+		return addAnnotBitmap( hand, image.hand, rect );
+	}
+
+	/**
+	 * add a bitmap object as an annotation to page.<br/>
+	 * you should re-render page to display modified data.<br/>
+	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
+	 * this method require professional or premium license, and Document.SetCache() invoked.
 	 * @param bitmap Bitmap object to add, which should be formated in ARGB_8888/ARGB_4444/RGB_565
 	 * @param has_alpha is need to save alpha channel information?
 	 * @param rect 4 elements: left, top, right, bottom in PDF coordinate system.
 	 * @return true or false.<br/>
 	 * the added annotation can be obtained by Page.GetAnnot(Page.GetAnnotCount() - 1), if this method return true.
 	 */
-    final public boolean AddAnnotBitmap( Bitmap bitmap, boolean has_alpha, float[] rect )
-	{
-		return addAnnotBitmap( hand, bitmap, has_alpha, rect );
+	@Deprecated
+	final public boolean AddAnnotBitmap( Bitmap bitmap, boolean has_alpha, float[] rect ) {
+		DocImage dimg = m_doc.NewImage(bitmap, has_alpha);
+		return dimg != null && AddAnnotBitmap(dimg, rect);
 	}
+
 	/**
 	 * add a file as an attachment to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version, and Document.SetCache invoked.
+	 * this method require professional or premium license, and Document.SetCache invoked.
 	 * @param path absolute path name to the file.
 	 * @param icon icon display to the page. values as:<br/>
 	 * 0: PushPin<br/>
@@ -2094,11 +2251,30 @@ public class Page
 	{
 		return addAnnotAttachment( hand, path, icon, rect );
 	}
+
+	/**
+	 * add a RichMedia annotation to page.<br/>
+	 * you should re-render page to display modified data.<br/>
+	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
+	 * this method require professional or premium license, and Document.SetCache invoked.
+	 * @param path_player path-name to flash player. example: "/sdcard/VideoPlayer.swf", "/sdcard/AudioPlayer.swf"
+	 * @param path_content path-name to RichMedia content. example: "/sdcard/video.mp4", "/sdcard/audio.mp3"
+	 * @param type 0: Video, 1: Audio, 2: Flash, 3: 3D<br/>
+	 *             Video like *.mpg, *.mp4 ...<br/>
+	 *             Audio like *.mp3 ...<br/>
+	 * @param image DocImage object return from Document.NewImage*();
+	 * @param rect 4 elements: left, top, right, bottom in PDF coordinate system.
+     * @return true or false.
+     */
+	final public boolean AddAnnotRichMedia(String path_player, String path_content, int type, DocImage image, float[] rect)
+	{
+		return addAnnotRichMedia(hand, path_player, path_content, type, image.hand, rect);
+	}
 	/**
 	 * add a sticky text annotation to page.<br/>
 	 * you should re-render page to display modified data.<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param pt 2 elements: x, y in PDF coordinate system.
 	 * @return true or false.<br/>
 	 * the added annotation can be obtained by Page.GetAnnot(Page.GetAnnotCount() - 1), if this method return true.
@@ -2111,7 +2287,7 @@ public class Page
 	 * add an edit-box on page.<br/>
 	 * the font of edit box is set by Global.setTextFont in Global.Init().<br/>
 	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method valid in premium version.
+	 * this method require premium license.
 	 * @param mat Matrix object that passed to Render or RenderToBmp function.
 	 * @param rect 4 elements: left, top, right, bottom in PDF coordinate system.
 	 * @param line_clr color of border line, formated as 0xAARRGGBB.
@@ -2128,7 +2304,7 @@ public class Page
 	}
 	/**
 	 * Start Reflow.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param width input width, function calculate height.
 	 * @param scale scale base to 72 DPI, 2.0 means 144 DPI. the reflowed text will displayed in scale
 	 * @param enable_images enable reflow images.
@@ -2140,7 +2316,7 @@ public class Page
 	}
 	/**
 	 * Reflow to dib.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param dib dib to render
 	 * @param orgx origin x coordinate
 	 * @param orgy origin y coordinate
@@ -2153,7 +2329,7 @@ public class Page
 	}
 	/**
 	 * Reflow to Bitmap object.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param bitmap bitmap to reflow
 	 * @param orgx origin x coordinate
 	 * @param orgy origin y coordinate
@@ -2165,7 +2341,7 @@ public class Page
 	}
 	/**
 	 * get reflow paragraph count.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @return count
 	 */
     final public int ReflowGetParaCount()
@@ -2174,7 +2350,7 @@ public class Page
 	}
 	/**
 	 * get one paragraph's char count.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @return char count
 	 */
@@ -2185,7 +2361,7 @@ public class Page
 	}
 	/**
 	 * get char's font width.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @return font width for this char
@@ -2197,7 +2373,7 @@ public class Page
 	}
 	/**
 	 * get char's font height.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @return font height for this char
@@ -2209,7 +2385,7 @@ public class Page
 	}
 	/**
 	 * get char's fill color for display.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @return color value formatted 0xAARRGGBB, AA: alpha value, RR:red, GG:green, BB:blue
@@ -2221,7 +2397,7 @@ public class Page
 	}
 	/**
 	 * get char's unicode value.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @return unicode
@@ -2233,7 +2409,7 @@ public class Page
 	}
 	/**
 	 * get char's font name.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @return name string
@@ -2245,7 +2421,7 @@ public class Page
 	}
 	/**
 	 * get char's bound box.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph paragraph index range[0, ReflowGetParaCount()-1]
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @param rect output: 4 element as [left, top, right, bottom].
@@ -2257,7 +2433,7 @@ public class Page
 	}
 	/**
 	 * get text from range.<br/>
-	 * this method valid in professional or premium version
+	 * this method require professional or premium license
 	 * @param iparagraph1 first position
 	 * @param ichar1 first position
 	 * @param iparagraph2 second position
@@ -2272,7 +2448,7 @@ public class Page
 	}
 	/**
 	 * add a font as resource of this page.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param font font object created by Document.NewFontCID()
 	 * @return ResFont or null.
 	 */
@@ -2290,7 +2466,7 @@ public class Page
 	}
 	/**
 	 * add an image as resource of this page.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param image image object created by Document.NewImage() or Document.NewImageJPEG()
 	 * @return null means failed.
 	 */
@@ -2308,7 +2484,7 @@ public class Page
 	}
 	/**
 	 * add GraphicState as resource of this page.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param gstate ExtGraphicState created by Document.NewGState();
 	 * @return null means failed.
 	 */
@@ -2327,7 +2503,7 @@ public class Page
 
     /**
      * add Form as resource of this page.<br/>
-     * a premium license is needed for this method.
+     * a premium license is required for this method.
      * @param form Form created by Document.NewForm();
      * @return null means failed.
      */
@@ -2342,7 +2518,7 @@ public class Page
     }
 	/**
 	 * add content stream to this page.<br/>
-	 * a premium license is needed for this method.
+	 * a premium license is required for this method.
 	 * @param content PageContent object called PageContent.create().
 	 * @param flush does need flush all resources?<br/>
 	 * true, if you want render page after this method, or false.<br/>
@@ -2367,7 +2543,7 @@ public class Page
 	}
     /**
      * remove all annotations and display it as normal content on page.<br/>
-     * this method need premium license.
+     * this method require premium license.
      * @return true or false
      */
     public boolean FlatAnnots()

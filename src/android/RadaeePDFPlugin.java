@@ -1,8 +1,10 @@
-/* 	
+/*
 	RadaeePDF-Cordova for Android
 	GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 	Nermeen Solaiman
 	v1.1
+
+	modified on 09/11/16 -->  added getFileState prototype
 */
 package com.radaee.cordova;
 
@@ -13,7 +15,6 @@ import android.webkit.URLUtil;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
-import com.radaee.reader.PDFPagerAct;
 import com.radaee.reader.PDFViewAct;
 import com.radaee.util.PDFHttpStream;
 
@@ -25,6 +26,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * define the method exposed by the RadaeePDFPlugin
+ */
 public class RadaeePDFPlugin extends CordovaPlugin {
 
     private Document mDocument;
@@ -70,6 +74,18 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                 mCallbackContext.success("License activated successfully.");
             else
                 mCallbackContext.error("License activation failure.");
+        } else if(action.equals("fileState")) {
+            switch (PDFViewAct.getFileState()) {
+                case PDFViewAct.NOT_MODIFIED:
+                    mCallbackContext.success("File has not been modified");
+                    break;
+                case PDFViewAct.MODIFIED_NOT_SAVED:
+                    mCallbackContext.success("File has been modified but not saved");
+                    break;
+                case PDFViewAct.MODIFIED_AND_SAVED:
+                    mCallbackContext.success("File has been modified and saved");
+                    break;
+            }
         } else if(action.equals("openFromAssets")) {
             params = args.getJSONObject(0);
 

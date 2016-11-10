@@ -32,6 +32,11 @@ import com.radaee.viewlib.R;
 
 public class PDFViewAct extends Activity implements PDFLayoutListener
 {
+	static final public int NOT_MODIFIED = 0;
+	static final public int MODIFIED_NOT_SAVED = 1;
+	static final public int MODIFIED_AND_SAVED = 2;
+	static private int mFileState = NOT_MODIFIED;
+
 	static protected Document ms_tran_doc;
 	static private int m_tmp_index = 0;
 	private PDFAssetStream m_asset_stream = null;
@@ -118,6 +123,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         @Override
         protected void onPostExecute(Integer integer)
         {
+			mFileState = NOT_MODIFIED;
             m_view.PDFOpen(m_doc, PDFViewAct.this);
             m_controller = new PDFViewController(m_layout, m_view);
             need_save_doc = need_save;
@@ -256,6 +262,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     	{
         	if(m_modified)
         	{
+				mFileState = MODIFIED_NOT_SAVED;
         		TextView txtView = new TextView(this);
         		txtView.setText("Document modified\r\nDo you want save it?");
 				new AlertDialog.Builder(this).setTitle("Exiting").setView(
@@ -265,6 +272,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 				           public void onClick(DialogInterface dialog, int which)
 				           {
 				        	   m_doc.Save();
+							   mFileState = MODIFIED_AND_SAVED;
 				        	   PDFViewAct.super.onBackPressed();
 				           }
 				       }).setNegativeButton("No", new DialogInterface.OnClickListener()
@@ -431,7 +439,12 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     }
 
     @Override
-    public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y) {
-        return false;
+    public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y)
+	{
+		return false;
     }
+
+	public static int getFileState() {
+		return mFileState;
+	}
 }

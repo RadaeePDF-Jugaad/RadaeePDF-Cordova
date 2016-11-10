@@ -42,6 +42,7 @@ public class PDFMemStream implements PDFStream
 		int len = data.length;
 		if( len + m_pos > m_len )
 			len = m_len - m_pos;
+		if (len < 0) len = 0;
 		System.arraycopy(m_data, m_pos, data, 0, len );
 		m_pos += len;
 		return len;
@@ -70,7 +71,9 @@ public class PDFMemStream implements PDFStream
 
 	public void seek(int pos)
 	{
-		m_pos = pos;
+		if(pos < 0) m_pos = 0;
+		else if (pos > m_len) m_pos = m_len;
+		else m_pos = pos;
 	}
 
 	public int tell()

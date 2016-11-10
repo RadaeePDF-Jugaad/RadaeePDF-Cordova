@@ -76,6 +76,7 @@ public class PDFLayoutView extends View implements LayoutListener
 
 	private Ink m_ink = null;
 	private Bitmap m_icon = null;
+	private Document.DocImage m_dicon = null;
 	private float m_rects[];
 	private VPage m_note_pages[];
 	private int m_note_indecs[];
@@ -94,6 +95,7 @@ public class PDFLayoutView extends View implements LayoutListener
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
         {
+			if(m_layout == null) return false;
         	if(m_status == STA_NONE && m_hold)
         	{
 	        	float dx = e2.getX() - e1.getX();
@@ -103,15 +105,21 @@ public class PDFLayoutView extends View implements LayoutListener
         	else return false;
         }
         @Override
-        public boolean onDoubleTap(MotionEvent e) { return false; }
+        public boolean onDoubleTap(MotionEvent e)
+		{
+			return false;
+		}
         @Override
         public boolean onDoubleTapEvent(MotionEvent e)
         {
-            if (m_listener == null ||
-                !m_listener.OnPDFDoubleTapped(m_layout, e.getX(), e.getY()))
-                return false;
-            m_status = STA_NONE;
-            return true;
+			if(m_layout == null) return false;
+			if(m_status == STA_NONE && e.getActionMasked() == MotionEvent.ACTION_UP) {
+				if (m_listener == null ||
+						!m_listener.OnPDFDoubleTapped(m_layout, e.getX(), e.getY()))
+					return false;
+				return true;
+			}
+			return false;
         }
         @Override
         public boolean onDown(MotionEvent e)
@@ -130,11 +138,6 @@ public class PDFLayoutView extends View implements LayoutListener
         @Override
         public void onShowPress(MotionEvent e)
         {
-        }
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e)
-        {
-        	return false;
         }
         private void onEditAnnot()
         {
@@ -165,64 +168,65 @@ public class PDFLayoutView extends View implements LayoutListener
             };
             getContext().startActivity(intent);
         }
-        @Override
-        public boolean onSingleTapUp(MotionEvent e)
-        {
-    		if( m_status == STA_NONE || m_status == STA_ANNOT )
-    		{
-    			m_annot_pos = m_layout.vGetPos((int)e.getX(), (int)e.getY());
-    			m_annot_page = m_layout.vGetPage(m_annot_pos.pageno);
-    			Page page = m_doc.GetPage(m_annot_page.GetPageNo());
-    			if( page == null ) m_annot = null;
-    			else m_annot = page.GetAnnotFromPoint(m_annot_pos.x, m_annot_pos.y);
-    			if( m_annot == null )
-    			{
-    				m_annot_page = null;
-    				m_annot_pos = null;
-    				m_annot_rect = null;
-    				if( m_listener != null )
-    				{
-    					if(m_status == STA_ANNOT)
-    						m_listener.OnPDFAnnotTapped(m_annot_page, null);
-    					else
-    						m_listener.OnPDFBlankTapped();
-    				}
-    				m_status = STA_NONE;
-    			}
-    			else
-    			{
-    				page.ObjsStart();
-    				m_annot_rect = m_annot.GetRect();
-    				float tmp = m_annot_rect[1];
-    				m_annot_rect[0] = m_annot_page.GetVX(m_annot_rect[0]) - m_layout.vGetX();
-    				m_annot_rect[1] = m_annot_page.GetVY(m_annot_rect[3]) - m_layout.vGetY();
-    				m_annot_rect[2] = m_annot_page.GetVX(m_annot_rect[2]) - m_layout.vGetX();
-    				m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
-    				m_status = STA_ANNOT;
-                    int check = m_annot.GetCheckStatus();
-                    if( m_doc.CanSave() && check >= 0 )
-                    {
-                        switch( check )
-                        {
-                            case 0:
-                                m_annot.SetCheckValue(true);
-                                break;
-                            case 1:
-                                m_annot.SetCheckValue(false);
-                                break;
-                            case 2:
-                            case 3:
-                                m_annot.SetRadio();
-                                break;
-                        }
-                        m_layout.vRenderSync(m_annot_page);
-                        if( m_listener != null )
-                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                        PDFEndAnnot();
-                    }
-    				else if( m_doc.CanSave() && m_annot.GetEditType() > 0 )//if form edit-box.
-    				{
-                        onEditAnnot();
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e)
+		{
+			if(m_layout == null) return false;
+			if( m_status == STA_NONE || m_status == STA_ANNOT )
+			{
+				m_annot_pos = m_layout.vGetPos((int)e.getX(), (int)e.getY());
+				m_annot_page = m_layout.vGetPage(m_annot_pos.pageno);
+				Page page = m_doc.GetPage(m_annot_page.GetPageNo());
+				if( page == null ) m_annot = null;
+				else m_annot = page.GetAnnotFromPoint(m_annot_pos.x, m_annot_pos.y);
+				if( m_annot == null )
+				{
+					m_annot_page = null;
+					m_annot_pos = null;
+					m_annot_rect = null;
+					if( m_listener != null )
+					{
+						if(m_status == STA_ANNOT)
+							m_listener.OnPDFAnnotTapped(m_annot_page, null);
+						else
+							m_listener.OnPDFBlankTapped();
+					}
+					m_status = STA_NONE;
+				}
+				else
+				{
+					page.ObjsStart();
+					m_annot_rect = m_annot.GetRect();
+					float tmp = m_annot_rect[1];
+					m_annot_rect[0] = m_annot_page.GetVX(m_annot_rect[0]) - m_layout.vGetX();
+					m_annot_rect[1] = m_annot_page.GetVY(m_annot_rect[3]) - m_layout.vGetY();
+					m_annot_rect[2] = m_annot_page.GetVX(m_annot_rect[2]) - m_layout.vGetX();
+					m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
+					m_status = STA_ANNOT;
+					int check = m_annot.GetCheckStatus();
+					if( m_doc.CanSave() && check >= 0 )
+					{
+						switch( check )
+						{
+							case 0:
+								m_annot.SetCheckValue(true);
+								break;
+							case 1:
+								m_annot.SetCheckValue(false);
+								break;
+							case 2:
+							case 3:
+								m_annot.SetRadio();
+								break;
+						}
+						m_layout.vRenderSync(m_annot_page);
+						if( m_listener != null )
+							m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+						PDFEndAnnot();
+					}
+					else if( m_doc.CanSave() && m_annot.GetEditType() > 0 )//if form edit-box.
+					{
+						onEditAnnot();
                         /*
                         int[] location = new int[2];
                         getLocationOnScreen(location);
@@ -275,69 +279,74 @@ public class PDFLayoutView extends View implements LayoutListener
                         });
                         m_pEdit.showAtLocation(PDFLayoutView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int) m_annot_rect[1] + location[1]);
                         */
-    				}
-    				else if( m_doc.CanSave() && m_annot.GetComboItemCount() >= 0 )//if form choice
-    				{
-                        try {
-                            int[] location = new int[2];
-                            getLocationOnScreen(location);
-                            String opts[] = new String[m_annot.GetComboItemCount()];
-                            int cur = 0;
-                            while (cur < opts.length) {
-                                opts[cur] = m_annot.GetComboItem(cur);
-                                cur++;
-                            }
-                            m_pCombo = new PopupWindow(LayoutInflater.from(getContext()).inflate(R.layout.pop_combo, null));
-                            Drawable dw = new ColorDrawable(0);
-                            m_pCombo.setFocusable(true);
-                            m_pCombo.setTouchable(true);
-                            m_pCombo.setBackgroundDrawable(dw);
-                            m_pCombo.setWidth((int) (m_annot_rect[2] - m_annot_rect[0]));
-                            if ((m_annot_rect[3] - m_annot_rect[1] - 4) * opts.length > 250)
-                                m_pCombo.setHeight(250);
-                            else
-                                m_pCombo.setHeight((int) (m_annot_rect[3] - m_annot_rect[1] - 4) * opts.length);
-                            ComboList combo = (ComboList) m_pCombo.getContentView().findViewById(R.id.annot_combo);
-                            combo.set_opts(opts);
-                            combo.setOnItemClickListener(new OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    m_combo_item = i;
-                                    m_pCombo.dismiss();
-                                }
-                            });
-                            m_edit_type = 2;
-                            m_combo_item = -1;
-                            m_pCombo.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                                @Override
-                                public void onDismiss() {
-                                    if (m_edit_type == 2)//combo
-                                    {
-                                        if (m_combo_item >= 0) {
-                                            m_annot.SetComboItem(m_combo_item);
-                                            m_layout.vRenderSync(m_annot_page);
-                                            if (m_listener != null)
-                                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                                        }
-                                        m_combo_item = -1;
-                                        PDFEndAnnot();
-                                    }
-                                    m_edit_type = 0;
+					}
+					else if( m_doc.CanSave() && m_annot.GetComboItemCount() >= 0 )//if form choice
+					{
+						try {
+							int[] location = new int[2];
+							getLocationOnScreen(location);
+							String opts[] = new String[m_annot.GetComboItemCount()];
+							int cur = 0;
+							while (cur < opts.length) {
+								opts[cur] = m_annot.GetComboItem(cur);
+								cur++;
+							}
+							m_pCombo = new PopupWindow(LayoutInflater.from(getContext()).inflate(R.layout.pop_combo, null));
+							Drawable dw = new ColorDrawable(0);
+							m_pCombo.setFocusable(true);
+							m_pCombo.setTouchable(true);
+							m_pCombo.setBackgroundDrawable(dw);
+							m_pCombo.setWidth((int) (m_annot_rect[2] - m_annot_rect[0]));
+							if ((m_annot_rect[3] - m_annot_rect[1] - 4) * opts.length > 250)
+								m_pCombo.setHeight(250);
+							else
+								m_pCombo.setHeight((int) (m_annot_rect[3] - m_annot_rect[1] - 4) * opts.length);
+							ComboList combo = (ComboList) m_pCombo.getContentView().findViewById(R.id.annot_combo);
+							combo.set_opts(opts);
+							combo.setOnItemClickListener(new OnItemClickListener() {
+								@Override
+								public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+									m_combo_item = i;
+									m_pCombo.dismiss();
+								}
+							});
+							m_edit_type = 2;
+							m_combo_item = -1;
+							m_pCombo.setOnDismissListener(new PopupWindow.OnDismissListener() {
+								@Override
+								public void onDismiss() {
+									if (m_edit_type == 2)//combo
+									{
+										if (m_combo_item >= 0) {
+											m_annot.SetComboItem(m_combo_item);
+											m_layout.vRenderSync(m_annot_page);
+											if (m_listener != null)
+												m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+										}
+										m_combo_item = -1;
+										PDFEndAnnot();
+									}
+									m_edit_type = 0;
 
-                                }
-                            });
-                            m_pCombo.showAtLocation(PDFLayoutView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int) (m_annot_rect[3] + location[1]));
-                        }
-                        catch(Exception exc)
-                        {
-                        }
-    				}
-    				else if( m_listener != null )
-    					m_listener.OnPDFAnnotTapped(m_annot_page, m_annot);
-    				invalidate();
-    			}
-    			return true;
-    		}
+								}
+							});
+							m_pCombo.showAtLocation(PDFLayoutView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int) (m_annot_rect[3] + location[1]));
+						}
+						catch(Exception exc)
+						{
+						}
+					}
+					else if( m_listener != null )
+						m_listener.OnPDFAnnotTapped(m_annot_page, m_annot);
+					invalidate();
+				}
+				return true;
+			}
+			return false;
+		}
+        @Override
+        public boolean onSingleTapUp(MotionEvent e)
+        {
     		return false;
         }
     }
@@ -1539,7 +1548,12 @@ public class PDFLayoutView extends View implements LayoutListener
 		if( code == 0 )//start
 		{
 			m_status = STA_STAMP;
-			m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.pdf_custom_stamp);
+			if(m_dicon == null) {
+				m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.pdf_custom_stamp);
+				if (m_icon != null) {
+					m_dicon = m_doc.NewImage(m_icon, true);
+				}
+			}
 		}
 		else if( code == 1 )//end
 		{
@@ -1579,7 +1593,7 @@ public class PDFLayoutView extends View implements LayoutListener
 						}
 						mat.TransformRect(rect);
 						page.ObjsStart();
-						page.AddAnnotBitmap(m_icon, true, rect);
+						page.AddAnnotBitmap(m_dicon, rect);
                         mat.Destroy();
                         //add to redo/undo stack.
                         m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));

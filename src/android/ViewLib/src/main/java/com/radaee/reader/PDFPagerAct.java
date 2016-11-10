@@ -13,8 +13,6 @@ import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.view.PDFViewPager;
 
-import com.radaee.viewlib.R;
-
 /**
  * Created by radaee on 2015/5/14.
  */
@@ -62,7 +60,7 @@ public class PDFPagerAct extends Activity
     {
         super.onCreate(savedInstanceState);
         Global.Init(this);
-        m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.pdf_fragment, null);
+        m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(com.radaee.viewlib.R.layout.pdf_fragment, null);
         m_pager = (PDFViewPager)m_layout.findViewById(R.id.pdf_pager);
         m_doc = new Document();
         Intent intent = getIntent();
@@ -117,7 +115,10 @@ public class PDFPagerAct extends Activity
     protected void onDestroy()
     {
         m_pager.PDFClose();
-        m_doc.Close();;
+        if(m_doc != null) {
+            m_doc.Close();
+            m_doc = null;
+        }
         if( m_asset_stream != null )
         {
             m_asset_stream.close();

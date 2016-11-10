@@ -1,7 +1,10 @@
 //  RadaeePDFPlugin
 //  GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 //  Created by Nermeen Solaiman on 06/06/16.
-//  v1
+
+// modified by Nermeen Solaiman on 09/11/16
+//      added getFileState prototype
+//  v1.1.0
 
 var argscheck = require('cordova/argscheck'),
     exec      = require('cordova/exec');
@@ -24,6 +27,12 @@ RadaeePDFPlugin.prototype.open = function (params, success, failure) {
 RadaeePDFPlugin.prototype.openFromAssets = function(params, successCallback, errorCallback) {
         params = params || {};
                 exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'openFromAssets', [params]);
+};
+
+RadaeePDFPlugin.prototype.getFileState = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'fileState', [params]);
 };
 
 module.exports = new RadaeePDFPlugin();

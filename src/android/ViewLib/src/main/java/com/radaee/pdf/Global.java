@@ -1,6 +1,7 @@
 package com.radaee.pdf;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -21,7 +22,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.7beta1
+ * @version 3.9RC1
  */
 public class Global
 {
@@ -30,7 +31,7 @@ public class Global
 	public static String mEmail = "radaee_com@yahoo.cn";
 	public static String mKey = "LNJFDN-C89QFX-9ZOU9E-OQ31K2-FADG6Z-XEBCAO";
 
-	public static void Init(Activity act)
+	public static boolean Init(Context ctx)
     {
         //second para is license type
         //            0 means standard license.
@@ -40,7 +41,7 @@ public class Global
         //4th para is mail
         //5th para is key string
         //the package name got by native C/C++ library, not by pass parameter.
-		Init( act, mLicenseType, mCompany, mEmail, mKey);
+		return Init( (ContextWrapper)ctx, mLicenseType, mCompany, mEmail, mKey);
 	}
 	/**
 	 * get version string from library.
@@ -266,6 +267,14 @@ public class Global
 	 */
 	public static int selColor = 0x400000C0;// selection color
 	/**
+	 * find primary color.
+	 */
+	public static int findPrimaryColor = 0x400000FF;// find primary color
+	/**
+	 * find secondary color.
+	 */
+	public static int findSecondaryColor = 0x40404040;// find secondary color
+	/**
 	 * is text selection start from right to left in one line?
 	 */
 	public static boolean selRTOL = false;
@@ -308,6 +317,7 @@ public class Global
 	 */
 	public static String tmp_path = null;
 	public static boolean debug_mode = true;
+	public static boolean highlight_annotation = true;
 	public static boolean save_thumb_in_cache = true;
 
 	static private void load_file(Resources res, int res_id, File save_file)
@@ -356,14 +366,14 @@ public class Global
 	static private boolean ms_init = false;
 	/**
 	 * global initialize function. it load JNI library and write some data to memory.
-	 * @param act Activity need input, native get package name from this Activity, and then check package name.
+	 * @param act Context object must derived from CoontextWrapper, native get package name from this Activity, and then check package name.
 	 * @param license_type 0: standard license, 1: professional license, 2: premium license.
 	 * @param company_name
 	 * @param mail
 	 * @param serial
 	 * @return
 	 */
-	public static boolean Init(Activity act, int license_type, String company_name, String mail, String serial)
+	public static boolean Init(ContextWrapper act, int license_type, String company_name, String mail, String serial)
 	{
 		if(ms_init) return true;
 		if( act == null ) return false;
@@ -431,7 +441,7 @@ public class Global
         fontfileListAdd("/system/fonts/NotoSansTC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansJP-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansKR-Regular.otf");
-
+        //fontfileListAdd("/system/fonts/NotoSansHebrew-Regular.ttf");
         load_truetype_font( res, R.raw.arimo, new File(files, "arimo.ttf") );//load from APP resource
         load_truetype_font( res, R.raw.arimob, new File(files, "arimob.ttf") );
         load_truetype_font( res, R.raw.arimoi, new File(files, "arimoi.ttf") );
@@ -445,9 +455,10 @@ public class Global
         load_truetype_font( res, R.raw.cousinei, new File(files, "cousinei.ttf") );
         load_truetype_font( res, R.raw.cousinebi, new File(files, "cousinebi.ttf") );
         load_truetype_font( res, R.raw.symbol, new File(files, "symbol.ttf") );//Symbol Neu for Powerline
+        //load_truetype_font( res, R.raw.notosanshebrew, new File(files, "notosanshebrew.ttf") );//Symbol Neu for Powerline
 		fontfileListEnd();//this method parser all added font files, and extract font names, to init font mapping list.
 
-        // using resource fonts to replace type1 fonts.
+        // using resource fonts to replace type1 fonts.H
         fontfileMapping("Arial",                    "Arimo");
         fontfileMapping("Arial Bold",              "Arimo Bold");
         fontfileMapping("Arial BoldItalic",       "Arimo Bold Italic");
@@ -563,6 +574,7 @@ public class Global
 		while (face_first < face_count)
 		{
 			face_name = getFaceName(face_first);
+			//Log.d("------Fonts------", "----face name = " + face_name);
 			if (face_name != null) break;
 			face_first++;
 		}
@@ -653,6 +665,8 @@ public class Global
 	public static void default_config()
 	{
 		selColor = 0x400000C0;// selection color
+		findPrimaryColor = 0x400000FF;// find primary color
+		findSecondaryColor = 0x40404040;// find secondary color
 		fling_dis = 1.0f;// 0.5-2
         fling_speed = 0.1f;// 0.05 - 0.2
 		def_view = 0;// 0,1,2,3,4,5,6 0:vertical 1:horizon 2:curl effect 3:single
@@ -662,6 +676,7 @@ public class Global
 		dark_mode = false;// dark mode
 		zoomLevel = 3;
         debug_mode = true;
+		highlight_annotation = true;
 		setAnnotTransparency(0x200040FF);
 	}
 

@@ -98,8 +98,27 @@ RadaeePDFPlugin.openFromAssets(
     });
 ```
 
+### Get last opened file state
+
+Returns the state of the last opened pdf, it can be:
+- File has not been modified.
+- File has been modified but not saved.
+- File has been modified and saved.
+It's currently available for Android, soon it will be added also to iOS.
+
+```javascript
+RadaeePDFPlugin.getFileState(
+	{},
+	function(message) {
+		 console.log("Success: " + message);
+	},
+	function(err){
+		console.log("Failure: " + err);
+    });
+```
+
 RadaeePDF library version included:
-- Android: v3.6.2b
+- Android: v3.9
 - iOS: v3.6.6
 
 Original development: 

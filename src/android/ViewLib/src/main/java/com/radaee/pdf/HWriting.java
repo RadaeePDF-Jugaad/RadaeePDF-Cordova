@@ -10,6 +10,7 @@ so the line in HWriting will not in same width.
 @author Radaee
 @version 1.1
 */
+@Deprecated
 public class HWriting
 {
 	protected long hand = 0;
