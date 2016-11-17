@@ -485,6 +485,8 @@ bool Document_removeOutline(PDF_DOC doc, PDF_OUTLINE outlinenode);
  *	@return	length of meta data.
  */
 int Document_getMeta( PDF_DOC doc, const char *tag, char *meta, int len );
+bool Document_setMeta( PDF_DOC doc, const char *tag, const char *meta );
+
 bool Document_getID(PDF_DOC doc, unsigned char *fid);
 /**
  *	@brief	get page width.
@@ -641,6 +643,7 @@ bool Document_setGStateStrokeAlpha( PDF_DOC doc, PDF_DOC_GSTATE state, int alpha
  *	@return	true or false
  */
 bool Document_setGStateFillAlpha( PDF_DOC doc, PDF_DOC_GSTATE state, int alpha );
+bool Document_setGStateStrokeDash(PDF_DOC doc, PDF_DOC_GSTATE state, const float *dash, int dash_cnt, float phase);
 PDF_DOC_FORM Document_newForm(PDF_DOC doc);
 PDF_PAGE_FONT Document_addFormResFont(PDF_DOC doc, PDF_DOC_FORM form, PDF_DOC_FONT font);
 PDF_PAGE_IMAGE Document_addFormResImage(PDF_DOC doc, PDF_DOC_FORM form, PDF_DOC_IMAGE image);
@@ -1127,6 +1130,7 @@ float Page_getAnnotStrokeWidth( PDF_PAGE page, PDF_ANNOT annot );
  *	@return	true or false
  */
 bool Page_setAnnotStrokeWidth( PDF_PAGE page, PDF_ANNOT annot, float width );
+bool Page_setAnnotStrokeDash(PDF_PAGE page, PDF_ANNOT annot, const float *dash, int cnt);
 /**
  *	@brief	set icon for sticky text note/file attachment annotation.
  *          this can be invoked after ObjsStart or Render or RenderToBmp.
@@ -1357,6 +1361,17 @@ bool Page_getAnnotSoundData( PDF_PAGE page, PDF_ANNOT annot, int *paras, const c
  *	@return	true or false.
  */
 bool Page_getAnnotAttachmentData( PDF_PAGE page, PDF_ANNOT annot, const char *path );
+
+int Page_getAnnotRichMediaItemCount(PDF_PAGE page, PDF_ANNOT annot);
+int Page_getAnnotRichMediaItemActived(PDF_PAGE page, PDF_ANNOT annot);
+int Page_getAnnotRichMediaItemType(PDF_PAGE page, PDF_ANNOT annot, int idx);
+NSString *Page_getAnnotRichMediaItemAsset(PDF_PAGE page, PDF_ANNOT annot, int idx);
+NSString *Page_getAnnotRichMediaItemPara(PDF_PAGE page, PDF_ANNOT annot, int idx);
+NSString *Page_getAnnotRichMediaItemSource(PDF_PAGE page, PDF_ANNOT annot, int idx);
+bool Page_getAnnotRichMediaItemSourceData(PDF_PAGE page, PDF_ANNOT annot, int idx, NSString *save_path);
+bool Page_getAnnotRichMediaData(PDF_PAGE page, PDF_ANNOT annot, NSString *asset, NSString *save_path);
+
+
 PDF_ANNOT Page_getAnnotPopup(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_getAnnotPopupOpen(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_setAnnotPopupOpen(PDF_PAGE page, PDF_ANNOT annot, bool open);
@@ -1956,6 +1971,8 @@ bool Page_addAnnotEllipse( PDF_PAGE page, PDF_MATRIX matrix, const PDF_RECT *rec
  *	@return	true or false
  */
 bool Page_addAnnotEllipse2( PDF_PAGE page, const PDF_RECT *rect, float width, int color, int icolor );
+bool Page_addAnnotPolygon(PDF_PAGE page, PDF_PATH hand, int color, int fill_color, float width);
+bool Page_addAnnotPolyline(PDF_PAGE page, PDF_PATH hand, int style1, int style2, int color, int fill_color, float width);
 /**
  *	@brief	add popup text annotation to page. shows as an text note icon.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1997,8 +2014,9 @@ bool Page_addAnnotText2( PDF_PAGE page, float x, float y );
  *
  *	@return	true or false
  */
-bool Page_addAnnotBitmap( PDF_PAGE page, PDF_MATRIX matrix, CGImageRef bitmap, bool has_alpha, const PDF_RECT *rect );
-bool Page_addAnnotBitmap2( PDF_PAGE page, CGImageRef bitmap, bool has_alpha, const PDF_RECT *rect );
+bool Page_addAnnotBitmap( PDF_PAGE page, PDF_MATRIX matrix, PDF_DOC_IMAGE dimg, const PDF_RECT *rect );
+bool Page_addAnnotBitmap2( PDF_PAGE page, PDF_DOC_IMAGE dimg, const PDF_RECT *rect );
+bool Page_addAnnotRichMedia(PDF_PAGE page, NSString *path_player, NSString *path_content, int type, PDF_DOC_IMAGE dimage, const PDF_RECT *rect);
 bool Page_addAnnotPopup(PDF_PAGE page, PDF_ANNOT parent, const PDF_RECT *rect, bool open);
 /**
  *	@brief	add a text-markup annotation to page.

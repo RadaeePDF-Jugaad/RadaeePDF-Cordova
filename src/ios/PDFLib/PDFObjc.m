@@ -388,6 +388,10 @@ extern uint annotStrikeoutColor;
 {
 	return Document_setGStateFillAlpha( m_doc, m_handle, alpha );
 }
+-(bool)setStrokeDash:(const float *)dash :(int)dash_cnt :(float)phase
+{
+	return Document_setGStateStrokeDash( m_doc, m_handle, dash, dash_cnt, phase );
+}
 @end
 
 @implementation PDFDocImage
@@ -888,6 +892,10 @@ extern uint annotStrikeoutColor;
 {
 	return Page_setAnnotStrokeWidth( m_page, m_handle, width );
 }
+-(bool)setStrokeDash:(float *)dash : (int)cnt
+{
+	return Page_setAnnotStrokeDash( m_page, m_handle, dash, cnt );
+}
 -(int)getIcon
 {
 	return Page_getAnnotIcon( m_page, m_handle );
@@ -960,6 +968,49 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotAttachmentData( m_page, m_handle, [save_file UTF8String] );
 }
+
+
+-(int)getRichMediaItemCount
+{
+	return Page_getAnnotRichMediaItemCount(m_page, m_handle);
+}
+
+-(int)getRichMediaItemActived
+{
+	return Page_getAnnotRichMediaItemActived(m_page, m_handle);
+}
+
+-(int)getRichMediaItemType:(int) idx
+{
+	return Page_getAnnotRichMediaItemType(m_page, m_handle, idx);
+}
+
+-(NSString *)getRichMediaItemAsset:(int) idx
+{
+	return Page_getAnnotRichMediaItemAsset(m_page, m_handle, idx);
+}
+
+-(NSString *)getRichMediaItemPara:(int) idx
+{
+	return Page_getAnnotRichMediaItemPara(m_page, m_handle, idx);
+}
+
+-(NSString *)getRichMediaItemSource:(int) idx
+{
+	return Page_getAnnotRichMediaItemSource(m_page, m_handle, idx);
+}
+
+-(bool)getRichMediaItemSourceData:(int) idx :(NSString *)save_path
+{
+	return Page_getAnnotRichMediaItemSourceData(m_page, m_handle, idx, save_path);
+}
+
+-(bool)getRichMediaData :(NSString *)asset :(NSString *)save_path
+{
+	return Page_getAnnotRichMediaData(m_page, m_handle, asset, save_path);
+}
+
+
 -(bool)getPopupOpen
 {
 	return Page_getAnnotPopupOpen(m_page, m_handle);
@@ -1291,6 +1342,14 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotEllipse2( m_page, rect, width, color, icolor );
 }
+-(bool)addAnnotPolygon:(PDFPath *)path :(int) color :(int) fill_color :(float) width
+{
+	return Page_addAnnotPolygon(m_page, [path handle], color, fill_color, width);
+}
+-(bool)addAnnotPolyline:(PDFPath *)path :(int) style1 :(int) style2 :(int) color :(int) fill_color :(float) width
+{
+	return Page_addAnnotPolyline(m_page, [path handle], style1, style2, color, fill_color, width);
+}
 -(bool)addAnnotNote:(const PDF_POINT *)pt
 {
 	return Page_addAnnotText2( m_page, pt->x, pt->y );
@@ -1299,14 +1358,20 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotAttachment( m_page, [att UTF8String], icon, rect );
 }
--(bool)addAnnotBitmap0:(PDFMatrix *)mat :(CGImageRef) bitmap :(bool) has_alpha :(const PDF_RECT *) rect
+-(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *) dimage :(bool) has_alpha :(const PDF_RECT *) rect
 {
-	return Page_addAnnotBitmap( m_page, [mat handle], bitmap, has_alpha, rect );
+	return Page_addAnnotBitmap( m_page, [mat handle], [dimage handle], rect );
 }
--(bool)addAnnotBitmap:(CGImageRef) bitmap :(bool) has_alpha :(const PDF_RECT *) rect
+-(bool)addAnnotBitmap:(PDFDocImage *) dimage :(const PDF_RECT *) rect
 {
-	return Page_addAnnotBitmap2( m_page, bitmap, has_alpha, rect );
+	return Page_addAnnotBitmap2( m_page, [dimage handle], rect );
 }
+
+-(bool)addAnnotRichMedia:(NSString *) path_player :(NSString *) path_content :(int) type :(PDFDocImage *) dimage :(const PDF_RECT *) rect
+{
+	return Page_addAnnotRichMedia( m_page, path_player, path_content, type, [dimage handle], rect );
+}
+
 -(bool)addAnnotStamp:(int)icon :(const PDF_RECT *)rect
 {
 	return Page_addAnnotStamp( m_page, rect, icon );
@@ -1492,7 +1557,7 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getEmbedFileName:(int)idx
 {
-	return Document_getEFName(m_doc, idx);
+	Document_getEFName(m_doc, idx);
 }
 -(bool)getEmbedFileData:(int)idx :(NSString *)path
 {
@@ -1524,6 +1589,13 @@ extern uint annotStrikeoutColor;
     Document_getMeta(m_doc, stag, smeta, 511);
     return [NSString stringWithUTF8String: smeta];
 }
+
+-(bool)setMeta:(NSString *)tag :(NSString *)val
+{
+    const char *stag = [tag UTF8String];
+    return Document_setMeta(m_doc, stag, [val UTF8String]);
+}
+
 -(bool)PDFID:(unsigned char *)buf
 {
 	return Document_getID(m_doc, buf);

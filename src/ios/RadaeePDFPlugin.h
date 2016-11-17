@@ -26,6 +26,7 @@
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_command;
 
 @property (nonatomic) int viewMode;
+@property (strong, nonatomic) NSString *lastOpenedPath;
 @property (strong, nonatomic) UIImage *viewModeImage;
 @property (strong, nonatomic) UIImage *searchImage;
 @property (strong, nonatomic) UIImage *bookmarkImage;
@@ -44,7 +45,8 @@
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)activateLicense:(CDVInvokedUrlCommand*)command;
 - (void)openFromAssets:(CDVInvokedUrlCommand*)command;
-
+- (void)fileState:(CDVInvokedUrlCommand*)command;
+    
 + (RadaeePDFPlugin *)pluginInit;
 
 + (NSMutableArray *)loadBookmark;

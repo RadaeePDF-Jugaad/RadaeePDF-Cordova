@@ -97,6 +97,10 @@
         return;
     }
     
+    _lastOpenedPath = filePath;
+    
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:0] forKey:@"fileStat"];
+    
     [self readerInit];
     
     int result = [m_pdf PDFOpen:filePath :password];
@@ -128,6 +132,37 @@
     APP_Init();
     
     [self activateLicenseResult:[[NSUserDefaults standardUserDefaults] boolForKey:@"actIsActive"]];
+}
+
+- (void)fileState:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:_lastOpenedPath]) {
+        
+        NSString *message = @"";
+        
+        switch ([[NSUserDefaults standardUserDefaults] integerForKey:@"fileStat"]) {
+            case 0:
+            message = @"File has not been modified.";
+            break;
+            
+            case 1:
+            message = @"File has been modified but not saved.";
+            break;
+            
+            case 2:
+            message = @"File has been modified and saved.";
+            break;
+            
+            default:
+            break;
+        }
+        
+        [self getFileStateResult:message];
+    }
+    else
+        [self fileStateDidFailWithError:@"File not found"];
 }
 
 - (void)readerInit
@@ -384,6 +419,16 @@
     [self chargePdfSendResult:[CDVPluginResult
                                resultWithStatus: CDVCommandStatus_ERROR
                                messageAsDictionary:dict]];
+}
+    
+- (void)getFileStateResult:(NSString *)message
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
+}
+    
+- (void)fileStateDidFailWithError:(NSString *)errorMessage
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
 }
 
 @end

@@ -180,6 +180,7 @@
  *	@return true or false.
  */
 -(bool)setFillAlpha :(int)alpha;
+-(bool)setStrokeDash:(const float *)dash : (int)dash_cnt : (float)phase;
 @end
 
 @interface PDFDocImage : NSObject
@@ -437,6 +438,7 @@
  * @param w line width in PDF coordinate
  */
 -(void)setStrokeWidth:(float) w;
+-(bool)setStrokeDash:(float *)dash : (int)cnt;
 /**
  * @brief PDF operator: set miter limit.
  * @param miter miter limit.
@@ -861,6 +863,18 @@
  * @return true if save_file created, or false.
  */
 -(bool)getAttachmentData:(NSString *)save_file;
+
+-(int)getRichMediaItemCount;
+-(int)getRichMediaItemActived;
+-(int)getRichMediaItemType:(int) idx;
+-(NSString *)getRichMediaItemAsset:(int) idx;
+-(NSString *)getRichMediaItemPara:(int) idx;
+-(NSString *)getRichMediaItemSource:(int) idx;
+-(bool)getRichMediaItemSourceData:(int) idx :(NSString *)save_path;
+-(bool)getRichMediaData :(NSString *)asset :(NSString *)save_path;
+
+
+
 -(bool)getPopupOpen;
 /**
  * @brief get annotation's popup subject.
@@ -1094,12 +1108,12 @@
 -(bool)flatAnnots;
 /**
  * @brief get text objects to memory.
- * a standard license is needed for this method
+ * a standard license is required for this method
  */
 -(void)objsStart;
 /**
  * @brief get chars count in this page. this can be invoked after ObjsStart
- * a standard license is needed for this method
+ * a standard license is required for this method
  * @return count or 0 if ObjsStart not invoked.
  */
 -(int)objsCount;
@@ -1258,6 +1272,8 @@
  * @return true or false
  */
 -(bool)addAnnotEllipse:(const PDF_RECT *)rect :(float) width :(int) color :(int) icolor;
+-(bool)addAnnotPolygon:(PDFPath *)path :(int) color :(int) fill_color :(float) width;
+-(bool)addAnnotPolyline:(PDFPath *)path :(int) style1 :(int) style2 :(int) color :(int) fill_color :(float) width;
 /**
  * @brief add a sticky text annotation to page.
  * you should re-render page to display modified data.
@@ -1302,8 +1318,9 @@
 	 * the added annotation can be obtained by Page.GetAnnot(Page.GetAnnotCount() - 1), if this method return true.
 	 */
 -(bool)addAnnotStamp:(int)icon :(const PDF_RECT *)rect;
--(bool)addAnnotBitmap0:(PDFMatrix *)mat :(CGImageRef) bitmap :(bool) has_alpha :(const PDF_RECT *) rect;
--(bool)addAnnotBitmap:(CGImageRef) bitmap :(bool) has_alpha :(const PDF_RECT *) rect;
+-(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *)dimage :(const PDF_RECT *)rect;
+-(bool)addAnnotBitmap:(PDFDocImage *)dimage : (const PDF_RECT *)rect;
+-(bool)addAnnotRichMedia:(NSString *)path_player :(NSString *)path_content :(int)type :(PDFDocImage *)dimage :(const PDF_RECT *)rect;
 /**
  * @brief add a file as an attachment to page.
  * you should re-render page to display modified data.
@@ -1321,21 +1338,21 @@
 -(bool)addAnnotAttachment:(NSString *)att :(int)icon :(const PDF_RECT *)rect;
 /**
  * @brief add a font as resource of this page.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param font font object created by PDFDoc.newFontCID
  * @return ResFont or null.
  */
 -(PDF_PAGE_FONT)addResFont:(PDFDocFont *)font;
 /**
  * @brief add an image as resource of this page.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param image image object created by PDFDoc.newImageXXX
  * @return null means failed.
  */
 -(PDF_PAGE_IMAGE)addResImage:(PDFDocImage *)image;
 /**
  * @brief add GraphicState as resource of this page.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param gstate ExtGraphicState created by PDFDoc.newGState();
  * @return null means failed.
  */
@@ -1343,7 +1360,7 @@
 -(PDF_PAGE_FORM)addResForm:(PDFDocForm *)form;
 /**
  * @brief add content stream to this page.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param content PageContent object called PageContent.create().
  * @return true or false.
  */
@@ -1358,7 +1375,7 @@
 -(id)init:(PDF_DOC)doc :(PDF_IMPORTCTX)handle;
 /**
  * @brief import a page to dest document.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param srcno 0 based page NO. from source Document that passed to ImportStart.
  * @param dstno 0 based page NO. to insert in dest document object.
  * @return true or false.
@@ -1404,7 +1421,7 @@
 
 /**
  * @brief set cache file to PDF.
- * a premium license is needed for this method.
+ * a professional or premium license is required for this method.
  * @param path a path to save some temporary data, compressed images and so on
  * @return true or false
  */
@@ -1437,7 +1454,7 @@
  */
 -(bool)saveAs:(NSString *)dst :(bool)rem_sec;
 /**
-*	@brief	encrypt PDF file as another file. this function need premium license.
+*	@brief	encrypt PDF file as another file. this function require premium license.
 *
 *	@param 	dst 	full path to save.
 *	@param  upswd	user password.
@@ -1455,6 +1472,7 @@
  * @return Meta string value, or null.
  */
 -(NSString *)meta:(NSString *)tag;
+-(bool)setMeta:(NSString *)tag :(NSString *)val;
 /**
 * @brief get ID of PDF file.
 * @param buf receive 32 bytes as PDF ID, must be 32 bytes long.
@@ -1493,7 +1511,7 @@
 -(bool)newRootOutline: (NSString *)label :(int) pageno :(float) top;
 /**
  * @brief create a font object, used to write texts.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param font_name
  *		font name exists in font list.
  *		using Global.getFaceCount(), Global.getFaceName() to enumerate fonts.
@@ -1507,7 +1525,7 @@
 -(PDFDocFont *)newFontCID: (NSString *)name :(int) style;
 /**
  * @brief create a ExtGraphicState object, used to set alpha values.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @return DocGState object or null.
  */
 -(PDFDocGState *)newGState;
@@ -1516,7 +1534,7 @@
  * @brief insert a page to Document
  * if pagheno >= page_count, it do same as append.
  * otherwise, insert to pageno.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param pageno 0 based page NO.
  * @param w page width in PDF coordinate
  * @param h page height in PDF coordinate
@@ -1525,7 +1543,7 @@
 -(PDFPage *)newPage:(int) pageno :(float) w :(float) h;
 /**
  * @brief Start import operations, import page from src
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * you shall maintenance the source Document object until all pages are imported and ImportContext.Destroy() invoked. 
  * @param src source Document object that opened.
  * @return a context object used in ImportPage. 
@@ -1533,7 +1551,7 @@
 -(PDFImportCtx *)newImportCtx:(PDFDoc *)src_doc;
 /**
  * @brief move the page to other position.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param pageno1 page NO, move from
  * @param pageno2 page NO, move to
  * @return true or false
@@ -1541,7 +1559,7 @@
 -(bool)movePage:(int)pageno1 :(int)pageno2;
 /**
  * @brief remove page by page NO.
- * a premium license is needed for this method.
+ * a premium license is required for this method.
  * @param pageno 0 based page NO.
  * @return true or false
  */
@@ -1552,14 +1570,14 @@
  * --GRAY
  * --RGB
  * --CMYK
- * a premium license is needed for this method.
+ * a professional or premium license is required for this method.
  * @param path path to JPEG file.
  * @return DocImage object or null.
  */
 -(PDFDocImage *)newImageJPEG:(NSString *)path;
 /**
  * @brief create an image from JPX/JPEG 2k file.
- * a premium license is needed for this method.
+ * a professional or premium license is required for this method.
  * @param path path to JPX file.
  * @return DocImage object or null.
  */
