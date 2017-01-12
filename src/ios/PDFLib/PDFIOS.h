@@ -718,6 +718,8 @@ bool Document_movePage( PDF_DOC doc, int pageno1, int pageno2 );
  *	@return	true or false
  */
 bool Document_removePage( PDF_DOC doc, int pageno );
+
+PDF_DOC_IMAGE Document_newImage(PDF_DOC doc, CGImageRef img, bool has_alpha);
 /**
  *	@brief	create an image from JPEG/JPG file.
  *          supported image color space:

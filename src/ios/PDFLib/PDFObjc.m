@@ -1358,7 +1358,7 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotAttachment( m_page, [att UTF8String], icon, rect );
 }
--(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *) dimage :(bool) has_alpha :(const PDF_RECT *) rect
+-(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *) dimage :(const PDF_RECT *) rect
 {
 	return Page_addAnnotBitmap( m_page, [mat handle], [dimage handle], rect );
 }
@@ -1682,6 +1682,14 @@ extern uint annotStrikeoutColor;
 {
 	return Document_removePage( m_doc, pageno );
 }
+-(PDFDocImage *)newImage:(CGImageRef)img : (bool)has_alpha
+{
+	if(!img) return nil;
+	PDF_DOC_IMAGE hand = Document_newImage( m_doc, img, has_alpha );
+	if( !hand ) return NULL;
+    return [[PDFDocImage alloc] init:m_doc:hand];
+}
+
 -(PDFDocImage *)newImageJPEG:(NSString *)path
 {
 	PDF_DOC_IMAGE hand = Document_newImageJPEG( m_doc, [path UTF8String] );

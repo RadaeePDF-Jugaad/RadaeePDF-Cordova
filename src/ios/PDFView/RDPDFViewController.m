@@ -252,6 +252,8 @@ extern uint g_oval_color;
 	[self createToolbarItems];
     self.navigationItem.titleView =toolBar;
     
+    [pageNumLabel setFrame:CGRectMake(0, 20+self.navigationController.navigationBar.frame.size.height+1, 65, 30)];
+    
     [self toolbarStyle];
     
     //GEAR
@@ -563,7 +565,7 @@ extern uint g_oval_color;
     return YES;
 }
 
--(NSUInteger)supportedInterfaceOrientations
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return UIInterfaceOrientationMaskAllButUpsideDown;
 }
@@ -649,7 +651,7 @@ extern uint g_oval_color;
     err = [m_doc open:path :pwd];
     if ([m_doc canSave]){
         NSString *cacheFile = [[NSTemporaryDirectory() stringByAppendingString:@""] stringByAppendingString:@"cache.dat"];
-       // [m_doc setCache:cacheFile];
+        [m_doc setCache:cacheFile];
     }
     
     switch( err )
@@ -684,12 +686,12 @@ extern uint g_oval_color;
     m_bSel = false;
     return 1;
 }
--(int)PDFOpenStream:(id<PDFStream>)stream :(NSString *)password
+-(int)PDFOpenStream:(id<PDFStream>)stream :(NSString *)pwd
 {
+    password = pwd;
     [self PDFClose];
     PDF_ERR err = 0;
     m_doc = [[PDFDoc alloc] init];
-   // err = [m_doc open:path :pwd];
     err = [m_doc openStream:stream :password];
     switch( err )
     {
@@ -808,7 +810,7 @@ extern uint g_oval_color;
     pageNumLabel.backgroundColor = [UIColor colorWithRed:1.5 green:1.5 blue:1.5 alpha:0.2];
     pageNumLabel.textColor = [UIColor whiteColor];
     pageNumLabel.adjustsFontSizeToFitWidth = YES;
-    pageNumLabel.textAlignment= UITextAlignmentCenter;
+    pageNumLabel.textAlignment= NSTextAlignmentCenter;
     pageNumLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
     pageNumLabel.layer.cornerRadius = 10;
     NSString *pagestr = [[NSString alloc]initWithFormat:@"%d/",pagecount];
@@ -855,7 +857,7 @@ extern uint g_oval_color;
     pageNumLabel.backgroundColor = [UIColor colorWithRed:1.5 green:1.5 blue:1.5 alpha:0.2];
     pageNumLabel.textColor = [UIColor whiteColor];
     pageNumLabel.adjustsFontSizeToFitWidth = YES;
-    pageNumLabel.textAlignment= UITextAlignmentCenter;
+    pageNumLabel.textAlignment = NSTextAlignmentCenter;
     pageNumLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
     pageNumLabel.layer.cornerRadius = 10;
     NSString *pagestr = [[NSString alloc]initWithFormat:@"%d/",pagecount];
@@ -1830,5 +1832,44 @@ extern uint g_oval_color;
     [textField resignFirstResponder];
     return YES;
 }
+
+//add begin and end editing delegate to add keyboard notifications
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    return YES;
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+    
+    [self.view endEditing:YES];
+    return YES;
+}
+
+//add keyboard notification
+#pragma mark - Keyboard Notifications
+
+- (void)keyboardDidShow:(NSNotification *)notification
+{
+    //move the view to avoid the keyboard overlay
+    NSDictionary* keyboardInfo = [notification userInfo];
+    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+    
+    float gap = (keyboardFrameBeginRect.size.height - 30) - (textFd.frame.origin.y + textFd.frame.size.height);
+    
+    if (gap < 0) {
+        [self.view setFrame:CGRectMake(0, gap, self.view.frame.size.width, self.view.frame.size.height)];
+    }
+}
+
+- (void)keyboardDidHide:(NSNotification *)notification
+{
+    //restore the correct view position
+    [self.view setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+}
+
 
 @end

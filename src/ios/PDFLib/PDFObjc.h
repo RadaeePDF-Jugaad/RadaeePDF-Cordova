@@ -1564,6 +1564,7 @@
  * @return true or false
  */
 -(bool)removePage:(int)pageno;
+-(PDFDocImage *)newImage:(CGImageRef)img : (bool)has_alpha;
 /**
  * @brief create an image from JPEG/JPG file.
  * supported image color space:
