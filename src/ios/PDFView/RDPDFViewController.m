@@ -66,6 +66,15 @@ extern uint g_oval_color;
     toolBar.tintColor = searchToolBar.tintColor = m_searchBar.tintColor = annotToolBar.tintColor = drawLineToolBar.tintColor = drawRectToolBar.tintColor = m_slider.tintColor = self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
 }
 
+//---------------------------------------------------------
+/*
+ Author: Emanuele
+ Date last update: 01/12/16
+ Note: Aggiunta la possibilità di nascondere le icone della
+        toolbar
+ */
+//---------------------------------------------------------
+
 - (void)createToolbarItems
 {
     BOOL isActive = [[NSUserDefaults standardUserDefaults] boolForKey:@"actIsActive"];
@@ -151,16 +160,28 @@ extern uint g_oval_color;
     
     printButton.width =30;
     
+    NSMutableArray *hiddenItems = [NSMutableArray arrayWithObjects:[NSNumber numberWithBool:_hideViewModeImage], [NSNumber numberWithBool:_hideSearchImage], [NSNumber numberWithBool:_hideLineImage], [NSNumber numberWithBool:_hideRectImage], [NSNumber numberWithBool:_hideEllipseImage], [NSNumber numberWithBool:_hideBookmarkImage], [NSNumber numberWithBool:_hideBookmarkListImage], [NSNumber numberWithBool:_hideOutlineImage], [NSNumber numberWithBool:_hidePrintImage], nil];
+    
     NSMutableArray *toolbarItem = [[NSMutableArray alloc] initWithObjects:viewModeButton, searchButton, lineButton, rectButton, circleButton, addBookMarkButton, addBookMarkListButton, viewMenuButton, printButton,nil];
     
     if (!isActive || licenseType < 1) {
-        [toolbarItem removeObject:lineButton];
-        [toolbarItem removeObject:rectButton];
-        [toolbarItem removeObject:circleButton];
+        [hiddenItems setObject:[NSNumber numberWithBool:YES] atIndexedSubscript:2];
+        [hiddenItems setObject:[NSNumber numberWithBool:YES] atIndexedSubscript:3];
+        [hiddenItems setObject:[NSNumber numberWithBool:YES] atIndexedSubscript:4];
+
         if (!isActive) {
-            [toolbarItem removeObject:searchButton];
+            [hiddenItems setObject:[NSNumber numberWithBool:YES] atIndexedSubscript:1];
         }
     }
+    
+    NSMutableArray *objectsToRemove = [NSMutableArray array];
+    for (int i = 0; i < hiddenItems.count; i++) {
+        if ([[hiddenItems objectAtIndex:i] boolValue]) {
+            [objectsToRemove addObject:[toolbarItem objectAtIndex:i]];
+        }
+    }
+    
+    [toolbarItem removeObjectsInArray:objectsToRemove];
     
     [toolBar setItems:toolbarItem animated:NO];
 }
@@ -900,7 +921,8 @@ extern uint g_oval_color;
 }
 -(void)OnSliderValueChange:(UISlider *)slider
 {
-    [self OnPageClicked:slider.value];
+    int page = (int)round(slider.value);
+    [self OnPageClicked:page - 1];
 }
 -(void)OnPageClicked :(int)pageno
 {
