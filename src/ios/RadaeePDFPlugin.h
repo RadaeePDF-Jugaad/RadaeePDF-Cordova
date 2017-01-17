@@ -2,6 +2,16 @@
 
 @class RDPDFViewController;
 
+// define the protocol for the delegate
+@protocol RadaeePDFPluginDelegate
+// define protocol functions that can be used in any class using this delegate
+- (void)willShowReader;
+- (void)didShowReader;
+- (void)willCloseReader;
+- (void)didCloseReader;
+- (void)didSearchTerm:(NSString *)term;
+@end;
+
 @interface RadaeePDFPlugin : CDVPlugin{
     CDVInvokedUrlCommand* cdv_command;
     RDPDFViewController *m_pdf;
@@ -41,12 +51,19 @@
 @property (strong, nonatomic) UIImage *prevImage;
 @property (strong, nonatomic) UIImage *nextImage;
 
+@property (nonatomic, assign) id <RadaeePDFPluginDelegate> delegate;
+
 - (void)pluginInitialize;
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)activateLicense:(CDVInvokedUrlCommand*)command;
 - (void)openFromAssets:(CDVInvokedUrlCommand*)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
-    
+
+// Form Extractor
+
+- (void)JSONFormFields:(CDVInvokedUrlCommand*)command;
+- (void)JSONFormFieldsAtPage:(CDVInvokedUrlCommand*)command;
+
 + (RadaeePDFPlugin *)pluginInit;
 
 + (NSMutableArray *)loadBookmark;

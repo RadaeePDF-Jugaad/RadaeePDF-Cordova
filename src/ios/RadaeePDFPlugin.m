@@ -12,6 +12,10 @@
 
 #pragma mark - Synthesize
 
+@interface RadaeePDFPlugin() <RDPDFViewControllerDelegate>
+
+@end
+
 @implementation RadaeePDFPlugin
 @synthesize cdv_command;
 
@@ -429,6 +433,74 @@
 - (void)fileStateDidFailWithError:(NSString *)errorMessage
 {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
+}
+
+- (void)JSONFormFieldsResult:(NSString *)message
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
+}
+
+- (void)JSONFormFieldsAtPageResult:(NSString *)message
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
+}
+
+#pragma mark - Form Extractor
+
+- (void)JSONFormFields:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    RDFormExtractor *fe = [[RDFormExtractor alloc] initWithDoc:[m_pdf getDoc]];
+    
+    [self JSONFormFieldsResult:[fe jsonInfoForAllPages]];
+}
+
+- (void)JSONFormFieldsAtPage:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    RDFormExtractor *fe = [[RDFormExtractor alloc] initWithDoc:[m_pdf getDoc]];
+    
+    [self JSONFormFieldsAtPageResult:[fe jsonInfoForPage:(int)[params objectForKey:@"page"]]];
+}
+
+#pragma mark - Reader Delegate
+
+- (void)willShowReader
+{
+    if (_delegate) {
+        [_delegate willShowReader];
+    }
+}
+
+- (void)didShowReader
+{
+    if (_delegate) {
+        [_delegate didShowReader];
+    }
+}
+
+- (void)willCloseReader
+{
+    if (_delegate) {
+        [_delegate willCloseReader];
+    }
+}
+
+- (void)didCloseReader
+{
+    if (_delegate) {
+        [_delegate didCloseReader];
+    }
+}
+
+- (void)didSearchTerm:(NSString *)term
+{
+    if (_delegate) {
+        [_delegate didSearchTerm:term];
+    }
 }
 
 @end

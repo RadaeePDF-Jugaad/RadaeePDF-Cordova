@@ -266,6 +266,9 @@ extern uint g_oval_color;
 }
 -(void)viewWillAppear:(BOOL)animated
 {
+    if (_delegate) {
+        [_delegate willShowReader];
+    }
     
     toolBar = [UIToolbar new];
     [toolBar sizeToFit];
@@ -282,10 +285,23 @@ extern uint g_oval_color;
     //END
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if (_delegate) {
+        [_delegate didShowReader];
+    }
+}
+
 -(void)viewWillDisappear:(BOOL)animated
 {
     if(!b_outline)
     {
+        if (_delegate) {
+            [_delegate willCloseReader];
+        }
+        
        //[m_ThumbView vClose] should before [m_view vClose]
         [m_Thumbview vClose];
         [m_view vClose];
@@ -301,6 +317,18 @@ extern uint g_oval_color;
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    if(!b_outline)
+    {
+        if (_delegate) {
+            [_delegate didCloseReader];
+        }
+    }
 }
 
 - (void)closeView
@@ -658,6 +686,11 @@ extern uint g_oval_color;
 }
 - (IBAction)sliderAction:(id)sender
 {
+}
+
+- (id)getDoc
+{
+    return m_doc;
 }
 
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd

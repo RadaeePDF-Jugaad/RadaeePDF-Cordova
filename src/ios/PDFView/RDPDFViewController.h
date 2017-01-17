@@ -16,6 +16,7 @@
 #import "PDFThumbView.h"
 #import "BookmarkTableViewController.h"
 #import "RadaeePDFPlugin.h"
+#import "RDFormExtractor.h"
 
 @class OutLineViewController;
 @class PDFView;
@@ -25,8 +26,11 @@
 // define the protocol for the delegate
 @protocol RDPDFViewControllerDelegate
 // define protocol functions that can be used in any class using this delegate
-- (void)pdfChargeDidFinishLoading:(int)dim;
-- (void)pdfChargeDidFailWithError:(NSString*)error andCode:(int)errorCode;
+- (void)willShowReader;
+- (void)didShowReader;
+- (void)willCloseReader;
+- (void)didCloseReader;
+- (void)didSearchTerm:(NSString *)term;
 @end;
 
 //---------------------------------------------------------
@@ -108,7 +112,7 @@
 @property (nonatomic) BOOL hidePrintImage;
 
 // define delegate property
-@property (nonatomic, assign) id delegate;
+@property (nonatomic, assign) id <RDPDFViewControllerDelegate> delegate;
 
 #pragma mark - standard properties
 
@@ -160,6 +164,8 @@
 -(BOOL)isPortrait;
 -(void)PDFThumbNailinit:(int) pageno;
 - (void)PDFSeekBarInit:(int)pageno;
+
+- (id)getDoc;
 
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;
