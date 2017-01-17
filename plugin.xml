@@ -280,6 +280,9 @@
         <source-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.m" />
         <header-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.h" />
 
+        <!-- Radaee Utils -->
+        <source-file src="src/ios/RDUtils/RDFormExtractor.m" />
+        <header-file src="src/ios/RDUtils/RDFormExtractor.h" />
 
         <!-- Radaee resources -->
         <resource-file src="src/ios/cmaps/cmaps.dat" />

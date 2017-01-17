@@ -175,8 +175,8 @@
     [m_pdf setDelegate:self];
     
     [self setReaderViewMode:3];
-    [self setPagingEnabled:YES];
-    [self setDoublePageEnabled:NO];
+    [self setPagingEnabled:g_paging_enabled];
+    [self setDoublePageEnabled:g_double_page_enabled];
     
     [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
     [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
