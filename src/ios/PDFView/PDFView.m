@@ -213,6 +213,7 @@ extern bool g_double_page_enabled;
     if( m_modified && m_doc != NULL )
     {
         [m_doc save];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"fileStat"];
     }
     if( m_view != nil )
     {
@@ -695,6 +696,7 @@ extern bool g_double_page_enabled;
     if( [m_doc canSave] )
     {
     	m_modified = true;
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
         m_tx = point.x * m_scale;
         m_ty = point.y * m_scale;
         m_annot_rect.left += m_tx - m_px;
@@ -754,6 +756,7 @@ extern bool g_double_page_enabled;
 		if( page )
 		{
 			m_modified = true;
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
 			PDF_POINT pt;
 			pt.x = pos.x;
 			pt.y = pos.y;
@@ -1161,6 +1164,7 @@ extern bool g_double_page_enabled;
 -(void)vNoteEnd
 {
     m_modified = true;
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
     
 	if( m_status == sta_note )
 	{
@@ -1215,6 +1219,7 @@ extern bool g_double_page_enabled;
                 [m_view vRenderSync:pos.pageno];
             }
             m_modified = true;
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
         }
         m_status = sta_none;
         m_ink = NULL;
@@ -1493,6 +1498,7 @@ extern bool g_double_page_enabled;
 {
 	if( m_status != sta_annot ) return;
     m_modified = true;
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
     [m_annot removeFromPage];
 	[self vAnnotEnd];
 	[m_view vRenderSync:m_annot_pos.pageno];
@@ -1659,6 +1665,7 @@ extern bool g_double_page_enabled;
             return;
         }
         m_modified = true;
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
         
         PDF_POINT pt;
         pt.x = pos.x ;
@@ -1748,5 +1755,7 @@ extern bool g_double_page_enabled;
 {
     return (g_def_view == 3 || g_def_view == 4);
 }
+
+
 
 @end
