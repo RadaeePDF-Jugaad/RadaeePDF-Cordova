@@ -169,6 +169,19 @@
         [self fileStateDidFailWithError:@"File not found"];
 }
 
+- (void)getPageNumber:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    if (m_pdf == nil || [m_pdf getDoc] == nil) {
+        [self getPageNumberDidFailWithError:@"Error in pdf instance"];
+        return;
+    }
+    
+    int page = [m_pdf getCurrentPage];
+    [self getPageNumberResult:[NSString stringWithFormat:@"%i", page]];
+}
+
 - (void)readerInit
 {
     if( m_pdf == nil )
@@ -431,6 +444,16 @@
 }
     
 - (void)fileStateDidFailWithError:(NSString *)errorMessage
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
+}
+
+- (void)getPageNumberResult:(NSString *)message
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
+}
+
+- (void)getPageNumberDidFailWithError:(NSString *)errorMessage
 {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
 }

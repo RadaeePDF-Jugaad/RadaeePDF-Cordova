@@ -166,6 +166,7 @@
 - (void)PDFSeekBarInit:(int)pageno;
 
 - (id)getDoc;
+- (int)getCurrentPage;
 
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;

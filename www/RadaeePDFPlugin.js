@@ -35,6 +35,12 @@ RadaeePDFPlugin.prototype.getFileState = function (params, successCallback, erro
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'fileState', [params]);
 };
 
+RadaeePDFPlugin.prototype.getPageNumber = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getPageNumber', [params]);
+};
+
 RadaeePDFPlugin.prototype.getJSONFormFields = function (params, successCallback, errorCallback) {
         params = params || {};
 

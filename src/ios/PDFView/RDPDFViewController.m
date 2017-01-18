@@ -693,6 +693,11 @@ extern uint g_oval_color;
     return m_doc;
 }
 
+- (int)getCurrentPage
+{
+    return [m_view vGetCurrentPage];
+}
+
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd
 {
     pdfPath = [path mutableCopy];

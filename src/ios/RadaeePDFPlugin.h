@@ -58,6 +58,7 @@
 - (void)activateLicense:(CDVInvokedUrlCommand*)command;
 - (void)openFromAssets:(CDVInvokedUrlCommand*)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
+- (void)getPageNumber:(CDVInvokedUrlCommand*)command;
 
 // Form Extractor
 
