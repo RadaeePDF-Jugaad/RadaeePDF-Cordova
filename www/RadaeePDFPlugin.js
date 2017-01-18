@@ -35,13 +35,13 @@ RadaeePDFPlugin.prototype.getFileState = function (params, successCallback, erro
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'fileState', [params]);
 };
 
-RadaeePDFPlugin.prototype.JSONFormFields = function (params, successCallback, errorCallback) {
+RadaeePDFPlugin.prototype.getJSONFormFields = function (params, successCallback, errorCallback) {
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'JSONFormFields', [params]);
 };
 
-RadaeePDFPlugin.prototype.JSONFormFieldsAtPage = function (params, successCallback, errorCallback) {
+RadaeePDFPlugin.prototype.getJSONFormFieldsAtPage = function (params, successCallback, errorCallback) {
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'JSONFormFieldsAtPage', [params]);
