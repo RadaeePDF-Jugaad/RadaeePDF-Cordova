@@ -44,14 +44,12 @@
 
 - (void)show:(CDVInvokedUrlCommand*)command;
 {
-    NSLog(@"Documents Directory: %@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
-    
     self.cdv_command = command;
     
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    if(![[NSURL URLWithString:url] isFileURL]){
+    if([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]){
         
         NSString *cacheFile = [[NSTemporaryDirectory() stringByAppendingString:@""] stringByAppendingString:@"cacheFile.pdf"];
         
@@ -70,19 +68,21 @@
         [self showReader];
         
     } else {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:[url stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
-        
-        [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
+        if ([url containsString:@"file://"]) {
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            NSString *filePath = [documentsDirectory stringByAppendingPathComponent:[url stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+            
+            [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
+        } else {
+            [self openFromPath:command];
+        }
     }
     
 }
 
 - (void)openFromAssets:(CDVInvokedUrlCommand *)command
 {
-    //NSLog(@"Documents Directory: %@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
-    
     self.cdv_command = command;
     
     // Get user parameters
@@ -94,8 +94,20 @@
     [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
 }
 
+- (void)openFromPath:(CDVInvokedUrlCommand *)command
+{
+    // Get user parameters
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    url = [params objectForKey:@"url"];
+    
+    NSString *filePath = url;
+    
+    [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
+}
+
 - (void)openPdf:(NSString *)filePath withPassword:(NSString *)password
 {
+    NSLog(@"File Path: %@", filePath);
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
         [self pdfChargeDidFailWithError:@"File not exist" andCode:200];
         return;
@@ -524,6 +536,39 @@
     if (_delegate) {
         [_delegate didSearchTerm:term];
     }
+}
+
+#pragma mark - Path Utils
+
+- (NSString *)getCustomPath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *libraryPath = [paths objectAtIndex:0];
+    NSString *customDirectory = [libraryPath stringByAppendingPathComponent:@"customDirectory"];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:customDirectory]) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:customDirectory withIntermediateDirectories:NO attributes:nil error:nil];
+    }
+    
+    return customDirectory;
+}
+
+- (BOOL)moveFileToCustomDir:(NSString *)path overwrite:(BOOL)overwrite
+{
+    NSString *itemPath = [[self getCustomPath] stringByAppendingPathComponent:[path lastPathComponent]];
+    
+    BOOL res = NO;
+    BOOL exist = [[NSFileManager defaultManager] fileExistsAtPath:itemPath];
+    
+    if (exist && overwrite) {
+        [[NSFileManager defaultManager] removeItemAtPath:itemPath error:nil];
+    }
+    
+    if (!exist) {
+        res = [[NSFileManager defaultManager] copyItemAtPath:path toPath:[[self getCustomPath] stringByAppendingPathComponent:[path lastPathComponent]] error:nil];
+    }
+    
+    return res;
 }
 
 @end

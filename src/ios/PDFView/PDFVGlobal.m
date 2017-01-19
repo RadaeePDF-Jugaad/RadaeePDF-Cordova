@@ -147,9 +147,9 @@ void APP_Init()
     }
     
     if (isActive)
-        NSLog(@"ATTIVA");
+        NSLog(@"License active");
     else
-        NSLog(@"NON ATTIVA");
+        NSLog(@"License not active");
     
     
     [[NSUserDefaults standardUserDefaults] setBool:isActive forKey:@"actIsActive"];

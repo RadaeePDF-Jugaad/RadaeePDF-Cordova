@@ -57,6 +57,7 @@
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)activateLicense:(CDVInvokedUrlCommand*)command;
 - (void)openFromAssets:(CDVInvokedUrlCommand*)command;
+- (void)openFromPath:(CDVInvokedUrlCommand*)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
 - (void)getPageNumber:(CDVInvokedUrlCommand*)command;
 
