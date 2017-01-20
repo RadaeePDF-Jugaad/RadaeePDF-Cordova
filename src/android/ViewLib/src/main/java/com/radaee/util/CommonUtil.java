@@ -5,6 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.radaee.pdf.Page;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,14 +18,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by EMANUELE on 15/01/2016.
+ * @author Davide created on 15/01/2016.
  */
 public class CommonUtil {
 
-    public static final String TAG = "Save";
+    static final String TAG = "RadaeeCommonUtil";
     private static final int CACHE_LIMIT = 1024;
 
-    public static String getThumbName(String path)
+    static String getThumbName(String path)
     {
         try {
             File file = new File(path);
@@ -33,19 +38,20 @@ public class CommonUtil {
         }
     }
 
-    public static Bitmap loadThumb(Context context, String thumbName) {
+    static Bitmap loadThumb(Context context, String thumbName) {
         if(thumbName == null || thumbName.length() <= 0) return null;
         File pictureFile = getOutputMediaFile(context, thumbName);
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bitmap = BitmapFactory.decodeFile(pictureFile.getAbsolutePath(), options);
-            return bitmap;
+            if(pictureFile != null)
+                return BitmapFactory.decodeFile(pictureFile.getAbsolutePath(), options);
         } catch (Exception e) {
-            return null;
+            e.getMessage();
         }
+        return null;
     }
-    public static void saveThumb(Context context, String thumbName, Bitmap image)
+    static void saveThumb(Context context, String thumbName, Bitmap image)
     {
         if(thumbName == null || thumbName.length() <= 0) return;
 
@@ -86,8 +92,7 @@ public class CommonUtil {
             }
             // Create a media file name
             String mImageName = thumbName + ".png";
-            File mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
-            return mediaFile;
+            return new File(mediaStorageDir.getPath() + File.separator + mImageName);
         } else {
             return file;
         }
@@ -111,6 +116,72 @@ public class CommonUtil {
             return hexString.toString();
 
         } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static JSONObject constructPageJsonFormFields(Page mPage, int index) {
+        try {
+            if(mPage != null) {
+                mPage.ObjsStart();
+                JSONArray mPagesAnnot = new JSONArray();
+                for(int i = 0 ; i < mPage.GetAnnotCount() ; i++) {
+                    Page.Annotation mAnnotation = mPage.GetAnnot(i);
+                    if(mAnnotation != null && (mAnnotation.GetType() == 20 || mAnnotation.GetType() == 3)) {
+                        JSONObject mAnnotInfoJson = new JSONObject();
+
+                        mAnnotInfoJson.put("Index", mAnnotation.GetIndexInPage());
+                        mAnnotInfoJson.put("Name", mAnnotation.GetName());
+                        mAnnotInfoJson.put("Type", mAnnotation.GetType());
+
+                        mAnnotInfoJson.put("FieldName", mAnnotation.GetFieldName());
+                        mAnnotInfoJson.put("FieldNameWithNO", mAnnotation.GetFieldNameWithNO());
+                        mAnnotInfoJson.put("FieldFullName", mAnnotation.GetFieldFullName());
+                        mAnnotInfoJson.put("FieldFullName2", mAnnotation.GetFieldFullName2());
+                        mAnnotInfoJson.put("FieldFlag", mAnnotation.GetFieldFlag());
+                        mAnnotInfoJson.put("FieldFormat", mAnnotation.GetFieldFormat());
+                        mAnnotInfoJson.put("FieldType", mAnnotation.GetFieldType());
+
+                        mAnnotInfoJson.put("PopupLabel", mAnnotation.GetPopupLabel());
+
+                        mAnnotInfoJson.put("CheckStatus", mAnnotation.GetCheckStatus());
+
+                        mAnnotInfoJson.put("ComboItemSel", mAnnotation.GetComboItemSel() == -1 ? mAnnotation.GetComboItemSel() :
+                            mAnnotation.GetComboItem(mAnnotation.GetComboItemSel()));
+                        mAnnotInfoJson.put("ComboItemCount", mAnnotation.GetComboItemCount());
+
+                        if(mAnnotation.GetListSels() != null) {
+                            int[] items = mAnnotation.GetListSels();
+                            if(items.length == 0)
+                                mAnnotInfoJson.put("ListSels", "");
+                            else {
+                                String selValues = "";
+                                for(int item : items)
+                                    selValues += mAnnotation.GetListItem(item) + ", ";
+                                mAnnotInfoJson.put("ListSels", selValues.substring(0, selValues.lastIndexOf(",")));
+                            }
+                        }
+                        mAnnotInfoJson.put("ListItemCount", mAnnotation.GetListItemCount());
+
+                        mAnnotInfoJson.put("EditText", mAnnotation.GetEditText());
+                        mAnnotInfoJson.put("EditType", mAnnotation.GetEditType());
+                        mAnnotInfoJson.put("EditTextFormat", mAnnotation.GetEditTextFormat());
+
+                        mAnnotInfoJson.put("SignStatus", mAnnotation.GetSignStatus());
+
+                        mPagesAnnot.put(mAnnotInfoJson);
+                    }
+                }
+
+                if(mPagesAnnot.length() > 0) {
+                    JSONObject mPageJson = new JSONObject();
+                    mPageJson.put("Page", index);
+                    mPageJson.put("Annots", mPagesAnnot);
+                    return mPageJson;
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

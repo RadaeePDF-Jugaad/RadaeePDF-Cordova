@@ -22,13 +22,19 @@ import android.widget.Toast;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
+import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.reader.PDFLayoutView.PDFLayoutListener;
+import com.radaee.util.CommonUtil;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.view.PDFLayout;
 import com.radaee.view.VPage;
 import com.radaee.viewlib.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PDFViewAct extends Activity implements PDFLayoutListener
 {
@@ -37,7 +43,11 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	static final public int MODIFIED_AND_SAVED = 2;
 	static private int mFileState = NOT_MODIFIED;
 
-	static protected Document ms_tran_doc;
+	private String mFindQuery = "";
+	private boolean mDidShowReader = false;
+	private static PDFReaderListener mPdfReaderListener;
+
+	static public Document ms_tran_doc;
 	static private int m_tmp_index = 0;
 	private PDFAssetStream m_asset_stream = null;
 	private PDFHttpStream m_http_stream = null;
@@ -47,6 +57,13 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	private PDFViewController m_controller = null;
 	private boolean m_modified = false;
 	private boolean need_save_doc = false;
+
+	private static PDFViewAct instance; //added to be used with 3rd party plugins (cordova, Xamarin)
+
+	public static PDFViewAct getInstance() {
+		return instance;
+	}
+
     private void onFail(String msg)//treat open failed.
     {
     	m_doc.Close();
@@ -59,25 +76,23 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		switch( ret )
 		{
 		case -1://need input password
-			onFail("Open Failed: Invalid Password");
+			onFail(getString(R.string.failed_invalid_password));
 			break;
 		case -2://unknown encryption
-			onFail("Open Failed: Unknown Encryption");
+			onFail(getString(R.string.failed_encryption));
 			break;
 		case -3://damaged or invalid format
-			onFail("Open Failed: Damaged or Invalid PDF file");
+			onFail(getString(R.string.failed_invalid_format));
 			break;
 		case -10://access denied or invalid file path
-			onFail("Open Failed: Access denied or Invalid path");
+			onFail(getString(R.string.failed_invalid_path));
 			break;
 		case 0://succeeded, and continue
             OpenTask task = new OpenTask(false);
             task.execute();
-        	//m_view.PDFOpen(m_doc, this);
-    		//m_controller = new PDFViewController(m_layout, m_view);
 			break;
 		default://unknown error
-			onFail("Open Failed: Unknown Error");
+			onFail(getString(R.string.failed_unknown));
 			break;
 		}
     }
@@ -139,12 +154,19 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+		instance = this;
+
         //plz set this line to Activity in AndroidManifes.xml:
         //    android:configChanges="orientation|keyboardHidden|screenSize"
         //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate. 
         Global.Init( this );
 		m_layout = (RelativeLayout)LayoutInflater.from(this).inflate(R.layout.pdf_layout, null);
 		m_view = (PDFLayoutView)m_layout.findViewById(R.id.pdf_view);
+
+		if(mPdfReaderListener != null)
+			mPdfReaderListener.willShowReader();
+
         Intent intent = getIntent();
         String bmp_format = intent.getStringExtra("BMPFormat");
         if(bmp_format != null)
@@ -264,9 +286,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         	{
 				mFileState = MODIFIED_NOT_SAVED;
         		TextView txtView = new TextView(this);
-        		txtView.setText("Document modified\r\nDo you want save it?");
-				new AlertDialog.Builder(this).setTitle("Exiting").setView(
-						txtView).setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        		txtView.setText(R.string.save_msg);
+				new AlertDialog.Builder(this).setTitle(R.string.exiting).setView(
+						txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
 						{
 				           @Override
 				           public void onClick(DialogInterface dialog, int which)
@@ -275,7 +297,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 							   mFileState = MODIFIED_AND_SAVED;
 				        	   PDFViewAct.super.onBackPressed();
 				           }
-				       }).setNegativeButton("No", new DialogInterface.OnClickListener()
+				       }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
 				       {
 				           @Override
 				           public void onClick(DialogInterface dialog, int which)
@@ -292,6 +314,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	@Override
     protected void onDestroy()
     {
+		if(mPdfReaderListener != null)
+			mPdfReaderListener.willCloseReader();
+
     	if(m_doc != null)
     	{
 	    	m_view.PDFClose();
@@ -310,6 +335,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     	}
         Global.RemoveTmp();
     	super.onDestroy();
+
+		if(mPdfReaderListener != null)
+			mPdfReaderListener.didCloseReader();
     }
 	@Override
 	public void OnPDFPageModified(int pageno)
@@ -349,19 +377,15 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 			{
 				if( rad_group.getCheckedRadioButtonId() == R.id.rad_copy )
 				{
-					Toast.makeText(PDFViewAct.this, "todo copy text:" + sel_text, Toast.LENGTH_SHORT).show();
-				}
-				else if( m_doc.CanSave() )
-				{
-					boolean ret = false;
-			        if( rad_group.getCheckedRadioButtonId() == R.id.rad_copy )
-			    	{
-	                    Toast.makeText(PDFViewAct.this, "todo copy text:" + sel_text, Toast.LENGTH_SHORT).show();
 	                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 	                    android.content.ClipData clip = android.content.ClipData.newPlainText("Radaee", sel_text);
 	                    clipboard.setPrimaryClip(clip);                    
+					Toast.makeText(PDFViewAct.this, getString(R.string.copy_text, sel_text), Toast.LENGTH_SHORT).show();
 			        }
-			        else if( rad_group.getCheckedRadioButtonId() == R.id.rad_highlight )
+				else if( m_doc.CanSave() )
+				{
+					boolean ret = false;
+			        if( rad_group.getCheckedRadioButtonId() == R.id.rad_highlight )
 						ret = m_view.PDFSetSelMarkup(0);
 					else if( rad_group.getCheckedRadioButtonId() == R.id.rad_underline )
 						ret = m_view.PDFSetSelMarkup(1);
@@ -370,21 +394,21 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 					else if( rad_group.getCheckedRadioButtonId() == R.id.rad_squiggly )
 						ret = m_view.PDFSetSelMarkup(4);
 					if( !ret )
-						Toast.makeText(PDFViewAct.this, "add annotation failed!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(PDFViewAct.this, R.string.annotation_failed, Toast.LENGTH_SHORT).show();
 				}
 				else
-					Toast.makeText(PDFViewAct.this, "can't write or encrypted!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(PDFViewAct.this, R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
 				dialog.dismiss();
 				if(m_controller != null)
 					m_controller.OnSelectEnd();
 			}});
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int which)
 			{
 				dialog.dismiss();
 			}});
-		builder.setTitle("Process selected text");
+		builder.setTitle(R.string.process_selected_text);
 		builder.setCancelable(false);
 		builder.setView(layout);
 		AlertDialog dlg = builder.create();
@@ -444,7 +468,110 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		return false;
     }
 
+	@Override
+	public void onPDFPageRendered(int pageno) {
+		if(mPdfReaderListener != null && !mDidShowReader) {
+			mPdfReaderListener.didShowReader();
+			mDidShowReader = true;
+		}
+	}
+
+	@Override
+	public void onPDFSearchFinished(boolean found) {
+		if(mPdfReaderListener != null && !mFindQuery.equals(m_controller.getFindQuery())) {
+			mFindQuery = m_controller.getFindQuery();
+			mPdfReaderListener.didSearchTerm(mFindQuery, found);
+		}
+	}
+
+	/**
+	 * To get the current file state.
+	 *
+	 * @return a string that contains one of the following values:
+	 * 		Not modified
+	 * 		Modified but not saved
+	 * 		Modified and saved
+	 */
 	public static int getFileState() {
 		return mFileState;
+	}
+
+	/**
+	 * Returns a json object that contains all the document form fields dictionary
+	 *
+	 * @return json object of all the document form fields dictionary (if-any), or ERROR otherwise
+	 */
+	public String getJsonFormFields() {
+		try {
+			if(m_doc != null && m_doc.IsOpened()) {
+                JSONArray mPages = new JSONArray();
+                for (int i = 0 ; i < m_doc.GetPageCount() ; i++) {
+                    Page mPage = m_doc.GetPage(i);
+                    JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, i);
+                    if(mResult != null)
+                        mPages.put(mResult);
+                }
+
+                if(mPages.length() > 0) {
+                    JSONObject mPageJson = new JSONObject();
+                    mPageJson.put("Pages", mPages);
+                    return mPageJson.toString();
+                }
+                return "";
+            }
+            else
+            	return "Document not set";
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return "ERROR";
+	}
+
+	/**
+	 * Returns a json object that contains a specific page's form fields dictionary
+	 *
+	 * @param pageno the page number, 0-index (from 0 to Document.GetPageCount - 1)
+	 * @return json object of the page's form fields dictionary (if-any), or ERROR otherwise
+	 */
+	public String getJsonFormFieldsAtPage(int pageno) {
+		if(m_doc == null || !m_doc.IsOpened()) return "Document not set";
+		if(pageno >= m_doc.GetPageCount()) return "Page index error";
+
+		Page mPage = m_doc.GetPage(pageno);
+		JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, pageno);
+		if(mResult != null)
+			return mResult.toString();
+		else
+			return "";
+	}
+	
+	/**
+	 * returns current rendered page.
+	 * 
+	 * @return current rendered page, -1 otherwise
+	 */
+	public int getCurrentPage() {
+		if(m_view != null)
+			return m_view.PDFGetCurrPage();
+		return -1;
+	}
+
+	/**
+	 * Sets a listener to the reader
+	 * @param listener a PDFReaderListener instance
+	 */
+	public static void setPDFReaderListener(PDFReaderListener listener) {
+		mPdfReaderListener = listener;
+	}
+
+	/**
+	 * An interface that can help in recognizing some events.
+	 */
+	public interface PDFReaderListener {
+		void willShowReader();
+		void didShowReader();
+		void willCloseReader();
+		void didCloseReader();
+		void didSearchTerm(String query, boolean found);
 	}
 }

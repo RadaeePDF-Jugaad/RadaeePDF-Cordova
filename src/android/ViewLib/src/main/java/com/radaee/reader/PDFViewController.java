@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.Bidi;
 
 public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChangeListener
 {
@@ -43,8 +45,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	{
 		public void OnCtrlSelect(boolean set);
 	}
-	private int m_bar_status = 0;
-	private int mNavigationMode = NAVIGATION_SEEK;
 	static public final int BAR_NONE = 0;
 	static public final int BAR_CMD = 1;
 	static public final int BAR_ANNOT = 2;
@@ -52,6 +52,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	static public final int BAR_ACT = 4;
 	static public final int NAVIGATION_THUMBS = 0;
 	static public final int NAVIGATION_SEEK = 1;
+	private int m_bar_status = 0;
+	private int mNavigationMode = NAVIGATION_SEEK;
 	private RelativeLayout m_parent;
 	private PDFLayoutView m_view;
 	private PDFTopBar m_bar_act;
@@ -419,7 +421,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             final OutlineList olist = (OutlineList)layout.findViewById(R.id.lst_outline);
             olist.SetOutlines(m_view.PDFGetDoc());
             final AlertDialog dlg = new AlertDialog.Builder(m_parent.getContext())
-                    .setTitle("PDF Outlines")
+                    .setTitle(R.string.pdf_outline)
                     .setView(layout)
                     .show();
             AdapterView.OnItemClickListener item_clk = new AdapterView.OnItemClickListener() {
@@ -456,8 +458,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		else if( arg0 == btn_find_prev )
 		{
 			String val = edit_find.getText().toString();
-			if( val != null && val.length() > 0 )
-			{
+			if( val != null && val.length() > 0 ) {
+				((InputMethodManager) m_parent.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+						.hideSoftInputFromWindow(edit_find.getWindowToken(), 0);
+				val = bidiFormatCheck(val);
                 if(val.equals(m_find_str))
 				{
 					m_view.PDFFind(-1);
@@ -473,8 +477,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		else if( arg0 == btn_find_next )
 		{
 			String val = edit_find.getText().toString();
-			if( val != null && val.length() > 0 )
-			{
+			if( val != null && val.length() > 0 ) {
+				((InputMethodManager) m_parent.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+						.hideSoftInputFromWindow(edit_find.getWindowToken(), 0);
+				val = bidiFormatCheck(val);
 				if(val.equals(m_find_str))
 				{
 					m_view.PDFFind(1);
@@ -789,5 +795,33 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				}
 			}
 		}, null);
+	}
+
+	private String bidiFormatCheck(String input) {
+		if(Global.selRTOL) { //selection is right to left, check case of mixed text
+			Bidi bidi = new Bidi(input, Bidi.DIRECTION_DEFAULT_RIGHT_TO_LEFT);
+			if(bidi.isMixed() || bidi.isLeftToRight()) { //we need to reverse mixed text
+				String reversedVal= "", toBeReversed = "";
+				int baseLevel = bidi.getBaseLevel();
+				for(int i = 0 ; i < bidi.getLength() ; i++) {
+					if(bidi.getLevelAt(i) != baseLevel || bidi.isLeftToRight()) { //mixed char, save it
+						toBeReversed += input.charAt(i);
+						if(i+1 == bidi.getLength() ||
+								(i+1 < bidi.getLength() && bidi.getLevelAt(i + 1) == baseLevel && !bidi.isLeftToRight())) { //reverse and append to reversed text
+							reversedVal += new StringBuilder(toBeReversed).reverse().toString();
+							toBeReversed = "";
+						}
+					} else
+						reversedVal += input.charAt(i);
+
+				}
+				input = reversedVal;
+			}
+		}
+		return input;
+	}
+
+	public String getFindQuery() {
+		return m_find_str;
 	}
 }

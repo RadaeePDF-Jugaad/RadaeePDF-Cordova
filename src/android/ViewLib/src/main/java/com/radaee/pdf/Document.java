@@ -252,6 +252,7 @@ public class Document
 	private static native void setFontDel( long hand, PDFFontDelegate del );
     private static native int getEFCount( long hand );
     private static native String getEFName( long hand, int index );
+	private static native String getEFDesc( long hand, int index );
     private static native boolean getEFData( long hand, int index, String save_path );
     private static native int getPermission( long hand );
 	private static native int getPerm( long hand );
@@ -834,6 +835,16 @@ public class Document
     {
         return getEFName(hand_val, index);
     }
+
+	/**
+	 * get Description of embed file.
+	 * @param index range in [0, GetEmbedFilesCount())
+	 * @return Description of embed file
+     */
+	public String GetEmbedFileDesc( int index )
+	{
+		return getEFDesc(hand_val, index);
+	}
 
     /**
      * get embed file data, and save to save_path

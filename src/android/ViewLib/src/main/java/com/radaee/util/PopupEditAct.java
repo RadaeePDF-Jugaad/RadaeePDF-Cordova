@@ -1,6 +1,7 @@
 package com.radaee.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
@@ -87,6 +89,10 @@ public class PopupEditAct extends Activity {
                 else
                     m_txt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1020)});
                 m_txt.setVisibility(View.VISIBLE);
+
+                //show the keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(m_txt, InputMethodManager.SHOW_IMPLICIT);
             }
         };
         handler.postDelayed(runnable, 50);
@@ -110,6 +116,6 @@ public class PopupEditAct extends Activity {
             m_listener.OnEditValue(value.toString());
         finish();
         overridePendingTransition(0, android.R.anim.fade_out);
-        return false;
+        return true;
     }
 }

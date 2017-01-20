@@ -190,6 +190,32 @@ public class Page
 		{
 			return Page.getAnnotType(page.hand, hand);
 		}
+
+		/**
+		 * get modify DateTime of Annotation.<br/>
+		 * this method require professional or premium license
+		 * @return DateTime String object<br/>
+		 * format as (D:YYYYMMDDHHmmSSOHH'mm') where:<br/>
+		 * YYYY is the year<br/>
+		 * MM is the month<br/>
+		 * DD is the day (01–31)<br/>
+		 * HH is the hour (00–23)<br/>
+		 * mm is the minute (00–59)<br/>
+		 * SS is the second (00–59)<br/>
+		 * O is the relationship of local time to Universal Time (UT), denoted by one of the characters +, −, or Z (see below)<br/>
+		 * HH followed by ' is the absolute value of the offset from UT in hours (00–23)<br/>
+		 * mm followed by ' is the absolute value of the offset from UT in minutes (00–59)<br/>
+		 * more details see PDF-Reference-1.7 section 3.8.3
+         */
+		final public String GetModifyDate() { return Page.getAnnotModifyDate(page.hand, hand); }
+
+		/**
+		 * set modify DateTime of Annotation.<br/>
+		 * this method require professional or premium license.
+		 * @param mdt the format descript in GetModifyDate() or PDF-Reference-1.7 section 3.8.3
+         * @return true or false.
+         */
+		final public boolean SetModifyDate(String mdt) { return Page.setAnnotModifyDate(page.hand, hand, mdt); }
 		/**
 		 * check if position and size of the annotation is locked?<br/>
 		 * this method require professional or premium license
@@ -1179,12 +1205,12 @@ public class Page
 		/**
 		 * set customized icon for  sticky text note/file attachment annotation.<br/>
 		 * @param name customized icon name.
-		 * @param content PageContent object to display icon, must be 20 * 20 size.
+		 * @param form DocForm object return from Document.NewForm();
 		 * @return true or false.
 		 */
-        final public boolean SetIcon( String name, PageContent content )
+        final public boolean SetIcon( String name, DocForm form )
 		{
-			return Page.setAnnotIcon2(page.hand, hand, name, content.hand);
+			return Page.setAnnotIcon2(page.hand, hand, name, form.hand);
 		}
 		/**
 		 * get icon value for sticky text note/file attachment/Rubber Stamp annotation.<br/>
@@ -1351,6 +1377,8 @@ public class Page
 	static private native String getAnnotFieldFullName( long hand, long annot );
 	static private native String getAnnotFieldFullName2( long hand, long annot );
 	static private native int getAnnotType( long hand, long annot );
+	static private native String getAnnotModifyDate(long page, long annot);
+	static private native boolean setAnnotModifyDate(long page, long annot, String val);
 	static private native boolean isAnnotLocked( long hand, long annot );
 	static private native boolean isAnnotHide( long hand, long annot );
 	static private native boolean isAnnotLockedContent( long hand, long annot );
@@ -1522,29 +1550,41 @@ public class Page
 	 */
     final public void Close()
 	{
+		long hand_page = hand;
+		hand = 0;
         if(m_doc != null)
         {
             if(m_doc.hand_val != 0)
-                close( hand );
+                close( hand_page );
             else
                 Log.e("Bad Coding", "Document object closed, but Page object not closed, will cause memory leaks.");
+			m_doc = null;
         }
-        m_doc = null;
-        hand = 0;
 	}
 	/**
-	 * prepare to render. it reset dib pixels to white value, and reset page status.
-	 * @param dib DIB object to render. obtained by Global.dibGet().
+	 * prepare to render. it reset dib pixels to white value, and reset page status.<br/>
+	 * if dib is null, only to reset page status.
+	 * @param dib DIB object to render. get from Global.dibGet() or null.
 	 */
-    final public void RenderPrePare( DIB dib )
+    final public void RenderPrepare( DIB dib )
 	{
         if(dib == null)
-            renderPrepare( hand, 0 );
+			renderPrepare( hand, 0 );
         else
-		    renderPrepare( hand, dib.hand );
+			renderPrepare( hand, dib.hand );
+	}
+
+	/**
+	 * same as RenderPrepare(null);
+	 */
+	final public void RenderPrepare(Bitmap bmp)
+	{
+		if(bmp != null)
+			bmp.eraseColor(-1);
+		renderPrepare( hand, 0 );
 	}
 	/**
-	 * render page to dib object. this function returned for cancelled or finished.<br/>before render, you need invoke RenderPrePare.
+	 * render page to dib object. this function returned for cancelled or finished.<br/>before render, you need invoke RenderPrepare.
 	 * @param dib DIB object to render. obtained by Global.dibGet().
 	 * @param mat Matrix object define scale, rotate, translate operations.
 	 * @return true or false.
@@ -2214,24 +2254,6 @@ public class Page
 	{
 		return addAnnotBitmap( hand, image.hand, rect );
 	}
-
-	/**
-	 * add a bitmap object as an annotation to page.<br/>
-	 * you should re-render page to display modified data.<br/>
-	 * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
-	 * this method require professional or premium license, and Document.SetCache() invoked.
-	 * @param bitmap Bitmap object to add, which should be formated in ARGB_8888/ARGB_4444/RGB_565
-	 * @param has_alpha is need to save alpha channel information?
-	 * @param rect 4 elements: left, top, right, bottom in PDF coordinate system.
-	 * @return true or false.<br/>
-	 * the added annotation can be obtained by Page.GetAnnot(Page.GetAnnotCount() - 1), if this method return true.
-	 */
-	@Deprecated
-	final public boolean AddAnnotBitmap( Bitmap bitmap, boolean has_alpha, float[] rect ) {
-		DocImage dimg = m_doc.NewImage(bitmap, has_alpha);
-		return dimg != null && AddAnnotBitmap(dimg, rect);
-	}
-
 	/**
 	 * add a file as an attachment to page.<br/>
 	 * you should re-render page to display modified data.<br/>

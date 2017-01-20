@@ -352,6 +352,8 @@ public class PDFLayoutView extends View implements LayoutListener
     }
 	public interface PDFLayoutListener
 	{
+		void onPDFPageRendered(int pageno);
+		void onPDFSearchFinished(boolean found);
 		public void OnPDFPageModified(int pageno);
 		public void OnPDFPageChanged(int pageno);
 		public void OnPDFAnnotTapped(VPage vpage, Annotation annot);
@@ -387,12 +389,21 @@ public class PDFLayoutView extends View implements LayoutListener
     	VPage pages[];
     	int pages_cnt;
     }
+	private ActivityManager m_amgr;
+	private ActivityManager.MemoryInfo m_info = new ActivityManager.MemoryInfo();
+	private Paint m_info_paint = new Paint();
 	public PDFLayoutView(Context context)
 	{
 		super(context);
 		m_doc = null;
     	m_gesture = new GestureDetector( context, new PDFGestureListener() );
         setBackgroundColor(0xFFCCCCCC);
+		if(Global.debug_mode)
+		{
+			m_amgr = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+			m_info_paint.setARGB(255, 255, 0, 0);
+			m_info_paint.setTextSize(30);
+		}
     }
 	public PDFLayoutView(Context context, AttributeSet attrs)
 	{
@@ -400,6 +411,12 @@ public class PDFLayoutView extends View implements LayoutListener
 		m_doc = null;
     	m_gesture = new GestureDetector( context, new PDFGestureListener() );
         setBackgroundColor(0xFFCCCCCC);
+		if(Global.debug_mode)
+		{
+			m_amgr = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+			m_info_paint.setARGB(255, 255, 0, 0);
+			m_info_paint.setTextSize(30);
+		}
 	}
 	@Override
 	protected void onSizeChanged( int w, int h, int oldw, int oldh )
@@ -436,7 +453,7 @@ public class PDFLayoutView extends View implements LayoutListener
 	}
 	private void onDrawAnnot(Canvas canvas)
 	{
-		if( m_status == STA_ANNOT )
+		if( m_status == STA_ANNOT && Global.highlight_annotation)
 		{
 			Paint paint = new Paint();
 			paint.setStyle(Style.STROKE);
@@ -596,7 +613,6 @@ public class PDFLayoutView extends View implements LayoutListener
 			}
 		}
 	}
-	static private Paint m_info_paint = new Paint();
 	@Override
 	protected void onDraw(Canvas canvas)
 	{
@@ -614,14 +630,16 @@ public class PDFLayoutView extends View implements LayoutListener
 				m_ink.OnDraw(canvas, 0, 0 );
 			}
 		}
-        if(Global.debug_mode)
+        if(Global.debug_mode && m_amgr != null)
         {
-            ActivityManager mgr = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-            ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
-            mgr.getMemoryInfo(info);
-            m_info_paint.setARGB(255, 255, 0, 0);
-            m_info_paint.setTextSize(30);
-            canvas.drawText("AvialMem:" + info.availMem / (1024 * 1024) + " M", 20, 150, m_info_paint);
+			try {
+				m_amgr.getMemoryInfo(m_info);
+				canvas.drawText("AvialMem:" + m_info.availMem / (1024 * 1024) + " M", 20, 150, m_info_paint);
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+			}
         }
 	}
     private boolean m_hold = false;
@@ -871,7 +889,7 @@ public class PDFLayoutView extends View implements LayoutListener
 				m_annot_rect0 = null;
 			break;
 		case MotionEvent.ACTION_MOVE:
-			if( m_annot_rect0 != null )
+			if( m_annot_rect0 != null && !m_annot.IsLocked())
 			{
 				float x = event.getX();
 				float y = event.getY();
@@ -883,7 +901,7 @@ public class PDFLayoutView extends View implements LayoutListener
 			break;
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_CANCEL:
-			if( m_annot_rect0 != null )
+			if( m_annot_rect0 != null && !m_annot.IsLocked())
 			{
 				float x = event.getX();
 				float y = event.getY();
@@ -1206,15 +1224,18 @@ public class PDFLayoutView extends View implements LayoutListener
 	public void OnPageRendered(int pageno)
 	{
 		invalidate();
+		if(m_listener != null)
+			m_listener.onPDFPageRendered(pageno);
 	}
 	public void OnFound(boolean found)
 	{
 		if(found) invalidate();
-		else Toast.makeText(getContext(), "no more found", Toast.LENGTH_SHORT).show();
+		else Toast.makeText(getContext(), R.string.no_more_found, Toast.LENGTH_SHORT).show();
+		if(m_listener != null)
+			m_listener.onPDFSearchFinished(found);
 	}
 	public void OnPageDisplayed(Canvas canvas, VPage vpage)
 	{
-		// TODO Auto-generated method stub
 	}
 	public void OnTimer()
 	{
@@ -1692,7 +1713,7 @@ public class PDFLayoutView extends View implements LayoutListener
 					m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
 				PDFEndAnnot();
 			}});
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
 			public void onClick(DialogInterface dialog, int which)
 			{
 				dialog.dismiss();
@@ -1880,7 +1901,7 @@ public class PDFLayoutView extends View implements LayoutListener
             invalidate();
         }
         else
-            Toast.makeText(getContext(), "No more undo.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.no_more_undo, Toast.LENGTH_SHORT).show();
     }
     public void PDFRedo()
     {
@@ -1894,7 +1915,7 @@ public class PDFLayoutView extends View implements LayoutListener
             invalidate();
         }
         else
-            Toast.makeText(getContext(), "No more redo.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.no_more_redo, Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void finalize() throws Throwable

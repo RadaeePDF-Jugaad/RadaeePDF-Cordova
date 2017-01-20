@@ -169,6 +169,7 @@ public class PDFGridItem extends LinearLayout
                     canvas.drawRect((iw - w * ratiox)/2, (ih - h * ratiox)/2,
                             (iw + w * ratiox)/2, (ih + h * ratiox)/2, paint);
                     Matrix mat = new Matrix( ratiox, -ratiox, (iw - w * ratiox)/2, (ih + h * ratiox)/2 );
+					page.RenderPrepare((Bitmap)null);
                     page.RenderToBmp(bmp, mat);
                     mat.Destroy();
                     if( !m_page.RenderIsFinished() )

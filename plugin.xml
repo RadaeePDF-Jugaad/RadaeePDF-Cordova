@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.1.0">
+        id="com.radaee.cordova" version="1.2.0">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -131,6 +131,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
 
         <!-- Radaee raw -->
+        <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/arimo" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/arimob" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/arimobi" target-dir="res/raw" />
@@ -141,6 +142,7 @@
         <source-file src="src/android/ViewLib/src/main/res/raw/cousineb" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinebi" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinei" target-dir="res/raw" />
+		<source-file src="src/android/ViewLib/src/main/res/raw/rdf008" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/rdf013" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/tinos" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/tinosb" target-dir="res/raw" />
@@ -186,6 +188,19 @@
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_undo.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_print.png" target-dir="res/drawable" />
 
+		<!-- Radaee values -->
+		<source-file src="src/android/ViewLib/src/main/res/values-ar/strings.xml" target-dir="res/values-ar" />
+		<source-file src="src/android/ViewLib/src/main/res/values-es-rES/strings.xml" target-dir="res/values-es-rES" />
+		<source-file src="src/android/ViewLib/src/main/res/values-fr-rFR/strings.xml" target-dir="res/values-fr-rFR" />
+		<source-file src="src/android/ViewLib/src/main/res/values-it/strings.xml" target-dir="res/values-it" />
+		
+		<!-- Radaee res -->
+		<source-file src="src/android/ViewLib/src/main/res/AMIRI_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/ARIMO_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/COUSINE_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/FONT-LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/TINOS_LICENSE.txt" target-dir="res" />
+		
         <!-- Fonts -->
         <source-file src="fonts/Roboto-Black.ttf" target-dir="assets/fonts" />
         <source-file src="fonts/Roboto-Bold.ttf" target-dir="assets/fonts" />
@@ -194,6 +209,70 @@
         <source-file src="fonts/Roboto-Regular.ttf" target-dir="assets/fonts" />
         <source-file src="fonts/Roboto-RegularItalic.ttf" target-dir="assets/fonts" />
 
+		<!-- plugman cannot merge - prepare manual merge -->
+        <config-file target="res/values/strings.xml" parent="/resources">
+			<string name="failed_invalid_password">Open Failed: Invalid Password</string>
+			<string name="failed_invalid_format">Open Failed: Damaged or Invalid PDF file</string>
+			<string name="failed_encryption">Open Failed: Unknown Encryption</string>
+			<string name="failed_invalid_path">Open Failed: Access denied or Invalid path</string>
+			<string name="failed_unknown">Open Failed: Unknown Error</string>
+			<string name="please_wait">Please wait</string>
+			<string name="no_more_found">No more found</string>
+			<string name="thumbnail_creation_running">Thumbnail creation is running…</string>
+			<string name="exiting">Exiting</string>
+			<string name="no">No</string>
+			<string name="yes">Yes</string>
+			<string name="annotation_failed">Add annotation failed!</string>
+			<string name="cannot_write_or_encrypted">Cannot write or encrypted!</string>
+			<string name="copy_text_to_clipboard">Copy text to clipboard</string>
+			<string name="highlight_texts">Highlight texts</string>
+			<string name="underline">Underline</string>
+			<string name="strikeout">StrikeOut</string>
+			<string name="squiggly">Squiggly</string>
+			<string name="process_selected_text">Process selected text</string>
+			<string name="cancel">Cancel</string>
+			<string name="no_more_redo">No more redo.</string>
+			<string name="no_more_undo">No more undo.</string>
+			<string name="pdf_outline">PDF Outlines</string>
+			<string name="single_page">Single Page</string>
+			<string name="vertical">Vertical</string>
+			<string name="dual_page">Dual Page</string>
+			<string name="save_msg">Document modified.\r\nDo you want to save it?</string>
+			<string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
+			<string name="note_content">Note Content</string>
+			<string name="input_password">Input Password</string>
+			<string name="loading_pdf">Loading PDF file…</string>
+			<string name="browse_open_file">Browse And Open File</string>
+			<string name="view_pager">ViewPager</string>
+			<string name="open_asset">Open From Assets (ReadOnly)</string>
+			<string name="open_sdcard">Open From sdcard</string>
+			<string name="open_http">Open Http Link (INTERNET access)</string>
+			<string name="using_RGB_565">Using RGB_565</string>
+			<string name="using_RGB_4444">Using RGB_4444</string>
+			<string name="simple_open_gl">Simple OpenGL</string>
+			<string name="curl_pages">Curl Pages</string>
+			<string name="advance">Advance</string>
+			<string name="create_pdf">CreatePDF</string>
+			<string name="javascript">JavaScript</string>
+			<string name="about">About</string>
+			<string name="ok">OK</string>
+			<string name="todo_open_url">todo: open url: </string>
+			<string name="todo_java_script">todo: execute java script</string>
+			<string name="todo_play_movie">todo: play movie</string>
+			<string name="todo_play_sound">todo: play sound</string>
+			<string name="todo_attachment">todo: treat attachment</string>
+			<string name="todo_3d">todo: play 3D module</string>
+			<string name="file_not_exist">File not exists: </string>
+			<string name="file_not_exist_error">%1$s not exists or not a file.</string>
+			<string name="file_not_opened">Cannot open %1$s.</string>
+			<string name="catalog_not_found">Catalog object is not a dictionary.</string>
+			<string name="edit_catalog_failed">Edit catalog failed.</string>
+			<string name="no_pdf_outlines">PDF does not contain outlines</string>
+			<string name="pdf_print_not_available">PDF File is not available for print.</string>
+			<string name="pdf_print_calculation_failed">Page count calculation failed.</string>
+			<string name="copy_text">Text copied to clipboard: %1$s</string>
+		</config-file>
+		
         <!-- Hooks -->
         <hook type="after_prepare" src="src/android/hooks/configure-android.js"/>
 

@@ -60,7 +60,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
             {
                 public void run()
                 {
-                    dlg = ProgressDialog.show(PDFNavAct.this, "Please wait", "Thumbnail creation is running...", true);
+                    dlg = ProgressDialog.show(PDFNavAct.this, getString(R.string.please_wait), getString(R.string.thumbnail_creation_running), true);
                 }
             };
             handler.postDelayed(runable, 1000);//delay 1 second to display progress dialog.
@@ -77,19 +77,19 @@ public class PDFNavAct extends Activity implements OnItemClickListener
                     InputPswd(item);
                     break;
                 case -2://unknown encryption
-                    onFail(doc, "Open Failed: Unknown Encryption");
+                    onFail(doc, getString(R.string.failed_encryption));
                     break;
                 case -3://damaged or invalid format
-                    onFail(doc, "Open Failed: Damaged or Invalid PDF file");
+                    onFail(doc, getString(R.string.failed_invalid_format));
                     break;
                 case -10://access denied or invalid file path
-                    onFail(doc, "Open Failed: Access denied or Invalid path");
+                    onFail(doc, getString(R.string.failed_invalid_path));
                     break;
                 case 0://succeeded, and continue
                     InitView(doc);
                     break;
                 default://unknown error
-                    onFail(doc, "Open Failed: Unknown Error");
+                    onFail(doc, getString(R.string.failed_unknown));
                     break;
             }
             if(dlg != null)
@@ -140,14 +140,14 @@ public class PDFNavAct extends Activity implements OnItemClickListener
 		final PDFGridItem gitem = item;
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
 			public void onClick(DialogInterface dialog, int which)
 			{
 				String password = tpassword.getText().toString();
                 OpenTask task = new OpenTask(gitem, password);
                 task.execute();
 			}});
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
 			public void onClick(DialogInterface dialog, int which)
 			{
 				dialog.dismiss();

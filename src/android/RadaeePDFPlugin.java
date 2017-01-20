@@ -2,15 +2,18 @@
 	RadaeePDF-Cordova for Android
 	GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 	Nermeen Solaiman
-	v1.1
+	v1.2
 
 	modified on 09/11/16 -->  added getFileState prototype
+	
+	modified on 18/01/17 -->  added implementation of PDFReaderListener
 */
 package com.radaee.cordova;
 
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.URLUtil;
 
 import com.radaee.pdf.Document;
@@ -29,10 +32,11 @@ import org.json.JSONObject;
 /**
  * define the method exposed by the RadaeePDFPlugin
  */
-public class RadaeePDFPlugin extends CordovaPlugin {
+public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFReaderListener {
 
     private Document mDocument;
     private boolean showPdfInProgress;
+    private static final String TAG = "RadaeePDFPlugin";
 
 	/**
      * Constructor.
@@ -61,9 +65,8 @@ public class RadaeePDFPlugin extends CordovaPlugin {
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         Context mContext;
-        CallbackContext mCallbackContext = callbackContext;
         JSONObject params;
-        if(action.equals("activateLicense")) {
+        if(action.equals("activateLicense")) { //activate the license
             params = args.getJSONObject(0);
             Global.mLicenseType = params.optInt("licenseType");
             Global.mCompany = params.optString("company");
@@ -71,22 +74,22 @@ public class RadaeePDFPlugin extends CordovaPlugin {
             Global.mKey = params.optString("key");
 			
 			if(Global.Init(cordova.getActivity(), Global.mLicenseType, Global.mCompany, Global.mEmail, Global.mKey))
-                mCallbackContext.success("License activated successfully.");
+                callbackContext.success("License activated successfully.");
             else
-                mCallbackContext.error("License activation failure.");
-        } else if(action.equals("fileState")) {
+                callbackContext.error("License activation failure.");
+        } else if(action.equals("fileState")) { //get last opened file's state
             switch (PDFViewAct.getFileState()) {
                 case PDFViewAct.NOT_MODIFIED:
-                    mCallbackContext.success("File has not been modified");
+                    callbackContext.success("File has not been modified");
                     break;
                 case PDFViewAct.MODIFIED_NOT_SAVED:
-                    mCallbackContext.success("File has been modified but not saved");
+                    callbackContext.success("File has been modified but not saved");
                     break;
                 case PDFViewAct.MODIFIED_AND_SAVED:
-                    mCallbackContext.success("File has been modified and saved");
+                    callbackContext.success("File has been modified and saved");
                     break;
             }
-        } else if(action.equals("openFromAssets")) {
+        } else if(action.equals("openFromAssets")) { //open file from assets
             params = args.getJSONObject(0);
 
             String mTarget = params.optString("url");
@@ -97,20 +100,21 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                 intent.putExtra("PDFAsset", mTarget);
                 intent.putExtra("PDFPswd", params.optString("password"));
                 mContext.startActivity(intent);
-                mCallbackContext.success("Pdf assets opening success");
+                callbackContext.success("Pdf assets opening success");
             }
-        } else if (action.equals("show")) {
+        } else if (action.equals("show")) { //open file 
         	params = args.getJSONObject(0);
             String targetPath = params.optString("url");
 
             if(showPdfInProgress){
-                mCallbackContext.error("another Pdf opening in progress");
+                callbackContext.error("another Pdf opening in progress");
                 return false;
             }
             showPdfInProgress = true;
             if(!TextUtils.isEmpty(targetPath)) {
                 mContext = this.cordova.getActivity().getApplicationContext();
-                if(URLUtil.isFileUrl(targetPath)) {
+                if(URLUtil.isFileUrl(targetPath)) { //open from file system
+                    PDFViewAct.setPDFReaderListener(this);
                     String suffix = "file://";
                     Intent intent = new Intent(mContext, PDFViewAct.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -118,8 +122,9 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                     intent.putExtra("PDFPswd", params.optString("password"));
                     mContext.startActivity(intent);
                     showPdfInProgress = false;
-                    mCallbackContext.success("Pdf local opening success");
-                } else if(URLUtil.isHttpUrl(targetPath) || URLUtil.isHttpsUrl(targetPath)) {
+                    callbackContext.success("Pdf local opening success");
+                } else if(URLUtil.isHttpUrl(targetPath) || URLUtil.isHttpsUrl(targetPath)) { //open from remote url
+                    PDFViewAct.setPDFReaderListener(this);
 					Global.Init(cordova.getActivity());
                     PDFHttpStream m_http_stream = new PDFHttpStream();
                     m_http_stream.open(targetPath);
@@ -128,22 +133,22 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                     switch (ret)
                     {
                         case -1://need input password
-                            onFail(mCallbackContext, "Open Failed: Invalid Password");
+                            onFail(callbackContext, "Open Failed: Invalid Password");
                             break;
                         case -2://unknown encryption
-                            onFail(mCallbackContext, "Open Failed: Unknown Encryption");
+                            onFail(callbackContext, "Open Failed: Unknown Encryption");
                             break;
                         case -3://damaged or invalid format
-                            onFail(mCallbackContext, "Open Failed: Damaged or Invalid PDF file");
+                            onFail(callbackContext, "Open Failed: Damaged or Invalid PDF file");
                             break;
                         case -10://access denied or invalid file path
-                            onFail(mCallbackContext, "Open Failed: Access denied or Invalid path");
+                            onFail(callbackContext, "Open Failed: Access denied or Invalid path");
                             break;
                         case 0://succeeded, and continue
                             PDFViewAct.ms_tran_doc = mDocument;
                             break;
                         default://unknown error
-                            onFail(mCallbackContext, "Open Failed: Unknown Error");
+                            onFail(callbackContext, "Open Failed: Unknown Error");
                             break;
                     }
 
@@ -155,10 +160,25 @@ public class RadaeePDFPlugin extends CordovaPlugin {
                 }
             } else {
                 showPdfInProgress = false;
-                mCallbackContext.error("url is null or white space, this is a mandatory parameter");
+                callbackContext.error("url is null or white space, this is a mandatory parameter");
             }
-        }
-        else
+        } else if(action.equals("getPageNumber")) { //get current page number
+            if(PDFViewAct.getInstance() != null) {
+                callbackContext.success("Current page Number = " + PDFViewAct.getInstance().getCurrentPage());
+            } else
+                callbackContext.error("Reader Not ready");
+        } else if(action.equals("JSONFormFields")) { //get file's form fields values in json format
+            if(PDFViewAct.getInstance() != null) {
+                callbackContext.success("Result = " + PDFViewAct.getInstance().getJsonFormFields());
+            } else
+                callbackContext.error("Reader Not ready");
+        } else if(action.equals("JSONFormFieldsAtPage")) { //get file's form fields values for given page in json format
+            if(PDFViewAct.getInstance() != null) {
+                callbackContext.success("Current page Number = " +
+                        PDFViewAct.getInstance().getJsonFormFieldsAtPage(args.getJSONObject(0).optInt("page")));
+            } else
+                callbackContext.error("Reader Not ready");
+        } else
             return false;
 
         return true;
@@ -168,5 +188,30 @@ public class RadaeePDFPlugin extends CordovaPlugin {
         mDocument.Close();
         mDocument = null;
         callbackContext.error(msg);
+    }
+
+    @Override
+    public void willShowReader() {
+        Log.d(TAG, "will show reader");
+    }
+
+    @Override
+    public void didShowReader() {
+        Log.d(TAG, "did show reader");
+    }
+
+    @Override
+    public void willCloseReader() {
+        Log.d(TAG, "will close reader");
+    }
+
+    @Override
+    public void didCloseReader() {
+        Log.d(TAG, "did close reader");
+    }
+
+    @Override
+    public void didSearchTerm(String query, boolean found) {
+        Log.d(TAG, "did search term -> " + query + " and result = " + found);
     }
 }

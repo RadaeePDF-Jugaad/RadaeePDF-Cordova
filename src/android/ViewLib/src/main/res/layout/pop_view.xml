@@ -19,12 +19,11 @@
             android:src="@drawable/btn_view_vert" />
 
         <TextView
-            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="6dp"
-            android:text="Vertical" />
+            android:text="@string/vertical" />
 
     </LinearLayout>
 
@@ -41,13 +40,12 @@
             android:src="@drawable/btn_view_single" />
 
         <TextView
-            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="6dp"
-            android:text="Single Page" />
+            android:text="@string/single_page" />
 
     </LinearLayout>
 
@@ -64,13 +62,12 @@
             android:src="@drawable/btn_view_dual" />
 
         <TextView
-            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="6dp"
-            android:text="Dual Page" />
+            android:text="@string/dual_page" />
 
     </LinearLayout>
 

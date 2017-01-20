@@ -1,28 +1,23 @@
 package com.radaee.pdf;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.util.Log;
 
 import com.radaee.viewlib.R;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-
-//import android.telephony.TelephonyManager;
-//import android.net.wifi.WifiInfo;
-//import android.net.wifi.WifiManager;
 
 /**
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.9RC1
+ * @version 3.10RC2
  */
 public class Global
 {
@@ -220,13 +215,13 @@ public class Global
 	 */
 	private static native void hideAnnots(boolean hide);
 
-	private static native void drawScroll(Bitmap bmp, long dib1, long dib2, int x, int y, int style);
+	private static native void drawScroll(Bitmap bmp, long dib1, long dib2, int x, int y, int style, int back_side_clr);
 	/**
 	 * not used for developer
 	 */
-	public static void DrawScroll(Bitmap bmp, DIB dib1, DIB dib2, int x, int y, int style)
+	public static void DrawScroll(Bitmap bmp, DIB dib1, DIB dib2, int x, int y, int style, int back_side_clr)
 	{
-		drawScroll(bmp, dib1.hand, dib2.hand, x, y, style);
+		drawScroll(bmp, dib1.hand, dib2.hand, x, y, style, back_side_clr);
 	}
 
 	private static native void toDIBPoint(long matrix, float[] ppoint,
@@ -363,6 +358,25 @@ public class Global
 		load_file(res, res_umap, dst_umap);
 		setCMapsPath(dst_cmap.getPath(), dst_umap.getPath());
 	}
+	static private void save_font(String path, String out)
+	{
+		File file = new File(path);
+		if(!file.exists()) return;
+		try {
+			FileInputStream fi = new FileInputStream(file);
+			FileOutputStream fo = new FileOutputStream(out);
+			byte[] data = new byte[4096];
+			int read = 0;
+			while((read = fi.read(data)) > 0)
+				fo.write(data, 0, read);
+			fo.close();
+			fi.close();
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 	static private boolean ms_init = false;
 	/**
 	 * global initialize function. it load JNI library and write some data to memory.
@@ -434,11 +448,16 @@ public class Global
 		// add external fonts from system and resource
 		fontfileListStart();//this method create empty font list
 		fontfileListAdd("/system/fonts/DroidSans.ttf");//load from system fonts.
+		//save_font("/system/fonts/DroidSans.ttf", "/sdcard/DroidSans.ttf");
 		fontfileListAdd("/system/fonts/Roboto-Regular.ttf");
+		//save_font("/system/fonts/Roboto-Regular.ttf", "/sdcard/Roboto-Regular.ttf");
 
 		fontfileListAdd("/system/fonts/DroidSansFallback.ttf");
+		//save_font("/system/fonts/DroidSansFallback.ttf", "/sdcard/DroidSansFallback.ttf");
         fontfileListAdd("/system/fonts/NotoSansSC-Regular.otf");
+		//save_font("/system/fonts/NotoSansSC-Regular.otf", "/sdcard/NotoSansSC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansTC-Regular.otf");
+		//save_font("/system/fonts/NotoSansTC-Regular.otf", "/sdcard/NotoSansTC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansJP-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansKR-Regular.otf");
         //fontfileListAdd("/system/fonts/NotoSansHebrew-Regular.ttf");
@@ -455,7 +474,7 @@ public class Global
         load_truetype_font( res, R.raw.cousinei, new File(files, "cousinei.ttf") );
         load_truetype_font( res, R.raw.cousinebi, new File(files, "cousinebi.ttf") );
         load_truetype_font( res, R.raw.symbol, new File(files, "symbol.ttf") );//Symbol Neu for Powerline
-        //load_truetype_font( res, R.raw.notosanshebrew, new File(files, "notosanshebrew.ttf") );//Symbol Neu for Powerline
+		load_truetype_font( res, R.raw.amiri_regular, new File(files, "amiriRegular.ttf") );//arabic
 		fontfileListEnd();//this method parser all added font files, and extract font names, to init font mapping list.
 
         // using resource fonts to replace type1 fonts.H
@@ -616,39 +635,40 @@ public class Global
 		// set default font for Simplified Chinese. 简体
 		if (!setDefaultFont("GB1", "DroidSansFallback", true) &&
             !setDefaultFont("GB1", "Noto Sans SC Regular", true) && face_name != null)
-			setDefaultFont(null, face_name, true);
+			setDefaultFont("GB1", face_name, true);
 		if (!setDefaultFont("GB1", "DroidSansFallback", false) &&
             !setDefaultFont("GB1", "Noto Sans SC Regular", false) && face_name != null)
-			setDefaultFont(null, face_name, false);
+			setDefaultFont("GB1", face_name, false);
 
 		// set default font for Traditional Chinese. 繁體
 		if (!setDefaultFont("CNS1", "DroidSansFallback", true) &&
             !setDefaultFont("CNS1", "Noto Sans TC Regular", true) && face_name != null)
-			setDefaultFont(null, face_name, true);
+			setDefaultFont("CNS1", face_name, true);
 		if (!setDefaultFont("CNS1", "DroidSansFallback", false) &&
             !setDefaultFont("CNS1", "Noto Sans TC Regular", false) && face_name != null)
-			setDefaultFont(null, face_name, false);
+			setDefaultFont("CNS1", face_name, false);
 
 		// set default font for Japanese.
 		if (!setDefaultFont("Japan1", "DroidSansFallback", true) &&
             !setDefaultFont("Japan1", "Noto Sans JP Regular", true) && face_name != null)
-			setDefaultFont(null, face_name, true);
+			setDefaultFont("Japan1", face_name, true);
 		if (!setDefaultFont("Japan1", "DroidSansFallback", false) &&
             !setDefaultFont("Japan1", "Noto Sans JP Regular", false) && face_name != null)
-			setDefaultFont(null, face_name, false);
+			setDefaultFont("Japan1", face_name, false);
 
 		// set default font for Korean.
 		if (!setDefaultFont("Korea1", "DroidSansFallback", true) &&
             !setDefaultFont("Korea1", "Noto Sans KR Regular", true) && face_name != null)
-			setDefaultFont(null, face_name, true);
+			setDefaultFont("Korea1", face_name, true);
 		if (!setDefaultFont("Korea1", "DroidSansFallback", false) &&
             !setDefaultFont("Korea1", "Noto Sans KR Regular", false) && face_name != null)
-			setDefaultFont(null, face_name, false);
+			setDefaultFont("Korea1", face_name, false);
 
 		// set text font for edit-box and combo-box editing.
         // first we try using DroidSansFallback, which has large code range include CJK,
         // but not good support france, german and some EUR languages.
         // if DroidSansFallback not exits, we using Arimo, loading from resource, which has good support EUR languages.
+		// For arabic support use setAnnotFont("Amiri-Regular")
         if (!setAnnotFont("DroidSansFallback") &&
             !setAnnotFont("Arimo") && face_name != null) {
             setAnnotFont(face_name);
@@ -676,7 +696,6 @@ public class Global
 		dark_mode = false;// dark mode
 		zoomLevel = 3;
         debug_mode = true;
-		highlight_annotation = true;
 		setAnnotTransparency(0x200040FF);
 	}
 
