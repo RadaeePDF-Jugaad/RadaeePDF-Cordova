@@ -602,10 +602,17 @@
     }
 }
 
-- (void)didSearchTerm:(NSString *)term
+- (void)didChangePage:(int)page
 {
     if (_delegate) {
-        [_delegate didSearchTerm:term];
+        [_delegate didChangePage:page];
+    }
+}
+
+- (void)didSearchTerm:(NSString *)term found:(BOOL)found
+{
+    if (_delegate) {
+        [_delegate didSearchTerm:term found:found];
     }
 }
 

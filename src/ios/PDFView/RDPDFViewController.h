@@ -30,7 +30,8 @@
 - (void)didShowReader;
 - (void)willCloseReader;
 - (void)didCloseReader;
-- (void)didSearchTerm:(NSString *)term;
+- (void)didChangePage:(int)page;
+- (void)didSearchTerm:(NSString *)term found:(BOOL)found;
 @end;
 
 //---------------------------------------------------------
@@ -52,6 +53,7 @@
     //FINE
     PDFView *m_view;
     PDFThumbView *m_Thumbview;
+    PDFThumbView *m_Gridview;
     UISlider *m_slider;
     PDFDoc *m_doc;
     BOOL b_findStart;

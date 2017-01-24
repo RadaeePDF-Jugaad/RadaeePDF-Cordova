@@ -9,7 +9,8 @@
 - (void)didShowReader;
 - (void)willCloseReader;
 - (void)didCloseReader;
-- (void)didSearchTerm:(NSString *)term;
+- (void)didChangePage:(int)page;
+- (void)didSearchTerm:(NSString *)term found:(BOOL)found;
 @end;
 
 @interface RadaeePDFPlugin : CDVPlugin{

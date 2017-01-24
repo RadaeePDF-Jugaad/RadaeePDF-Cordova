@@ -1203,6 +1203,14 @@ extern uint g_oval_color;
 
 - (void)OnPageChanged :(int)pageno
 {
+    static int prevPage = -1;
+    if (_delegate) {
+        if (pageno != prevPage) {
+            prevPage = pageno;
+            [_delegate didChangePage:pageno];
+        }
+    }
+    
     pageno++;
     NSString *pagestr = [[NSString alloc]initWithFormat:@"%d/",pageno];
     pagestr = [pagestr stringByAppendingFormat:@"%d",pagecount];
@@ -1277,6 +1285,10 @@ extern uint g_oval_color;
 
 - (void)OnFound:(bool)found
 {
+    if (_delegate) {
+        [_delegate didSearchTerm:findString found:found];
+    }
+    
     if( !found )
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Waring" message:@"Find Over" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
