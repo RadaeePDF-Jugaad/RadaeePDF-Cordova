@@ -12,12 +12,20 @@
 #import <OpenGLES/ES1/glext.h>
 #import "PDFV.h"
 
+#define UIColorFromRGB(rgbValue) \
+[UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
+green:((float)((rgbValue & 0x0000FF00) >>  8))/255.0 \
+blue:((float)((rgbValue & 0x000000FF) >>  0))/255.0 \
+alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
+
 @protocol PDFThumbViewDelegate <NSObject>
 - (void)OnPageClicked :(int) pageno;
 @end
 
 @interface PDFThumbView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate>
 {
+    int thumbBackgroundColor;
+    
     PDFDoc *m_doc;
     PDFVThmb *m_view;
     
@@ -41,8 +49,10 @@
 }
 
 -(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate;
+-(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate mode:(int)mode;
 -(void)vGoto:(int)pageno;
 -(void)vClose;
 -(void)refresh;
+-(void)setThumbBackgroundColor:(int)color;
 @end
 

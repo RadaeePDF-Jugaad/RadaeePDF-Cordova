@@ -71,6 +71,14 @@ extern bool g_double_page_enabled;
     //END
     m_doc = doc;
     bool *verts = (bool *)calloc( sizeof(bool), [doc pageCount] );
+    bool *horzs = (bool *)calloc( sizeof(bool), [doc pageCount] );
+    
+    for (int i = 0; i < m_doc.pageCount; i++) {
+        if (i > 0) {
+            horzs[i] = true;
+        }
+    }
+    
     switch(g_def_view)
     {
         case 1:
@@ -84,7 +92,7 @@ extern bool g_double_page_enabled;
             doublePage = g_double_page_enabled;
             
             if (doublePage) {
-                m_view = [[PDFVDual alloc] init:false :NULL :0 :NULL :0];
+                m_view = [[PDFVDual alloc] init:false :NULL :0 :(coverPage) ? horzs : NULL :doc.pageCount];
             }
             else
             {
@@ -114,7 +122,7 @@ extern bool g_double_page_enabled;
     struct PDFVThreadBack tback;
     tback.OnPageRendered = @selector(OnPageRendered:);
     tback.OnFound = @selector(OnFound:);
-    self.backgroundColor = [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
+    self.backgroundColor = (readerBackgroundColor != 0) ? UIColorFromRGB(readerBackgroundColor) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
     [m_view vOpen:doc :4 :self: &tback];
     [m_view vResize:m_w :m_h];
     m_status = sta_none;
@@ -174,7 +182,9 @@ extern bool g_double_page_enabled;
             pageno++;
         }
         
-        if (g_paging_enabled && g_def_view == 3 && pageno > 0 && (pageno % 2 != 0) && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
+        BOOL checkMod = (coverPage) ? (pageno % 2 == 0) : (pageno % 2 != 0);
+        
+        if (g_paging_enabled && g_def_view == 3 && pageno > 0 && checkMod && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
             pageno--;
         }
     }
@@ -184,7 +194,7 @@ extern bool g_double_page_enabled;
     pos.x = 0;
     pos.y = [m_doc pageHeight:pageno];
     pos.pageno = pageno;
-    int pages = (!UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]) && doublePage && m_doc.pageCount > 1) ? 2 : 1;
+    int pages = (!UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]) && doublePage && m_doc.pageCount > 1 && !(coverPage && (pageno < 1 || ((pageno % 2 != 0) && pageno == (m_doc.pageCount - 1))))) ? 2 : 1;
     float gapX = (m_w - (([m_doc pageWidth:pageno] * pages)*[m_view vGetScaleMin])) / 2;
     float gapY = (m_h - ([m_doc pageHeight:pageno]*[m_view vGetScaleMin])) / 2;
     
@@ -1756,6 +1766,18 @@ extern bool g_double_page_enabled;
     return (g_def_view == 3 || g_def_view == 4);
 }
 
+- (void)setReaderBackgroundColor:(int)color
+{
+    readerBackgroundColor = color;
+    
+    if (readerBackgroundColor != 0) {
+        self.backgroundColor = UIColorFromRGB(readerBackgroundColor);
+    }
+}
 
+- (void)setFirstPageCover:(BOOL)cover
+{
+    coverPage = cover;
+}
 
 @end

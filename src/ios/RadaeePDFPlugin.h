@@ -30,6 +30,15 @@
     int ovalColor;
     int selColor;
     
+    int thumbBackgroundColor;
+    int readerBackgroundColor;
+    int titleBackgroundColor;
+    int iconsBackgroundColor;
+    
+    float thumbHeight;
+    
+    BOOL firstPageCover;
+    
     int bottomBar;
 }
 
@@ -45,6 +54,7 @@
 @property (strong, nonatomic) UIImage *rectImage;
 @property (strong, nonatomic) UIImage *ellipseImage;
 @property (strong, nonatomic) UIImage *printImage;
+@property (strong, nonatomic) UIImage *gridImage;
 @property (strong, nonatomic) UIImage *deleteImage;
 @property (strong, nonatomic) UIImage *doneImage;
 @property (strong, nonatomic) UIImage *removeImage;
@@ -60,6 +70,12 @@
 - (void)openFromPath:(CDVInvokedUrlCommand*)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
 - (void)getPageNumber:(CDVInvokedUrlCommand*)command;
+- (void)setThumbnailBGColor:(CDVInvokedUrlCommand*)command;
+- (void)setReaderBGColor:(CDVInvokedUrlCommand*)command;
+- (void)setTitleBGColor:(CDVInvokedUrlCommand*)command;
+- (void)setIconsBGColor:(CDVInvokedUrlCommand*)command;
+- (void)setThumbHeight:(CDVInvokedUrlCommand*)command;
+- (void)setFirstPageCover:(CDVInvokedUrlCommand*)command;
 
 // Form Extractor
 

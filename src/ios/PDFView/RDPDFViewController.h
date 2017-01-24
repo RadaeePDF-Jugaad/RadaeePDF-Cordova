@@ -44,6 +44,9 @@
 
 @interface RDPDFViewController : UIViewController <UISearchBarDelegate,saveTextAnnotDelegate,PDFViewDelegate,BookmarkTableViewDelegate,UIPrintInteractionControllerDelegate>
 {
+    BOOL firstPageCover;
+    float thumbHeight;
+    
     //GEAR
     MPMoviePlayerViewController *mpvc;
     //FINE
@@ -94,6 +97,7 @@
 @property (strong, nonatomic) UIImage *rectImage;
 @property (strong, nonatomic) UIImage *ellipseImage;
 @property (strong, nonatomic) UIImage *printImage;
+@property (strong, nonatomic) UIImage *gridImage;
 @property (strong, nonatomic) UIImage *deleteImage;
 @property (strong, nonatomic) UIImage *doneImage;
 @property (strong, nonatomic) UIImage *removeImage;
@@ -110,6 +114,7 @@
 @property (nonatomic) BOOL hideRectImage;
 @property (nonatomic) BOOL hideEllipseImage;
 @property (nonatomic) BOOL hidePrintImage;
+@property (nonatomic) BOOL hideGridImage;
 
 // define delegate property
 @property (nonatomic, assign) id <RDPDFViewControllerDelegate> delegate;
@@ -167,6 +172,10 @@
 
 - (id)getDoc;
 - (int)getCurrentPage;
+- (void)setThumbnailBGColor:(int)color;
+- (void)setReaderBGColor:(int)color;
+- (void)setThumbHeight:(float)height;
+- (void)setFirstPageCover:(BOOL)cover;
 
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;

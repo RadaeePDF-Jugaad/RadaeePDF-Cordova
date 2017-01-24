@@ -53,4 +53,28 @@ RadaeePDFPlugin.prototype.getJSONFormFieldsAtPage = function (params, successCal
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'JSONFormFieldsAtPage', [params]);
 };
 
+RadaeePDFPlugin.prototype.setThumbnailBGColor = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbnailBGColor', [params]);
+};
+
+RadaeePDFPlugin.prototype.setReaderBGColor = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setReaderBGColor', [params]);
+};
+
+RadaeePDFPlugin.prototype.setThumbHeight = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbHeight', [params]);
+};
+
+RadaeePDFPlugin.prototype.setFirstPageCover = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setFirstPageCover', [params]);
+};
+
 module.exports = new RadaeePDFPlugin();

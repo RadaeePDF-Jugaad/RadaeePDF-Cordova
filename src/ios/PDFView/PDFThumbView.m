@@ -27,20 +27,27 @@
 {
 }
 
--(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate
+-(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate mode:(int)mode
 {
     //GEAR
     [self vClose];
     //END
     m_doc = doc;
-    m_view = [[PDFVThmb alloc] init:0:false];
+    m_view = [[PDFVThmb alloc] init:mode:false];
     m_delegate = delegate;
     
     struct PDFVThreadBack tback;
     tback.OnPageRendered = @selector(OnPageRendered:);
     //tback.OnFound = @selector(OnFound:);
-    self.backgroundColor = [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
-    [m_view vOpen:doc :4 : self: &tback];
+    self.backgroundColor = (thumbBackgroundColor != 0) ? UIColorFromRGB(thumbBackgroundColor) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
+    
+    if (mode == 2) {
+        [m_view vOpen:doc :20 : self: &tback];
+    }
+    else {
+        [m_view vOpen:doc :4 : self: &tback];
+    }
+    
     [m_view vResize:m_w :m_h];
     self.contentSize = CGSizeMake([m_view vGetDocW]/m_scale, [m_view vGetDocH]/m_scale);
     CGPoint pt;
@@ -54,7 +61,12 @@
     [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
     m_status = tsta_none;
     self.delegate = self;
-//    m_delegate = nil;
+    //    m_delegate = nil;
+}
+
+-(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate
+{
+    [self vOpen:doc :delegate mode:0];
 }
 
 -(void)vGoto:(int)pageno
@@ -263,4 +275,14 @@
         }
     }
 }
+
+- (void)setThumbBackgroundColor:(int)color
+{
+    thumbBackgroundColor = color;
+    
+    if (thumbBackgroundColor != 0) {
+        self.backgroundColor = UIColorFromRGB(thumbBackgroundColor);
+    }
+}
+
 @end

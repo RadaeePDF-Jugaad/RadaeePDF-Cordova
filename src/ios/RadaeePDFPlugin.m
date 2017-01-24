@@ -194,6 +194,60 @@
     [self getPageNumberResult:[NSString stringWithFormat:@"%i", page]];
 }
 
+- (void)setThumbnailBGColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    thumbBackgroundColor = [[params objectForKey:@"color"] intValue];
+}
+
+- (void)setReaderBGColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    readerBackgroundColor = [[params objectForKey:@"color"] intValue];
+}
+
+- (void)setTitleBGColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    titleBackgroundColor = [[params objectForKey:@"color"] intValue];
+}
+
+- (void)setIconsBGColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    iconsBackgroundColor = [[params objectForKey:@"color"] intValue];
+}
+
+- (void)setThumbHeight:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    thumbHeight = [[params objectForKey:@"height"] floatValue];
+}
+
+- (void)setFirstPageCover:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    firstPageCover = [[params objectForKey:@"cover"] boolValue];
+}
+
 - (void)readerInit
 {
     if( m_pdf == nil )
@@ -204,8 +258,10 @@
     [m_pdf setDelegate:self];
     
     [self setReaderViewMode:3];
-    [self setPagingEnabled:g_paging_enabled];
-    [self setDoublePageEnabled:g_double_page_enabled];
+    [self setPagingEnabled:YES];
+    [self setDoublePageEnabled:YES];
+    
+    [m_pdf setFirstPageCover:firstPageCover];
     
     [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
     [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
@@ -214,6 +270,7 @@
     [m_pdf setEllipseImage:[UIImage imageNamed:@"btn_annot_ellipse.png"]];
     [m_pdf setOutlineImage:[UIImage imageNamed:@"btn_outline.png"]];
     [m_pdf setPrintImage:[UIImage imageNamed:@"btn_print.png"]];
+    [m_pdf setGridImage:[UIImage imageNamed:@"btn_grid.png"]];
     
     [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
     
@@ -254,13 +311,27 @@
     [self pdfChargeDidFinishLoading];
     
     //toggle thumbnail/seekbar
-    if (bottomBar < 1)
+    if (bottomBar < 1){
+        [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
         [m_pdf PDFThumbNailinit:1];
+        [m_pdf setThumbnailBGColor:thumbBackgroundColor];
+    }
     else
         [m_pdf PDFSeekBarInit:1];
     
+    [m_pdf setReaderBGColor:readerBackgroundColor];
+    
     m_pdf.hidesBottomBarWhenPushed = YES;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:m_pdf];
+    
+    if (titleBackgroundColor != 0) {
+        navController.navigationBar.barTintColor = UIColorFromRGB(titleBackgroundColor);
+    }
+    
+    if (iconsBackgroundColor != 0) {
+        navController.navigationBar.tintColor = UIColorFromRGB(iconsBackgroundColor);
+    }
+    
     [self.viewController presentViewController:navController animated:YES completion:nil];
 }
 

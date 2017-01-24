@@ -312,6 +312,7 @@
         <resource-file src="src/ios/Resources/btn_view_single.png" />
         <resource-file src="src/ios/Resources/btn_view_vert.png" />
         <resource-file src="src/ios/Resources/btn_view.png" />
+        <resource-file src="src/ios/Resources/btn_grid.png" />
 
         <!-- Radaee sources -->
         <source-file src="src/ios/NSObject/NSObject+PerformBlock.m" />

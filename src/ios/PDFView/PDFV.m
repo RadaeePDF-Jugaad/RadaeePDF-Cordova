@@ -204,7 +204,7 @@
 -(void)vGetPos:(struct PDFV_POS *)pos :(int)x :(int)y
 {
     if( !pos ) return;
-    int pageno = [self vGetPage:x:y];
+    int pageno = [self vGetPage:x :y];
     pos->pageno = pageno;
     if( pageno < 0 )
     {
@@ -955,7 +955,7 @@
 -(void)vOpen:(PDFDoc *)doc : (int)page_gap :(id<PDFVInnerDel>)notifier :(const struct PDFVThreadBack *)disp
 {
     [super vOpen :doc :page_gap :notifier :disp];
-    if( m_rtol && m_orientation == 0 ) m_x = 0x7FFFFFFF;
+    if( m_rtol && (m_orientation == 0 || m_orientation == 2) ) m_x = 0x7FFFFFFF;
 }
 
 -(void)vClose
@@ -1007,7 +1007,7 @@
             m_docw = left + m_w/2;
         }
     }
-    else
+    else if (m_orientation == 1)
     {
         m_scale_min = ((float)(m_w - m_page_gap)) / sz.cx;
         m_scale_max = m_scale_min * g_zoom_level;
@@ -1027,13 +1027,43 @@
             cur++;
         }
         m_doch = top + m_h/2;
+    } else {
+        m_scale_min = (((float)(m_h - m_page_gap)) / sz.cy) / 4;
+        m_scale_max = m_scale_min * g_zoom_level;
+        m_scale = m_scale_min;
+        
+        int cols = (m_w / ((sz.cx * m_scale) + m_page_gap));
+        float gap = (m_w - ((cols * (sz.cx * m_scale)) + (m_page_gap * (cols - 1)))) / 2;
+       
+        int left = gap;
+        int top = m_page_gap / 2;
+        cur = 0;
+        m_docw = 0;
+        m_doch = 0;
+        
+        while( cur < cnt )
+        {
+            for (int i = 0; i < cols; i++) {
+                if (cur >= cnt) break;
+                PDFVPage *vpage = m_pages[cur];
+                [vpage SetRect :left: top: m_scale];
+                left += [vpage GetWidth] + m_page_gap;
+                if( m_doch < [vpage GetHeight] ) m_doch = [vpage GetHeight];
+                cur++;
+            }
+            
+            left = gap;
+            top += m_page_gap + (sz.cy * m_scale);
+            m_doch = top + (sz.cy * m_scale);
+        }
+        m_docw = m_w;
     }
 }
 
 -(int)vGetPage:(int) vx :(int) vy
 {
 	if( !m_pages || m_pages_cnt <= 0 ) return -1;
-	if( m_orientation == 0 && !m_rtol )//ltor
+	if(m_orientation == 0 && !m_rtol )//ltor
 	{
 		int left = 0;
 		int right = m_pages_cnt - 1;
@@ -1085,7 +1115,7 @@
 		if( right < 0 ) return 0;
 		else return m_pages_cnt - 1;
 	}
-	else
+	else if( m_orientation == 1 )
 	{
 		int left = 0;
 		int right = m_pages_cnt - 1;
@@ -1110,7 +1140,47 @@
 		}
 		if( right < 0 ) return 0;
 		else return m_pages_cnt - 1;
-	}
+    } else 	{   // grid
+        
+        int left = 0;
+        int right = m_pages_cnt - 1;
+        int x = m_x + vx;
+        int y = m_y + vy;
+        int gap = m_page_gap>>1;
+        while( left <= right )
+        {
+            int mid = (left + right)>>1;
+            PDFVPage *pg1 = m_pages[mid];
+            if((x < [pg1 GetX] - gap))// || (y < [pg1 GetY] - gap))
+            {
+                if (y < ([pg1 GetY] + [pg1 GetHeight])) {
+                    right = mid - 1;
+                }
+                else
+                {
+                    left = mid + 1;
+                }
+            }
+            else if((x > [pg1 GetX] + [pg1 GetWidth] + gap))// || (y > [pg1 GetY] + [pg1 GetHeight]))
+            {
+                if(y > [pg1 GetY])
+                {
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
+                }
+                
+            }
+            else
+            {
+                return mid;
+            }
+        }
+        if( right < 0 ) return 0;
+        else return m_pages_cnt - 1;
+    }
 }
 
 -(void)vFlushRange
