@@ -1028,7 +1028,7 @@
         }
         m_doch = top + m_h/2;
     } else {
-        m_scale_min = (((float)(m_h - m_page_gap)) / sz.cy) / 4;
+        m_scale_min = (((float)(m_h - m_page_gap)) / sz.cy) / 4; //set static scale to get the same size in portrait/landscape
         m_scale_max = m_scale_min * g_zoom_level;
         m_scale = m_scale_min;
         
@@ -1147,46 +1147,50 @@
         int x = m_x + vx;
         int y = m_y + vy;
         int gap = m_page_gap>>1;
+        
         while( left <= right )
         {
             int mid = (left + right)>>1;
             PDFVPage *pg1 = m_pages[mid];
-            if((x < [pg1 GetX] - gap))// || (y < [pg1 GetY] - gap))
+            
+            if (y < ([pg1 GetY] - gap))
             {
-                if (y < ([pg1 GetY] + [pg1 GetHeight])) {
-                    right = mid - 1;
-                }
-                else
-                {
-                    left = mid + 1;
-                }
+                right = mid - 1;
             }
-            else if((x > [pg1 GetX] + [pg1 GetWidth] + gap))// || (y > [pg1 GetY] + [pg1 GetHeight]))
+            else if(y > ([pg1 GetY] + [pg1 GetHeight] + gap))
             {
-                if(y > [pg1 GetY])
-                {
-                    left = mid + 1;
-                }
-                else
-                {
-                    right = mid - 1;
-                }
-                
+                left = mid + 1;
             }
             else
             {
-                return mid;
+                if( x < [pg1 GetX] )
+                {
+                    right = mid - 1;
+                }
+                else if( x > [pg1 GetX] + [pg1 GetWidth] + gap )
+                {
+                    left = mid + 1;
+                }
+                else
+                {
+                    return mid;
+                }
             }
         }
         if( right < 0 ) return 0;
+        //else if(left > 0 && left < m_pages_cnt) return left;
         else return m_pages_cnt - 1;
     }
 }
 
 -(void)vFlushRange
 {
-	int pageno1 = [self vGetPage: 0 :0];
-	int pageno2 = [self vGetPage:m_w :m_h];
+    PDF_SIZE sz = [m_doc getPagesMaxSize];
+    int cols = (m_w / ((sz.cx * m_scale) + m_page_gap));
+    int gap = (m_w - ((cols * (sz.cx * m_scale)) + (m_page_gap * (cols - 1)))) / 2;
+    
+	int pageno1 = [self vGetPage: gap :0];
+	int pageno2 = [self vGetPage:m_w - gap :m_h];
 	if( pageno1 >= 0 && pageno2 >= 0 )
 	{
 		if( pageno1 > pageno2 )

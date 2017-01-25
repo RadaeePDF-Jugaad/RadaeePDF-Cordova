@@ -59,11 +59,14 @@ extern uint g_oval_color;
 
 - (void)toolbarStyle
 {
+    defaultTranslucent = self.navigationController.navigationBar.isTranslucent;
+    [self.navigationController.navigationBar setTranslucent:YES];
+    
     //set style
     //toolBar.barStyle = searchToolBar.barStyle = m_searchBar.barStyle = annotToolBar.barStyle = drawLineToolBar.barStyle = drawRectToolBar.barStyle = self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
     //set tint
-    toolBar.tintColor = searchToolBar.tintColor = m_searchBar.tintColor = annotToolBar.tintColor = drawLineToolBar.tintColor = drawRectToolBar.tintColor = m_slider.tintColor = self.navigationController.navigationBar.tintColor = self.navigationController.navigationBar.tintColor;
+    toolBar.tintColor = searchToolBar.tintColor = m_searchBar.tintColor = annotToolBar.tintColor = drawLineToolBar.tintColor = drawRectToolBar.tintColor = m_slider.tintColor = self.navigationController.navigationBar.tintColor;
     
     toolBar.barTintColor = searchToolBar.barTintColor = m_searchBar.barTintColor = annotToolBar.barTintColor = drawLineToolBar.barTintColor = drawRectToolBar.barTintColor = self.navigationController.navigationBar.barTintColor;
 }
@@ -306,12 +309,18 @@ extern uint g_oval_color;
     if (_delegate) {
         [_delegate didShowReader];
     }
+    
+    if (isImmersive) {
+        [self hideBars];
+    }
 }
 
 -(void)viewWillDisappear:(BOOL)animated
 {
     if(!b_outline)
     {
+        [self.navigationController.navigationBar setTranslucent:defaultTranslucent];
+        
         if (_delegate) {
             [_delegate willCloseReader];
         }
@@ -700,7 +709,7 @@ extern uint g_oval_color;
         [m_searchBar setFrame:CGRectMake(0, 0, cwidth, 41)];
     }
     [m_Thumbview refresh];
-    [m_Gridview refresh];
+    [m_Gridview didRotate];
     
     [m_view resetZoomLevel];
 }
@@ -736,6 +745,17 @@ extern uint g_oval_color;
 - (void)setFirstPageCover:(BOOL)cover
 {
     firstPageCover = cover;
+}
+
+- (void)setImmersive:(BOOL)immersive
+{
+    isImmersive = immersive;
+    
+    if (isImmersive) {
+        [self hideBars];
+    } else {
+        [self showBars];
+    }
 }
 
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd
@@ -785,6 +805,8 @@ extern uint g_oval_color;
     pagecount =[m_doc pageCount];
     [self.view addSubview:m_view];
     m_bSel = false;
+    
+    
     return 1;
 }
 -(int)PDFOpenStream:(id<PDFStream>)stream :(NSString *)pwd
@@ -1230,26 +1252,15 @@ extern uint g_oval_color;
     if(SYS_VERSION>=7.0)
     {
         //ios7
-        if(self.navigationController.navigationBar.hidden)
+        if(isImmersive)
         {
-            m_Thumbview.hidden = NO;
-            m_slider.hidden = NO;
-            [self.pageNumLabel setHidden:false];
-            [self.navigationController setNavigationBarHidden:NO animated:YES];
-            [[UIApplication sharedApplication] setStatusBarHidden:NO];
-            [m_searchBar setHidden:NO];
-            statusBarHidden = NO;
+            [self showBars];
         }
         else
         {
-             m_Thumbview.hidden =YES;
-            [self.pageNumLabel setHidden:true];
-            [self.navigationController setNavigationBarHidden:YES animated:YES];
-            [m_searchBar resignFirstResponder];
-            [m_searchBar setHidden:YES];
-            m_slider.hidden = YES;
-            statusBarHidden = YES;
+            [self hideBars];
         }
+        
         b_outline = true;
         m_bSel = false;
         [m_view vSelEnd];
@@ -1775,6 +1786,38 @@ extern uint g_oval_color;
     
 }
 
+#pragma mark - Immersive
+
+- (void)showBars
+{
+    if(self.navigationController.navigationBar.hidden)
+    {
+        m_Thumbview.hidden = NO;
+        m_slider.hidden = NO;
+        [self.pageNumLabel setHidden:false];
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+        [m_searchBar setHidden:NO];
+        statusBarHidden = NO;
+        isImmersive = NO;
+    }
+}
+
+- (void)hideBars
+{
+    if(!self.navigationController.navigationBar.hidden)
+    {
+        m_Thumbview.hidden =YES;
+        [self.pageNumLabel setHidden:true];
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
+        [m_searchBar resignFirstResponder];
+        [m_searchBar setHidden:YES];
+        m_slider.hidden = YES;
+        statusBarHidden = YES;
+        isImmersive = YES;
+    }
+}
+
 #pragma mark - Set view
 
 - (void)showViewModeTableView
@@ -1877,7 +1920,7 @@ extern uint g_oval_color;
     if (!m_Gridview) {
         CGRect frame = self.view.frame;
         m_Gridview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, [[UIApplication sharedApplication] statusBarFrame].size.height + self.navigationController.navigationBar.frame.size.height, frame.size.width, frame.size.height - [[UIApplication sharedApplication] statusBarFrame].size.height + self.navigationController.navigationBar.frame.size.height)];
-        [m_Gridview vOpen:m_doc :nil mode:2];
+        [m_Gridview vOpen:m_doc :(id<PDFThumbViewDelegate>)self mode:2];
         
         [self.view addSubview:m_Gridview];
         

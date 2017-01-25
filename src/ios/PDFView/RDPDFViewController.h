@@ -45,7 +45,9 @@
 
 @interface RDPDFViewController : UIViewController <UISearchBarDelegate,saveTextAnnotDelegate,PDFViewDelegate,BookmarkTableViewDelegate,UIPrintInteractionControllerDelegate>
 {
+    BOOL defaultTranslucent;
     BOOL firstPageCover;
+    BOOL isImmersive;
     float thumbHeight;
     
     //GEAR
@@ -178,6 +180,7 @@
 - (void)setReaderBGColor:(int)color;
 - (void)setThumbHeight:(float)height;
 - (void)setFirstPageCover:(BOOL)cover;
+- (void)setImmersive:(BOOL)immersive;
 
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;

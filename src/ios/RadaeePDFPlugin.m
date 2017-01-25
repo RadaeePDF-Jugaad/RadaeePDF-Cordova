@@ -248,6 +248,15 @@
     firstPageCover = [[params objectForKey:@"cover"] boolValue];
 }
 
+- (void)setImmersive:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+ 
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    isImmersive = [[params objectForKey:@"cover"] boolValue];
+}
+
 - (void)readerInit
 {
     if( m_pdf == nil )
@@ -262,6 +271,7 @@
     [self setDoublePageEnabled:YES];
     
     [m_pdf setFirstPageCover:firstPageCover];
+    [m_pdf setImmersive:NO];
     
     [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
     [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
@@ -331,6 +341,8 @@
     if (iconsBackgroundColor != 0) {
         navController.navigationBar.tintColor = UIColorFromRGB(iconsBackgroundColor);
     }
+    
+    [navController.navigationBar setTranslucent:NO];
     
     [self.viewController presentViewController:navController animated:YES completion:nil];
 }

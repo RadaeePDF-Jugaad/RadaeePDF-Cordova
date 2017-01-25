@@ -39,6 +39,7 @@
     float thumbHeight;
     
     BOOL firstPageCover;
+    BOOL isImmersive;
     
     int bottomBar;
 }
@@ -77,6 +78,7 @@
 - (void)setIconsBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setThumbHeight:(CDVInvokedUrlCommand*)command;
 - (void)setFirstPageCover:(CDVInvokedUrlCommand*)command;
+- (void)setImmersive:(CDVInvokedUrlCommand*)command;
 
 // Form Extractor
 
