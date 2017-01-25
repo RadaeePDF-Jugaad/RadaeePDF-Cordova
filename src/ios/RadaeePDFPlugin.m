@@ -254,7 +254,11 @@
  
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    isImmersive = [[params objectForKey:@"cover"] boolValue];
+    isImmersive = [[params objectForKey:@"immersive"] boolValue];
+    
+    if (m_pdf != nil && [m_pdf getDoc] != nil) {
+        [m_pdf setImmersive:isImmersive];
+    }
 }
 
 - (void)readerInit
