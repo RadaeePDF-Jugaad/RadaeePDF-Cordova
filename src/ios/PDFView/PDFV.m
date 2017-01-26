@@ -943,10 +943,17 @@
 @implementation PDFVThmb
 -(id)init:(int)orientation :(bool)rtol
 {
+    return [self init:orientation :rtol :0 :0];
+}
+
+-(id)init:(int)orientation :(bool)rtol :(int)height :(int)gridMode
+{
     if( self = [super init] )
     {
         m_orientation = orientation;
         m_rtol = rtol;
+        m_element_height = height;
+        m_grid_mode = gridMode;
         if( rtol && orientation == 0 ) m_x = 0x7FFFFFFF;
     }
     return self;
@@ -1028,12 +1035,28 @@
         }
         m_doch = top + m_h/2;
     } else {
-        m_scale_min = (((float)(m_h - m_page_gap)) / sz.cy) / 4; //set static scale to get the same size in portrait/landscape
+        m_scale_min = (((float)(m_element_height)) / sz.cy);
         m_scale_max = m_scale_min * g_zoom_level;
         m_scale = m_scale_min;
         
-        int cols = (m_w / ((sz.cx * m_scale) + m_page_gap));
-        float gap = (m_w - ((cols * (sz.cx * m_scale)) + (m_page_gap * (cols - 1)))) / 2;
+        float elementWidth = (sz.cx * m_scale);
+        int cols;
+        
+        switch (m_grid_mode) {
+            case 0:
+                cols = (m_w / (elementWidth + m_page_gap)); //full screen
+                break;
+            case 1:
+                cols = m_w / ((elementWidth + m_page_gap ) * 2); //justify center
+                break;
+            default:
+                cols = (m_w / (elementWidth + m_page_gap)); //full screen
+                break;
+        }
+        
+        float gap = (m_w - ((cols * elementWidth) + (m_page_gap * (cols - 1)))) / 2;
+        
+        
        
         int left = gap;
         int top = m_page_gap / 2;
@@ -1186,8 +1209,21 @@
 -(void)vFlushRange
 {
     PDF_SIZE sz = [m_doc getPagesMaxSize];
-    int cols = (m_w / ((sz.cx * m_scale) + m_page_gap));
-    int gap = (m_w - ((cols * (sz.cx * m_scale)) + (m_page_gap * (cols - 1)))) / 2;
+    float elementWidth = (sz.cx * m_scale);
+    int cols;
+    switch (m_grid_mode) {
+        case 0:
+            cols = (m_w / (elementWidth + m_page_gap)); //full screen
+            break;
+        case 1:
+            cols = m_w / ((elementWidth + m_page_gap ) * 2); //justify center
+            break;
+        default:
+            cols = (m_w / (elementWidth + m_page_gap)); //full screen
+            break;
+    }
+    float gap = (m_w - ((cols * elementWidth) + (m_page_gap * (cols - 1)))) / 2;
+    gap += 5;
     
 	int pageno1 = [self vGetPage: gap :0];
 	int pageno2 = [self vGetPage:m_w - gap :m_h];

@@ -168,11 +168,11 @@ extern uint g_oval_color;
     UIBarButtonItem *gridButton;
     
     if (_gridImage) {
-        gridButton = [[UIBarButtonItem alloc] initWithImage:_gridImage style:UIBarButtonItemStylePlain target:self action:@selector(showGridView)];
+        gridButton = [[UIBarButtonItem alloc] initWithImage:_gridImage style:UIBarButtonItemStylePlain target:self action:@selector(toggleGridView)];
     }
     else
     {
-        gridButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(showGridView)];
+        gridButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(toggleGridView)];
     }
     
     gridButton.width =30;
@@ -732,6 +732,26 @@ extern uint g_oval_color;
     [m_Thumbview setThumbBackgroundColor:color];
 }
 
+- (void)setThumbGridBGColor:(int)color
+{
+    gridBackgroundColor = color;
+}
+
+- (void)setThumbGridElementHeight:(float)height
+{
+    gridElementHeight = height;
+}
+
+- (void)setThumbGridGap:(float)gap
+{
+    gridGap = gap;
+}
+
+- (void)setThumbGridViewMode:(int)mode
+{
+    gridMode = mode;
+}
+
 - (void)setReaderBGColor:(int)color
 {
     [m_view setReaderBackgroundColor:color];
@@ -1036,6 +1056,7 @@ extern uint g_oval_color;
     NSString *pagestr = [[NSString alloc]initWithFormat:@"%d/",pagenow];
     pagestr = [pagestr stringByAppendingFormat:@"%d",pagecount];
     pageNumLabel.text = pagestr;
+    [self hideGridView];
 }
 
 -(int)PDFOpenPage:(NSString *)path :(int)pageno :(float)x :(float)y :(NSString *)pwd
@@ -1915,16 +1936,34 @@ extern uint g_oval_color;
 
 #pragma mark - Grid View
 
+- (void)toggleGridView
+{
+    if (!m_Gridview) {
+        [self showGridView];
+        
+    } else {
+        [self hideGridView];
+    }
+}
+
 - (void)showGridView
 {
     if (!m_Gridview) {
         CGRect frame = self.view.frame;
         m_Gridview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, [[UIApplication sharedApplication] statusBarFrame].size.height + self.navigationController.navigationBar.frame.size.height, frame.size.width, frame.size.height - [[UIApplication sharedApplication] statusBarFrame].size.height + self.navigationController.navigationBar.frame.size.height)];
-        [m_Gridview vOpen:m_doc :(id<PDFThumbViewDelegate>)self mode:2];
+        [m_Gridview vOpen:m_doc :(id<PDFThumbViewDelegate>)self mode:2 elementGap:(gridGap > 0) ? gridGap : 10 elementHeight:(gridElementHeight > 0) ? gridElementHeight : 200 gridMode:gridMode];
+        
+        if (gridBackgroundColor != 0) {
+            [m_Gridview setThumbBackgroundColor:gridBackgroundColor];
+        }
         
         [self.view addSubview:m_Gridview];
-        
-    } else {
+    }
+}
+
+- (void)hideGridView
+{
+    if(m_Gridview) {
         [m_Gridview removeFromSuperview];
         [m_Gridview vClose];
         m_Gridview = nil;

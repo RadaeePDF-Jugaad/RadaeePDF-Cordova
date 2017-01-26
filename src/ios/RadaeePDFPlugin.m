@@ -203,6 +203,15 @@
     thumbBackgroundColor = [[params objectForKey:@"color"] intValue];
 }
 
+- (void)setThumbGridBGColor:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    gridBackgroundColor = [[params objectForKey:@"color"] intValue];
+}
+
 - (void)setReaderBGColor:(CDVInvokedUrlCommand*)command
 {
     self.cdv_command = command;
@@ -210,6 +219,33 @@
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
     readerBackgroundColor = [[params objectForKey:@"color"] intValue];
+}
+
+- (void)setThumbGridElementHeight:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    gridElementHeight = [[params objectForKey:@"height"] floatValue];
+}
+
+- (void)setThumbGridGap:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    gridGap = [[params objectForKey:@"gap"] floatValue];
+}
+
+- (void)setThumbGridViewMode:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    gridMode = [[params objectForKey:@"mode"] floatValue];
 }
 
 - (void)setTitleBGColor:(CDVInvokedUrlCommand*)command
@@ -334,6 +370,12 @@
         [m_pdf PDFSeekBarInit:1];
     
     [m_pdf setReaderBGColor:readerBackgroundColor];
+    
+    //Set thumbGridView
+    [m_pdf setThumbGridBGColor:gridBackgroundColor];
+    [m_pdf setThumbGridElementHeight:gridElementHeight];
+    [m_pdf setThumbGridGap:gridGap];
+    [m_pdf setThumbGridViewMode:gridMode];
     
     m_pdf.hidesBottomBarWhenPushed = YES;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:m_pdf];

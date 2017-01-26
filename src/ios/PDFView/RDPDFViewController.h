@@ -48,6 +48,12 @@
     BOOL defaultTranslucent;
     BOOL firstPageCover;
     BOOL isImmersive;
+    
+    int gridBackgroundColor;
+    int gridElementHeight;
+    int gridGap;
+    int gridMode;
+    
     float thumbHeight;
     
     //GEAR
@@ -177,6 +183,10 @@
 - (id)getDoc;
 - (int)getCurrentPage;
 - (void)setThumbnailBGColor:(int)color;
+- (void)setThumbGridBGColor:(int)color;
+- (void)setThumbGridElementHeight:(float)height;
+- (void)setThumbGridGap:(float)gap;
+- (void)setThumbGridViewMode:(int)mode;
 - (void)setReaderBGColor:(int)color;
 - (void)setThumbHeight:(float)height;
 - (void)setFirstPageCover:(BOOL)cover;

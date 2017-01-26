@@ -49,10 +49,11 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 }
 
 -(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate;
--(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate mode:(int)mode;
+-(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate mode:(int)mode elementGap:(int)gap elementHeight:(int)height gridMode:(int)gridMode;
 -(void)vGoto:(int)pageno;
 -(void)vClose;
 -(void)refresh;
 -(void)setThumbBackgroundColor:(int)color;
+-(void)didRotate;
 @end
 

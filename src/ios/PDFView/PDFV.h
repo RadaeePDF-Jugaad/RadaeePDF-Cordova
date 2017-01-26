@@ -120,11 +120,14 @@ struct PDFV_POS
 
 @interface PDFVThmb: PDFV
 {
+    int m_grid_mode;
+    int m_element_height;
 	int m_orientation;
 	int m_sel;
     bool m_rtol;
 }
 -(id)init:(int)orientation :(bool)rtol;
+-(id)init:(int)orientation :(bool)rtol :(int)height :(int)gridMode;
 -(void)vOpen:(PDFDoc *) doc :(int)page_gap :(id<PDFVInnerDel>)notifier :(const struct PDFVThreadBack *)disp;
 -(void)vClose;
 -(void)vLayout;

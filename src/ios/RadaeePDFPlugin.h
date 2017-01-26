@@ -32,11 +32,15 @@
     int selColor;
     
     int thumbBackgroundColor;
+    int gridBackgroundColor;
     int readerBackgroundColor;
     int titleBackgroundColor;
     int iconsBackgroundColor;
     
     float thumbHeight;
+    int gridElementHeight;
+    int gridGap;
+    int gridMode;
     
     BOOL firstPageCover;
     BOOL isImmersive;
@@ -73,7 +77,11 @@
 - (void)fileState:(CDVInvokedUrlCommand*)command;
 - (void)getPageNumber:(CDVInvokedUrlCommand*)command;
 - (void)setThumbnailBGColor:(CDVInvokedUrlCommand*)command;
+- (void)setThumbGridBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setReaderBGColor:(CDVInvokedUrlCommand*)command;
+- (void)setThumbGridElementHeight:(CDVInvokedUrlCommand*)command;
+- (void)setThumbGridGap:(CDVInvokedUrlCommand*)command;
+- (void)setThumbGridViewMode:(CDVInvokedUrlCommand*)command;
 - (void)setTitleBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setIconsBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setThumbHeight:(CDVInvokedUrlCommand*)command;
