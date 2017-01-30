@@ -42,6 +42,8 @@
     int gridGap;
     int gridMode;
     
+    int doubleTapZoomMode;
+    
     BOOL firstPageCover;
     BOOL isImmersive;
     
@@ -86,7 +88,9 @@
 - (void)setIconsBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setThumbHeight:(CDVInvokedUrlCommand*)command;
 - (void)setFirstPageCover:(CDVInvokedUrlCommand*)command;
+- (void)setDoubleTapZoomMode:(CDVInvokedUrlCommand*)command;
 - (void)setImmersive:(CDVInvokedUrlCommand*)command;
+- (void)setReaderViewMode:(CDVInvokedUrlCommand*)command;
 
 // Form Extractor
 
@@ -102,7 +106,6 @@
 
 - (void)setPagingEnabled:(BOOL)enabled;
 - (void)setDoublePageEnabled:(BOOL)enabled;
-- (BOOL)setReaderViewMode:(int)mode;
 - (void)toggleThumbSeekBar:(int)mode;
 - (void)setColor:(int)color forFeature:(int)feature;
 

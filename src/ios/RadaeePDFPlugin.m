@@ -284,6 +284,15 @@
     firstPageCover = [[params objectForKey:@"cover"] boolValue];
 }
 
+- (void)setDoubleTapZoomMode:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    doubleTapZoomMode = [[params objectForKey:@"mode"] intValue];
+}
+
 - (void)setImmersive:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
@@ -306,11 +315,11 @@
     
     [m_pdf setDelegate:self];
     
-    [self setReaderViewMode:3];
     [self setPagingEnabled:YES];
     [self setDoublePageEnabled:YES];
     
     [m_pdf setFirstPageCover:firstPageCover];
+    [m_pdf setDoubleTapZoomMode:doubleTapZoomMode];
     [m_pdf setImmersive:NO];
     
     [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
@@ -331,6 +340,8 @@
     [m_pdf setDeleteImage:[UIImage imageNamed:@"btn_remove.png"]];
     
     [m_pdf setDoneImage:[UIImage imageNamed:@"btn_done.png"]];
+    
+    [m_pdf setHideGridImage:YES];
     
     /*
      SetColor, Available features
@@ -410,14 +421,17 @@
     g_double_page_enabled = enabled;
 }
 
-- (BOOL)setReaderViewMode:(int)mode
+- (void)setReaderViewMode:(CDVInvokedUrlCommand *)command
 {
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    int mode = [[params objectForKey:@"mode"] intValue];
+    
     if (mode > 0 && mode < 5) {
         _viewMode = mode;
-        return YES;
     }
-    
-    return NO;
 }
 
 - (void)setColor:(int)color forFeature:(int)feature

@@ -193,14 +193,14 @@
 		<source-file src="src/android/ViewLib/src/main/res/values-es-rES/strings.xml" target-dir="res/values-es-rES" />
 		<source-file src="src/android/ViewLib/src/main/res/values-fr-rFR/strings.xml" target-dir="res/values-fr-rFR" />
 		<source-file src="src/android/ViewLib/src/main/res/values-it/strings.xml" target-dir="res/values-it" />
-		
+
 		<!-- Radaee res -->
 		<source-file src="src/android/ViewLib/src/main/res/AMIRI_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/ARIMO_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/COUSINE_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/FONT-LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/TINOS_LICENSE.txt" target-dir="res" />
-		
+
         <!-- Fonts -->
         <source-file src="fonts/Roboto-Black.ttf" target-dir="assets/fonts" />
         <source-file src="fonts/Roboto-Bold.ttf" target-dir="assets/fonts" />
@@ -272,7 +272,7 @@
 			<string name="pdf_print_calculation_failed">Page count calculation failed.</string>
 			<string name="copy_text">Text copied to clipboard: %1$s</string>
 		</config-file>
-		
+
         <!-- Hooks -->
         <hook type="after_prepare" src="src/android/hooks/configure-android.js"/>
 
@@ -363,6 +363,8 @@
         <!-- Radaee Utils -->
         <source-file src="src/ios/RDUtils/RDFormExtractor.m" />
         <header-file src="src/ios/RDUtils/RDFormExtractor.h" />
+        <source-file src="src/ios/RDUtils/ReaderHandler.m" />
+        <header-file src="src/ios/RDUtils/ReaderHandler.h" />
 
         <!-- Radaee resources -->
         <resource-file src="src/ios/cmaps/cmaps.dat" />

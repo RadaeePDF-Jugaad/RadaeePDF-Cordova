@@ -53,6 +53,7 @@
     int gridElementHeight;
     int gridGap;
     int gridMode;
+    int doubleTapZoomMode;
     
     float thumbHeight;
     
@@ -190,6 +191,7 @@
 - (void)setReaderBGColor:(int)color;
 - (void)setThumbHeight:(float)height;
 - (void)setFirstPageCover:(BOOL)cover;
+- (void)setDoubleTapZoomMode:(int)mode;
 - (void)setImmersive:(BOOL)immersive;
 
 //GEAR

@@ -954,6 +954,10 @@
         m_rtol = rtol;
         m_element_height = height;
         m_grid_mode = gridMode;
+        if (orientation == 2) {
+            m_sel = -1;
+        }
+        
         if( rtol && orientation == 0 ) m_x = 0x7FFFFFFF;
     }
     return self;
@@ -1306,10 +1310,13 @@
 	    	cur++;
 	    }
 	}
-    PDFVPage *vpage = m_pages[m_sel];
-    int left = [vpage GetX];
-    int top = [vpage GetY];
-    [canvas FillRect:CGRectMake(left, top, [vpage GetWidth], [vpage GetHeight]) :g_sel_color];
+    
+    if (m_orientation < 2) {
+        PDFVPage *vpage = m_pages[m_sel];
+        int left = [vpage GetX];
+        int top = [vpage GetY];
+        [canvas FillRect:CGRectMake(left, top, [vpage GetWidth], [vpage GetHeight]) :g_sel_color];
+    }
 
     //NSTimeInterval time2 = [[NSDate date] timeIntervalSince1970] * 1000 - time1;
     //time2 = 0;

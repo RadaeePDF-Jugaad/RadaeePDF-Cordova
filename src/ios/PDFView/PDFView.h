@@ -12,6 +12,7 @@
 #import <OpenGLES/ES1/glext.h>
 #import "PDFV.h"
 #import "NSObject+PerformBlock.h"
+#import "ReaderHandler.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
@@ -48,6 +49,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 @interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
 {
     BOOL coverPage;
+    
+    int doubleTapZoomMode;
     int readerBackgroundColor;
     
     PDFDoc *m_doc;
@@ -179,6 +182,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (void)setReaderBackgroundColor:(int)color;
 - (void)setFirstPageCover:(BOOL)cover;
+- (void)setDoubleTapZoomMode:(int)mode;
 
 @end
 

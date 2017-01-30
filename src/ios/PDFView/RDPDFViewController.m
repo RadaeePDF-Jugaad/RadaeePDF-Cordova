@@ -767,6 +767,11 @@ extern uint g_oval_color;
     firstPageCover = cover;
 }
 
+- (void)setDoubleTapZoomMode:(int)mode
+{
+    doubleTapZoomMode = mode;
+}
+
 - (void)setImmersive:(BOOL)immersive
 {
     isImmersive = immersive;
@@ -821,6 +826,7 @@ extern uint g_oval_color;
     }
     
     [m_view setFirstPageCover:firstPageCover];
+    [m_view setDoubleTapZoomMode:doubleTapZoomMode];
     [m_view vOpen :m_doc :(id<PDFViewDelegate>)self];
     pagecount =[m_doc pageCount];
     [self.view addSubview:m_view];
@@ -863,6 +869,7 @@ extern uint g_oval_color;
         m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-44)];
     }
     [m_view setFirstPageCover:firstPageCover];
+    [m_view setDoubleTapZoomMode:doubleTapZoomMode];
     [m_view vOpen:m_doc:(id<PDFViewDelegate>)self];
     pagecount =[m_doc pageCount];
     [self.view addSubview:m_view];
@@ -904,6 +911,7 @@ extern uint g_oval_color;
         m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-44)];
     }
     [m_view setFirstPageCover:firstPageCover];
+    [m_view setDoubleTapZoomMode:doubleTapZoomMode];
     [m_view vOpen :m_doc :(id<PDFViewDelegate>)self];
     pagecount =[m_doc pageCount];
     [self.view addSubview:m_view];
@@ -1918,6 +1926,7 @@ extern uint g_oval_color;
         m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-44)];
     }
     [m_view setFirstPageCover:firstPageCover];
+    [m_view setDoubleTapZoomMode:doubleTapZoomMode];
     [m_view vOpen :m_doc :(id<PDFViewDelegate>)self];
     pagecount =[m_doc pageCount];
     

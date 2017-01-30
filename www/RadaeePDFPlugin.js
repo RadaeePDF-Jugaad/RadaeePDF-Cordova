@@ -59,30 +59,6 @@ RadaeePDFPlugin.prototype.setThumbnailBGColor = function (params, successCallbac
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbnailBGColor', [params]);
 };
 
-RadaeePDFPlugin.prototype.setThumbGridBGColor = function (params, successCallback, errorCallback) {
-        params = params || {};
-
-        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbGridBGColor', [params]);
-};
-
-RadaeePDFPlugin.prototype.setThumbGridElementHeight = function (params, successCallback, errorCallback) {
-        params = params || {};
-
-        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbGridElementHeight', [params]);
-};
-
-RadaeePDFPlugin.prototype.setThumbGridGap = function (params, successCallback, errorCallback) {
-        params = params || {};
-
-        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbGridGap', [params]);
-};
-
-RadaeePDFPlugin.prototype.setThumbGridViewMode = function (params, successCallback, errorCallback) {
-        params = params || {};
-
-        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbGridViewMode', [params]);
-};
-
 RadaeePDFPlugin.prototype.setReaderBGColor = function (params, successCallback, errorCallback) {
         params = params || {};
 
@@ -99,6 +75,12 @@ RadaeePDFPlugin.prototype.setFirstPageCover = function (params, successCallback,
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setFirstPageCover', [params]);
+};
+
+RadaeePDFPlugin.prototype.setReaderViewMode = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setReaderViewMode', [params]);
 };
 
 module.exports = new RadaeePDFPlugin();

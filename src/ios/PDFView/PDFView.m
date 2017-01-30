@@ -970,13 +970,53 @@ extern bool g_double_page_enabled;
     isDoubleTapping = YES;
     
     NSLog(@"double tap");
-    if (m_zoom > 1){
-        self.pagingEnabled = g_paging_enabled;
-        [self resetZoomLevel];
-    }else {
-        self.pagingEnabled = NO;
-        [self initZoomWithPoint:[touch locationInView:self.window]];
-        [self zoomToScale:2.0 atPoint:[touch locationInView:self.window]];
+    
+    if (doubleTapZoomMode > 0) {
+        if (m_zoom > 1){
+            self.pagingEnabled = g_paging_enabled;
+            [self resetZoomLevel];
+        }else {
+            self.pagingEnabled = NO;
+            [self initZoomWithPoint:[touch locationInView:self.window]];
+            
+            if (doubleTapZoomMode == 1) {
+                [self zoomToScale:2.0 atPoint:[touch locationInView:self.window]];
+            } else {
+                struct PDFV_POS pos;
+                CGPoint p = [touch locationInView:self.window];
+                
+                [m_view vGetPos:&pos :p.x * m_scale :p.y * m_scale];
+                PDF_RECT mZoomRect = [ReaderHandler handleAutomaticZoom:m_view withPos:pos forDoc:m_doc containedInWidth:m_w];
+                
+                float mParagraphWidth = mZoomRect.right - mZoomRect.left;
+                
+                if (mParagraphWidth == 0) {
+                    [self zoomToScale:2.0 atPoint:[touch locationInView:self.window]];
+                } else {
+                    int scale = (int) (m_w / mParagraphWidth); //screen width / paragraph width
+                    
+                    pos.x = mZoomRect.right - (mParagraphWidth / 2);
+                    
+                    if (scale > 1) {
+                        
+                        self.zoomScale = (scale > g_zoom_level) ? g_zoom_level : scale;
+                        m_zoom = scale;
+                        
+                        [m_view vSetScale:scale];
+                        [m_view vSetPos:&pos :m_w /2 :m_h /2];
+                        
+                        CGSize sz;
+                        sz.width = [m_view vGetDocW]/m_scale;
+                        sz.height = [m_view vGetDocH]/m_scale;
+                        self.contentSize = sz;
+                        //[m_view vSetPos:&m_zoom_pos :(pos.x - (zoomPoint.x * scale)) * m_scale :(pos.y - (zoomPoint.y * scale)) * m_scale];
+                        self.contentOffset = CGPointMake([m_view vGetX]/m_scale, [m_view vGetY]/m_scale);
+                        
+                        [self refresh];
+                    }
+                }
+            }
+        }
     }
     
     if (m_delegate) {
@@ -1778,6 +1818,11 @@ extern bool g_double_page_enabled;
 - (void)setFirstPageCover:(BOOL)cover
 {
     coverPage = cover;
+}
+
+- (void)setDoubleTapZoomMode:(int)mode
+{
+    doubleTapZoomMode = mode;
 }
 
 @end
