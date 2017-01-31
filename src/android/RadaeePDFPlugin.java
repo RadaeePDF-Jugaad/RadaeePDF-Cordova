@@ -13,7 +13,6 @@
 package com.radaee.cordova;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
 
