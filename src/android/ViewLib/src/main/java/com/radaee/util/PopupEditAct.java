@@ -37,7 +37,7 @@ public class PopupEditAct extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        setContentView(R.layout.pop_edit1);
+        setContentView(R.layout.pop_edit);
         m_layout = (RelativeLayout)findViewById(R.id.lay_root);
         m_txt = (EditText)findViewById(R.id.annot_text);
         m_txt.setVisibility(View.INVISIBLE);

@@ -22,7 +22,7 @@ public class PDFMenu implements PopupWindow.OnDismissListener
 		m_popup.setOutsideTouchable(true);
 		m_popup.setBackgroundDrawable(new ColorDrawable(0));
 		final float scale = parent.getContext().getResources().getDisplayMetrics().density;
-		m_popup.setWidth((int)(140 * scale));
+		m_popup.setWidth((int)(150 * scale));
 		m_popup.setHeight((int)(130 * scale));
 		m_parent = parent;
 	}

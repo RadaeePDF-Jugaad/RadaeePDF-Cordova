@@ -1,8 +1,8 @@
 package com.radaee.reader;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
@@ -13,11 +13,9 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,12 +24,17 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.radaee.pdf.Global;
+import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
-import com.radaee.util.OutlineList;
-import com.radaee.util.OutlineListAdt;
+import com.radaee.util.CommonUtil;
 import com.radaee.util.PDFThumbView;
+import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.PDFViewThumb;
 import com.radaee.viewlib.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -53,7 +56,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	static public final int NAVIGATION_THUMBS = 0;
 	static public final int NAVIGATION_SEEK = 1;
 	private int m_bar_status = 0;
-	private int mNavigationMode = NAVIGATION_SEEK;
+	private int mNavigationMode = Global.navigationMode;
 	private RelativeLayout m_parent;
 	private PDFLayoutView m_view;
 	private PDFTopBar m_bar_act;
@@ -177,6 +180,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			btn_undo.setVisibility(View.GONE);
 			btn_redo.setVisibility(View.GONE);
 		}
+		RadaeePluginCallback.getInstance().setControllerListener(mControllerListner);
 
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
 			btn_print.setVisibility(View.GONE);
@@ -417,22 +421,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		}
         else if( arg0 == btn_outline )
         {
-            LinearLayout layout = (LinearLayout) LayoutInflater.from(m_parent.getContext()).inflate(R.layout.dlg_outline, null);
-            final OutlineList olist = (OutlineList)layout.findViewById(R.id.lst_outline);
-            olist.SetOutlines(m_view.PDFGetDoc());
-            final AlertDialog dlg = new AlertDialog.Builder(m_parent.getContext())
-                    .setTitle(R.string.pdf_outline)
-                    .setView(layout)
-                    .show();
-            AdapterView.OnItemClickListener item_clk = new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    OutlineListAdt.outline_ui_item item = olist.GetItem(i);
-                    m_view.PDFGotoPage(item.GetPageNO());
-                    dlg.dismiss();
-                }
-            };
-            olist.setOnItemClickListener(item_clk);
+			CommonUtil.showPDFOutlines(m_view, m_parent.getContext());
         }
 		else if( arg0 == btn_find )
 		{
@@ -733,7 +722,13 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private void printPDF() {
 		PrintManager mPrintManager = (PrintManager) m_parent.getContext().getSystemService(Context.PRINT_SERVICE);
-		mPrintManager.print(m_parent.getContext().getString(R.string.app_name) + " PDF Document", new PrintDocumentAdapter() {
+		String mJobName = m_parent.getContext().getString(R.string.app_name) + " PDF Document";
+		if(!TextUtils.isEmpty(m_view.PDFGetDoc().getDocPath())) {
+			String docName = m_view.PDFGetDoc().getDocPath();
+			mJobName += " " + TextUtils.substring(docName, docName.lastIndexOf("/") + 1, docName.length());
+		}
+
+		mPrintManager.print(mJobName, new PrintDocumentAdapter() {
 			int mTotalPages = 0;
 
 			@Override
@@ -755,7 +750,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 					// Content layout reflow is complete
 					callback.onLayoutFinished(info, true);
 				} else { // Otherwise report an error to the print framework
-					callback.onLayoutFailed("Page count calculation failed.");
+					callback.onLayoutFailed(m_parent.getContext().getString(R.string.pdf_print_calculation_failed));
 				}
 			}
 
@@ -788,7 +783,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 						input.close();
 						output.close();
 					} else
-						callback.onWriteFailed("PDF File is not available");
+						callback.onWriteFailed(m_parent.getContext().getString(R.string.pdf_print_not_available));
 				} catch (Exception e) {
 					e.printStackTrace();
 					callback.onWriteFailed(e.toString());
@@ -824,4 +819,135 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	public String getFindQuery() {
 		return m_find_str;
 	}
+
+	private RadaeePluginCallback.PDFControllerListener mControllerListner = new RadaeePluginCallback.PDFControllerListener() {
+
+		@Override
+		public void onSetIconsBGColor(int color) {
+			try {
+				btn_view.setColorFilter(color);
+				btn_find.setColorFilter(color);
+				btn_find_back.setColorFilter(color);
+				btn_find_next.setColorFilter(color);
+				btn_find_prev.setColorFilter(color);
+				btn_annot.setColorFilter(color);
+				btn_select.setColorFilter(color);
+				btn_outline.setColorFilter(color);
+				btn_undo.setColorFilter(color);
+				btn_redo.setColorFilter(color);
+				btn_print.setColorFilter(color);
+				btn_act_back.setColorFilter(color);
+				btn_act_edit.setColorFilter(color);
+				btn_act_perform.setColorFilter(color);
+				btn_act_remove.setColorFilter(color);
+				btn_annot_back.setColorFilter(color);
+				btn_annot_ink.setColorFilter(color);
+				btn_annot_line.setColorFilter(color);
+				btn_annot_rect.setColorFilter(color);
+				btn_annot_oval.setColorFilter(color);
+				btn_annot_stamp.setColorFilter(color);
+				btn_annot_note.setColorFilter(color);
+				((ImageView)view_vert.findViewById(R.id.imageView1)).setColorFilter(color);
+				((ImageView)view_single.findViewById(R.id.imageView2)).setColorFilter(color);
+				((ImageView)view_dual.findViewById(R.id.imageView3)).setColorFilter(color);
+			} catch (Exception e) {e.getMessage();}
+		}
+
+		@Override
+		public void onSetToolbarBGColor(int color) {
+			try {
+				m_bar_cmd.BarGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+				m_bar_act.BarGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+				m_bar_annot.BarGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+				m_menu_view.MenuGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+			} catch (Exception e) {e.getMessage();}
+		}
+
+		@Override
+		public void onSetImmersive(boolean immersive) {
+			switch(m_bar_status) {
+				case BAR_NONE:
+					if(!immersive) {
+						m_bar_cmd.BarShow();
+
+						if (mNavigationMode == NAVIGATION_THUMBS)
+							m_thumb_view.BarShow();
+						else if (mNavigationMode == NAVIGATION_SEEK)
+							m_bar_seek.BarShow();
+						m_bar_status = BAR_CMD;
+					}
+					break;
+				case BAR_ACT:
+					if(immersive) {
+						m_bar_act.BarHide();
+						m_bar_status = BAR_NONE;
+					}
+					break;
+				case BAR_CMD:
+					if(immersive) {
+						m_menu_view.MenuDismiss();
+						m_bar_cmd.BarHide();
+
+						if (mNavigationMode == NAVIGATION_THUMBS)
+							m_thumb_view.BarHide();
+						else if (mNavigationMode == NAVIGATION_SEEK)
+							m_bar_seek.BarHide();
+						m_bar_status = BAR_NONE;
+					}
+					break;
+				case BAR_FIND:
+					if(immersive) {
+						m_bar_find.BarHide();
+						m_bar_status = BAR_NONE;
+					}
+					break;
+				case BAR_ANNOT:
+					if(immersive) {
+						m_bar_annot.BarHide();
+						m_bar_status = BAR_NONE;
+					}
+					break;
+			}
+		}
+
+		@Override
+		public String onGetJsonFormFields() {
+			try {
+				if(m_view.PDFGetDoc() != null && m_view.PDFGetDoc().IsOpened()) {
+					JSONArray mPages = new JSONArray();
+					for (int i = 0 ; i < m_view.PDFGetDoc().GetPageCount() ; i++) {
+						Page mPage = m_view.PDFGetDoc().GetPage(i);
+						JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, i);
+						if(mResult != null)
+							mPages.put(mResult);
+					}
+
+					if(mPages.length() > 0) {
+						JSONObject mPageJson = new JSONObject();
+						mPageJson.put("Pages", mPages);
+						return mPageJson.toString();
+					}
+					return "";
+				}
+				else
+					return "Document not set";
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			return "ERROR";
+		}
+
+		@Override
+		public String onGetJsonFormFieldsAtPage(int pageno) {
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return "Document not set";
+			if(pageno >= m_view.PDFGetDoc().GetPageCount()) return "Page index error";
+
+			Page mPage = m_view.PDFGetDoc().GetPage(pageno);
+			JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, pageno);
+			if(mResult != null)
+				return mResult.toString();
+			else
+				return "";
+		}
+	};
 }

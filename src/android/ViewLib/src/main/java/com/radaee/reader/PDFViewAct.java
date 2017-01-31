@@ -22,19 +22,14 @@ import android.widget.Toast;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
-import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.reader.PDFLayoutView.PDFLayoutListener;
-import com.radaee.util.CommonUtil;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
+import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.PDFLayout;
 import com.radaee.view.VPage;
 import com.radaee.viewlib.R;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class PDFViewAct extends Activity implements PDFLayoutListener
 {
@@ -45,7 +40,6 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 
 	private String mFindQuery = "";
 	private boolean mDidShowReader = false;
-	private static PDFReaderListener mPdfReaderListener;
 
 	static public Document ms_tran_doc;
 	static private int m_tmp_index = 0;
@@ -57,12 +51,6 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	private PDFViewController m_controller = null;
 	private boolean m_modified = false;
 	private boolean need_save_doc = false;
-
-	private static PDFViewAct instance; //added to be used with 3rd party plugins (cordova, Xamarin)
-
-	public static PDFViewAct getInstance() {
-		return instance;
-	}
 
     private void onFail(String msg)//treat open failed.
     {
@@ -129,7 +117,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
             {
                 public void run()
                 {
-                    dlg = ProgressDialog.show(PDFViewAct.this, "Please wait", "Loading PDF file...", true);
+					dlg = ProgressDialog.show(PDFViewAct.this, getString(R.string.please_wait), getString(R.string.loading_pdf), true);
                 }
             };
             handler.postDelayed(runable, 1000);//delay 1 second to display progress dialog.
@@ -155,8 +143,6 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     {
         super.onCreate(savedInstanceState);
 
-		instance = this;
-
         //plz set this line to Activity in AndroidManifes.xml:
         //    android:configChanges="orientation|keyboardHidden|screenSize"
         //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate. 
@@ -164,8 +150,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		m_layout = (RelativeLayout)LayoutInflater.from(this).inflate(R.layout.pdf_layout, null);
 		m_view = (PDFLayoutView)m_layout.findViewById(R.id.pdf_view);
 
-		if(mPdfReaderListener != null)
-			mPdfReaderListener.willShowReader();
+		RadaeePluginCallback.getInstance().willShowReader();
 
         Intent intent = getIntent();
         String bmp_format = intent.getStringExtra("BMPFormat");
@@ -314,8 +299,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	@Override
     protected void onDestroy()
     {
-		if(mPdfReaderListener != null)
-			mPdfReaderListener.willCloseReader();
+		RadaeePluginCallback.getInstance().willCloseReader();
 
     	if(m_doc != null)
     	{
@@ -336,8 +320,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         Global.RemoveTmp();
     	super.onDestroy();
 
-		if(mPdfReaderListener != null)
-			mPdfReaderListener.didCloseReader();
+		RadaeePluginCallback.getInstance().didCloseReader();
     }
 	@Override
 	public void OnPDFPageModified(int pageno)
@@ -349,6 +332,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	{
 		if(m_controller != null)
 			m_controller.OnPageChanged(pageno);
+		RadaeePluginCallback.getInstance().didChangePage(pageno);
 	}
 	@Override
 	public void OnPDFAnnotTapped(VPage vpage, Annotation annot)
@@ -370,7 +354,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		final String sel_text = text;
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
 		{
 			@SuppressLint("NewApi")
 			public void onClick(DialogInterface dialog, int which)
@@ -427,33 +411,33 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		}
 		catch(Exception e)
 		{
-			Toast.makeText(PDFViewAct.this, "todo: open url:" + uri, Toast.LENGTH_SHORT).show();
+			Toast.makeText(PDFViewAct.this, getString(R.string.todo_open_url) + uri, Toast.LENGTH_SHORT).show();
 		}
     }
 	@Override
 	public void OnPDFOpenJS(String js)
 	{
-		Toast.makeText(PDFViewAct.this, "todo: execute java script", Toast.LENGTH_SHORT).show();
+		Toast.makeText(PDFViewAct.this, R.string.todo_java_script, Toast.LENGTH_SHORT).show();
 	}
 	@Override
 	public void OnPDFOpenMovie(String path)
 	{
-		Toast.makeText(PDFViewAct.this, "todo: play movie", Toast.LENGTH_SHORT).show();
+		Toast.makeText(PDFViewAct.this, R.string.todo_play_movie, Toast.LENGTH_SHORT).show();
 	}
 	@Override
 	public void OnPDFOpenSound(int[] paras, String path)
 	{
-		Toast.makeText(PDFViewAct.this, "todo: play sound", Toast.LENGTH_SHORT).show();
+		Toast.makeText(PDFViewAct.this, R.string.todo_play_sound, Toast.LENGTH_SHORT).show();
 	}
 	@Override
 	public void OnPDFOpenAttachment(String path)
 	{
-		Toast.makeText(PDFViewAct.this, "todo: treat attachment", Toast.LENGTH_SHORT).show();
+		Toast.makeText(PDFViewAct.this, R.string.todo_attachment, Toast.LENGTH_SHORT).show();
 	}
 	@Override
 	public void OnPDFOpen3D(String path)
 	{
-		Toast.makeText(PDFViewAct.this, "todo: play 3D module", Toast.LENGTH_SHORT).show();
+		Toast.makeText(PDFViewAct.this, R.string.todo_3d, Toast.LENGTH_SHORT).show();
 	}
     @Override
     public void OnPDFZoomStart() {
@@ -470,17 +454,17 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 
 	@Override
 	public void onPDFPageRendered(int pageno) {
-		if(mPdfReaderListener != null && !mDidShowReader) {
-			mPdfReaderListener.didShowReader();
+		if(!mDidShowReader) {
+			RadaeePluginCallback.getInstance().didShowReader();
 			mDidShowReader = true;
 		}
 	}
 
 	@Override
 	public void onPDFSearchFinished(boolean found) {
-		if(mPdfReaderListener != null && !mFindQuery.equals(m_controller.getFindQuery())) {
+		if(!mFindQuery.equals(m_controller.getFindQuery())) {
 			mFindQuery = m_controller.getFindQuery();
-			mPdfReaderListener.didSearchTerm(mFindQuery, found);
+			RadaeePluginCallback.getInstance().didSearchTerm(mFindQuery, found);
 		}
 	}
 
@@ -497,81 +481,13 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	}
 
 	/**
-	 * Returns a json object that contains all the document form fields dictionary
-	 *
-	 * @return json object of all the document form fields dictionary (if-any), or ERROR otherwise
-	 */
-	public String getJsonFormFields() {
-		try {
-			if(m_doc != null && m_doc.IsOpened()) {
-                JSONArray mPages = new JSONArray();
-                for (int i = 0 ; i < m_doc.GetPageCount() ; i++) {
-                    Page mPage = m_doc.GetPage(i);
-                    JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, i);
-                    if(mResult != null)
-                        mPages.put(mResult);
-                }
-
-                if(mPages.length() > 0) {
-                    JSONObject mPageJson = new JSONObject();
-                    mPageJson.put("Pages", mPages);
-                    return mPageJson.toString();
-                }
-                return "";
-            }
-            else
-            	return "Document not set";
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return "ERROR";
-	}
-
-	/**
-	 * Returns a json object that contains a specific page's form fields dictionary
-	 *
-	 * @param pageno the page number, 0-index (from 0 to Document.GetPageCount - 1)
-	 * @return json object of the page's form fields dictionary (if-any), or ERROR otherwise
-	 */
-	public String getJsonFormFieldsAtPage(int pageno) {
-		if(m_doc == null || !m_doc.IsOpened()) return "Document not set";
-		if(pageno >= m_doc.GetPageCount()) return "Page index error";
-
-		Page mPage = m_doc.GetPage(pageno);
-		JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, pageno);
-		if(mResult != null)
-			return mResult.toString();
-		else
-			return "";
-	}
-	
-	/**
 	 * returns current rendered page.
-	 * 
+	 *
 	 * @return current rendered page, -1 otherwise
 	 */
 	public int getCurrentPage() {
 		if(m_view != null)
 			return m_view.PDFGetCurrPage();
 		return -1;
-	}
-
-	/**
-	 * Sets a listener to the reader
-	 * @param listener a PDFReaderListener instance
-	 */
-	public static void setPDFReaderListener(PDFReaderListener listener) {
-		mPdfReaderListener = listener;
-	}
-
-	/**
-	 * An interface that can help in recognizing some events.
-	 */
-	public interface PDFReaderListener {
-		void willShowReader();
-		void didShowReader();
-		void willCloseReader();
-		void didCloseReader();
-		void didSearchTerm(String query, boolean found);
 	}
 }

@@ -135,7 +135,7 @@ public class PDFGridItem extends LinearLayout
             thumbName = CommonUtil.getThumbName(m_path);
             if(thumbName != null)
             {
-                bmp = CommonUtil.loadThumb(getContext(), thumbName);
+				bmp = CommonUtil.loadThumb(CommonUtil.getOutputMediaFile(getContext(), thumbName));
                 if (bmp != null)//if found cache, return immediately.
                 {
                     set_page(null, bmp);
@@ -178,14 +178,13 @@ public class PDFGridItem extends LinearLayout
                         bmp = null;
                     }
                     else if(Global.save_thumb_in_cache) {
-                        CommonUtil.saveThumb(getContext(), thumbName, bmp);
+						CommonUtil.saveThumb(bmp, CommonUtil.getOutputMediaFile(getContext(), thumbName));
                     }
                 }
                 set_page( null, bmp );
             }
             catch(Exception e)
-            {
-            }
+            { e.getMessage(); }
             page.Close();
             doc.Close();
 		}

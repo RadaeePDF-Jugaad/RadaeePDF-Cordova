@@ -2,24 +2,24 @@
 	RadaeePDF-Cordova for Android
 	GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 	Nermeen Solaiman
-	v1.2
+	v1.3
 
 	modified on 09/11/16 -->  added getFileState prototype
 	
 	modified on 18/01/17 -->  added implementation of PDFReaderListener
+
+	modified on 30/01/17 -->  added the usage of RadaeePDFManager
 */
 package com.radaee.cordova;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.URLUtil;
 
-import com.radaee.pdf.Document;
-import com.radaee.pdf.Global;
 import com.radaee.reader.PDFViewAct;
-import com.radaee.util.PDFHttpStream;
+import com.radaee.util.RadaeePDFManager;
+import com.radaee.util.RadaeePluginCallback;
 
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
@@ -32,10 +32,10 @@ import org.json.JSONObject;
 /**
  * define the method exposed by the RadaeePDFPlugin
  */
-public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFReaderListener {
+public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallback.PDFReaderListener {
 
-    private Document mDocument;
     private boolean showPdfInProgress;
+    private static RadaeePDFManager mPdfManager;
     private static final String TAG = "RadaeePDFPlugin";
 
 	/**
@@ -53,6 +53,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFRead
      */
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+        mPdfManager = new RadaeePDFManager(this);
     }
     
     /**
@@ -68,12 +69,9 @@ public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFRead
         JSONObject params;
         if(action.equals("activateLicense")) { //activate the license
             params = args.getJSONObject(0);
-            Global.mLicenseType = params.optInt("licenseType");
-            Global.mCompany = params.optString("company");
-            Global.mEmail = params.optString("email");
-            Global.mKey = params.optString("key");
 			
-			if(Global.Init(cordova.getActivity(), Global.mLicenseType, Global.mCompany, Global.mEmail, Global.mKey))
+			if(mPdfManager.activateLicense(cordova.getActivity(), params.optInt("licenseType"), params.optString("company"),
+                    params.optString("email"), params.optString("key")))
                 callbackContext.success("License activated successfully.");
             else
                 callbackContext.error("License activation failure.");
@@ -95,11 +93,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFRead
             String mTarget = params.optString("url");
             if(!TextUtils.isEmpty(mTarget)) {
                 mContext = this.cordova.getActivity().getApplicationContext();
-                Intent intent = new Intent(mContext, PDFViewAct.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("PDFAsset", mTarget);
-                intent.putExtra("PDFPswd", params.optString("password"));
-                mContext.startActivity(intent);
+                mPdfManager.openFromAssets(mContext, mTarget, params.optString("password"));
                 callbackContext.success("Pdf assets opening success");
             }
         } else if (action.equals("show")) { //open file 
@@ -113,81 +107,52 @@ public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFRead
             showPdfInProgress = true;
             if(!TextUtils.isEmpty(targetPath)) {
                 mContext = this.cordova.getActivity().getApplicationContext();
-                if(URLUtil.isFileUrl(targetPath)) { //open from file system
-                    PDFViewAct.setPDFReaderListener(this);
-                    String suffix = "file://";
-                    Intent intent = new Intent(mContext, PDFViewAct.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("PDFPath", targetPath.substring(targetPath.indexOf(suffix) + suffix.length()));
-                    intent.putExtra("PDFPswd", params.optString("password"));
-                    mContext.startActivity(intent);
+                mPdfManager.show(mContext, targetPath, params.optString("password"));
                     showPdfInProgress = false;
                     callbackContext.success("Pdf local opening success");
-                } else if(URLUtil.isHttpUrl(targetPath) || URLUtil.isHttpsUrl(targetPath)) { //open from remote url
-                    PDFViewAct.setPDFReaderListener(this);
-					Global.Init(cordova.getActivity());
-                    PDFHttpStream m_http_stream = new PDFHttpStream();
-                    m_http_stream.open(targetPath);
-                    mDocument = new Document();
-                    int ret = mDocument.OpenStreamWithoutLoadingPages(m_http_stream, params.optString("password"));
-                    switch (ret)
-                    {
-                        case -1://need input password
-                            onFail(callbackContext, "Open Failed: Invalid Password");
-                            break;
-                        case -2://unknown encryption
-                            onFail(callbackContext, "Open Failed: Unknown Encryption");
-                            break;
-                        case -3://damaged or invalid format
-                            onFail(callbackContext, "Open Failed: Damaged or Invalid PDF file");
-                            break;
-                        case -10://access denied or invalid file path
-                            onFail(callbackContext, "Open Failed: Access denied or Invalid path");
-                            break;
-                        case 0://succeeded, and continue
-                            PDFViewAct.ms_tran_doc = mDocument;
-                            break;
-                        default://unknown error
-                            onFail(callbackContext, "Open Failed: Unknown Error");
-                            break;
-                    }
-
-                    Intent intent = new Intent(mContext, PDFViewAct.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra( "PDFHttp", targetPath );
-                    intent.putExtra( "PDFPswd", params.optString("password") );
-                    mContext.startActivity(intent);
-                }
             } else {
                 showPdfInProgress = false;
                 callbackContext.error("url is null or white space, this is a mandatory parameter");
             }
         } else if(action.equals("getPageNumber")) { //get current page number
-            if(PDFViewAct.getInstance() != null) {
-                callbackContext.success("Current page Number = " + PDFViewAct.getInstance().getCurrentPage());
-            } else
-                callbackContext.error("Reader Not ready");
+            callbackContext.success("Current page Number = " + mPdfManager.getPageNumber());
         } else if(action.equals("JSONFormFields")) { //get file's form fields values in json format
-            if(PDFViewAct.getInstance() != null) {
-                callbackContext.success("Result = " + PDFViewAct.getInstance().getJsonFormFields());
-            } else
-                callbackContext.error("Reader Not ready");
+            callbackContext.success("JSONFormFields = " + mPdfManager.getJsonFormFields());
         } else if(action.equals("JSONFormFieldsAtPage")) { //get file's form fields values for given page in json format
-            if(PDFViewAct.getInstance() != null) {
-                callbackContext.success("Current page Number = " +
-                        PDFViewAct.getInstance().getJsonFormFieldsAtPage(args.getJSONObject(0).optInt("page")));
-            } else
-                callbackContext.error("Reader Not ready");
+            callbackContext.success("JSONFormFields = " +
+                    mPdfManager.getJsonFormFieldsAtPage(args.getJSONObject(0).optInt("page")));
+        }else if(action.equals("setReaderBGColor")) { //sets reader view background color
+            params = args.getJSONObject(0);
+            mPdfManager.setReaderBGColor(params.optInt("color"));
+            callbackContext.success("Color passed to the reader");
+        } else if(action.equals("setThumbnailBGColor")) { //sets thumbnail view background color
+            params = args.getJSONObject(0);
+            mPdfManager.setThumbnailBGColor(params.optInt("color"));
+            callbackContext.success("Color passed to the reader");
+        } else if(action.equals("setThumbHeight")) { //sets thumbnail view height
+            params = args.getJSONObject(0);
+            mPdfManager.setThumbHeight(params.optInt("height"));
+            callbackContext.success("Height passed to the reader");
+        } else if(action.equals("setFirstPageCover")) { //sets if the first page should be rendered as cover or dual
+            params = args.getJSONObject(0);
+            mPdfManager.setFirstPageCover(params.optBoolean("cover"));
+            callbackContext.success("property set successfully");
+        } else if(action.equals("setReaderViewMode")) { //sets the reader's view mode
+            params = args.getJSONObject(0);
+            mPdfManager.setReaderViewMode(params.optInt("mode"));
+            callbackContext.success("property set successfully");
+        } else if(action.equals("setIconsBGColor")) { //Changes the color of the reader toolbar's icons.
+            params = args.getJSONObject(0);
+            mPdfManager.setIconsBGColor(params.optInt("color"));
+            callbackContext.success("property set successfully");
+        } else if(action.equals("setTitleBGColor")) { //Changes the color of the reader's toolbar.
+            params = args.getJSONObject(0);
+            mPdfManager.setTitleBGColor(params.optInt("color"));
+            callbackContext.success("property set successfully");
         } else
             return false;
 
         return true;
-    }
-
-    private void onFail(CallbackContext callbackContext, String msg) { //treat open failed.
-        mDocument.Close();
-        mDocument = null;
-        callbackContext.error(msg);
     }
 
     @Override
@@ -208,6 +173,11 @@ public class RadaeePDFPlugin extends CordovaPlugin implements PDFViewAct.PDFRead
     @Override
     public void didCloseReader() {
         Log.d(TAG, "did close reader");
+    }
+
+    @Override
+    public void didChangePage(int pageno) {
+        Log.d(TAG, "Did change page " + pageno);
     }
 
     @Override

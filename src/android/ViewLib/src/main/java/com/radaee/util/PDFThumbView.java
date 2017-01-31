@@ -8,8 +8,10 @@ import android.graphics.Paint.Align;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.radaee.pdf.Document;
+import com.radaee.pdf.Global;
 import com.radaee.view.PDFVPage;
 import com.radaee.view.PDFView.PDFViewListener;
 import com.radaee.view.PDFViewThumb;
@@ -21,6 +23,7 @@ public class PDFThumbView extends View implements PDFViewListener
 	public PDFThumbView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
+
 		m_thumb = new PDFViewThumb(context);
 	}
 	public void OnPDFPageChanged(int pageno)
@@ -78,9 +81,14 @@ public class PDFThumbView extends View implements PDFViewListener
 	}
 	public void thumbOpen( Document doc, PDFThumbListener listener, boolean isRTL )
 	{
+        if(Global.thumbViewHeight > 0) { //added to support configurable height
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
+            params.height = (int) (Global.thumbViewHeight * getContext().getResources().getDisplayMetrics().density);
+            setLayoutParams(params);
+        }
         if(isRTL)
 		    m_thumb.vSetOrientation(2);//RTOL horizontal layout
-		m_thumb.vOpen(doc, 8, 0x40CCCCCC, this);
+		m_thumb.vOpen(doc, 8, Global.thumbViewBgColor, this);
 		m_thumb.vSetThumbListener(listener);
 		m_thumb.vResize(getWidth(), getHeight());
 	}

@@ -6,6 +6,10 @@
 //      added getFileState prototype
 //  v1.1.0
 
+// modified by Nermeen Solaiman/Emanuele on 31/01/17
+//      added config prototypes
+//  v1.2.0
+
 var argscheck = require('cordova/argscheck'),
     exec      = require('cordova/exec');
 
@@ -81,6 +85,18 @@ RadaeePDFPlugin.prototype.setReaderViewMode = function (params, successCallback,
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setReaderViewMode', [params]);
+};
+
+RadaeePDFPlugin.prototype.setIconsBGColor = function (params, successCallback, errorCallback) { //android only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setIconsBGColor', [params]);
+};
+
+RadaeePDFPlugin.prototype.setTitleBGColor = function (params, successCallback, errorCallback) { //android only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setTitleBGColor', [params]);
 };
 
 module.exports = new RadaeePDFPlugin();

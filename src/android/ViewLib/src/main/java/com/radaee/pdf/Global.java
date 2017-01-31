@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.10RC2
+ * @version 3.10b
  */
 public class Global
 {
@@ -311,6 +311,22 @@ public class Global
 	 * save_thumb_in_cache, save pdf first page in cache storage
 	 */
 	public static String tmp_path = null;
+	/**
+	 * Thumb view background color
+	 */
+	public static int thumbViewBgColor = 0x40CCCCCC;
+	/**
+	 * Thumb view height in dp, i.e. 100 = 100dp
+	 */
+	public static int thumbViewHeight = 100;
+	/**
+	 * Reader view background color
+	 */
+	public static int readerViewBgColor = 0xFFCCCCCC;
+	/**
+	 * navigation mode, 0:thumbnail view 1:seekbar view
+	 */
+	public static int navigationMode = 1;
 	public static boolean debug_mode = true;
 	public static boolean highlight_annotation = true;
 	public static boolean save_thumb_in_cache = true;

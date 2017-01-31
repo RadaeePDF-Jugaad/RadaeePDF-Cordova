@@ -397,7 +397,7 @@ public class PDFLayoutView extends View implements LayoutListener
 		super(context);
 		m_doc = null;
     	m_gesture = new GestureDetector( context, new PDFGestureListener() );
-        setBackgroundColor(0xFFCCCCCC);
+        setBackgroundColor(Global.readerViewBgColor);
 		if(Global.debug_mode)
 		{
 			m_amgr = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -410,7 +410,7 @@ public class PDFLayoutView extends View implements LayoutListener
 		super(context, attrs);
 		m_doc = null;
     	m_gesture = new GestureDetector( context, new PDFGestureListener() );
-        setBackgroundColor(0xFFCCCCCC);
+        setBackgroundColor(Global.readerViewBgColor);
 		if(Global.debug_mode)
 		{
 			m_amgr = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -425,6 +425,10 @@ public class PDFLayoutView extends View implements LayoutListener
 		if(m_layout != null && m_status != STA_ANNOT && w > 0 && h > 0)
 		{
 			m_layout.vResize(w, h);
+
+			m_layout.vZoomSet(m_layout.vGetWidth()/2, m_layout.vGetHeight()/2, m_layout.vGetPos(0,0), 1);
+			PDFGotoPage(m_pageno);
+
 			if( m_goto_pos != null )
 			{
 				m_layout.vSetPos(0, 0, m_goto_pos);
@@ -1126,6 +1130,19 @@ public class PDFLayoutView extends View implements LayoutListener
         }
             break;
         case 4:
+		{
+			PDFLayoutDual layout = new PDFLayoutDual(getContext());
+			boolean paras[] = new boolean[m_doc.GetPageCount()];
+			int cur = 0;
+			while( cur < paras.length )
+			{
+				paras[cur] = true;
+				cur++;
+			}
+			layout.vSetLayoutPara(null, paras, m_rtol, false);
+			m_layout = layout;
+		}
+		break;
         case 6:
         {
         	PDFLayoutDual layout = new PDFLayoutDual(getContext());
@@ -1700,7 +1717,7 @@ public class PDFLayoutView extends View implements LayoutListener
 		final EditText subj = (EditText)layout.findViewById(R.id.txt_subj);
 		final EditText content = (EditText)layout.findViewById(R.id.txt_content);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int which)
 			{
@@ -1719,7 +1736,7 @@ public class PDFLayoutView extends View implements LayoutListener
 				dialog.dismiss();
 				PDFEndAnnot();
 			}});
-		builder.setTitle("Note Content");
+		builder.setTitle(R.string.note_content);
 		builder.setCancelable(false);
 		builder.setView(layout);
 		
@@ -1923,4 +1940,16 @@ public class PDFLayoutView extends View implements LayoutListener
         PDFClose();
         super.finalize();
     }
+
+	public float PDFGetScale() {
+		if(m_layout != null)
+			return m_layout.vGetScale();
+		return 1;
+	}
+
+	public float PDFGetMinScale() {
+		if(m_layout != null)
+			return m_layout.vGetMinScale();
+		return 1;
+	}
 }

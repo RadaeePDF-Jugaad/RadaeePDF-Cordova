@@ -152,7 +152,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
 			{
 				dialog.dismiss();
 			}});
-		builder.setTitle("Input Password");
+        builder.setTitle(R.string.input_password);
 		builder.setCancelable(false);
 		builder.setView(layout);
 		

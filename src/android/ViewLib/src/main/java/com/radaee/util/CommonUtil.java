@@ -1,11 +1,19 @@
 package com.radaee.util;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.radaee.pdf.Page;
+import com.radaee.reader.PDFLayoutView;
+import com.radaee.viewlib.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,10 +27,13 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Davide created on 15/01/2016.
+ *
+ * modified on 23/11/2016
+ *      Adding new utils methods.
  */
 public class CommonUtil {
 
-    static final String TAG = "RadaeeCommonUtil";
+    private static final String TAG = "RadaeeCommonUtil";
     private static final int CACHE_LIMIT = 1024;
 
     static String getThumbName(String path)
@@ -38,31 +49,19 @@ public class CommonUtil {
         }
     }
 
-    static Bitmap loadThumb(Context context, String thumbName) {
-        if(thumbName == null || thumbName.length() <= 0) return null;
-        File pictureFile = getOutputMediaFile(context, thumbName);
+    static Bitmap loadThumb(File pictureFile) {
         try {
+            if(!pictureFile.exists())
+                return null;
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            if(pictureFile != null)
-                return BitmapFactory.decodeFile(pictureFile.getAbsolutePath(), options);
+            return BitmapFactory.decodeFile(pictureFile.getAbsolutePath(), options);
         } catch (Exception e) {
-            e.getMessage();
+            return null;
         }
-        return null;
     }
-    static void saveThumb(Context context, String thumbName, Bitmap image)
-    {
-        if(thumbName == null || thumbName.length() <= 0) return;
 
-        File pictureFile = getOutputMediaFile(context, thumbName);
-        File dir = new File(context.getCacheDir() + "/thumbnails");
-        if(dir.exists())//too many caches
-        {
-            File files[] = dir.listFiles();
-            if(files.length > CACHE_LIMIT)
-                files[0].deleteOnExit();
-        }
+    static void saveThumb(Bitmap image, File pictureFile) {
         if (pictureFile == null) {
             Log.d(TAG,
                     "Error creating media file, check storage permissions: ");// e.getMessage());
@@ -79,7 +78,13 @@ public class CommonUtil {
         }
     }
 
-    private static File getOutputMediaFile(Context context, String thumbName) {
+    static File getOutputMediaFile(Context context, String thumbName) {
+        File dir = new File(context.getCacheDir() + "/thumbnails");
+        if(dir.exists()) { //too many caches
+            File files[] = dir.listFiles();
+            if(files.length > CACHE_LIMIT)
+                files[0].deleteOnExit();
+        }
         File file = new File(context.getCacheDir() + "/thumbnails/" + thumbName + ".png");
         if (!file.exists()) {
             File mediaStorageDir = new File(context.getCacheDir() + "/thumbnails");
@@ -185,5 +190,31 @@ public class CommonUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void showPDFOutlines(final PDFLayoutView mPdfLayoutView, Context mContext) {
+        if(mPdfLayoutView.PDFGetDoc() != null) {
+            if(mPdfLayoutView.PDFGetDoc().GetOutlines() == null) {
+                Toast.makeText(mContext, R.string.no_pdf_outlines, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            LinearLayout layout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.dlg_outline, null);
+            final OutlineList mOutlineList = (OutlineList) layout.findViewById(R.id.lst_outline);
+            mOutlineList.SetOutlines(mPdfLayoutView.PDFGetDoc());
+            final AlertDialog mAlertDialog = new AlertDialog.Builder(mContext)
+                    .setTitle(R.string.pdf_outline)
+                    .setView(layout)
+                    .show();
+            AdapterView.OnItemClickListener item_clk = new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    OutlineListAdt.outline_ui_item item = mOutlineList.GetItem(i);
+                    mPdfLayoutView.PDFGotoPage(item.GetPageNO());
+                    mAlertDialog.dismiss();
+                }
+            };
+            mOutlineList.setOnItemClickListener(item_clk);
+        }
     }
 }
