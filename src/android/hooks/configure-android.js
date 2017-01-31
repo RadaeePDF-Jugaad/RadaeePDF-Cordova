@@ -37,17 +37,14 @@ module.exports = function (ctx) {
     var platformRoot = path.join(ctx.opts.projectRoot, 'platforms/android');
     var fileImportR = [
     	{filePath: 'src/com/radaee/pdf/Global.java', importStatement: 'com.radaee.viewlib.R'},
-    	{filePath: 'src/com/radaee/reader/PDFCurlViewAct.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/reader/PDFLayoutView.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/reader/PDFNavAct.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/reader/PDFViewAct.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/reader/PDFViewController.java', importStatement: 'com.radaee.viewlib.R'},
-		{filePath: 'src/com/radaee/reader/PDFPagerAct.java', importStatement: 'com.radaee.viewlib.R+'},
     	{filePath: 'src/com/radaee/util/OutlineListAdt.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/util/PDFGridItem.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: 'src/com/radaee/util/PopupEditAct.java', importStatement: 'com.radaee.viewlib.R'},
-		{filePath: 'src/com/radaee/util/CommonUtil.java', importStatement: 'com.radaee.viewlib.R'},
-		{filePath: 'src/com/radaee/util/RadaeePDFManager.java', importStatement: 'com.radaee.viewlib.R'}
+		{filePath: 'src/com/radaee/util/CommonUtil.java', importStatement: 'com.radaee.viewlib.R'}
     ];
 
 
