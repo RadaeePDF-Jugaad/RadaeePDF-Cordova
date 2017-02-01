@@ -238,14 +238,14 @@ extern uint g_oval_color;
     item1.width = 40;
     
     PopupMenuItem *item2 = [PopupMenuItem itemWithTitle:@"Mark" image:nil target:self action:@selector(Mark:)];
-    item1.width = 40;
+    item2.width = 40;
     
     PopupMenuItem *item3 = [PopupMenuItem itemWithTitle:@"STO" image:nil target:self action:@selector(StrikeOut:)];
-    item2.width =40;
+    item3.width =40;
     PopupMenuItem *item4 = [PopupMenuItem itemWithTitle:@"HL" image:nil target:self action:@selector(HighLight:)];
-    item3.width=40;
+    item4.width=40;
     PopupMenuItem *item5 = [PopupMenuItem itemWithTitle:@"UDL" image:nil target:self action:@selector(UnderLine:)];
-    item4.width =40;
+    item5.width =40;
     PopupMenuItem *item6 = [PopupMenuItem itemWithTitle:@"TA" image:nil target:self action:@selector(TextAnnot:)];
     item6.width = 40;
     
