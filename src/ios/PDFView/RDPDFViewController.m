@@ -793,6 +793,7 @@ extern uint g_oval_color;
     PDF_ERR err = 0;
     m_doc = [[PDFDoc alloc] init];
     err = [m_doc open:path :pwd];
+    
     if ([m_doc canSave]){
         NSString *cacheFile = [[NSTemporaryDirectory() stringByAppendingString:@""] stringByAppendingString:@"cache.dat"];
         [m_doc setCache:cacheFile];
@@ -1337,6 +1338,12 @@ extern uint g_oval_color;
 }
 -(void)refreshStatusBar{
     [self setNeedsStatusBarAppearanceUpdate];
+}
+
+
+- (void)refreshCurrentPage
+{
+    [m_view refreshCurrentPage];
 }
 
 -(BOOL)prefersStatusBarHidden

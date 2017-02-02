@@ -184,5 +184,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
 
+- (void)refreshCurrentPage;
+
 @end
 

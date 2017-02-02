@@ -92,10 +92,12 @@
 - (void)setImmersive:(CDVInvokedUrlCommand*)command;
 - (void)setReaderViewMode:(CDVInvokedUrlCommand*)command;
 
-// Form Extractor
+// Form Manager
 
 - (void)JSONFormFields:(CDVInvokedUrlCommand*)command;
 - (void)JSONFormFieldsAtPage:(CDVInvokedUrlCommand*)command;
+
+- (void)setFormFieldWithJSON:(CDVInvokedUrlCommand *)command;
 
 + (RadaeePDFPlugin *)pluginInit;
 

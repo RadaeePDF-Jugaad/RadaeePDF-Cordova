@@ -57,6 +57,12 @@ RadaeePDFPlugin.prototype.getJSONFormFieldsAtPage = function (params, successCal
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'JSONFormFieldsAtPage', [params]);
 };
 
+RadaeePDFPlugin.prototype.setFormFieldWithJSON = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setFormFieldWithJSON', [params]);
+};
+
 RadaeePDFPlugin.prototype.setThumbnailBGColor = function (params, successCallback, errorCallback) {
         params = params || {};
 

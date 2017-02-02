@@ -363,8 +363,8 @@
         <header-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.h" />
 
         <!-- Radaee Utils -->
-        <source-file src="src/ios/RDUtils/RDFormExtractor.m" />
-        <header-file src="src/ios/RDUtils/RDFormExtractor.h" />
+        <source-file src="src/ios/RDUtils/RDFormManager.m" />
+        <header-file src="src/ios/RDUtils/RDFormManager.h" />
         <source-file src="src/ios/RDUtils/ReaderHandler.m" />
         <header-file src="src/ios/RDUtils/ReaderHandler.h" />
 

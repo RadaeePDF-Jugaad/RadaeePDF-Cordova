@@ -16,7 +16,7 @@
 #import "PDFThumbView.h"
 #import "BookmarkTableViewController.h"
 #import "RadaeePDFPlugin.h"
-#import "RDFormExtractor.h"
+#import "RDFormManager.h"
 
 @class OutLineViewController;
 @class PDFView;
@@ -193,6 +193,8 @@
 - (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
 - (void)setImmersive:(BOOL)immersive;
+
+- (void)refreshCurrentPage;
 
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;

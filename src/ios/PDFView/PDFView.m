@@ -270,6 +270,21 @@ extern bool g_double_page_enabled;
     [self setNeedsDisplay];
 }
 
+- (void)refreshCurrentPage
+{
+    if (m_cur_page > 0) {
+        [m_view vRenderSync:m_cur_page - 1];
+    }
+    if ((m_cur_page + 1) < [m_doc pageCount]) {
+        [m_view vRenderSync:m_cur_page + 1];
+    }
+    
+
+    [m_view vRenderSync:m_cur_page];
+    
+    [self refresh];
+}
+
 - (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
 {
     return YES;

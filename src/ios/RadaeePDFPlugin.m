@@ -90,7 +90,7 @@
     url = [params objectForKey:@"url"];
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:url ofType:nil];
-    
+
     [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
 }
 
@@ -120,6 +120,7 @@
     [self readerInit];
     
     int result = [m_pdf PDFOpen:filePath :password];
+    
     NSLog(@"%d", result);
     if(result != err_ok && result != err_open){
         [self pdfChargeDidFailWithError:@"Error open pdf" andCode:(NSInteger) result];
@@ -623,13 +624,23 @@
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
 }
 
+- (void)setFormFieldsResult
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:[self.cdv_command callbackId]];
+}
+
+- (void)setFormFieldsDidFailWithError:(NSString *)errorMessage
+{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
+}
+
 #pragma mark - Form Extractor
 
 - (void)JSONFormFields:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
     
-    RDFormExtractor *fe = [[RDFormExtractor alloc] initWithDoc:[m_pdf getDoc]];
+    RDFormManager *fe = [[RDFormManager alloc] initWithDoc:[m_pdf getDoc]];
     
     [self JSONFormFieldsResult:[fe jsonInfoForAllPages]];
 }
@@ -639,9 +650,35 @@
     self.cdv_command = command;
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    RDFormExtractor *fe = [[RDFormExtractor alloc] initWithDoc:[m_pdf getDoc]];
+    RDFormManager *fe = [[RDFormManager alloc] initWithDoc:[m_pdf getDoc]];
     
     [self JSONFormFieldsAtPageResult:[fe jsonInfoForPage:(int)[params objectForKey:@"page"]]];
+}
+
+- (void)setFormFieldWithJSON:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    RDFormManager *fe = [[RDFormManager alloc] initWithDoc:[m_pdf getDoc]];
+    
+    NSError *error;
+    if ([params objectForKey:@"json"]) {
+        [fe setInfoWithJson:[params objectForKey:@"json"] error:&error];
+        
+        if (error) {
+            [self setFormFieldsDidFailWithError:[error description]];
+        } else
+        {
+            if (m_pdf) {
+                [m_pdf refreshCurrentPage];
+            }
+            [self setFormFieldsResult];
+        }
+    } else
+    {
+        [self setFormFieldsDidFailWithError:@"JSON not found"];
+    }
 }
 
 #pragma mark - Reader Delegate
