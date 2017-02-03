@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.radaee.pdf.Document;
 import com.radaee.pdf.Page;
 import com.radaee.reader.PDFLayoutView;
 import com.radaee.viewlib.R;
@@ -24,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * @author Davide created on 15/01/2016.
@@ -152,7 +154,8 @@ public class CommonUtil {
 
                         mAnnotInfoJson.put("CheckStatus", mAnnotation.GetCheckStatus());
 
-                        mAnnotInfoJson.put("ComboItemSel", mAnnotation.GetComboItemSel() == -1 ? mAnnotation.GetComboItemSel() :
+                        mAnnotInfoJson.put("ComboItemSel", mAnnotation.GetComboItemSel());
+                        mAnnotInfoJson.put("ComboItemSelItem", mAnnotation.GetComboItemSel() == -1 ? mAnnotation.GetComboItemSel() :
                             mAnnotation.GetComboItem(mAnnotation.GetComboItemSel()));
                         mAnnotInfoJson.put("ComboItemCount", mAnnotation.GetComboItemCount());
 
@@ -164,7 +167,8 @@ public class CommonUtil {
                                 String selValues = "";
                                 for(int item : items)
                                     selValues += mAnnotation.GetListItem(item) + ", ";
-                                mAnnotInfoJson.put("ListSels", selValues.substring(0, selValues.lastIndexOf(",")));
+                                mAnnotInfoJson.put("ListSels", Arrays.toString(items));
+                                mAnnotInfoJson.put("ListSelsItems", selValues.substring(0, selValues.lastIndexOf(",")));
                             }
                         }
                         mAnnotInfoJson.put("ListItemCount", mAnnotation.GetListItemCount());
@@ -190,6 +194,69 @@ public class CommonUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void parsePageJsonFormFields(JSONObject pageJson, Document document) {
+        try {
+            int pageIndex = pageJson.optInt("Page");
+            if(pageIndex < document.GetPageCount()) {
+                Page mPage = document.GetPage(pageIndex);
+                if(mPage != null) {
+                    mPage.ObjsStart();
+                    JSONArray mPageAnnots = pageJson.optJSONArray("Annots");
+                    if(mPageAnnots != null) {
+                        for(int i = 0 ; i < mPageAnnots.length() ; i++) {
+                            JSONObject mAnnotInfo = mPageAnnots.getJSONObject(i);
+                            Page.Annotation mAnnotation = mPage.GetAnnot(mAnnotInfo.getInt("Index"));
+                            switch (mAnnotation.GetType()) {
+                                case 3:
+                                    if(!mAnnotInfo.isNull("EditText"))
+                                        mAnnotation.SetEditText(mAnnotInfo.getString("EditText"));
+                                    break;
+                                case 20:
+                                    switch (mAnnotation.GetFieldType()) {
+                                        case 1: //check box/radio buttons
+                                            if(!mAnnotInfo.isNull("CheckStatus")) {
+                                                switch(mAnnotInfo.getInt("CheckStatus")) {
+                                                    case 0:
+                                                        mAnnotation.SetCheckValue(false);
+                                                        break;
+                                                    case 1:
+                                                        mAnnotation.SetCheckValue(true);
+                                                        break;
+                                                    case 3:
+                                                        mAnnotation.SetRadio();
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                        case 2: //text field
+                                            if(!mAnnotInfo.isNull("EditText"))
+                                                mAnnotation.SetEditText(mAnnotInfo.getString("EditText"));
+                                            break;
+                                        case 3: //combo/list
+                                            if(mAnnotation.GetComboItemCount() != -1 && !mAnnotInfo.isNull("ComboItemSel"))
+                                                mAnnotation.SetComboItem(mAnnotInfo.getInt("ComboItemSel"));
+                                            if(mAnnotation.GetListItemCount() != -1 && !mAnnotInfo.isNull("ListSels")) {
+                                                String[] itemsStrs = mAnnotInfo.getString("ListSels").replaceAll("\\[", "").replaceAll("\\]", "").split(",");
+                                                int[] items = new int[itemsStrs.length];
+                                                for(int j = 0 ; j < itemsStrs.length ; j++)
+                                                    items[j] = Integer.parseInt(itemsStrs[j]);
+                                                mAnnotation.SetListSels(items);
+                                            }
+                                            break;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    mPage.Close();
+                    document.Save();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void showPDFOutlines(final PDFLayoutView mPdfLayoutView, Context mContext) {

@@ -219,6 +219,16 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().onGetJsonFormFieldsAtPage(pageno);
     }
 
+    /**
+     * Using the passed json, you can set the value of form fields like: Text fields, checkbox,
+     * combo, radio buttons.
+     *
+     * @param json object of the document form fields dictionary
+     */
+    public String setFormFieldsWithJSON(String json) {
+        return RadaeePluginCallback.getInstance().onSetFormFieldsWithJSON(json);
+    }
+
     @Override
     public void willShowReader() {
         Global.def_view = mViewMode;

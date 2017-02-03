@@ -1952,4 +1952,9 @@ public class PDFLayoutView extends View implements LayoutListener
 			return m_layout.vGetMinScale();
 		return 1;
 	}
+
+	public void refreshCurrentPage() {
+		if(m_layout != null)
+			m_layout.vRenderSync(m_layout.vGetPage(m_pageno));
+	}
 }

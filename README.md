@@ -117,7 +117,7 @@ RadaeePDFPlugin.getFileState(
 ```
 
 RadaeePDF library version included:
-- Android: v3.10b
+- Android: v3.10c
 - iOS: v3.8.0
 
 Original development: 

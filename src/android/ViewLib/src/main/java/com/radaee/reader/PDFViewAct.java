@@ -219,7 +219,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         		int ret = m_doc.Open(pdf_path, pdf_pswd);
                 m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
                 m_tmp_index++;
-                m_doc.SetFontDel(m_font_del);
+                //m_doc.SetFontDel(m_font_del);
         		ProcessOpenResult(ret);
         	}
         }

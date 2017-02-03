@@ -949,5 +949,25 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			else
 				return "";
 		}
+
+        @Override
+        public String onSetFormFieldsWithJSON(String json) {
+            if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return "Document not set";
+            if(!m_view.PDFGetDoc().CanSave()) return "Document instance is readonly";
+            try {
+                JSONObject pages = new JSONObject(json);
+                if(pages.optJSONArray("Pages") != null) {
+                    JSONArray pagesArray = pages.optJSONArray("Pages");
+                    for(int i = 0 ; i < pagesArray.length() ; i++) {
+                        CommonUtil.parsePageJsonFormFields(pagesArray.getJSONObject(i), m_view.PDFGetDoc());
+                    }
+                    m_view.refreshCurrentPage();
+                    return "";
+                } else return "\"Pages\" attribute is missing";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "ERROR";
+        }
 	};
 }

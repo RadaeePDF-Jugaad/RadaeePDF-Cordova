@@ -1,7 +1,7 @@
 package com.radaee.util;
 
 /**
- * A class to manage callbacks between Activity, and calling class.
+ * A class to manage callbacks between PDF viewer, and calling class.
  * Your class should implement PDFReaderListener to receive its events.
  *
  * @author Nermeen created on 23/01/2017.
@@ -86,6 +86,12 @@ public class RadaeePluginCallback {
         return "ERROR";
     }
 
+    public String onSetFormFieldsWithJSON(String json) {
+        if(mControlListener != null)
+            return mControlListener.onSetFormFieldsWithJSON(json);
+        return "ERROR";
+    }
+
     /**
      * An interface that can help in recognizing some events.
      */
@@ -107,5 +113,6 @@ public class RadaeePluginCallback {
         void onSetImmersive(boolean immersive);
         String onGetJsonFormFields();
         String onGetJsonFormFieldsAtPage(int pageno);
+        String onSetFormFieldsWithJSON(String json);
     }
 }
