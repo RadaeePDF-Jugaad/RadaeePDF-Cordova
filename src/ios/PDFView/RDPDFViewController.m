@@ -22,6 +22,7 @@
 	UIPopoverController *bookmarkPopover;
     UIPopoverController *viewModePopover;
     NSString *password;
+    UIBarButtonItem *addBookMarkListButton;
 }
 
 @end
@@ -128,8 +129,6 @@ extern uint g_oval_color;
     }
     
     addBookMarkButton.width =30;
-    
-    UIBarButtonItem *addBookMarkListButton;
     
     if (_bookmarkListImage) {
         addBookMarkListButton = [[UIBarButtonItem alloc] initWithImage:_bookmarkListImage style:UIBarButtonItemStylePlain target:self action:@selector(bookmarkList)];
@@ -372,7 +371,7 @@ extern uint g_oval_color;
         bookmarkPopover = [[UIPopoverController alloc] initWithContentViewController:b];
         bookmarkPopover.popoverContentSize = CGSizeMake(300, 44 * b.items.count);
         
-        [bookmarkPopover presentPopoverFromBarButtonItem:[self.toolBar.items objectAtIndex:5] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        [bookmarkPopover presentPopoverFromBarButtonItem:addBookMarkListButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
     }
     else
     {
