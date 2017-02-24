@@ -69,9 +69,14 @@
         
     } else {
         if ([url containsString:@"file://"]) {
-            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-            NSString *documentsDirectory = [paths objectAtIndex:0];
-            NSString *filePath = [documentsDirectory stringByAppendingPathComponent:[url stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+            
+            NSString *filePath = [url stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+            
+            if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                NSString *documentsDirectory = [paths objectAtIndex:0];
+                filePath = [documentsDirectory stringByAppendingPathComponent:filePath];
+            }
             
             [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
         } else {
