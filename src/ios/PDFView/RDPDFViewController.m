@@ -356,8 +356,45 @@ extern uint g_oval_color;
 
 - (void)closeView
 {
-    [self.navigationController popViewControllerAnimated:YES];
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if ([m_view isModified]) {
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Exiting"
+                                                                       message:@"Document modified.\r\nDo you want to save it?"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* ok = [UIAlertAction
+                             actionWithTitle:@"Yes"
+                             style:UIAlertActionStyleDefault
+                             handler:^(UIAlertAction * action)
+                             {
+                                 [self PDFClose];
+                                 [self.navigationController popViewControllerAnimated:YES];
+                                 [self dismissViewControllerAnimated:YES completion:nil];
+                                 [alert dismissViewControllerAnimated:YES completion:nil];
+                                 
+                             }];
+        UIAlertAction* cancel = [UIAlertAction
+                                 actionWithTitle:@"No"
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction * action)
+                                 {
+                                     [m_view setModified:NO force:YES];
+                                     [self PDFClose];
+                                     [self.navigationController popViewControllerAnimated:YES];
+                                     [self dismissViewControllerAnimated:YES completion:nil];
+                                     [alert dismissViewControllerAnimated:YES completion:nil];
+                                     
+                                 }];
+                                        
+        [alert addAction:ok];
+        [alert addAction:cancel];
+        [self presentViewController:alert animated:YES completion:nil];
+
+    }
+    else {
+        [self PDFClose];
+        [self.navigationController popViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void)bookmarkList

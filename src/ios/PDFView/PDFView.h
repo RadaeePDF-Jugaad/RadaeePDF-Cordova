@@ -186,5 +186,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (void)refreshCurrentPage;
 
+- (BOOL)isModified;
+- (void)setModified:(BOOL)modified force:(BOOL)force;
+
 @end
 
