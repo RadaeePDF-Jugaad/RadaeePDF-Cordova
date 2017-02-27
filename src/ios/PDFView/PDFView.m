@@ -1,4 +1,4 @@
-//
+    //
 //  PDFView.m
 //  PDFReader
 //
@@ -719,7 +719,7 @@ extern bool g_double_page_enabled;
 	if( m_status != sta_annot ) return false;
     if( [m_doc canSave] )
     {
-    	[self setModified:YES force:NO];
+    	//[self setModified:YES force:NO];
         m_tx = point.x * m_scale;
         m_ty = point.y * m_scale;
         m_annot_rect.left += m_tx - m_px;
@@ -1799,6 +1799,7 @@ extern bool g_double_page_enabled;
 
 - (void)setEditBoxWithText:(NSString *)text
 {
+    if (m_status != sta_annot) return;
     if (![[m_annot getEditText] isEqualToString:text]) {
         [self setModified:YES force:NO];
     }
