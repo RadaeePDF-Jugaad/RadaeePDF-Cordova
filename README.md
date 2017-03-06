@@ -4,7 +4,7 @@ The repository has been moved to https://github.com/gearit/RadaeePDF-Cordova
 
 The new one contains sources for both Android and iOS.
 
-Official information page: http://www.radaeepdf.com/download/xamarin-module
+Official information page: http://www.radaeepdf.com/download/cordova-plugin
 
 ## License
 
