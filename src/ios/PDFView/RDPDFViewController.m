@@ -1154,6 +1154,7 @@ extern uint g_oval_color;
 {
     if( m_view != nil )
     {
+        b_outline = false;
         [m_view vClose];
         [m_view removeFromSuperview];
         m_view = NULL;
