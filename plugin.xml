@@ -7,10 +7,10 @@
     </engines>
 
     <name>RadaeePDF-Cordova</name>
-    <author>Gear.it S.R.L.</author>
-    <description>RadaeePDF cordova plugin, read pdf with native library!</description>
-    <license>Apache LGPL</license>
-    <keywords>pdf, open, inapppdf, radaee, cordova</keywords>
+    <author>GEAR.it S.R.L.</author>
+    <description>RadaeePDF SDK Plugin for Cordova. The best PDF rendering engine with annotation, form, page creation features.</description>
+    <license>Apache</license>
+    <keywords>pdf, open, inapppdf, radaee, cordova, radaeepdf, android, ios</keywords>
 
     <js-module src="www/RadaeePDFPlugin.js" name="RadaeePDFPlugin">
         <clobbers target="RadaeePDFPlugin" />
