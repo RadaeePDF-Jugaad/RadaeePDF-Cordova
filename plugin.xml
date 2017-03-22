@@ -8,7 +8,7 @@
 
     <name>RadaeePDF-Cordova</name>
     <author>GEAR.it S.R.L.</author>
-    <description>RadaeePDF SDK Plugin for Cordova. The best PDF rendering engine with annotation, form, page creation features.</description>
+    <description>RadaeePDF SDK Plugin for Cordova. The best PDF rendering engine with annotation, form, page creation features. Support forum, java and objective-c sources are available on www.radaeepdf.com</description>
     <license>Apache</license>
     <keywords>pdf, open, inapppdf, radaee, cordova, radaeepdf, android, ios</keywords>
 
