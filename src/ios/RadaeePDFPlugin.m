@@ -349,6 +349,28 @@
     
     [m_pdf setHideGridImage:YES];
     
+    if (disableToolbar) {
+        [m_pdf setHideLineImage:YES];
+        [m_pdf setHideRectImage:YES];
+        [m_pdf setHidePrintImage:YES];
+        [m_pdf setHideSearchImage:YES];
+        [m_pdf setHideEllipseImage:YES];
+        [m_pdf setHideOutlineImage:YES];
+        [m_pdf setHideBookmarkImage:YES];
+        [m_pdf setHideViewModeImage:YES];
+        [m_pdf setHideBookmarkListImage:YES];
+    } else {
+        [m_pdf setHideLineImage:NO];
+        [m_pdf setHideRectImage:NO];
+        [m_pdf setHidePrintImage:NO];
+        [m_pdf setHideSearchImage:NO];
+        [m_pdf setHideEllipseImage:NO];
+        [m_pdf setHideOutlineImage:NO];
+        [m_pdf setHideBookmarkImage:NO];
+        [m_pdf setHideViewModeImage:NO];
+        [m_pdf setHideBookmarkListImage:NO];
+    }
+    
     /*
      SetColor, Available features
      
@@ -438,6 +460,17 @@
     if (mode > 0 && mode < 5) {
         _viewMode = mode;
     }
+}
+
+- (void)setToolbarEnabled:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    BOOL enabled = [[params objectForKey:@"enabled"] boolValue];
+    
+    disableToolbar = !enabled;
 }
 
 - (void)setColor:(int)color forFeature:(int)feature

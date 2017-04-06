@@ -105,4 +105,11 @@ RadaeePDFPlugin.prototype.setTitleBGColor = function (params, successCallback, e
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setTitleBGColor', [params]);
 };
 
+RadaeePDFPlugin.prototype.setToolbarEnabled = function(params, successCallback, errorCallback) { //iOS only
+
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setToolbarEnabled', [params]);
+}
+
 module.exports = new RadaeePDFPlugin();

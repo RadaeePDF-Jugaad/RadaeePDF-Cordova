@@ -46,6 +46,7 @@
     
     BOOL firstPageCover;
     BOOL isImmersive;
+    BOOL disableToolbar;
     
     int bottomBar;
 }
@@ -91,6 +92,7 @@
 - (void)setDoubleTapZoomMode:(CDVInvokedUrlCommand*)command;
 - (void)setImmersive:(CDVInvokedUrlCommand*)command;
 - (void)setReaderViewMode:(CDVInvokedUrlCommand*)command;
+- (void)setToolbarEnabled:(CDVInvokedUrlCommand*)command;
 
 // Form Manager
 
