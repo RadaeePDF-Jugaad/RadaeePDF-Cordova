@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -128,12 +129,17 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         {
 			mFileState = NOT_MODIFIED;
             m_view.PDFOpen(m_doc, PDFViewAct.this);
+			m_view.setReadOnly(getIntent().getBooleanExtra("READ_ONLY", false));
             m_controller = new PDFViewController(m_layout, m_view);
             need_save_doc = need_save;
             if(dlg != null)
                 dlg.dismiss();
             else
                 handler.removeCallbacks(runable);
+
+			int gotoPage = getIntent().getIntExtra("GOTO_PAGE", -1);
+			if(gotoPage > 0)
+				m_view.PDFGotoPage(gotoPage);
         }
     }
     private MyPDFFontDel m_font_del = new MyPDFFontDel();
@@ -269,27 +275,29 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     	{
         	if(m_modified)
         	{
+				if(getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
+					m_doc.Save();
+					mFileState = MODIFIED_AND_SAVED;
+					super.onBackPressed();
+				} else {
 				mFileState = MODIFIED_NOT_SAVED;
         		TextView txtView = new TextView(this);
         		txtView.setText(R.string.save_msg);
 				new AlertDialog.Builder(this).setTitle(R.string.exiting).setView(
-						txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
-						{
+							txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 				           @Override
-				           public void onClick(DialogInterface dialog, int which)
-				           {
+						public void onClick(DialogInterface dialog, int which) {
 				        	   m_doc.Save();
 							   mFileState = MODIFIED_AND_SAVED;
 				        	   PDFViewAct.super.onBackPressed();
 				           }
-				       }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
-				       {
+					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 				           @Override
-				           public void onClick(DialogInterface dialog, int which)
-				           {
+						public void onClick(DialogInterface dialog, int which) {
 				        	   PDFViewAct.super.onBackPressed();
 				           }
 				       }).show(); 
+				}
         	}
         	else super.onBackPressed();
     	}
@@ -366,7 +374,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	                    clipboard.setPrimaryClip(clip);                    
 					Toast.makeText(PDFViewAct.this, getString(R.string.copy_text, sel_text), Toast.LENGTH_SHORT).show();
 			        }
-				else if( m_doc.CanSave() )
+				else if(m_doc.CanSave() && !getIntent().getBooleanExtra("READ_ONLY", false))
 				{
 					boolean ret = false;
 			        if( rad_group.getCheckedRadioButtonId() == R.id.rad_highlight )
@@ -449,7 +457,15 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     @Override
     public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y)
 	{
-		return false;
+		float mCurZoomLevel = layout.vGetZoom();
+		if(m_view.PDFGetScale() <= m_view.PDFGetMinScale())
+			Global.zoomStep = 1;
+		if((mCurZoomLevel > Global.zoomLevel && Global.zoomStep > 0) ||
+				(mCurZoomLevel == 1 && Global.zoomStep < 0)) //reverse zoom step
+			Global.zoomStep *= -1;
+
+		layout.vZoomSet((int) x, (int) y, layout.vGetPos((int) x, (int) y), mCurZoomLevel + Global.zoomStep);
+		return true;
     }
 
 	@Override
@@ -458,6 +474,11 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 			RadaeePluginCallback.getInstance().didShowReader();
 			mDidShowReader = true;
 		}
+	}
+
+	@Override
+	public void onPDFCacheRendered(int pageno) {
+		findViewById(R.id.progress).setVisibility(View.GONE);
 	}
 
 	@Override

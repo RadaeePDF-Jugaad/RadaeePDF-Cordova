@@ -9,6 +9,8 @@
 	modified on 18/01/17 -->  added implementation of PDFReaderListener
 
 	modified on 30/01/17 -->  added the usage of RadaeePDFManager
+
+	modified on 26/04/17 -->  added getPageCount, extractTextFromPage and encryptDocAs actions
 */
 package com.radaee.cordova;
 
@@ -106,7 +108,8 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             showPdfInProgress = true;
             if(!TextUtils.isEmpty(targetPath)) {
                 mContext = this.cordova.getActivity().getApplicationContext();
-                mPdfManager.show(mContext, targetPath, params.optString("password"));
+                mPdfManager.show(mContext, targetPath, params.optString("password"), params.optBoolean("readOnlyMode"),
+                        params.optBoolean("automaticSave"), params.optInt("gotoPage"));
                     showPdfInProgress = false;
                     callbackContext.success("Pdf local opening success");
             } else {
@@ -152,6 +155,14 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             params = args.getJSONObject(0);
             mPdfManager.setTitleBGColor(params.optInt("color"));
             callbackContext.success("property set successfully");
+        } else if(action.equals("getPageCount")) //get total page count
+            callbackContext.success("Total page count = " + mPdfManager.getPageCount());
+        else if(action.equals("extractTextFromPage")) //get given page's text
+            callbackContext.success("Page text = " + mPdfManager.extractTextFromPage(args.getJSONObject(0).optInt("page")));
+        else if(action.equals("encryptDocAs")) { //encrypt the opened document
+            params = args.getJSONObject(0);
+            callbackContext.success("document encrypted = " + mPdfManager.encryptDocAs(params.optString("dst"), params.optString("user_pwd"),
+                    params.optString("owner_pwd"), params.optInt("permission"), params.optInt("method"), params.optString("id")));
         } else
             return false;
 
@@ -166,6 +177,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
     @Override
     public void didShowReader() {
         Log.d(TAG, "did show reader");
+        //Log.d(TAG, mPdfManager.encryptDocAs("/mnt/sdcard/Download/pdf/License_enc.pdf", "12345", "", 4, 4, "123456789abcdefghijklmnopqrstuvw"));
     }
 
     @Override

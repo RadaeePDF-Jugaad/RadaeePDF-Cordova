@@ -164,6 +164,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		view_single.setOnClickListener(this);
 		view_dual.setOnClickListener(this);
 		SetBtnEnabled(btn_annot, m_view.PDFCanSave());
+		SetBtnEnabled(btn_print, m_view.PDFCanSave());
 
 		//Nermeen, show/hide buttons based on license type
 		if(Global.isLicenseActivated()) {
@@ -714,7 +715,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		}
 		else if( arg0 == view_dual )
 		{
-			m_view.PDFSetView(4);
+			m_view.PDFSetView(6);
 			m_menu_view.MenuDismiss();
 		}
 	}
@@ -722,12 +723,13 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private void printPDF() {
 		PrintManager mPrintManager = (PrintManager) m_parent.getContext().getSystemService(Context.PRINT_SERVICE);
-		String mJobName = m_parent.getContext().getString(R.string.app_name) + " PDF Document";
+		String mJobName = "";
 		if(!TextUtils.isEmpty(m_view.PDFGetDoc().getDocPath())) {
 			String docName = m_view.PDFGetDoc().getDocPath();
-			mJobName += " " + TextUtils.substring(docName, docName.lastIndexOf("/") + 1, docName.length());
+			mJobName += TextUtils.substring(docName, docName.lastIndexOf("/") + 1, docName.length()).replace(".pdf", "_print.pdf");
 		}
 
+		final String finalJobName = mJobName;
 		mPrintManager.print(mJobName, new PrintDocumentAdapter() {
 			int mTotalPages = 0;
 
@@ -743,7 +745,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 
 				if (mTotalPages > 0) { // Return print information to print framework
 					PrintDocumentInfo info = new PrintDocumentInfo
-							.Builder("print_output.pdf")
+							.Builder(finalJobName)
 							.setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
 							.setPageCount(mTotalPages)
 							.build();
@@ -944,6 +946,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 
 			Page mPage = m_view.PDFGetDoc().GetPage(pageno);
 			JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, pageno);
+			mPage.Close();
 			if(mResult != null)
 				return mResult.toString();
 			else
@@ -953,7 +956,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         @Override
         public String onSetFormFieldsWithJSON(String json) {
             if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return "Document not set";
-            if(!m_view.PDFGetDoc().CanSave()) return "Document instance is readonly";
+            if(!m_view.PDFCanSave()) return "Document instance is readonly";
             try {
                 JSONObject pages = new JSONObject(json);
                 if(pages.optJSONArray("Pages") != null) {
@@ -969,5 +972,25 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             }
             return "ERROR";
         }
+
+		@Override
+		public int onGetPageCount() {
+			if(m_view.PDFGetDoc() != null && m_view.PDFGetDoc().IsOpened())
+				return m_view.PDFGetDoc().GetPageCount();
+			return -1;
+		}
+
+        @Override
+        public String onGetPageText(int pageno) {
+            if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return "Document not set";
+			if(pageno >= m_view.PDFGetDoc().GetPageCount()) return "Page index error";
+            return CommonUtil.getPageText(m_view.PDFGetDoc(), pageno);
+        }
+
+		@Override
+		public boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id) {
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+			return m_view.PDFGetDoc().EncryptAs(dst, upswd, opswd, perm, method, id);
+		}
 	};
 }

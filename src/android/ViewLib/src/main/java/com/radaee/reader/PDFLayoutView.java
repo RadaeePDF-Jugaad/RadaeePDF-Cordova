@@ -58,14 +58,14 @@ public class PDFLayoutView extends View implements LayoutListener
 	static final protected int STA_STAMP = 8;
 	static final protected int STA_ANNOT = 100;
     private Bitmap.Config m_bmp_format = Bitmap.Config.ALPHA_8;
-	private PDFLayout m_layout;
+	protected PDFLayout m_layout;
 	private Document m_doc;
-	private int m_status = STA_NONE;
+	protected int m_status = STA_NONE;
 	private boolean m_zooming = false;
 	private int m_pageno = 0;
 	private PDFPos m_goto_pos = null;
 
-    private GestureDetector m_gesture = null;
+    protected GestureDetector m_gesture = null;
 	private Annotation m_annot = null;
 	private PDFPos m_annot_pos = null;
 	private VPage m_annot_page = null;
@@ -74,6 +74,7 @@ public class PDFLayoutView extends View implements LayoutListener
 	private float m_annot_x0;
 	private float m_annot_y0;
 
+	private boolean mReadOnly = false;
 	private Ink m_ink = null;
 	private Bitmap m_icon = null;
 	private Document.DocImage m_dicon = null;
@@ -353,6 +354,7 @@ public class PDFLayoutView extends View implements LayoutListener
 	public interface PDFLayoutListener
 	{
 		void onPDFPageRendered(int pageno);
+		void onPDFCacheRendered(int pageno);
 		void onPDFSearchFinished(boolean found);
 		public void OnPDFPageModified(int pageno);
 		public void OnPDFPageChanged(int pageno);
@@ -426,15 +428,16 @@ public class PDFLayoutView extends View implements LayoutListener
 		{
 			m_layout.vResize(w, h);
 
-			m_layout.vZoomSet(m_layout.vGetWidth()/2, m_layout.vGetHeight()/2, m_layout.vGetPos(0,0), 1);
-			PDFGotoPage(m_pageno);
-
 			if( m_goto_pos != null )
 			{
+				m_pageno = m_goto_pos.pageno;
 				m_layout.vSetPos(0, 0, m_goto_pos);
 				m_goto_pos = null;
 				invalidate();
 			}
+
+			m_layout.vZoomSet(m_layout.vGetWidth()/2, m_layout.vGetHeight()/2, m_layout.vGetPos(0,0), 1);
+			PDFGotoPage(m_pageno);
 		}
 	}
 	private void onDrawSelect(Canvas canvas)
@@ -448,7 +451,7 @@ public class PDFLayoutView extends View implements LayoutListener
 			m_sel.DrawSel(canvas, scale, pheight, orgx, orgy);
 			int rect1[] = m_sel.GetRect1(scale, pheight, orgx, orgy);
 			int rect2[] = m_sel.GetRect2(scale, pheight, orgx, orgy);
-			if(rect1 != null && rect2 != null)
+			if(rect1 != null && rect2 != null && Global.useSelIcons)
 			{
 				canvas.drawBitmap(m_sel_icon1, rect1[0] - m_sel_icon1.getWidth(), rect1[1] - m_sel_icon1.getHeight(), null);
 				canvas.drawBitmap(m_sel_icon2, rect2[2], rect2[3], null);
@@ -1244,6 +1247,13 @@ public class PDFLayoutView extends View implements LayoutListener
 		if(m_listener != null)
 			m_listener.onPDFPageRendered(pageno);
 	}
+
+	@Override
+	public void OnCacheRendered(int pageno) {
+		if(m_listener != null)
+			m_listener.onPDFCacheRendered(pageno);
+	}
+
 	public void OnFound(boolean found)
 	{
 		if(found) invalidate();
@@ -1456,17 +1466,21 @@ public class PDFLayoutView extends View implements LayoutListener
 	{
 		if( m_status == STA_SELECT )
 		{
+			if(Global.useSelIcons) {
 			m_sel_icon1.recycle();
 			m_sel_icon2.recycle();
 			m_sel_icon1 = null;
 			m_sel_icon2 = null;
+			}
 			m_annot_page = null;
 			m_status = STA_NONE;
 		}
 		else
 		{
+			if(Global.useSelIcons) {
 			m_sel_icon1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_start);
 			m_sel_icon2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_end);
+			}
 			m_annot_page = null;
 			m_status = STA_SELECT;
 		}
@@ -1586,12 +1600,12 @@ public class PDFLayoutView extends View implements LayoutListener
 		if( code == 0 )//start
 		{
 			m_status = STA_STAMP;
-			if(m_dicon == null) {
+			//if(m_dicon == null) {
 				m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.pdf_custom_stamp);
 				if (m_icon != null) {
 					m_dicon = m_doc.NewImage(m_icon, true);
 				}
-			}
+			//}
 		}
 		else if( code == 1 )//end
 		{
@@ -1839,6 +1853,11 @@ public class PDFLayoutView extends View implements LayoutListener
 	{
 		m_layout.vFind(dir);
 	}
+	public final void PDFFindEnd()
+	{
+		m_layout.vFindEnd();
+		invalidate();
+	}
 	public boolean PDFSetSelMarkup(int type)
 	{
 		if( m_status == STA_SELECT && m_sel != null && m_sel.SetSelMarkup(type) )
@@ -1864,7 +1883,7 @@ public class PDFLayoutView extends View implements LayoutListener
 	public final PDFPos PDFGetPos(int x, int y)
 	{
 		if(m_layout != null)
-			return m_layout.vGetPos(0, 0);
+			return m_layout.vGetPos(x, y);
 		else return null;
 	}
 	public final void PDFSetPos(PDFPos pos, int x, int y)
@@ -1905,7 +1924,7 @@ public class PDFLayoutView extends View implements LayoutListener
 		}
 	}
 	public final Document PDFGetDoc(){return m_doc;}
-	public final boolean PDFCanSave(){return m_doc.CanSave();}
+	public final boolean PDFCanSave(){return !mReadOnly && m_doc.CanSave();}
     public void PDFUndo()
     {
         //if(m_opstack.can_undo()) return;
@@ -1956,5 +1975,9 @@ public class PDFLayoutView extends View implements LayoutListener
 	public void refreshCurrentPage() {
 		if(m_layout != null)
 			m_layout.vRenderSync(m_layout.vGetPage(m_pageno));
+	}
+
+	public void setReadOnly(boolean readonly) {
+		mReadOnly = readonly;
 	}
 }

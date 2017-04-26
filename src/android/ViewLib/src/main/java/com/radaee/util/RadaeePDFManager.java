@@ -59,10 +59,13 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param context the current context.
      * @param url the url can be remote (starts with http/https), or local
      * @param password the pdf's password, if no apssword, pass empty string
+     * @param readOnlyMode if true, the document will be opened in read-only mode
+     * @param automaticSave if true, the modifications will be saved automatically, else a requester to save will be shown
+     * @param gotoPage if greater than 0, the reader will render directly the passed page (0-index: from 0 to Document.GetPageCount - 1)
      */
-    public void show(Context context, String url, String password) {
+    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave, int gotoPage) {
         if(!TextUtils.isEmpty(url)) {
-            String name = "";
+            String name;
             if(URLUtil.isHttpUrl(url) || URLUtil.isHttpsUrl(url))
                 name = "PDFHttp";
             else if(URLUtil.isFileUrl(url)) {
@@ -75,6 +78,9 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra( name, url);
             intent.putExtra( "PDFPswd", password);
+            intent.putExtra("READ_ONLY", readOnlyMode);
+            intent.putExtra("AUTOMATIC_SAVE", automaticSave);
+            intent.putExtra("GOTO_PAGE", gotoPage);
             context.startActivity(intent);
         } else
             Toast.makeText(context, context.getString(R.string.failed_invalid_path), Toast.LENGTH_SHORT).show();
@@ -227,6 +233,55 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      */
     public String setFormFieldsWithJSON(String json) {
         return RadaeePluginCallback.getInstance().onSetFormFieldsWithJSON(json);
+    }
+
+    /**
+     * Returns document's pages count
+     *
+     * @return document's pages count, -1 in case of error
+     */
+    public int getPageCount() {
+        return RadaeePluginCallback.getInstance().onGetPageCount();
+    }
+
+    /**
+     * extract the text content of the given page
+     *
+     * @param page the page number, 0-index (from 0 to Document.GetPageCount - 1)
+     * @return the given page's text
+     */
+    public String extractTextFromPage(int page) {
+        return RadaeePluginCallback.getInstance().onGetPageText(page);
+    }
+
+    /**
+     * encrypt document and save into another file.<br/>
+     * this method require premium license.
+     * @param dst path to save， same as path parameter of SaveAs.
+     * @param upswd user password, can be null (is the public password (shared with authorized users). It's sufficient to open the file with applied permission mask set).
+     * @param opswd owner password, can be null (is the password that allow opening the file without any restriction from the permission mask).
+     * @param perm permission to set, same as GetPermission() method.<br/>
+     * bit 1-2 reserved<br/>
+     * bit 3(0x4) print<br/>
+     * bit 4(0x8) modify<br/>
+     * bit 5(0x10) extract text or image<br/>
+     * others: see PDF reference
+     * @param method set 3 means using AES 256bits encrypt(Acrobat X), V=5 and R = 6 mode, others AES with V=4 and R=4 mode.
+     * @param id must be 32 bytes for file ID. it is divided to 2 array in native library, as each 16 bytes (something like the encryption seed or salt in some
+     *           other encryption scheme. That id is a reserved code that make password stronger).
+     * @return Success of error.
+     */
+    public String encryptDocAs(String dst, String upswd, String opswd, int perm, int method, String id) {
+        if(!TextUtils.isEmpty(dst)) {
+            if(URLUtil.isFileUrl(dst)) {
+                String prefix = "file://";
+                dst = dst.substring(dst.indexOf(prefix) + prefix.length());
+            }
+            if(RadaeePluginCallback.getInstance().onEncryptDocAs(dst, upswd, opswd, perm, method, id.getBytes()))
+                return "Success";
+            else return "Error";
+        }
+        return "Invalid destination path";
     }
 
     @Override

@@ -38,7 +38,7 @@ public class CommonUtil {
     private static final String TAG = "RadaeeCommonUtil";
     private static final int CACHE_LIMIT = 1024;
 
-    static String getThumbName(String path)
+    public static String getThumbName(String path)
     {
         try {
             File file = new File(path);
@@ -51,7 +51,7 @@ public class CommonUtil {
         }
     }
 
-    static Bitmap loadThumb(File pictureFile) {
+    public static Bitmap loadThumb(File pictureFile) {
         try {
             if(!pictureFile.exists())
                 return null;
@@ -63,7 +63,7 @@ public class CommonUtil {
         }
     }
 
-    static void saveThumb(Bitmap image, File pictureFile) {
+    public static void saveThumb(Bitmap image, File pictureFile) {
         if (pictureFile == null) {
             Log.d(TAG,
                     "Error creating media file, check storage permissions: ");// e.getMessage());
@@ -175,7 +175,7 @@ public class CommonUtil {
 
                         mAnnotInfoJson.put("EditText", mAnnotation.GetEditText());
                         mAnnotInfoJson.put("EditType", mAnnotation.GetEditType());
-                        mAnnotInfoJson.put("EditTextFormat", mAnnotation.GetEditTextFormat());
+                        mAnnotInfoJson.put("EditTextFormat", mAnnotation.GetFieldFormat());
 
                         mAnnotInfoJson.put("SignStatus", mAnnotation.GetSignStatus());
 
@@ -283,5 +283,18 @@ public class CommonUtil {
             };
             mOutlineList.setOnItemClickListener(item_clk);
         }
+    }
+
+    public static String getPageText(Document mDocument, int pageIndex) {
+        String mPageText = null;
+        try {
+            Page mPage = mDocument.GetPage(pageIndex);
+            mPage.ObjsStart();
+            mPageText = mPage.ObjsGetString(0, mPage.ObjsGetCharCount() - 1);
+            mPage.Close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mPageText;
     }
 }

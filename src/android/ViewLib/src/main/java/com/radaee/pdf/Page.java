@@ -684,9 +684,23 @@ public class Page
 			return Page.getAnnotEditTextSize(page.hand, hand);
 		}
 		/**
-		 * get format of edit-box.<br/>
+		 * get jsvascript action of fields.<br/>
+		 * this method require premium license.
+		 * @param idx action index:<br/>
+		 *            0:'K' performed when the user types a keystroke<br/>
+		 *            1:'F' to be performed before the field is formatted to display its current value.<br/>
+		 *            2:'V' to be performed when the field’s value is changed<br/>
+		 *            3:'C' to be performed to recalculate the value of this field when that of another field changes.<br/>
+		 * @return javsscript of field's action, mostly a java-script like:<br/>
+		 */
+		final public String GetFieldJS(int idx)
+		{
+			return Page.getAnnotFieldJS(page.hand, hand, idx);
+		}
+		/**
+		 * get format of field.<br/>
 		 * this method require premium license
-		 * @return format of edit-box, mostly a java-script like:<br/>
+		 * @return format of field, mostly a java-script like:<br/>
 		 * AFDate_FormatEx("dd/mm/yy");<br/>
 		 * most common java script function invoked as:
 		 * AFNumber_Format<br/>
@@ -698,24 +712,7 @@ public class Page
 		 */
         final public String GetFieldFormat()
 		{
-			return Page.getAnnotFieldFormat(page.hand, hand);
-		}
-		/**
-		 * get format of edit-box.<br/>
-		 * this method require premium license
-		 * @return format of edit-box, mostly a java-script like:<br/>
-		 * AFDate_FormatEx("dd/mm/yy");<br/>
-		 * most common java script function invoked as:
-		 * AFNumber_Format<br/>
-		 * AFDate_Format<br/>
-		 * AFTime_Format<br/>
-		 * AFSpecial_Format<br/>
-		 * AFPercent_Format<br/>
-		 * and so on.
-		 */
-        final public String GetEditTextFormat()
-		{
-			return Page.getAnnotEditTextFormat(page.hand, hand);
+			return Page.getAnnotFieldJS(page.hand, hand, 1);
 		}
 		/**
 		 * get text color for edit-box annotation.include text field and free-text.<br/>
@@ -1376,6 +1373,7 @@ public class Page
     static private native String getAnnotFieldNameWithoutNO( long hand, long annot );
 	static private native String getAnnotFieldFullName( long hand, long annot );
 	static private native String getAnnotFieldFullName2( long hand, long annot );
+	static private native String getAnnotFieldJS( long hand, long annot, int idx );
 	static private native int getAnnotType( long hand, long annot );
 	static private native String getAnnotModifyDate(long page, long annot);
 	static private native boolean setAnnotModifyDate(long page, long annot, String val);
@@ -1421,8 +1419,6 @@ public class Page
 	static private native int getAnnotEditMaxlen( long hand, long annot );
 	static private native boolean getAnnotEditTextRect( long hand, long annot, float[] rect );
 	static private native float getAnnotEditTextSize( long hand, long annot );
-	static private native String getAnnotEditTextFormat( long hand, long annot );
-	static private native String getAnnotFieldFormat( long hand, long annot );
 	static private native int getAnnotEditTextColor(long hand, long annot);
 	static private native boolean setAnnotEditTextColor(long hand, long annot, int color);
 	static private native String getAnnotEditText( long hand, long annot );
