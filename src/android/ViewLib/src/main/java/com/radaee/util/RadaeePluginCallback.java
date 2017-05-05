@@ -92,6 +92,24 @@ public class RadaeePluginCallback {
         return "ERROR";
     }
 
+    public int onGetPageCount() {
+        if(mControlListener != null)
+            return mControlListener.onGetPageCount();
+        return -1;
+    }
+
+    public String onGetPageText(int pageno) {
+        if(mControlListener != null)
+            return mControlListener.onGetPageText(pageno);
+        return "ERROR";
+    }
+
+    public boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id) {
+        if(mControlListener != null)
+            return mControlListener.onEncryptDocAs(dst, upswd, opswd, perm, method, id);
+        return false;
+    }
+
     /**
      * An interface that can help in recognizing some events.
      */
@@ -108,11 +126,14 @@ public class RadaeePluginCallback {
      * Interface to help pass events to the PDFViewController
      */
     public interface PDFControllerListener {
+        int onGetPageCount();
         void onSetIconsBGColor(int color);
         void onSetToolbarBGColor(int color);
         void onSetImmersive(boolean immersive);
+        String onGetPageText(int pageno);
         String onGetJsonFormFields();
         String onGetJsonFormFieldsAtPage(int pageno);
         String onSetFormFieldsWithJSON(String json);
+        boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id);
     }
 }

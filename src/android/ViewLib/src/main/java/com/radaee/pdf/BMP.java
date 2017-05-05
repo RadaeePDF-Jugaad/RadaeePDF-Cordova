@@ -102,10 +102,13 @@ public class BMP
      * G = G * alpha / 255;
      * B = B * alpha / 255;
      * for Bitmap all alpha is 0 or all alpha is 255, this method can be ignored to invoke.
+	 * Deprecated since 3.12beta2, after the enhancements in the color blending & transparency composing,
+	 * no need to use MulAlpha
      */
+    @Deprecated
     public final void MulAlpha()
     {
-        mulAlpha(hand);
+        //mulAlpha(hand);
     }
 	public final void Invert()
 	{

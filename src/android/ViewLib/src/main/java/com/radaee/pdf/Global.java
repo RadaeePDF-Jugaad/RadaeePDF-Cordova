@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.10c
+ * @version 3.12
  */
 public class Global
 {
@@ -262,6 +262,14 @@ public class Global
 	 */
 	public static int selColor = 0x400000C0;// selection color
 	/**
+	 * Use selection icons (markers).
+	 */
+	public static boolean useSelIcons = true;
+	/**
+	 * Annotation transparency color
+	 */
+	public static int annotTransparencyColor = 0x200040FF;
+	/**
 	 * find primary color.
 	 */
 	public static int findPrimaryColor = 0x400000FF;// find primary color
@@ -278,6 +286,16 @@ public class Global
 	 */
 	public static float zoomLevel = 3;
 	public static float zoomStep = 1;
+	/**
+	 * can't be neg value. 15 means 15x(2000%) zooming.
+	 * Starting from version 3.12beta2 (which introduces enhancements in transparency composing and color blending)
+	 * we recommend using 12 as the max level, higher levels will reduce performance
+	 */
+	public static float layoutZoomLevel = 11;
+	/**
+	 * can't be neg value. 2 means 2x(200%) zooming. when zoom value greater than this, it clip pages as many small bitmaps.
+	 */
+	public static float layoutZoomLevelClip = 2.5f;
 	/**
 	 * fling distance: 0.5-2
 	 */
@@ -712,7 +730,7 @@ public class Global
 		dark_mode = false;// dark mode
 		zoomLevel = 3;
         debug_mode = true;
-		setAnnotTransparency(0x200040FF);
+		setAnnotTransparency(annotTransparencyColor);
 	}
 
 	/**

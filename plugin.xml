@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.2.0">
+        id="com.radaee.cordova" version="1.3.0">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
     </engines>
 
     <name>RadaeePDF-Cordova</name>
-    <author>Gear.it S.R.L.</author>
-    <description>RadaeePDF cordova plugin, read pdf with native library!</description>
-    <license>Apache LGPL</license>
-    <keywords>pdf, open, inapppdf, radaee, cordova</keywords>
+    <author>GEAR.it S.R.L.</author>
+    <description>RadaeePDF SDK Plugin for Cordova. The best PDF rendering engine with annotation, form, page creation features. Support forum, java and objective-c sources are available on www.radaeepdf.com</description>
+    <license>Apache</license>
+    <keywords>pdf, open, inapppdf, radaee, cordova, radaeepdf, android, ios</keywords>
 
     <js-module src="www/RadaeePDFPlugin.js" name="RadaeePDFPlugin">
         <clobbers target="RadaeePDFPlugin" />
@@ -191,6 +191,8 @@
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_print.png" target-dir="res/drawable" />
 
 		<!-- Radaee values -->
+		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
+		<source-file src="src/android/ViewLib/src/main/res/values-v21/styles.xml" target-dir="res/values-v21" />
 		<source-file src="src/android/ViewLib/src/main/res/values-ar/strings.xml" target-dir="res/values-ar" />
 		<source-file src="src/android/ViewLib/src/main/res/values-es-rES/strings.xml" target-dir="res/values-es-rES" />
 		<source-file src="src/android/ViewLib/src/main/res/values-fr-rFR/strings.xml" target-dir="res/values-fr-rFR" />
