@@ -78,7 +78,7 @@
                 filePath = [documentsDirectory stringByAppendingPathComponent:filePath];
             }
             
-            [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
+            [self openPdf:filePath atPage:[[params objectForKey:@"gotoPage"] intValue] withPassword:[params objectForKey:@"password"] readOnly:[[params objectForKey:@"readOnlyMode"] boolValue] autoSave:[[params objectForKey:@"automaticSave"] boolValue]];
         } else {
             [self openFromPath:command];
         }
@@ -96,7 +96,7 @@
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:url ofType:nil];
 
-    [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
+    [self openPdf:filePath atPage:[[params objectForKey:@"gotoPage"] intValue] withPassword:[params objectForKey:@"password"] readOnly:[[params objectForKey:@"readOnlyMode"] boolValue] autoSave:[[params objectForKey:@"automaticSave"] boolValue]];
 }
 
 - (void)openFromPath:(CDVInvokedUrlCommand *)command
@@ -107,10 +107,10 @@
     
     NSString *filePath = url;
     
-    [self openPdf:filePath withPassword:[params objectForKey:@"password"]];
+    [self openPdf:filePath atPage:[[params objectForKey:@"gotoPage"] intValue] withPassword:[params objectForKey:@"password"] readOnly:[[params objectForKey:@"readOnlyMode"] boolValue] autoSave:[[params objectForKey:@"automaticSave"] boolValue]];
 }
 
-- (void)openPdf:(NSString *)filePath withPassword:(NSString *)password
+- (void)openPdf:(NSString *)filePath atPage:(int)page withPassword:(NSString *)password readOnly:(BOOL)readOnly autoSave:(BOOL)autoSave
 {
     NSLog(@"File Path: %@", filePath);
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
@@ -124,7 +124,7 @@
     
     [self readerInit];
     
-    int result = [m_pdf PDFOpen:filePath :password];
+    int result = [m_pdf PDFOpen:filePath :password atPage:page readOnly:readOnly autoSave:autoSave];
     
     NSLog(@"%d", result);
     if(result != err_ok && result != err_open){
@@ -181,10 +181,10 @@
             break;
         }
         
-        [self getFileStateResult:message];
+        [self cdvOkWithMessage:message];
     }
     else
-        [self fileStateDidFailWithError:@"File not found"];
+        [self cdvErrorWithMessage:@"File not found"];
 }
 
 - (void)getPageNumber:(CDVInvokedUrlCommand *)command
@@ -192,12 +192,25 @@
     self.cdv_command = command;
     
     if (m_pdf == nil || [m_pdf getDoc] == nil) {
-        [self getPageNumberDidFailWithError:@"Error in pdf instance"];
+        [self cdvErrorWithMessage:@"Error in pdf instance"];
         return;
     }
     
     int page = [m_pdf getCurrentPage];
-    [self getPageNumberResult:[NSString stringWithFormat:@"%i", page]];
+    [self cdvOkWithMessage:[NSString stringWithFormat:@"%i", page]];
+}
+
+- (void)getPageCount:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    if (m_pdf == nil || [m_pdf getDoc] == nil) {
+        [self cdvErrorWithMessage:@"Error in pdf instance"];
+        return;
+    }
+    
+    int count = [(PDFDoc *)[m_pdf getDoc] pageCount];
+    [self cdvOkWithMessage:[NSString stringWithFormat:@"%i", count]];
 }
 
 - (void)setThumbnailBGColor:(CDVInvokedUrlCommand*)command
@@ -432,6 +445,60 @@
     [self.viewController presentViewController:navController animated:YES completion:nil];
 }
 
+- (void)extractTextFromPage:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    int pageNum = [[params objectForKey:@"page"] intValue];
+    
+    PDFDoc *doc = [m_pdf getDoc];
+    
+    if (m_pdf == nil || doc == nil) {
+        [self cdvErrorWithMessage:@"Error in pdf instance"];
+        return;
+    }
+    
+    PDFPage *page = [doc page:pageNum];
+    [page objsStart];
+    
+    [self cdvOkWithMessage:[page objsString:0 :page.objsCount]];
+    
+    page = nil;
+}
+
+- (void)encryptDocAs:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    NSString *path = [params objectForKey:@"dst"];
+    NSString *userPwd = [params objectForKey:@"user_pwd"];
+    NSString *ownerPwd = [params objectForKey:@"owner_pwd"];
+    int permission = [[params objectForKey:@"permission"] intValue];
+    int method = [[params objectForKey:@"method"] intValue];
+    NSString *idString = [params objectForKey:@"id"];
+    
+    PDFDoc *doc = [m_pdf getDoc];
+    
+    if (m_pdf == nil || doc == nil) {
+        [self cdvErrorWithMessage:@"Error in pdf instance"];
+        return;
+    }
+    
+    unsigned char *c = (unsigned char *)[idString cStringUsingEncoding:NSUTF8StringEncoding];
+    
+    bool res = [doc encryptAs:path :userPwd :ownerPwd :permission :method :c];
+    
+    if (res) {
+        [self cdvOkWithMessage:@"Success"];
+    } else {
+        [self cdvErrorWithMessage:@"Failure"];
+    }
+}
+
 #pragma mark - Settings
 
 - (void)toggleThumbSeekBar:(int)mode
@@ -631,45 +698,20 @@
                                resultWithStatus: CDVCommandStatus_ERROR
                                messageAsDictionary:dict]];
 }
-    
-- (void)getFileStateResult:(NSString *)message
+
+- (void)cdvOkWithMessage:(NSString *)message
 {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
 }
-    
-- (void)fileStateDidFailWithError:(NSString *)errorMessage
+
+- (void)cdvErrorWithMessage:(NSString *)errorMessage
 {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
-}
-
-- (void)getPageNumberResult:(NSString *)message
-{
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
-}
-
-- (void)getPageNumberDidFailWithError:(NSString *)errorMessage
-{
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
-}
-
-- (void)JSONFormFieldsResult:(NSString *)message
-{
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
-}
-
-- (void)JSONFormFieldsAtPageResult:(NSString *)message
-{
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
 }
 
 - (void)setFormFieldsResult
 {
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:[self.cdv_command callbackId]];
-}
-
-- (void)setFormFieldsDidFailWithError:(NSString *)errorMessage
-{
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage] callbackId:[self.cdv_command callbackId]];
 }
 
 #pragma mark - Form Extractor
@@ -680,7 +722,7 @@
     
     RDFormManager *fe = [[RDFormManager alloc] initWithDoc:[m_pdf getDoc]];
     
-    [self JSONFormFieldsResult:[fe jsonInfoForAllPages]];
+    [self cdvOkWithMessage:[fe jsonInfoForAllPages]];
 }
 
 - (void)JSONFormFieldsAtPage:(CDVInvokedUrlCommand *)command
@@ -690,7 +732,7 @@
     
     RDFormManager *fe = [[RDFormManager alloc] initWithDoc:[m_pdf getDoc]];
     
-    [self JSONFormFieldsAtPageResult:[fe jsonInfoForPage:(int)[params objectForKey:@"page"]]];
+    [self cdvOkWithMessage:[fe jsonInfoForPage:(int)[params objectForKey:@"page"]]];
 }
 
 - (void)setFormFieldWithJSON:(CDVInvokedUrlCommand *)command
@@ -705,7 +747,7 @@
         [fe setInfoWithJson:[params objectForKey:@"json"] error:&error];
         
         if (error) {
-            [self setFormFieldsDidFailWithError:[error description]];
+            [self cdvErrorWithMessage:[error description]];
         } else
         {
             if (m_pdf) {
@@ -715,7 +757,7 @@
         }
     } else
     {
-        [self setFormFieldsDidFailWithError:@"JSON not found"];
+        [self cdvErrorWithMessage:@"JSON not found"];
     }
 }
 
@@ -760,6 +802,20 @@
 {
     if (_delegate) {
         [_delegate didSearchTerm:term found:found];
+    }
+}
+
+- (void)didTapOnPage:(int)page atPoint:(CGPoint)point
+{
+    if (_delegate) {
+        [_delegate didTapOnPage:page atPoint:point];
+    }
+}
+
+- (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point
+{
+    if (_delegate) {
+        [_delegate didTapOnAnnotationOfType:type atPage:page atPoint:point];
     }
 }
 

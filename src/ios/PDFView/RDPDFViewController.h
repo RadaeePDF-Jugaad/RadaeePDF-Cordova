@@ -32,6 +32,8 @@
 - (void)didCloseReader;
 - (void)didChangePage:(int)page;
 - (void)didSearchTerm:(NSString *)term found:(BOOL)found;
+- (void)didTapOnPage:(int)page atPoint:(CGPoint)point;
+- (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point;
 @end;
 
 //---------------------------------------------------------
@@ -48,6 +50,7 @@
     BOOL defaultTranslucent;
     BOOL firstPageCover;
     BOOL isImmersive;
+    BOOL readOnly;
     
     int gridBackgroundColor;
     int gridElementHeight;
@@ -166,7 +169,7 @@
 
 -(IBAction)sliderValueChanged:(id)sender;
 -(IBAction)sliderDragUp:(id)sender;
--(int)PDFOpen:(NSString *)path :(NSString *)pwd;
+-(int)PDFOpen:(NSString *)path :(NSString *)pwd atPage:(int)page readOnly:(BOOL)readOnlyEnabled autoSave:(BOOL)autoSaveEnabled;
 -(int)PDFOpenPage:(NSString *)path :(int)pageno : (float)x :(float)y :(NSString *)pwd;
 
 //for test
@@ -183,6 +186,7 @@
 
 - (id)getDoc;
 - (int)getCurrentPage;
+- (CGImageRef)imageForPage:(int)pg;
 - (void)setThumbnailBGColor:(int)color;
 - (void)setThumbGridBGColor:(int)color;
 - (void)setThumbGridElementHeight:(float)height;

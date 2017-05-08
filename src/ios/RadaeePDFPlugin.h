@@ -11,6 +11,8 @@
 - (void)didCloseReader;
 - (void)didChangePage:(int)page;
 - (void)didSearchTerm:(NSString *)term found:(BOOL)found;
+- (void)didTapOnPage:(int)page atPoint:(CGPoint)point;
+- (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point;
 @end;
 
 @interface RadaeePDFPlugin : CDVPlugin{
@@ -79,6 +81,7 @@
 - (void)openFromPath:(CDVInvokedUrlCommand*)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
 - (void)getPageNumber:(CDVInvokedUrlCommand*)command;
+- (void)getPageCount:(CDVInvokedUrlCommand*)command;
 - (void)setThumbnailBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setThumbGridBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setReaderBGColor:(CDVInvokedUrlCommand*)command;
@@ -93,6 +96,7 @@
 - (void)setImmersive:(CDVInvokedUrlCommand*)command;
 - (void)setReaderViewMode:(CDVInvokedUrlCommand*)command;
 - (void)setToolbarEnabled:(CDVInvokedUrlCommand*)command;
+- (void)extractTextFromPage:(CDVInvokedUrlCommand*)command;
 
 // Form Manager
 

@@ -319,8 +319,6 @@
         <resource-file src="src/ios/Resources/btn_grid.png" />
 
         <!-- Radaee sources -->
-        <source-file src="src/ios/NSObject/NSObject+PerformBlock.m" />
-        <header-file src="src/ios/NSObject/NSObject+PerformBlock.h" />
         <source-file src="src/ios/PDFView/BookmarkTableViewController.m" />
         <header-file src="src/ios/PDFView/BookmarkTableViewController.h" />
         <source-file src="src/ios/PDFView/OUTLINE_ITEM.m" />

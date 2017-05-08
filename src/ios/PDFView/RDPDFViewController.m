@@ -23,6 +23,8 @@
     UIPopoverController *viewModePopover;
     NSString *password;
     UIBarButtonItem *addBookMarkListButton;
+    
+    BOOL autoSave;
 }
 
 @end
@@ -305,6 +307,8 @@ extern uint g_oval_color;
 {
     [super viewDidAppear:animated];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshCurrentPage) name:@"Radaee-Refresh-Page" object:nil];
+    
     if (_delegate) {
         [_delegate didShowReader];
     }
@@ -351,12 +355,15 @@ extern uint g_oval_color;
         if (_delegate) {
             [_delegate didCloseReader];
         }
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"Radaee-Refresh-Page" object:nil];
     }
 }
 
 - (void)closeView
 {
-    if ([m_view isModified]) {
+    if ([m_view isModified] && !autoSave) {
+        
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Exiting"
                                                                        message:@"Document modified.\r\nDo you want to save it?"
                                                                 preferredStyle:UIAlertControllerStyleAlert];
@@ -420,8 +427,6 @@ extern uint g_oval_color;
 
 -(void)composeFile:(id)sender
 {
-
-    
     int pageno = 0;
     struct PDFV_POS pos;
     [m_view vGetPos:&pos];
@@ -448,16 +453,19 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"Add BookMark Success!", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2  delegate:self cancelButtonTitle:str3 otherButtonTitles:nil, nil];
-        
-        [alter show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:str1 message:str2 preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action1 = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:action1];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     else {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"BookMark Already Exist", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil, nil];
-        [alter show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:str1 message:str2 preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action1 = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:action1];
+        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 - (IBAction)searchView:(id) sender
@@ -744,7 +752,7 @@ extern uint g_oval_color;
         [m_slider sizeThatFits:CGRectMake(0, cheight-hi-50-20, cwidth, 50).size];
         [m_searchBar setFrame:CGRectMake(0, 0, cwidth, 41)];
     }
-    [m_Thumbview refresh];
+    [m_Thumbview didRotate];
     [m_Gridview didRotate];
     
     [m_view resetZoomLevel];
@@ -761,6 +769,64 @@ extern uint g_oval_color;
 - (int)getCurrentPage
 {
     return [m_view vGetCurrentPage];
+}
+
+- (CGImageRef)imageForPage:(int)pg
+{
+    CGRect bounds = [[UIScreen mainScreen] bounds];
+    if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+        if (bounds.size.height > bounds.size.width) {
+            bounds.size.width = bounds.size.height;
+            bounds.size.height = [[[[UIApplication sharedApplication] delegate] window] bounds].size.width;
+        }
+    }
+
+    PDFPage *page = [m_doc page:pg];;
+    float w = [m_doc pageWidth:pg];
+    float h = [m_doc pageHeight:pg];
+    int iw = w;
+    int ih = h;
+    PDF_DIB m_dib = NULL;
+    PDF_DIB bmp = Global_dibGet(m_dib, iw, ih);
+    float ratiox = 1;
+    float ratioy = 1;
+    
+    if (ratiox>ratioy) {
+        ratiox = ratioy;
+    }
+    
+    ratiox = ratiox * 1.0;
+    PDF_MATRIX mat = Matrix_createScale(ratiox, -ratiox, 0, h * ratioy);
+    Page_renderPrepare(page.handle, bmp);
+    Page_render(page.handle, bmp, mat, false, 1);
+    Matrix_destroy(mat);
+    page = nil;
+    
+    void *data = Global_dibGetData(bmp);
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, data, iw * ih * 4, NULL);
+    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+    CGImageRef imgRef = CGImageCreate(iw, ih, 8, 32, iw<<2, cs, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst, provider, NULL, FALSE, kCGRenderingIntentDefault);
+    
+    
+    CGContextRef context = CGBitmapContextCreate(NULL, (bounds.size.width - ((bounds.size.width - iw) / 2)) * 1, ih * 1, 8, 0, cs, kCGImageAlphaPremultipliedLast);
+    
+    
+    // Draw ...
+    //
+    CGContextSetAlpha(context, 1);
+    CGContextSetRGBFillColor(context, (CGFloat)0.0, (CGFloat)0.0, (CGFloat)0.0, (CGFloat)1.0 );
+    CGContextDrawImage(context, CGRectMake(((bounds.size.width- iw) / 2), 1, iw, ih), imgRef);
+    
+    
+    // Get your image
+    //
+    CGImageRef cgImage = CGBitmapContextCreateImage(context);
+    
+    
+    CGColorSpaceRelease(cs);
+    CGDataProviderRelease(provider);
+    
+    return cgImage;
 }
 
 - (void)setThumbnailBGColor:(int)color
@@ -819,8 +885,10 @@ extern uint g_oval_color;
     }
 }
 
--(int)PDFOpen:(NSString *)path : (NSString *)pwd
+-(int)PDFOpen:(NSString *)path : (NSString *)pwd atPage:(int)page readOnly:(BOOL)readOnlyEnabled autoSave:(BOOL)autoSaveEnabled
 {
+    autoSave = autoSaveEnabled;
+    
     pdfPath = [path mutableCopy];
     pdfName = [[path lastPathComponent] mutableCopy];
     password = pwd;
@@ -864,7 +932,13 @@ extern uint g_oval_color;
     
     [m_view setFirstPageCover:firstPageCover];
     [m_view setDoubleTapZoomMode:doubleTapZoomMode];
+    [m_view setReadOnly:readOnlyEnabled];
     [m_view vOpen :m_doc :(id<PDFViewDelegate>)self];
+    
+    if (page > 0) {
+        [m_view vGoto:page];
+    }
+    
     pagecount =[m_doc pageCount];
     [self.view addSubview:m_view];
     m_bSel = false;
@@ -1061,7 +1135,6 @@ extern uint g_oval_color;
     [pageNumLabel setHidden:NO];
     
 }
-
 
 -(void)initbar :(int) pageno
 {
@@ -1311,6 +1384,12 @@ extern uint g_oval_color;
 
 - (void)OnSingleTapped:(float)x :(float)y
 {
+    if (_delegate) {
+        struct PDFV_POS pos;
+        [m_view vGetPos:&pos x:x y:y];
+        [_delegate didTapOnPage:pos.pageno atPoint:CGPointMake(x, y)];
+    }
+    
     if (!pickerView.hidden) {
         pickerView.hidden = YES;
         confirmPickerBtn.hidden = YES;
@@ -1431,6 +1510,7 @@ extern uint g_oval_color;
 }
 -(void)annotCancel
 {
+    [m_view vAnnotEnd];
     [self removeAnnotToolBar];
 }
 -(void)removeAnnotToolBar
@@ -1441,6 +1521,11 @@ extern uint g_oval_color;
 //enter annotation status.
 -(void)OnAnnotClicked:(PDFPage *)page :(PDFAnnot *)annot :(float)x :(float)y
 {
+    if (_delegate) {
+        struct PDFV_POS pos;
+        [m_view vGetPos:&pos x:x y:y];
+        [_delegate didTapOnAnnotationOfType:annot.type atPage:pos.pageno atPoint:CGPointMake(x, y)];
+    }
     if(SYS_VERSION>=7.0)
     {
         //TEST EditText method
@@ -1730,7 +1815,15 @@ extern uint g_oval_color;
 -(void)StrikeOut :(id)sender
 {
     //2strikethrough
-    [m_view vSelMarkup:annotUnderlineColor :2];
+    if(![m_view vSelMarkup:annotUnderlineColor :2])
+    {
+        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+        NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
+        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        [alter show];
+        return;
+    }
     [popupMenu1 dismiss];
     if(m_bSel)
     {
@@ -1742,7 +1835,16 @@ extern uint g_oval_color;
 -(void)HighLight :(id)sender
 {
     //0HighLight
-    [m_view vSelMarkup:annotUnderlineColor :0];
+    if(![m_view vSelMarkup:annotUnderlineColor :0])
+    {
+        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+        NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
+        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        [alter show];
+        return;
+    }
+    
     [popupMenu1 dismiss];
     if(m_bSel)
     {
@@ -1753,7 +1855,16 @@ extern uint g_oval_color;
 -(void)UnderLine :(id)sender
 {
      //1UnderLine
-    [m_view vSelMarkup:annotUnderlineColor :1];
+    if(![m_view vSelMarkup:annotUnderlineColor :1])
+    {
+        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+        NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
+        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        [alter show];
+        return;
+    }
+    
     [popupMenu1 dismiss];
     if(m_bSel)
     {
@@ -1774,6 +1885,14 @@ extern uint g_oval_color;
 
 -(void)TextAnnot :(id)sender
 {
+    if (![m_view canSaveDocument]) {
+        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+        NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
+        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        [alter show];
+        return;
+    }
     
     m_bSel = false;
     b_outline = true;
