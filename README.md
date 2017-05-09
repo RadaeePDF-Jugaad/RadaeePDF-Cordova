@@ -20,7 +20,8 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 ## Usage
 
 1. Create the app using the demo package name, to be able to test all the features (standard, professional and premium).  
-   `cordova create RadaeePDF-Cordova com.radaee.reader RadaeePDF-Cordova`
+   `cordova create RadaeePDF-Cordova com.radaee.reader RadaeePDF-Cordova` (Android)
+   `cordova create RadaeePDF-Cordova com.radaee.pdf.PDFViewer RadaeePDF-Cordova` (iOS)
 	
 2. Add the android/iOS platform.  
    `cd RadaeePDF-Cordova`    
