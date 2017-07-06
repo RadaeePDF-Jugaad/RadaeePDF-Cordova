@@ -97,6 +97,7 @@
 - (void)setReaderViewMode:(CDVInvokedUrlCommand*)command;
 - (void)setToolbarEnabled:(CDVInvokedUrlCommand*)command;
 - (void)extractTextFromPage:(CDVInvokedUrlCommand*)command;
+- (void)encryptDocAs:(CDVInvokedUrlCommand *)command;
 
 // Form Manager
 
@@ -107,8 +108,14 @@
 
 + (RadaeePDFPlugin *)pluginInit;
 
-+ (NSMutableArray *)loadBookmark;
-+ (NSMutableArray *)loadBookmarkForPdf:(NSString *)pdfName;
+// Bookmarks
+- (void)addToBookmarks:(CDVInvokedUrlCommand *)command;//(NSString *)pdfPath page:(int)page label:(NSString *)label;
+- (void)removeBookmark:(CDVInvokedUrlCommand *)command;//(int)page pdfPath:(NSString *)pdfPath;
+- (void)getBookmarks:(CDVInvokedUrlCommand *)command;//(NSString *)pdfPath;
+
++ (NSString *)addToBookmarks:(NSString *)pdfPath page:(int)page label:(NSString *)label;
++ (void)removeBookmark:(int)page pdfPath:(NSString *)pdfPath;
++ (NSMutableArray *)loadBookmarkForPdf:(NSString *)pdfName withPath:(BOOL)withPath;
 
 //Settings
 

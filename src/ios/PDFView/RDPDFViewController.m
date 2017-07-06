@@ -407,7 +407,7 @@ extern uint g_oval_color;
 - (void)bookmarkList
 {
     BookmarkTableViewController *b = [[BookmarkTableViewController alloc] init];
-    b.items = [RadaeePDFPlugin loadBookmarkForPdf:[pdfName substringToIndex:pdfName.length-4]];
+    b.items = [RadaeePDFPlugin loadBookmarkForPdf:pdfPath withPath:YES];
     b.delegate = self;
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -431,43 +431,19 @@ extern uint g_oval_color;
     struct PDFV_POS pos;
     [m_view vGetPos:&pos];
     pageno = pos.pageno;
-    float x = pos.x;
-    float y = pos.y;
-    NSString *tempFile; 
-    NSString *tempName;
-    tempName = [pdfName substringToIndex:pdfName.length-4];
-    tempFile = [tempName stringByAppendingFormat:@"%d%@",pageno,@".bookmark"];
-    NSString *tempPath;
-    tempPath = [pdfPath stringByAppendingFormat:@"%@",pdfName];
-    NSString *fileContent = [NSString stringWithFormat:@"%@,%@,%d,%f,%f",tempPath,tempName,pageno,x,y];
-    NSString *BookMarkDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)objectAtIndex:0];
     
-    NSString *bookMarkFile = [BookMarkDir stringByAppendingPathComponent:tempFile];
-    if(![[NSFileManager defaultManager]fileExistsAtPath:bookMarkFile])
-    {
-        [[NSFileManager defaultManager]createFileAtPath:bookMarkFile contents:nil attributes:nil];
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForUpdatingAtPath:bookMarkFile];
-        [fileHandle seekToEndOfFile];
-        [fileHandle writeData:[fileContent dataUsingEncoding:NSUTF8StringEncoding]];
-        [fileHandle closeFile];
-        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-        NSString *str2=NSLocalizedString(@"Add BookMark Success!", @"Localizable");
-        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:str1 message:str2 preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *action1 = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
-        [alert addAction:action1];
-        [self presentViewController:alert animated:YES completion:nil];
-    }
-    else {
-        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-        NSString *str2=NSLocalizedString(@"BookMark Already Exist", @"Localizable");
-        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:str1 message:str2 preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *action1 = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
-        [alert addAction:action1];
-        [self presentViewController:alert animated:YES completion:nil];
-    }
+    NSString *result = [RadaeePDFPlugin addToBookmarks:pdfPath page:pageno label:@""];
+    
+    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+    NSString *str2=result;
+    NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:str1 message:str2 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:action1];
+    [self presentViewController:alert animated:YES completion:nil];
 }
+
 - (IBAction)searchView:(id) sender
 {
     searchToolBar = [UIToolbar new];
