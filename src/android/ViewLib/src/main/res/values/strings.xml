@@ -68,4 +68,17 @@
 
     <string name="copy_text">Text copied to clipboard: %1$s</string>
 
+    <string name="print">Print</string>
+    <string name="bookmark_label">Page: %1$d</string>
+    <string name="bookmark_already_added">Bookmark already exists</string>
+    <string name="bookmark_error">Error: Cannot add bookmark</string>
+    <string name="bookmark_remove_error">Error: Cannot delete bookmark</string>
+    <string name="bookmark_success">Bookmark (%1$s) added successfully.</string>
+    <string name="bookmark_add">Add to Bookmarks</string>
+    <string name="bookmark_show">Show Bookmarks</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="no_bookmarks">No bookmarks to show</string>
+    <string name="loading">Loading…</string>
+    <string name="delete">Delete</string>
+
 </resources>

@@ -22,12 +22,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
+import com.radaee.util.BookmarkHandler;
 import com.radaee.util.CommonUtil;
 import com.radaee.util.PDFThumbView;
+import com.radaee.util.RadaeePDFManager;
 import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.PDFViewThumb;
 import com.radaee.viewlib.R;
@@ -36,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -66,6 +70,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	private PDFBotBar m_bar_seek;
 	private PDFBotBar m_thumb_view;
 	private PDFMenu   m_menu_view;
+	private PDFMenu   m_menu_more;
 	private ImageView btn_view;
 	private ImageView btn_find;
 	private ImageView btn_annot;
@@ -73,7 +78,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     private ImageView btn_outline;
     private ImageView btn_undo;
     private ImageView btn_redo;
-    private ImageView btn_print;
+    private ImageView btn_more;
+    private View btn_add_bookmark;
+    private View btn_show_bookmarks;
+    private View btn_print;
 	private ImageView btn_find_back;
 	private ImageView btn_find_prev;
 	private ImageView btn_find_next;
@@ -106,6 +114,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		m_bar_find = new PDFTopBar(m_parent, R.layout.bar_find);
 		m_bar_annot = new PDFTopBar(m_parent, R.layout.bar_annot);
 		m_menu_view = new PDFMenu(m_parent, R.layout.pop_view);
+		m_menu_more = new PDFMenu(m_parent, R.layout.pop_more, 180,130);
 		RelativeLayout layout = (RelativeLayout)m_bar_cmd.BarGetView();
 		btn_view = (ImageView)layout.findViewById(R.id.btn_view);
 		btn_find = (ImageView)layout.findViewById(R.id.btn_find);
@@ -114,7 +123,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_outline = (ImageView)layout.findViewById(R.id.btn_outline);
         btn_undo = (ImageView)layout.findViewById(R.id.btn_undo);
         btn_redo = (ImageView)layout.findViewById(R.id.btn_redo);
-        btn_print = (ImageView)layout.findViewById(R.id.btn_print);
+        btn_more = (ImageView)layout.findViewById(R.id.btn_more);
 		layout = (RelativeLayout)m_bar_find.BarGetView();
 		btn_find_back = (ImageView)layout.findViewById(R.id.btn_back);
 		btn_find_prev = (ImageView)layout.findViewById(R.id.btn_left);
@@ -137,6 +146,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		view_vert = layout1.findViewById(R.id.view_vert);
 		view_single = layout1.findViewById(R.id.view_single);
 		view_dual = layout1.findViewById(R.id.view_dual);
+		LinearLayout moreLayout = (LinearLayout)m_menu_more.MenuGetView();
+		btn_print = moreLayout.findViewById(R.id.print);
+		btn_add_bookmark = moreLayout.findViewById(R.id.add_bookmark);
+		btn_show_bookmarks = moreLayout.findViewById(R.id.show_bookmarks);
 
 		btn_view.setOnClickListener(this);
 		btn_find.setOnClickListener(this);
@@ -145,7 +158,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_outline.setOnClickListener(this);
         btn_undo.setOnClickListener(this);
         btn_redo.setOnClickListener(this);
+        btn_more.setOnClickListener(this);
         btn_print.setOnClickListener(this);
+        btn_add_bookmark.setOnClickListener(this);
+        btn_show_bookmarks.setOnClickListener(this);
 		btn_find_back.setOnClickListener(this);
 		btn_find_prev.setOnClickListener(this);
 		btn_find_next.setOnClickListener(this);
@@ -182,6 +198,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			btn_redo.setVisibility(View.GONE);
 		}
 		RadaeePluginCallback.getInstance().setControllerListener(mControllerListner);
+		BookmarkHandler.setDbPath(m_parent.getContext().getFilesDir() + File.separator + "Bookmarks.db");
 
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
 			btn_print.setVisibility(View.GONE);
@@ -196,7 +213,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				public void OnPageClicked(int pageno) {
 					m_view.PDFGotoPage(pageno);
 				}
-			}, false);
+			}, Global.rtol);
 		} else if(mNavigationMode == NAVIGATION_SEEK) {
 			m_bar_seek = new PDFBotBar(m_parent, R.layout.bar_seek);
 			layout = (RelativeLayout)m_bar_seek.BarGetView();
@@ -207,7 +224,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			seek_page.setMax(m_view.PDFGetDoc().GetPageCount() - 1);
 		}
 	}
-	private void SetBtnEnabled(ImageView btn, boolean enable)
+	private void SetBtnEnabled(View btn, boolean enable)
 	{
 		if(enable)
 		{
@@ -307,6 +324,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			break;
 		case BAR_CMD:
 			m_menu_view.MenuDismiss();
+			m_menu_more.MenuDismiss();
 			m_bar_cmd.BarHide();
 
 			if(mNavigationMode == NAVIGATION_THUMBS)
@@ -369,6 +387,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		case BAR_CMD:
 			if(m_set) OnSelectEnd();
 			m_menu_view.MenuDismiss();
+			m_menu_more.MenuDismiss();
 			m_bar_cmd.BarHide();
 
 			if(mNavigationMode == NAVIGATION_THUMBS)
@@ -441,9 +460,18 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         else if(arg0 == btn_redo)
         {
             m_view.PDFRedo();
-        }
-		else if(arg0 == btn_print) {
+        } else if(arg0 == btn_more) {
+			m_menu_more.MenuShow(m_view.getWidth() - m_menu_more.getWidth(), m_bar_cmd.BarGetHeight());
+		} else if(arg0 == btn_print) {
 			printPDF();
+			m_menu_more.MenuDismiss();
+		}
+		else if(arg0 == btn_add_bookmark) {
+			addToBookmarks();
+			m_menu_more.MenuDismiss();
+		} else if(arg0 == btn_show_bookmarks) {
+			showBookmarks();
+			m_menu_more.MenuDismiss();
 		}
 		else if( arg0 == btn_find_prev )
 		{
@@ -764,6 +792,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				try {
 					String mDocPath = m_view.PDFGetDoc().getDocPath();
 					if(!TextUtils.isEmpty(mDocPath)) {
+
 						input = new FileInputStream(mDocPath);
 						output = new FileOutputStream(destination.getFileDescriptor());
 						byte[] buf = new byte[1024];
@@ -791,7 +820,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 					callback.onWriteFailed(e.toString());
 				}
 			}
-		}, null);
+        }, null);
 	}
 
 	private String bidiFormatCheck(String input) {
@@ -822,6 +851,32 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		return m_find_str;
 	}
 
+	private void addToBookmarks() {
+		try {
+			if(!TextUtils.isEmpty(m_view.PDFGetDoc().getDocPath())) {
+                String bookmarkLabel = m_parent.getContext().getString(R.string.bookmark_label, m_view.PDFGetCurrPage() + 1);
+				RadaeePDFManager mPDFManager = new RadaeePDFManager();
+				Toast.makeText(m_parent.getContext(), mPDFManager.addToBookmarks(m_parent.getContext(), m_view.PDFGetDoc().getDocPath(),
+						m_view.PDFGetCurrPage(), bookmarkLabel), Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(m_parent.getContext(), R.string.bookmark_error, Toast.LENGTH_SHORT).show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void showBookmarks() {
+		if(!TextUtils.isEmpty(m_view.PDFGetDoc().getDocPath()))
+			BookmarkHandler.showBookmarks(m_parent.getContext(), m_view.PDFGetDoc().getDocPath(), new BookmarkHandler.BookmarkListener() {
+				@Override
+				public void onBookmarkClickedListener(int pageno) {
+					m_view.PDFGotoPage(pageno);
+				}
+			});
+		else
+			Toast.makeText(m_parent.getContext(), R.string.bookmark_error, Toast.LENGTH_SHORT).show();
+	}
+
 	private RadaeePluginCallback.PDFControllerListener mControllerListner = new RadaeePluginCallback.PDFControllerListener() {
 
 		@Override
@@ -837,7 +892,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				btn_outline.setColorFilter(color);
 				btn_undo.setColorFilter(color);
 				btn_redo.setColorFilter(color);
-				btn_print.setColorFilter(color);
+				btn_more.setColorFilter(color);
 				btn_act_back.setColorFilter(color);
 				btn_act_edit.setColorFilter(color);
 				btn_act_perform.setColorFilter(color);
@@ -852,6 +907,9 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				((ImageView)view_vert.findViewById(R.id.imageView1)).setColorFilter(color);
 				((ImageView)view_single.findViewById(R.id.imageView2)).setColorFilter(color);
 				((ImageView)view_dual.findViewById(R.id.imageView3)).setColorFilter(color);
+				((ImageView)btn_add_bookmark.findViewById(R.id.add_bookmark_icon)).setColorFilter(color);
+				((ImageView)btn_show_bookmarks.findViewById(R.id.show_bookmarks_icon)).setColorFilter(color);
+				((ImageView)btn_print.findViewById(R.id.print_icon)).setColorFilter(color);
 			} catch (Exception e) {e.getMessage();}
 		}
 
@@ -862,6 +920,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				m_bar_act.BarGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
 				m_bar_annot.BarGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
 				m_menu_view.MenuGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+				m_menu_more.MenuGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
 			} catch (Exception e) {e.getMessage();}
 		}
 
@@ -888,6 +947,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				case BAR_CMD:
 					if(immersive) {
 						m_menu_view.MenuDismiss();
+						m_menu_more.MenuDismiss();
 						m_bar_cmd.BarHide();
 
 						if (mNavigationMode == NAVIGATION_THUMBS)

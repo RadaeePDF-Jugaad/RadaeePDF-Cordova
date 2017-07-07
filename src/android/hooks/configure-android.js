@@ -46,7 +46,8 @@ module.exports = function (ctx) {
     	{filePath: 'src/com/radaee/util/PDFGridItem.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: 'src/com/radaee/util/PopupEditAct.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: 'src/com/radaee/util/CommonUtil.java', importStatement: 'com.radaee.viewlib.R'},
-		{filePath: 'src/com/radaee/util/RadaeePDFManager.java', importStatement: 'com.radaee.reader.R'}
+		{filePath: 'src/com/radaee/util/RadaeePDFManager.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: 'src/com/radaee/util/BookmarkHandler.java', importStatement: 'com.radaee.viewlib.R'}
     ];
 
 

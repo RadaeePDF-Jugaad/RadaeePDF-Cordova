@@ -38,7 +38,7 @@
     <string name="loading_pdf">تحميل الملف …</string>
     <string name="browse_open_file">تصفح وفتح الملف</string>
     <string name="view_pager">ViewPager</string>
-    <string name="open_asset"> فتح من assets (للقراءة فقط)</string>
+    <string name="open_asset">فتح من assets (للقراءة فقط)</string>
     <string name="open_sdcard">فتح من Sdcard</string>
     <string name="open_http">مفتوحة من رابط HTTP (خدمة الإنترنت مطلوبة)</string>
     <string name="using_RGB_565">استخدام RGB_565</string>
@@ -51,13 +51,13 @@
     <string name="about">من نحن</string>
 
     <string name="ok">موافق</string>
-    <string name="todo_open_url"> ما يجب عمله: فتح رابط:</string>
+    <string name="todo_open_url">ما يجب عمله: فتح رابط:</string>
     <string name="todo_java_script">ما يجب عمله: تنفيذ جافا سكريبت</string>
     <string name="todo_play_movie">ما يجب عمله: تشغيل الفيلم</string>
     <string name="todo_play_sound">ما يجب عمله: تشغيل الصوت</string>
     <string name="todo_attachment">ما يجب عمله: مرفق</string>
     <string name="todo_3d">ما يجب عمله: تشغيل 3D</string>
-    <string name="todo_copy_text">ما يجب عمله: نسخ النص:</string>
+    <string name="copy_text">ما يجب عمله: نسخ النص:: %1$s</string>
     <string name="file_not_exist">الملف غير موجود:</string>
     <string name="file_not_exist_error">%1$s ليس موجود أو ليس ملف</string>
     <string name="file_not_opened">لا يمكن فتح %1$s</string>

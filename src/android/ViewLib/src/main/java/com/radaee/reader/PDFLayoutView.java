@@ -57,13 +57,13 @@ public class PDFLayoutView extends View implements LayoutListener
 	static final protected int STA_LINE = 7;
 	static final protected int STA_STAMP = 8;
 	static final protected int STA_ANNOT = 100;
-    private Bitmap.Config m_bmp_format = Bitmap.Config.ALPHA_8;
+    protected Bitmap.Config m_bmp_format = Bitmap.Config.ALPHA_8;
 	protected PDFLayout m_layout;
 	private Document m_doc;
 	protected int m_status = STA_NONE;
 	private boolean m_zooming = false;
 	private int m_pageno = 0;
-	private PDFPos m_goto_pos = null;
+	protected PDFPos m_goto_pos = null;
 
     protected GestureDetector m_gesture = null;
 	private Annotation m_annot = null;
@@ -85,7 +85,6 @@ public class PDFLayoutView extends View implements LayoutListener
 	private VSel m_sel = null;
     private int m_edit_type = 0;
     private int m_combo_item = -1;
-    private boolean m_rtol = false;
 	private PopupWindow m_pEdit = null;
 	private PopupWindow m_pCombo = null;
 	private Bitmap m_sel_icon1 = null;
@@ -142,33 +141,35 @@ public class PDFLayoutView extends View implements LayoutListener
         }
         private void onEditAnnot()
         {
-            int[] location = new int[2];
-            getLocationOnScreen(location);
-            Intent intent = new Intent(getContext(), PopupEditAct.class);
-            intent.putExtra("txt", m_annot.GetEditText());
-            intent.putExtra("x", m_annot_rect[0] + location[0]);
-            intent.putExtra("y", m_annot_rect[1] + location[1]);
-            intent.putExtra("w", m_annot_rect[2] - m_annot_rect[0]);
-            intent.putExtra("h", m_annot_rect[3] - m_annot_rect[1]);
-            intent.putExtra("type", m_annot.GetEditType());
-            intent.putExtra("max", m_annot.GetEditMaxlen());
-            intent.putExtra("size", m_annot.GetEditTextSize() * m_layout.vGetScale());
-            m_edit_type = 1;
-            PopupEditAct.ms_listener = new PopupEditAct.ActRetListener() {
-                @Override
-                public void OnEditValue(String val) {
-                    if(m_annot != null) {
+			try {
+				int[] location = new int[2];
+				getLocationOnScreen(location);
+				Intent intent = new Intent(getContext(), PopupEditAct.class);
+                intent.putExtra("txt", m_annot.GetEditText());
+				intent.putExtra("x", m_annot_rect[0] + location[0]);
+				intent.putExtra("y", m_annot_rect[1] + location[1]);
+				intent.putExtra("w", m_annot_rect[2] - m_annot_rect[0]);
+				intent.putExtra("h", m_annot_rect[3] - m_annot_rect[1]);
+				intent.putExtra("type", m_annot.GetEditType());
+				intent.putExtra("max", m_annot.GetEditMaxlen());
+				intent.putExtra("size", m_annot.GetEditTextSize() * m_layout.vGetScale());
+				m_edit_type = 1;
+				PopupEditAct.ms_listener = new PopupEditAct.ActRetListener() {
+                    @Override
+                    public void OnEditValue(String val) {
+                        if(m_annot != null) {
                         m_annot.SetEditText(val);
-                        m_layout.vRenderSync(m_annot_page);
-                        if (m_listener != null)
-                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                        PDFEndAnnot();
-                        m_edit_type = 0;
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                            PDFEndAnnot();
+                            m_edit_type = 0;
+                        }
                     }
-                }
-            };
-            getContext().startActivity(intent);
-        }
+                };
+				getContext().startActivity(intent);
+			} catch (Exception e) {	}
+		}
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e)
 		{
@@ -1120,7 +1121,7 @@ public class PDFLayoutView extends View implements LayoutListener
         {
         case 3:
         {
-        	PDFLayoutDual layout = new PDFLayoutDual(getContext());
+			PDFLayoutDual layout = new PDFLayoutDual(getContext());
         	boolean paras[] = new boolean[m_doc.GetPageCount()];
         	int cur = 0;
         	while( cur < paras.length )
@@ -1128,7 +1129,7 @@ public class PDFLayoutView extends View implements LayoutListener
         		paras[cur] = false;
         		cur++;
         	}
-        	layout.vSetLayoutPara(null, paras, m_rtol, false);
+        	layout.vSetLayoutPara(null, paras, Global.rtol, false);
             m_layout = layout;
         }
             break;
@@ -1142,14 +1143,14 @@ public class PDFLayoutView extends View implements LayoutListener
 				paras[cur] = true;
 				cur++;
 			}
-			layout.vSetLayoutPara(null, paras, m_rtol, false);
+			layout.vSetLayoutPara(null, paras, Global.rtol, false);
 			m_layout = layout;
 		}
 		break;
         case 6:
         {
-        	PDFLayoutDual layout = new PDFLayoutDual(getContext());
-        	layout.vSetLayoutPara(null, null, m_rtol, false);
+			PDFLayoutDual layout = new PDFLayoutDual(getContext());
+        	layout.vSetLayoutPara(null, null, Global.rtol, false);
             m_layout = layout;
         }
             break;
@@ -1160,6 +1161,7 @@ public class PDFLayoutView extends View implements LayoutListener
         }
             break;
         }
+        Global.def_view = style;
         //m_layout.vOpen(m_doc, this);
         m_layout.vOpen(m_doc, this);
         if(m_bmp_format != Bitmap.Config.ALPHA_8)
@@ -1467,10 +1469,10 @@ public class PDFLayoutView extends View implements LayoutListener
 		if( m_status == STA_SELECT )
 		{
 			if(Global.useSelIcons) {
-			m_sel_icon1.recycle();
-			m_sel_icon2.recycle();
-			m_sel_icon1 = null;
-			m_sel_icon2 = null;
+				m_sel_icon1.recycle();
+				m_sel_icon2.recycle();
+				m_sel_icon1 = null;
+				m_sel_icon2 = null;
 			}
 			m_annot_page = null;
 			m_status = STA_NONE;
@@ -1478,8 +1480,8 @@ public class PDFLayoutView extends View implements LayoutListener
 		else
 		{
 			if(Global.useSelIcons) {
-			m_sel_icon1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_start);
-			m_sel_icon2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_end);
+				m_sel_icon1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_start);
+				m_sel_icon2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_end);
 			}
 			m_annot_page = null;
 			m_status = STA_SELECT;
@@ -1975,6 +1977,11 @@ public class PDFLayoutView extends View implements LayoutListener
 	public void refreshCurrentPage() {
 		if(m_layout != null)
 			m_layout.vRenderSync(m_layout.vGetPage(m_pageno));
+	}
+
+	public void refreshPageAsync(int page) {
+		if(m_layout != null && page < m_doc.GetPageCount())
+			m_layout.vRenderAsync(m_layout.vGetPage(page));
 	}
 
 	public void setReadOnly(boolean readonly) {

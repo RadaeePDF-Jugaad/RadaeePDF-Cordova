@@ -300,6 +300,7 @@ public class Document
 	private static native boolean setGStateStrokeAlpha(long hand, long gstate, int alpha);
 	private static native boolean setGStateFillAlpha(long hand, long gstate, int alpha);
 	private static native boolean setGStateStrokeDash(long hand, long gstate, float[] dash, float phase);
+	private static native boolean setGStateBlendMode(long hand, long state, int bmode);
 	private static native long newImage( long hand, Bitmap bmp, boolean has_alpha );
 	private static native long newImageJPEG( long hand, String path );
     private static native long newImageJPEGByArray( long hand, byte[] data, int length );
@@ -309,13 +310,10 @@ public class Document
     private static native long addFormResGState(long doc, long form, long gstate);
     private static native long addFormResForm(long doc, long form, long sub);
     private static native void setFormContent(long doc, long form, float x, float y, float w, float h, long content);
+	private static native void setFormTransparency(long hand, long form, boolean isolate, boolean knockout);
     private static native void freeForm(long doc, long form);
 
-	private static native byte[] getSignContents( long hand );
-	private static native String getSignFilter( long hand );
-	private static native String getSignSubFilter( long hand );
-	private static native int[] getSignByteRange( long hand );
-	private static native int checkSignByteRange( long hand );
+	private static native int verifySign(long doc, long sign);
 
 
     private static native long advGetObj(long doc, long ref);
@@ -474,6 +472,29 @@ public class Document
 		{
 			return setGStateStrokeDash(doc.hand_val, hand, dash, phase);
 		}
+
+		/**
+		 * set blend mode to graphic state.
+		 * @param bmode 2:Multipy<br/>
+		 *              3:Screen<br/>
+		 *              4:Overlay<br/>
+		 *              5:Darken<br/>
+		 *              6:Lighten<br/>
+		 *              7:ColorDodge<br/>
+		 *              8:ColorBurn<br/>
+		 *              9:Difference<br/>
+		 *              10:Exclusion<br/>
+		 *              11:Hue<br/>
+		 *              12:Saturation<br/>
+		 *              13:Color<br/>
+		 *              14:Luminosity<br/>
+		 *              others:Normal
+		 * @return true or false.
+		 */
+		public boolean SetBlendMode(int bmode)
+		{
+			return setGStateBlendMode(doc.hand_val, hand, bmode);
+		}
 	}
 	public class DocImage
 	{
@@ -557,6 +578,16 @@ public class Document
         {
             if(content == null) return;
             setFormContent(m_doc.hand_val, hand, x, y, w, h, content.hand);
+        }
+
+		/**
+		 * set this form as transparency.
+		 * @param isolate set to isolate, mostly are false.
+		 * @param knockout set to knockout, mostly are false.
+		 */
+		public void SetTransparency(boolean isolate, boolean knockout)
+		{
+			setFormTransparency(m_doc.hand_val, hand, isolate, knockout);
         }
         @Override
         protected void finalize() throws Throwable
@@ -1357,68 +1388,14 @@ public class Document
 	}
 
 	/**
-	 * get signature contents. mostly an encrypted digest.<br/>
-	 * this method valid in professional or premium version.<br/>
-	 * @return byte array which format depends on Filter and SubFilter.<br/>
-	 * or null, if not signed for document.
+	 * verify the signature<br/>
+	 * a premium license is required for this method.
+	 * @param sign signature object from Annotation.GetSign()
+	 * @return 0 if veriify OK, others are error.
 	 */
-	public byte[] GetSignContents()
+	public int VerifySign(Sign sign)
 	{
-		return getSignContents( hand_val );
-	}
-	/**
-	 * get signature filter name.<br/>
-	 * this method valid in professional or premium version.<br/>
-	 * @return The name of the preferred signature handler to use.<br/>
-	 * Example signature handlers are "Adobe.PPKLite", "Entrust.PPKEF", "CICI.SignIt", and "VeriSign.PPKVS".<br/>
-	 * others maybe user defined.
-	 */
-	public String GetSignFilter()
-	{
-		return getSignFilter( hand_val );
-	}
-	/**
-	 * get sub filter name of signature.<br/>
-	 * this method valid in professional or premium version.<br/>
-	 * @return name that describes the encoding of the signature value and key information in the signature dictionary.<br/>
-	 * like "adbe.x509.rsa_sha1", "adbe.pkcs7.detached", and "adbe.pkcs7.sha1"<br/>
-	 * others maybe user defined.
-	 */
-	public String GetSignSubFilter()
-	{
-		return getSignSubFilter( hand_val );
-	}
-	/**
-	 * get byte ranges from PDF file, to get digest.<br/>
-	 * this method valid in professional or premium version.<br/>
-	 * @return an integer pair array, to record byte ranges.<br/>
-	 * each pair describing a range to digest.<br/>
-	 * 1st element of pair is offset.<br/>
-	 * 2nd element of pair is length.
-	 */
-	public int[] GetSignByteRange()
-	{
-		return getSignByteRange( hand_val );
-	}
-	/**
-	 * check object defined in signature("Data" entry), is in byte ranges defined in signature.
-	 * this method valid in professional or premium version.<br/>
-	 * to ensure PDF file modified, mostly you shall(Adobe Standard):<br/>
-	 * 1. invoke this method first.<br/>
-	 * 2. if succeeded, then get signature contents(see GetSignContents).<br/>
-	 * 3. decode public key from contents(see GetSignContents).<br/>
-	 * 4. decode encrypted digest from contents.<br/>
-	 * 5. decrypt digest.1 using public key, for step 4.<br/>
-	 * 6. calculate digest.2 by yourself, using byte ranges(GetSignByteRange).<br/>
-	 * 7. check digest.1 == digest.2
-	 * @return <br/>
-	 * -1: unknown or not defined in signature.<br/>
-	 *  0: check failed, means modified.<br/>
-	 *  1: check succeeded, means no new objects after signature.
-	 */
-	public int CheckSignByteRange()
-	{
-		return checkSignByteRange( hand_val );
+		return verifySign( hand_val, sign.m_hand );
 	}
 	public static void BundleSave(Bundle bundle, Document doc)
 	{

@@ -53,7 +53,7 @@
 <string name="todo_play_sound">"por hacer: reproducir sonido"</string>
 <string name="todo_attachment">"por hacer: manejar adjunto"</string>
 <string name="todo_3d">"por hacer: reproducir módulo 3D"</string>
-<string name="todo_copy_text">"por hacer: copiar texto: "</string>
+<string name="copy_text">"por hacer: copiar texto: %1$s"</string>
 <string name="file_not_exist">"El archivo no existe: "</string>
 <string name="file_not_exist_error">"%1$s no existe o no es un archivo."</string>
 <string name="file_not_opened">"No se puede abrir %1$s"</string>

@@ -14,6 +14,10 @@
 //      added getPageCount, extractTextFromPage and encryptDocAs prototypes
 //  v1.3.0
 
+// modified by Nermeen Solaiman/Emanuele on 05/07/17
+//      added addToBookmarks, removeBookmark and getBookmarks
+//  v1.4.0
+
 var argscheck = require('cordova/argscheck'),
     exec      = require('cordova/exec');
 
@@ -132,6 +136,24 @@ RadaeePDFPlugin.prototype.encryptDocAs = function (params, successCallback, erro
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'encryptDocAs', [params]);
+};
+
+RadaeePDFPlugin.prototype.addToBookmarks = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'addToBookmarks', [params]);
+};
+
+RadaeePDFPlugin.prototype.removeBookmark = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'removeBookmark', [params]);
+};
+
+RadaeePDFPlugin.prototype.getBookmarks = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getBookmarks', [params]);
 };
 
 module.exports = new RadaeePDFPlugin();

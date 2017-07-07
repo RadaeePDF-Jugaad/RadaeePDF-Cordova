@@ -683,6 +683,7 @@ public class Page
 		{
 			return Page.getAnnotEditTextSize(page.hand, hand);
 		}
+
 		/**
 		 * get jsvascript action of fields.<br/>
 		 * this method require premium license.
@@ -1271,6 +1272,23 @@ public class Page
 			hand = 0;
 			return ret;
 		}
+
+		/**
+		 * sign the empty field and save the PDF file.<br/>
+		 * if the signature field is not empty(signed), it will return failed.<br/>
+		 * this method require premium license.
+		 * @param form appearence icon for signature
+		 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
+		 * @param pswd password to open cert file.
+		 * @param reason sign reason will write to signature.
+		 * @param location signature location will write to signature.
+		 * @param contact contact info will write to signature.
+		 * @return 0 mean OK, others are failed.
+		 */
+		final public int SignField(DocForm form, String cert_file, String pswd, String reason, String location, String contact)
+		{
+			return signAnnotField(page.hand, hand, form.hand, cert_file, pswd, reason, location, contact);
+		}
 	}
 	public class Finder
 	{
@@ -1316,6 +1334,9 @@ public class Page
 
     static private native long getAnnotRef(long page, long annot);
     static private native boolean addAnnot(long page, long annot_ref);
+
+	static private native int sign(long hand, long form, float[] box, String cert_file, String pswd, String reason, String location, String contact);
+	static private native int signAnnotField(long hand, long annot, long form, String cert_file, String pswd, String reason, String location, String contact);
 
     static private native float[] getCropBox( long hand );
 	static private native float[] getMediaBox( long hand );
@@ -1541,6 +1562,24 @@ public class Page
     {
         return addAnnot(hand, ref);
     }
+
+	/**
+	 * Sign and save the PDF file.<br/>
+	 * this method required premium license.
+	 * @param form appearence for sign field.
+	 * @param rect rectangle for sign field
+	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
+	 * @param pswd password to open cert file.
+	 * @param reason sign reason will write to signature.
+	 * @param location signature location will write to signature.
+	 * @param contact contact info will write to signature.
+	 * @return 0 mean OK, others are failed.
+	 */
+    public int Sign(Document.DocForm form, float[] rect, String cert_file, String pswd, String reason, String location, String contact)
+	{
+		//int sign(long hand, long form, float[] box, String cert_file, String pswd, String reason, String location, String contact);
+		return sign(hand, form.hand, rect, cert_file, pswd, reason, location, contact);
+	}
 	/**
 	 * Close page object and free memory.
 	 */
@@ -2067,10 +2106,10 @@ public class Page
 	public boolean AddAnnotMarkup( Matrix mat, float[] rects, int type )
 	{
         if(mat == null) return false;
-		int color = 0xFFFFFF00;//yellow
-		if( type == 1 ) color = 0xFF0000C0;//black blue
-		if( type == 2 ) color = 0xFFC00000;//black red
-		if( type == 2 ) color = 0xFF00C000;//black green
+        int color = Global.highlight_color;
+        if( type == 1 ) color = Global.underline_color;
+        if( type == 2 ) color = Global.strikeout_color;
+        if( type == 4 ) color = Global.squiggle_color;
 		return addAnnotMarkup( hand, mat.hand, rects, color, type );
 	}
 	/**
@@ -2230,10 +2269,10 @@ public class Page
 	 */
 	public boolean AddAnnotMarkup( int cindex1, int cindex2, int type )
 	{
-		int color = 0xFFFFFF00;//yellow
-		if( type == 1 ) color = 0xFF0000C0;//black blue
-		if( type == 2 ) color = 0xFFC00000;//black red
-		if( type == 4 ) color = 0xFF00C000;//black green
+		int color = Global.highlight_color;
+		if( type == 1 ) color = Global.underline_color;
+		if( type == 2 ) color = Global.strikeout_color;
+		if( type == 4 ) color = Global.squiggle_color;
 		return addAnnotMarkup2( hand, cindex1, cindex2, color, type );
 	}
 	/**

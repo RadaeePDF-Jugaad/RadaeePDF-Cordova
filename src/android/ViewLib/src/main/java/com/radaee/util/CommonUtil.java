@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Page;
+import com.radaee.pdf.adv.Obj;
+import com.radaee.pdf.adv.Ref;
 import com.radaee.reader.PDFLayoutView;
 import com.radaee.viewlib.R;
 
@@ -285,7 +287,60 @@ public class CommonUtil {
         }
     }
 
-    public static String getPageText(Document mDocument, int pageIndex) {
+    static private String m_types[] = new String[]{"null", "boolean", "int", "real", "string", "name", "array", "dictionary", "reference", "stream"};
+    static private String get_type_name(int type)
+    {
+        if(type >= 0 && type < m_types.length) return m_types[type];
+        else return "unknown";
+    }
+
+    public static void checkAnnotAdvancedProp(Document mDocument, Page.Annotation annot) {
+        if(mDocument == null || !mDocument.IsOpened() || annot == null) return;
+
+        Ref ref = annot.Advance_GetRef();
+        if(ref != null) {
+            Obj obj = mDocument.Advance_GetObj(ref);
+            handleDictionary(obj);
+        }
+    }
+
+    private static void handleDictionary(Obj obj) {
+        try {
+            int count = obj.DictGetItemCount();
+            for(int cur = 0; cur < count; cur++) {
+                String tag = obj.DictGetItemTag(cur);
+                Obj item = obj.DictGetItem(cur);
+                int type = item.GetType();
+                String type_name = get_type_name(type);
+
+                Log.i("--ADV--","tag:" + cur + "---" + tag + ":" + type_name + " ->");
+
+                if(type == 1) //boolean
+                    Log.i("--ADV--"," value = " + item.GetBoolean());
+                else if(type == 2) //int
+                    Log.i("--ADV--"," value = " + item.GetInt());
+                else if(type == 3) //real
+                    Log.i("--ADV--"," value = " + item.GetReal());
+                else if(type == 4) //string
+                    Log.i("--ADV--"," value = " + item.GetTextString());
+                else if(type == 5) //name
+                    Log.i("--ADV--"," value = " + item.GetName());
+                else if(type == 6) { //array
+                    int arraycount = item.ArrayGetItemCount();
+                    for(int k = 0; k < arraycount; k++) {
+                        Obj array_obj = item.ArrayGetItem(k);
+                        Log.i("--ADV--","array item " + k + ": value = " + array_obj.GetReal());
+                    }
+                }
+                else if (type == 7) //dictionary
+                    handleDictionary(item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+	public static String getPageText(Document mDocument, int pageIndex) {
         String mPageText = null;
         try {
             Page mPage = mDocument.GetPage(pageIndex);

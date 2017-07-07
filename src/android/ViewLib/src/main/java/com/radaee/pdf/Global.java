@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.12
+ * @version 3.14
  */
 public class Global
 {
@@ -278,10 +278,6 @@ public class Global
 	 */
 	public static int findSecondaryColor = 0x40404040;// find secondary color
 	/**
-	 * is text selection start from right to left in one line?
-	 */
-	public static boolean selRTOL = false;
-	/**
 	 * max zoom level; valid values: [2, 5]
 	 */
 	public static float zoomLevel = 3;
@@ -289,7 +285,7 @@ public class Global
 	/**
 	 * can't be neg value. 15 means 15x(2000%) zooming.
 	 * Starting from version 3.12beta2 (which introduces enhancements in transparency composing and color blending)
-	 * we recommend using 12 as the max level, higher levels will reduce performance
+	 * we recommend using 11 as the max level, higher levels will reduce performance
 	 */
 	public static float layoutZoomLevel = 11;
 	/**
@@ -348,6 +344,22 @@ public class Global
 	public static boolean debug_mode = true;
 	public static boolean highlight_annotation = true;
 	public static boolean save_thumb_in_cache = true;
+	/**
+	 * enables/disables right to left navigation
+	 */
+	public static boolean rtol = false;
+	/**
+	 * is text selection start from right to left in one line?
+	 */
+	public static boolean selRTOL = false;
+    /**
+     * enables or disable cache during rendering
+     */
+    public static boolean cacheEnabled = true;
+    public static int highlight_color = 0xFFFFFF00;//yellow
+    public static int underline_color = 0xFF0000C0;//black blue
+    public static int strikeout_color = 0xFFC00000;//black red
+    public static int squiggle_color = 0xFF00C000;//black green
 
 	static private void load_file(Resources res, int res_id, File save_file)
 	{
@@ -432,7 +444,6 @@ public class Global
 		if (!files.exists())// not exist? make it!
 			files.mkdir();
 		Resources res = act.getResources();
-        //load_std_font( res, R.raw.rdf008, 8, new File(files, "rdf008") );
         load_std_font( res, R.raw.rdf013, 13, new File(files, "rdf013") );
 		load_cmyk_icc( res, R.raw.cmyk_rgb, new File(files, "cmyk_rgb") );
 		load_cmaps( res, R.raw.cmaps, new File(files, "cmaps"), R.raw.umaps, new File(files, "umaps") );
@@ -494,7 +505,7 @@ public class Global
 		//save_font("/system/fonts/NotoSansTC-Regular.otf", "/sdcard/NotoSansTC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansJP-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansKR-Regular.otf");
-        //fontfileListAdd("/system/fonts/NotoSansHebrew-Regular.ttf");
+		//fontfileListAdd("/system/fonts/NotoSansHebrew-Regular.ttf");
         load_truetype_font( res, R.raw.arimo, new File(files, "arimo.ttf") );//load from APP resource
         load_truetype_font( res, R.raw.arimob, new File(files, "arimob.ttf") );
         load_truetype_font( res, R.raw.arimoi, new File(files, "arimoi.ttf") );

@@ -61,6 +61,7 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResForm.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResGState.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResImage.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Sign.java" target-dir="src/com/radaee/pdf" />
 
         <!-- Radaee source - java.com.radaee.reader -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFBotBar.java" target-dir="src/com/radaee/reader" />
@@ -92,6 +93,7 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PopupEditAct.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePluginCallback.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
 
         <!-- Radaee source - java.com.radaee.util -->
         <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlMesh.java" target-dir="src/main/java/fi/harism/curl" />
@@ -131,6 +133,9 @@
         <source-file src="src/android/ViewLib/src/main/res/layout/pop_edit.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/pop_view.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_more.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_row.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_popup_menu.xml" target-dir="res/layout" />
 
         <!-- Radaee raw -->
         <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
@@ -144,7 +149,6 @@
         <source-file src="src/android/ViewLib/src/main/res/raw/cousineb" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinebi" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinei" target-dir="res/raw" />
-		<source-file src="src/android/ViewLib/src/main/res/raw/rdf008" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/rdf013" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/tinos" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/tinosb" target-dir="res/raw" />
@@ -189,9 +193,14 @@
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_redo.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_undo.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_print.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_add.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_bookmarks.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_more.png" target-dir="res/drawable" />
 
 		<!-- Radaee values -->
 		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
+		<source-file src="src/android/ViewLib/src/main/res/values-v11/styles.xml" target-dir="res/values-v11" />
+		<source-file src="src/android/ViewLib/src/main/res/values-v14/styles.xml" target-dir="res/values-v14" />
 		<source-file src="src/android/ViewLib/src/main/res/values-v21/styles.xml" target-dir="res/values-v21" />
 		<source-file src="src/android/ViewLib/src/main/res/values-ar/strings.xml" target-dir="res/values-ar" />
 		<source-file src="src/android/ViewLib/src/main/res/values-es-rES/strings.xml" target-dir="res/values-es-rES" />
@@ -222,6 +231,7 @@
 			<string name="failed_unknown">Open Failed: Unknown Error</string>
 			<string name="please_wait">Please wait</string>
 			<string name="no_more_found">No more found</string>
+
 			<string name="thumbnail_creation_running">Thumbnail creation is running…</string>
 			<string name="exiting">Exiting</string>
 			<string name="no">No</string>
@@ -243,6 +253,7 @@
 			<string name="dual_page">Dual Page</string>
 			<string name="save_msg">Document modified.\r\nDo you want to save it?</string>
 			<string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
+
 			<string name="note_content">Note Content</string>
 			<string name="input_password">Input Password</string>
 			<string name="loading_pdf">Loading PDF file…</string>
@@ -259,6 +270,7 @@
 			<string name="create_pdf">CreatePDF</string>
 			<string name="javascript">JavaScript</string>
 			<string name="about">About</string>
+
 			<string name="ok">OK</string>
 			<string name="todo_open_url">todo: open url: </string>
 			<string name="todo_java_script">todo: execute java script</string>
@@ -271,10 +283,25 @@
 			<string name="file_not_opened">Cannot open %1$s.</string>
 			<string name="catalog_not_found">Catalog object is not a dictionary.</string>
 			<string name="edit_catalog_failed">Edit catalog failed.</string>
+
 			<string name="no_pdf_outlines">PDF does not contain outlines</string>
 			<string name="pdf_print_not_available">PDF File is not available for print.</string>
 			<string name="pdf_print_calculation_failed">Page count calculation failed.</string>
+
 			<string name="copy_text">Text copied to clipboard: %1$s</string>
+
+			<string name="print">Print</string>
+			<string name="bookmark_label">Page: %1$d</string>
+			<string name="bookmark_already_added">Bookmark already exists</string>
+			<string name="bookmark_error">Error: Cannot add bookmark</string>
+			<string name="bookmark_remove_error">Error: Cannot delete bookmark</string>
+			<string name="bookmark_success">Bookmark (%1$s) added successfully.</string>
+			<string name="bookmark_add">Add to Bookmarks</string>
+			<string name="bookmark_show">Show Bookmarks</string>
+			<string name="bookmarks">Bookmarks</string>
+			<string name="no_bookmarks">No bookmarks to show</string>
+			<string name="loading">Loading…</string>
+			<string name="delete">Delete</string>
 		</config-file>
 
         <!-- Hooks -->

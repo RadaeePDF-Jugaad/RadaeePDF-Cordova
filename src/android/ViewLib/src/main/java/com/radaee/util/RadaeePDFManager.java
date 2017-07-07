@@ -8,7 +8,9 @@ import android.widget.Toast;
 
 import com.radaee.pdf.Global;
 import com.radaee.reader.PDFViewAct;
-import com.radaee.reader.R;
+import com.radaee.viewlib.R;
+
+import java.io.File;
 
 /**
  * A class that can be used by depending modules, to facilitate the PDF Viewer usage.
@@ -24,12 +26,12 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     private RadaeePluginCallback.PDFReaderListener mListener;
 
     public RadaeePDFManager() {
-        Global.navigationMode = 0; //thumbnail navigation mode
-        RadaeePluginCallback.getInstance().setListener(this);
+        this(null);
     }
 
     public RadaeePDFManager(RadaeePluginCallback.PDFReaderListener listener) {
         Global.navigationMode = 0; //thumbnail navigation mode
+        if(listener != null)
         mListener = listener;
         RadaeePluginCallback.getInstance().setListener(this);
     }
@@ -59,11 +61,23 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param context the current context.
      * @param url the url can be remote (starts with http/https), or local
      * @param password the pdf's password, if no apssword, pass empty string
+     */
+    public void show(Context context, String url, String password) {
+        show(context, url, password, false, false, 0, null);
+    }
+
+    /**
+     * Opens the passed file and shows the PDF reader.
+     *
+     * @param context the current context.
+     * @param url the url can be remote (starts with http/https), or local
+     * @param password the pdf's password, if no apssword, pass empty string
      * @param readOnlyMode if true, the document will be opened in read-only mode
      * @param automaticSave if true, the modifications will be saved automatically, else a requester to save will be shown
      * @param gotoPage if greater than 0, the reader will render directly the passed page (0-index: from 0 to Document.GetPageCount - 1)
+     * @param bmpFormat bmp format, can be RGB_565 or ARGB_4444, default is ALPHA_8
      */
-    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave, int gotoPage) {
+    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave, int gotoPage, String bmpFormat) {
         if(!TextUtils.isEmpty(url)) {
             String name;
             if(URLUtil.isHttpUrl(url) || URLUtil.isHttpsUrl(url))
@@ -81,6 +95,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
             intent.putExtra("READ_ONLY", readOnlyMode);
             intent.putExtra("AUTOMATIC_SAVE", automaticSave);
             intent.putExtra("GOTO_PAGE", gotoPage);
+            intent.putExtra( "BMPFormat", bmpFormat);
             context.startActivity(intent);
         } else
             Toast.makeText(context, context.getString(R.string.failed_invalid_path), Toast.LENGTH_SHORT).show();
@@ -94,10 +109,23 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param password the pdf's password, if no apssword, pass empty string
      */
     public void openFromAssets(Context context, String path, String password) {
+        openFromAssets(context, path, password, null);
+    }
+
+    /**
+     * Opens the passed assets file and shows the PDF reader.
+     *
+     * @param context the current context.
+     * @param path the asset name/path
+     * @param password the pdf's password, if no apssword, pass empty string
+     * @param bmpFormat bmp format, can be RGB_565 or ARGB_4444, default is ALPHA_8
+     */
+    public void openFromAssets(Context context, String path, String password, String bmpFormat) {
         Intent intent = new Intent(context, PDFViewAct.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra( "PDFAsset", path);
         intent.putExtra( "PDFPswd", password);
+        intent.putExtra( "BMPFormat", bmpFormat);
         context.startActivity(intent);
     }
 
@@ -282,6 +310,63 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
             else return "Error";
         }
         return "Invalid destination path";
+    }
+
+    /**
+     * Adds the given page to the bookmarks.
+     *
+     * @param mContext context object
+     * @param filePath the orignal pdf file
+     * @param page 0 based page no.
+     * @param bookmarkLabel label of Bookmark (can be empty string)
+     * @return a string that indicates the result
+     */
+    public String addToBookmarks(Context mContext, String filePath, int page, String bookmarkLabel) {
+        if(!Global.isLicenseActivated())
+            Global.Init(mContext);
+
+        if(URLUtil.isFileUrl(filePath)) {
+            String prefix = "file://";
+            filePath = filePath.substring(filePath.indexOf(prefix) + prefix.length());
+        }
+
+        if(TextUtils.isEmpty(BookmarkHandler.getDbPath()))
+            BookmarkHandler.setDbPath(mContext.getFilesDir() + File.separator + "Bookmarks.db");
+        BookmarkHandler.BookmarkStatus status = BookmarkHandler.addToBookmarks(filePath, page, bookmarkLabel);
+        if(status == BookmarkHandler.BookmarkStatus.SUCCESS)
+            return mContext.getString(R.string.bookmark_success, bookmarkLabel);
+        else if(status == BookmarkHandler.BookmarkStatus.ALREADY_ADDED)
+            return mContext.getString(R.string.bookmark_already_added);
+        else
+            return mContext.getString(R.string.bookmark_error);
+    }
+
+    /**
+     * Removes the given page from bookmarks.
+     *
+     * @param page 0 based page no.
+     * @param filePath the orignal pdf file
+     * @return true or false.
+     */
+    public boolean removeBookmark(int page, String filePath) {
+        if(URLUtil.isFileUrl(filePath)) {
+            String prefix = "file://";
+            filePath = filePath.substring(filePath.indexOf(prefix) + prefix.length());
+        }
+        return BookmarkHandler.removeBookmark(page, filePath);
+    }
+
+    /**
+     * returns a list of bookmarked pages in json format
+     * @param filePath the orignal pdf file
+     * @return json string or null ex: [{"Page": 4,"Label": "Page: 5"}, {"Page": 1,"Label": "Page: 2"}]
+     */
+    public String getBookmarksAsJson(String filePath) {
+        if(URLUtil.isFileUrl(filePath)) {
+            String prefix = "file://";
+            filePath = filePath.substring(filePath.indexOf(prefix) + prefix.length());
+        }
+        return BookmarkHandler.getBookmarksAsJson(filePath);
     }
 
     @Override

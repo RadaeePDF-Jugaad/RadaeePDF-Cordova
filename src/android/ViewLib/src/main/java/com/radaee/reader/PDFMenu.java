@@ -12,8 +12,12 @@ public class PDFMenu implements PopupWindow.OnDismissListener
 	private PopupWindow m_popup = null;
 	private View m_parent = null;
 	private View m_view = null;
-	PDFMenu(RelativeLayout parent, int resource)
-	{
+
+	PDFMenu(RelativeLayout parent, int resource) {
+		this(parent, resource, 150, 130);
+	}
+
+	PDFMenu(RelativeLayout parent, int resource, int width, int height) {
 		m_view = LayoutInflater.from(parent.getContext()).inflate(resource, null);
 		m_popup = new PopupWindow(m_view);
 		m_popup.setOnDismissListener(this);
@@ -22,12 +26,12 @@ public class PDFMenu implements PopupWindow.OnDismissListener
 		m_popup.setOutsideTouchable(true);
 		m_popup.setBackgroundDrawable(new ColorDrawable(0));
 		final float scale = parent.getContext().getResources().getDisplayMetrics().density;
-		m_popup.setWidth((int)(150 * scale));
-		m_popup.setHeight((int)(130 * scale));
+		m_popup.setWidth((int)(width * scale));
+		m_popup.setHeight((int)(height * scale));
 		m_parent = parent;
 	}
-	public final View MenuGetView(){return m_view;}
-	public final void MenuShow(int x, int y)
+	final View MenuGetView(){return m_view;}
+	final void MenuShow(int x, int y)
 	{
         try {
             int[] location = new int[2];
@@ -38,12 +42,16 @@ public class PDFMenu implements PopupWindow.OnDismissListener
         {
         }
 	}
-	public final void MenuDismiss()
+	final void MenuDismiss()
 	{
 		m_popup.dismiss();
 	}
 	@Override
 	public void onDismiss()
 	{
+	}
+
+	int getWidth() {
+		return m_popup != null ? m_popup.getWidth() : 0;
 	}
 }

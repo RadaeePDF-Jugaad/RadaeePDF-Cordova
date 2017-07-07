@@ -122,9 +122,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
                 }
             };
             handler.postDelayed(runable, 1000);//delay 1 second to display progress dialog.
-
         }
-        @Override
+
+		@Override
         protected void onPostExecute(Integer integer)
         {
 			mFileState = NOT_MODIFIED;
@@ -140,7 +140,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 			int gotoPage = getIntent().getIntExtra("GOTO_PAGE", -1);
 			if(gotoPage > 0)
 				m_view.PDFGotoPage(gotoPage);
-        }
+		}
     }
     private MyPDFFontDel m_font_del = new MyPDFFontDel();
     @SuppressLint("InlinedApi")
@@ -151,12 +151,14 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 
         //plz set this line to Activity in AndroidManifes.xml:
         //    android:configChanges="orientation|keyboardHidden|screenSize"
-        //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate. 
+        //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate.
         Global.Init( this );
 		m_layout = (RelativeLayout)LayoutInflater.from(this).inflate(R.layout.pdf_layout, null);
 		m_view = (PDFLayoutView)m_layout.findViewById(R.id.pdf_view);
 
 		RadaeePluginCallback.getInstance().willShowReader();
+		if(!Global.cacheEnabled)
+			findViewById(R.id.progress).setVisibility(View.GONE);
 
         Intent intent = getIntent();
         String bmp_format = intent.getStringExtra("BMPFormat");
@@ -171,8 +173,8 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         {
         	m_doc = ms_tran_doc;
         	ms_tran_doc = null;
-    		m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
-    		m_tmp_index++;
+    		//m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
+    		//m_tmp_index++;
             OpenTask task = new OpenTask(true);
             task.execute();
             /*
@@ -223,8 +225,8 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         	{
         		m_doc = new Document();
         		int ret = m_doc.Open(pdf_path, pdf_pswd);
-                m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
-                m_tmp_index++;
+                //m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
+                //m_tmp_index++;
                 //m_doc.SetFontDel(m_font_del);
         		ProcessOpenResult(ret);
         	}
@@ -297,7 +299,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 				        	   PDFViewAct.super.onBackPressed();
 				           }
 				       }).show(); 
-				}
+        	}
         	}
         	else super.onBackPressed();
     	}

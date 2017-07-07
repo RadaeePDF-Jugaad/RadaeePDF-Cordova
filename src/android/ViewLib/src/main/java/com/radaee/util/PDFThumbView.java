@@ -26,6 +26,10 @@ public class PDFThumbView extends View implements PDFViewListener
 
 		m_thumb = new PDFViewThumb(context);
 	}
+
+	@Override
+	public void OnPDFPageRendered(int pageno) {}
+
 	public void OnPDFPageChanged(int pageno)
 	{
 	}

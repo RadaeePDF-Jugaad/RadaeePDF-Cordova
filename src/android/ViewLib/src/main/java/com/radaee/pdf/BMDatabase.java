@@ -19,8 +19,8 @@ public class BMDatabase
 	private long m_hand = 0;
 	/**
 	 * open exist database file or create it if not exist. (Database for BookMark)
-	 * @param db_path
-	 * @return
+	 * @param db_path DB path
+	 * @return true or false
 	 */
 	public boolean OpenOrCreate( String db_path )
 	{
