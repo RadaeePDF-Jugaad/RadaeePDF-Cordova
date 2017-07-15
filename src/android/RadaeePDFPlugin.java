@@ -23,7 +23,7 @@ import android.webkit.URLUtil;
 
 import com.radaee.pdf.Global;
 import com.radaee.reader.PDFViewAct;
-import com.radaee.reader.R;
+import com.radaee.viewlib.R;
 import com.radaee.util.BookmarkHandler;
 import com.radaee.util.RadaeePDFManager;
 import com.radaee.util.RadaeePluginCallback;
