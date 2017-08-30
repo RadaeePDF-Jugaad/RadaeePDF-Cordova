@@ -646,6 +646,41 @@
     [self cdvOkWithMessage:[RadaeePDFPlugin getBookmarks:path]];
 }
 
+#pragma mark - Callbacks
+
+- (void)willShowReaderCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_willShowReader = command;
+}
+- (void)didShowReaderCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didShowReader = command;
+}
+- (void)willCloseReaderCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_willCloseReader = command;
+}
+- (void)didCloseReaderCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didCloseReader = command;
+}
+- (void)didChangePageCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didChangePage = command;
+}
+- (void)didSearchTermCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didSearchTerm = command;
+}
+- (void)didTapOnPageCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didTapOnPage = command;
+}
+
+- (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didTapOnAnnotationOfType = command;
+}
 
 + (NSString *)addToBookmarks:(NSString *)pdfPath page:(int)page label:(NSString *)label
 {
@@ -784,9 +819,18 @@
                                messageAsDictionary:dict]];
 }
 
+- (void)cdvSendCallback:(NSString *)message orCommand:(CDVInvokedUrlCommand *)command
+{
+    CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
+    [res setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:res callbackId:[command callbackId]];
+}
+
 - (void)cdvOkWithMessage:(NSString *)message
 {
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message] callbackId:[self.cdv_command callbackId]];
+    CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
+    [res setKeepCallback:0];
+    [self.commandDelegate sendPluginResult:res callbackId:[self.cdv_command callbackId]];
 }
 
 - (void)cdvErrorWithMessage:(NSString *)errorMessage
@@ -850,58 +894,90 @@
 
 - (void)willShowReader
 {
+    /*
     if (_delegate) {
         [_delegate willShowReader];
     }
+    */
+    
+    [self cdvSendCallback:@"" orCommand:self.cdv_willShowReader];
 }
 
 - (void)didShowReader
 {
+    /*
     if (_delegate) {
         [_delegate didShowReader];
     }
+    */
+    
+    [self cdvSendCallback:@"" orCommand:self.cdv_didShowReader];
 }
 
 - (void)willCloseReader
 {
+    /*
     if (_delegate) {
         [_delegate willCloseReader];
     }
+    */
+    
+    [self cdvSendCallback:@"" orCommand:self.cdv_willCloseReader];
 }
 
 - (void)didCloseReader
 {
+    /*
     if (_delegate) {
         [_delegate didCloseReader];
     }
+    */
+    
+    [self cdvSendCallback:@"" orCommand:self.cdv_didCloseReader];
 }
 
 - (void)didChangePage:(int)page
 {
+    /*
     if (_delegate) {
         [_delegate didChangePage:page];
     }
+    */
+    
+    [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didChangePage];
 }
 
 - (void)didSearchTerm:(NSString *)term found:(BOOL)found
 {
+    /*
     if (_delegate) {
         [_delegate didSearchTerm:term found:found];
     }
+    */
+    
+    [self cdvSendCallback:term orCommand:self.cdv_didSearchTerm];
 }
 
 - (void)didTapOnPage:(int)page atPoint:(CGPoint)point
 {
+    /*
     if (_delegate) {
         [_delegate didTapOnPage:page atPoint:point];
     }
+    */
+    
+    [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didTapOnPage];
 }
 
 - (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point
 {
+    /*
     if (_delegate) {
         [_delegate didTapOnAnnotationOfType:type atPage:page atPoint:point];
     }
+    */
+    
+    [self cdvSendCallback:[NSString stringWithFormat:@"%i", type] orCommand:self.cdv_didTapOnAnnotationOfType];
 }
 
 #pragma mark - Path Utils

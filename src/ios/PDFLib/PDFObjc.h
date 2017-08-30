@@ -10,6 +10,17 @@
 #import "PDFIOS.h"
 #pragma once
 
+@interface PDFSign : NSObject
+{
+	PDF_SIGN m_sign;
+}
+@property (readonly)PDF_SIGN handle;
+-(id)init:(PDF_SIGN)sign;
+-(NSString *)issue;
+-(NSString *)subject;
+-(long)version;
+@end
+
 @interface PDFDIB : NSObject
 {
     PDF_DIB m_dib;
@@ -45,6 +56,7 @@
  *	@return height in pixels
  */
 -(int)height;
+-(CGImageRef)image;
 @end
 
 @interface PDFObj : NSObject
@@ -181,6 +193,7 @@
  */
 -(bool)setFillAlpha :(int)alpha;
 -(bool)setStrokeDash:(const float *)dash : (int)dash_cnt : (float)phase;
+-(bool)setBlendMode :(int)bmode;
 @end
 
 @interface PDFDocImage : NSObject
@@ -199,6 +212,7 @@
  */
 -(id)init:(PDF_DOC)doc :(PDF_DOC_IMAGE)handle;
 @end
+
 
 @interface PDFFinder : NSObject
 {
@@ -438,7 +452,6 @@
  * @param w line width in PDF coordinate
  */
 -(void)setStrokeWidth:(float) w;
--(bool)setStrokeDash:(float *)dash : (int)cnt;
 /**
  * @brief PDF operator: set miter limit.
  * @param miter miter limit.
@@ -515,12 +528,13 @@
  *	@param	handle	GState handle.
  *
  */
--(id)init:(PDF_DOC)doc : (PDF_DOC_FORM *)handle;
+-(id)init:(PDF_DOC)doc : (PDF_DOC_FORM)handle;
 -(PDF_PAGE_FONT)addResFont :(PDFDocFont *)font;
 -(PDF_PAGE_IMAGE)addResImage :(PDFDocImage *)img;
 -(PDF_PAGE_GSTATE)addResGState : (PDFDocGState *)gs;
 -(PDF_PAGE_FORM)addResForm : (PDFDocForm *)form;
 -(void)setContent : (float)x : (float)y : (float)w : (float)h : (PDFPageContent *)content;
+-(void)setTransparency :(bool)isolate :(bool)knockout;
 @end
 
 
@@ -571,6 +585,8 @@
  * 26: rich media
  */
 -(int)type;
+-(int)export :(unsigned char *)buf : (int)len;
+-(int)signField;
 /**
  * @brief	get annotation field type in acroForm.
  *			this method valid in premium version
@@ -582,6 +598,7 @@
  * 4: signature field
  */
 -(int)fieldType;
+-(int)fieldFlag;
 /**
  *	@brief	get name of this annotation, example: "EditBox1[0]".
  *			this method valid in premium version
@@ -598,6 +615,7 @@
  *			this method valid in premium version
  */
 -(NSString *)fieldFullName2;
+-(NSString *)getFieldJS:(int)idx;
 /**
  * @brief check if position and size of the annotation is locked?
  * this method valid in professional or premium version
@@ -610,6 +628,8 @@
  * @param lock lock status to be set.
  */
 -(void)setLocked:(bool)lock;
+-(NSString *)getName;
+-(bool)setName:(NSString *)name;
 -(bool)isReadonly;
 -(void)setReadonly:(bool)readonly;
 /**
@@ -624,6 +644,7 @@
  * @param hide true or false.
  */
 -(bool)setHidden:(bool)hide;
+-(bool)renderToBmp:(CGImageRef)img;
 /**
  * @brief get annotation's box rectangle.
  *			this method valid in professional or premium version
@@ -697,6 +718,7 @@
  * @return true or false
  */
 -(bool)setStrokeWidth:(float)width;
+-(bool)setStrokeDash:(float *)dash : (int)cnt;
 /**
  * @brief get icon value for sticky text note/file attachment annotation.
  * this method valid in professional or premium version
@@ -797,6 +819,7 @@
  * @return true or false.
  */
 -(bool)setIcon:(int)icon;
+-(bool)setIcon2:(NSString *)icon_name :(PDFDocForm *)icon;
 /**
  * @brief get annotation's destination.
  * this method valid in professional or premium version
@@ -928,8 +951,8 @@
  * this method valid in premium version
  * @return size of text, in PDF coordinate system.
  */
--(float)getEditTextSize:(PDF_RECT *)rect;
--(NSString *)getEditTextFormat;
+-(float)getEditTextSize;
+-(bool)setEditTextSize:(float)fsize;
 /**
  * @brief get contents of edit-box.
  * this method valid in premium version
@@ -1061,6 +1084,7 @@
  */
 -(bool)removeFromPage;
 -(int)getSignStatus;
+-(PDFSign *)getSign;
 -(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect;
 @end
 
@@ -1076,6 +1100,7 @@
 -(id)init:(PDF_PAGE) hand;
 -(PDF_OBJ_REF)advanceGetRef;
 -(void)advanceReload;
+-(bool)importAnnot:(const PDF_RECT *)rect :(const unsigned char *)dat :(int)dat_len;
 -(bool)renderThumb:(PDFDIB *)dib;
 /**
  * @brief prepare to render, this method just erase DIB to white.
@@ -1106,6 +1131,7 @@
 -(bool)reflow:(PDFDIB *)dib :(float)orgx :(float)orgy;
 -(int)getRotate;
 -(bool)flatAnnots;
+-(int)sign :(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact;
 /**
  * @brief get text objects to memory.
  * a standard license is required for this method
@@ -1175,6 +1201,7 @@
  * @return handle of annotation, valid until Close invoked.
  */
 -(PDFAnnot *)annotAtPoint:(float)x :(float)y;
+-(PDFAnnot *)annotByName:(NSString *)name;
 -(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect;
 -(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open;
 /**
@@ -1428,6 +1455,7 @@
 -(bool)setCache:(NSString *)path;
 -(bool)setPageRotate: (int)pageno : (int)degree;
 -(bool)runJS:(NSString *)js :(id<PDFJSDelegate>)del;
+-(int)verifySign:(PDFSign *)sign;
 /**
  * @brief check if document can be modified or saved.
  * this always return false, if no license actived.
@@ -1437,6 +1465,7 @@
 -(bool)isEncrypted;
 -(int)getEmbedFileCount;
 -(NSString *)getEmbedFileName:(int)idx;
+-(NSString *)getEmbedFileDesc:(int)idx;
 -(bool)getEmbedFileData:(int)idx :(NSString *)path;
 -(NSString *)exportForm;
 /**
@@ -1583,5 +1612,4 @@
  * @return DocImage object or null.
  */
 -(PDFDocImage *)newImageJPX:(NSString *)path;
--(int)checkSignByteRange;
 @end

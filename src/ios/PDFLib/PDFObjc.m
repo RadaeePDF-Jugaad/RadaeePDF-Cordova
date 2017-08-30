@@ -10,6 +10,32 @@
 extern uint annotHighlightColor;
 extern uint annotUnderlineColor;
 extern uint annotStrikeoutColor;
+
+@implementation PDFSign
+@synthesize handle = m_sign;
+-(id)init:(PDF_SIGN)sign
+{
+    if( self = [super init] )
+    {
+        m_sign = sign;
+    }
+    return self;
+}
+
+-(NSString *)issue
+{
+	return Sign_getIssue(m_sign);
+}
+-(NSString *)subject
+{
+	return Sign_getSubject(m_sign);
+}
+-(long)version
+{
+	return Sign_getVersion(m_sign);
+}
+@end
+
 @implementation PDFDIB
 @synthesize handle = m_dib;
 -(id)init
@@ -48,16 +74,34 @@ extern uint annotStrikeoutColor;
 {
     return Global_dibGetHeight(m_dib);
 }
+/*
 -(void)clear
 {
     Global_dibFree(m_dib);
     m_dib = NULL;
-}
+}*/
 
 -(void)dealloc
 {
-	Global_dibFree(m_dib);
+    PDF_DIB tmp_dib = m_dib;
     m_dib = NULL;
+    Global_dibFree(tmp_dib);
+}
+
+-(CGImageRef)image
+{
+    if(!m_dib) return nil;
+    void *pdata = Global_dibGetData(m_dib);
+    int w = Global_dibGetWidth(m_dib);
+    int h = Global_dibGetHeight(m_dib);
+    CGDataProviderRef provider = CGDataProviderCreateWithData( NULL, pdata, w * h * 4, NULL );
+    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+    CGImageRef img = CGImageCreate( w, h, 8, 32, w<<2, cs,
+                                   kCGBitmapByteOrder32Little|kCGImageAlphaNoneSkipFirst,
+                                   provider, NULL, FALSE, kCGRenderingIntentDefault );
+    CGColorSpaceRelease(cs);
+    CGDataProviderRelease(provider);
+    return img;
 }
 @end
 
@@ -109,8 +153,9 @@ extern uint annotStrikeoutColor;
 }
 -(void)dealloc
 {
-    Matrix_destroy(m_mat);
+    PDF_MATRIX tmp_mat = m_mat;
     m_mat = NULL;
+    Matrix_destroy(tmp_mat);
 }
 @end
 
@@ -392,6 +437,12 @@ extern uint annotStrikeoutColor;
 {
 	return Document_setGStateStrokeDash( m_doc, m_handle, dash, dash_cnt, phase );
 }
+
+-(bool)setBlendMode :(int)bmode
+{
+	return Document_setGStateBlendMode( m_doc, m_handle, bmode );
+}
+
 @end
 
 @implementation PDFDocImage
@@ -464,6 +515,10 @@ extern uint annotStrikeoutColor;
 -(void)setContent : (float)x : (float)y : (float)w : (float)h : (PDFPageContent *)content
 {
 	Document_setFormContent(m_doc, m_handle, x, y, w, h, content.handle);
+}
+-(void)setTransparency :(bool)isolate :(bool)knockout
+{
+	Document_setFormTransparency(m_doc, m_handle, isolate, knockout);
 }
 @end
 
@@ -753,9 +808,22 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotType( m_page, m_handle );
 }
+-(int)export :(unsigned char *)buf :(int)len
+{
+	return Page_exportAnnot(m_page, m_handle, buf, len);
+}
+-(int)signField :(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact;
+{
+	return Page_signAnnotField(m_page, m_handle, [appearence handle], [cert_file UTF8String], [pswd UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
+}
+
 -(int)fieldType
 {
 	return Page_getAnnotFieldType( m_page, m_handle );
+}
+-(int)fieldFlag
+{
+	return Page_getAnnotFieldFlag( m_page, m_handle );
 }
 -(NSString *)fieldName
 {
@@ -793,6 +861,23 @@ extern uint annotStrikeoutColor;
 {
 	Page_setAnnotLock( m_page, m_handle, lock );
 }
+-(NSString *)getName
+{
+    char *stmp = (char *)malloc(1024);
+    if(!Page_getAnnotName(m_page, m_handle, stmp, 1023))
+    {
+        free(stmp);
+        return nil;
+    }
+    NSString *ret = [NSString stringWithUTF8String:stmp];
+    free(stmp);
+    return ret;
+}
+-(bool)setName:(NSString *)name
+{
+	if(!name) return false;
+	return Page_setAnnotName(m_page, m_handle, [name UTF8String]);
+}
 -(bool)isReadonly
 {
 	return Page_isAnnotReadonly( m_page, m_handle );
@@ -809,6 +894,10 @@ extern uint annotStrikeoutColor;
 {
 	Page_setAnnotHide( m_page, m_handle, hide );
 	return true;
+}
+-(bool)renderToBmp:(CGImageRef)img
+{
+	return Page_renderAnnotToBmp(m_page, m_handle, img);
 }
 -(void)getRect:(PDF_RECT *)rect
 {
@@ -902,8 +991,13 @@ extern uint annotStrikeoutColor;
 }
 -(bool)setIcon:(int)icon
 {
-	return Page_setAnnotIcon( m_page, m_handle, icon );
+	return Page_setAnnotIcon(m_page, m_handle, icon);
 }
+-(bool)setIcon2:(NSString *)icon_name :(PDFDocForm *)icon
+{
+	return Page_setAnnotIcon2(m_page, m_handle, [icon_name UTF8String], [icon handle]);
+}
+
 -(int)getDest
 {
 	return Page_getAnnotDest( m_page, m_handle );
@@ -1060,9 +1154,13 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotEditTextRect( m_page, m_handle, rect );
 }
--(float)getEditTextSize:(PDF_RECT *)rect
+-(float)getEditTextSize
 {
 	return Page_getAnnotEditTextSize( m_page, m_handle );
+}
+-(bool)setEditTextSize:(float)fsize
+{
+	return Page_setAnnotEditTextSize( m_page, m_handle, fsize );
 }
 -(NSString *)getEditText
 {
@@ -1072,10 +1170,10 @@ extern uint annotStrikeoutColor;
 	return [NSString stringWithUTF8String:buf];
 }
 
--(NSString *)getEditTextFormat
+-(NSString *)getFieldJS:(int)idx
 {
 	char buf[1024];
-	if( !Page_getAnnotEditTextFormat( m_page, m_handle, buf, 1023 ) )
+	if( !Page_getAnnotFieldJS( m_page, m_handle, idx, buf, 1023 ) )
 		return NULL;
 	return [NSString stringWithUTF8String:buf];
 }
@@ -1182,6 +1280,13 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotSignStatus( m_page, m_handle );
 }
+-(PDFSign *)getSign
+{
+	PDF_SIGN sign = Page_getAnnotSign(m_page, m_handle);
+	if(!sign) return NULL;
+	return [[PDFSign alloc] init:sign];
+}
+
 -(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect
 {
 	return Page_moveAnnot(m_page, [page handle], m_handle, rect);
@@ -1213,6 +1318,10 @@ extern uint annotStrikeoutColor;
 -(void)advanceReload
 {
 	Page_advReload(m_page);
+}
+-(bool)importAnnot:(const PDF_RECT *)rect :(const unsigned char *)dat :(int)dat_len
+{
+	return Page_importAnnot(m_page, rect, dat, dat_len);
 }
 
 -(bool)renderThumb:(PDFDIB *)dib
@@ -1252,6 +1361,12 @@ extern uint annotStrikeoutColor;
 {
 	return Page_flate(m_page);
 }
+
+-(int)sign:(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact
+{
+	return Page_sign(m_page, [appearence handle], box, [cert_file UTF8String], [pswd UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
+}
+
 -(void)objsStart
 {
     Page_objsStart(m_page);
@@ -1303,7 +1418,13 @@ extern uint annotStrikeoutColor;
 	if( !hand ) return NULL;
 	return [[PDFAnnot alloc] init:m_page:hand];
 }
-
+-(PDFAnnot *)annotByName:(NSString *)name
+{
+	if(!name) return NULL;
+	PDF_ANNOT hand = Page_getAnnotByName(m_page, [name UTF8String]);
+	if( !hand ) return NULL;
+	return [[PDFAnnot alloc] init:m_page:hand];
+}
 -(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect
 {
 	return Page_copyAnnot( m_page, [annot handle], rect );
@@ -1358,7 +1479,7 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotAttachment( m_page, [att UTF8String], icon, rect );
 }
--(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *) dimage :(bool) has_alpha :(const PDF_RECT *) rect
+-(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *) dimage :(const PDF_RECT *) rect
 {
 	return Page_addAnnotBitmap( m_page, [mat handle], [dimage handle], rect );
 }
@@ -1398,8 +1519,9 @@ extern uint annotStrikeoutColor;
 }
 -(void)dealloc
 {
-    Page_close(m_page);
+    PDF_PAGE tmp_page = m_page;
     m_page = NULL;
+    Page_close(tmp_page);
 }
 @end
 
@@ -1543,6 +1665,11 @@ extern uint annotStrikeoutColor;
     return Document_runJS(m_doc, [js UTF8String], del);
 }
 
+-(int)verifySign:(PDFSign *)sign
+{
+	return Document_verifySign(m_doc, [sign handle]);
+}
+
 -(bool)canSave
 {
     return Document_canSave(m_doc);
@@ -1558,6 +1685,10 @@ extern uint annotStrikeoutColor;
 -(NSString *)getEmbedFileName:(int)idx
 {
 	return Document_getEFName(m_doc, idx);
+}
+-(NSString *)getEmbedFileDesc:(int)idx
+{
+	return Document_getEFDesc(m_doc, idx);
 }
 -(bool)getEmbedFileData:(int)idx :(NSString *)path
 {
@@ -1682,6 +1813,14 @@ extern uint annotStrikeoutColor;
 {
 	return Document_removePage( m_doc, pageno );
 }
+-(PDFDocImage *)newImage:(CGImageRef)img : (bool)has_alpha
+{
+	if(!img) return nil;
+	PDF_DOC_IMAGE hand = Document_newImage( m_doc, img, has_alpha );
+	if( !hand ) return NULL;
+    return [[PDFDocImage alloc] init:m_doc:hand];
+}
+
 -(PDFDocImage *)newImageJPEG:(NSString *)path
 {
 	PDF_DOC_IMAGE hand = Document_newImageJPEG( m_doc, [path UTF8String] );
@@ -1694,10 +1833,6 @@ extern uint annotStrikeoutColor;
 	PDF_DOC_IMAGE hand = Document_newImageJPX( m_doc, [path UTF8String] );
 	if( !hand ) return NULL;
     return [[PDFDocImage alloc] init:m_doc:hand];
-}
--(int)checkSignByteRange
-{
-	return Document_checkSignByteRange(m_doc);
 }
 -(void)dealloc
 {

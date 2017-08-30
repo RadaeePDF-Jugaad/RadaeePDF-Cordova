@@ -55,6 +55,15 @@
 
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_command;
 
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_willShowReader;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didShowReader;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_willCloseReader;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didCloseReader;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didChangePage;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didSearchTerm;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnPage;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnAnnotationOfType;
+
 @property (nonatomic) int viewMode;
 @property (strong, nonatomic) NSString *lastOpenedPath;
 @property (strong, nonatomic) UIImage *viewModeImage;
@@ -123,5 +132,15 @@
 - (void)setDoublePageEnabled:(BOOL)enabled;
 - (void)toggleThumbSeekBar:(int)mode;
 - (void)setColor:(int)color forFeature:(int)feature;
+
+// Callbacks
+- (void)willShowReaderCallback:(CDVInvokedUrlCommand *)command;
+- (void)didShowReaderCallback:(CDVInvokedUrlCommand *)command;
+- (void)willCloseReaderCallback:(CDVInvokedUrlCommand *)command;
+- (void)didCloseReaderCallback:(CDVInvokedUrlCommand *)command;
+- (void)didChangePageCallback:(CDVInvokedUrlCommand *)command;
+- (void)didSearchTermCallback:(CDVInvokedUrlCommand *)command;
+- (void)didTapOnPageCallback:(CDVInvokedUrlCommand *)command;
+- (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command;
 
 @end
