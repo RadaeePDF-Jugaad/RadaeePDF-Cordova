@@ -1274,10 +1274,19 @@ public class Page
 		}
 
 		/**
+		 * export data from annotation.<br/>
+		 * a premium license is required for this method.
+		 * @return a PDF object save to memory(byte array).
+		 */
+		final public byte[] Export()
+		{
+			return exportAnnot(page.hand, hand);
+		}
+		/**
 		 * sign the empty field and save the PDF file.<br/>
 		 * if the signature field is not empty(signed), it will return failed.<br/>
 		 * this method require premium license.
-		 * @param form appearence icon for signature
+		 * @param form appearance icon for signature
 		 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
 		 * @param pswd password to open cert file.
 		 * @param reason sign reason will write to signature.
@@ -1288,6 +1297,16 @@ public class Page
 		final public int SignField(DocForm form, String cert_file, String pswd, String reason, String location, String contact)
 		{
 			return signAnnotField(page.hand, hand, form.hand, cert_file, pswd, reason, location, contact);
+		}
+
+		/**
+		 * set text size of edit-box.<br/>
+		 * this method require premium license
+		 * @param size text size in PDF coordinate system.
+		 * @return true or false
+		 */
+		final public boolean SetEditTextSize(float size) {
+			return Page.setAnnotEditTextSize(page.hand, hand, size);
 		}
 	}
 	public class Finder
@@ -1444,6 +1463,7 @@ public class Page
 	static private native boolean setAnnotEditTextColor(long hand, long annot, int color);
 	static private native String getAnnotEditText( long hand, long annot );
 	static private native boolean setAnnotEditText( long hand, long annot, String text );
+	static private native boolean setAnnotEditTextSize( long hand, long annot, float size );
     static private native boolean setAnnotEditFont( long hand, long annot, long font);
 	static private native int getAnnotComboItemCount( long hand, long annot );
 	static private native String getAnnotComboItem( long hand, long annot, int item );
@@ -1513,6 +1533,8 @@ public class Page
 	static private native boolean addAnnotStamp( long hand, float[] rect, int icon );
 	static private native boolean addAnnotPolygon( long hand, long path, int color, int fill_color, float width );
 	static private native boolean addAnnotPolyline( long hand, long path, int style1, int style2, int color, int fill_color, float width );
+	static private native boolean importAnnot(long page, float[] rect, byte[] data);
+	static private native byte[] exportAnnot(long page, long annot);
 
 	static private native long addResFont( long hand, long font );
 	static private native long addResImage( long hand, long image );
@@ -1566,7 +1588,7 @@ public class Page
 	/**
 	 * Sign and save the PDF file.<br/>
 	 * this method required premium license.
-	 * @param form appearence for sign field.
+	 * @param form appearance for sign field.
 	 * @param rect rectangle for sign field
 	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
 	 * @param pswd password to open cert file.
@@ -2607,6 +2629,18 @@ public class Page
     {
         return flate(hand);
     }
+
+	/**
+	 * import annotation from memory(byte array)<br/>
+	 * a premium license is required for this method.
+	 * @param rect [left, top, right, bottom] in PDF coordinate. which is the import annotation's position.
+	 * @param data data returned from Annotation.Export()
+	 * @return true or false.
+	 */
+    public boolean ImportAnnot(float rect[], byte data[])
+	{
+		return importAnnot(hand, rect, data);
+	}
     @Override
     protected void finalize() throws Throwable
     {

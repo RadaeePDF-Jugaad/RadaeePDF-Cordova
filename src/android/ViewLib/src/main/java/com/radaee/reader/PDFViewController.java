@@ -373,6 +373,13 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		} else if(mNavigationMode == NAVIGATION_THUMBS)
 			mThumbView.thumbGotoPage(pageno);
 	}
+	public void onConfigChanged() {
+		if(m_bar_status == BAR_ACT) {
+			m_view.PDFCancelAnnot();
+			m_bar_act.BarHide();
+			m_bar_status = BAR_NONE;
+		}
+	}
 	public boolean OnBackPressed()
 	{
 		switch(m_bar_status)

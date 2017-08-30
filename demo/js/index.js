@@ -36,11 +36,57 @@ var app = {
 
         console.log('Received Event: deviceready');
 
+		registerCallbacks();
+
         document.getElementById("activateLicense").addEventListener("click", this.activateLicense, false);
         document.getElementById("open").addEventListener("click", this.open, false);
         document.getElementById("openHttp").addEventListener("click", this.openHttp, false);
         document.getElementById("openFromAssets").addEventListener("click", this.openAssets, false);
 		
+		function registerCallbacks()
+        {
+            RadaeePDFPlugin.willShowReaderCallback(willShowReader);
+            RadaeePDFPlugin.didShowReaderCallback(didShowReader);
+            RadaeePDFPlugin.willCloseReaderCallback(willCloseReader);
+            RadaeePDFPlugin.didCloseReaderCallback(didCloseReader);
+            RadaeePDFPlugin.didChangePageCallback(function(message){didChangePage(message);});
+            RadaeePDFPlugin.didSearchTermCallback(function(message){didSearchTerm(message);});
+            RadaeePDFPlugin.didTapOnPageCallback(function(message){didTapOnPage(message);});
+            RadaeePDFPlugin.didTapOnAnnotationOfTypeCallback(function(message){didTapOnAnnotationOfType(message);});
+        }
+        
+        function willShowReader()
+        {
+            console.log("--- Callback: willShowReader");
+        }
+        function didShowReader()
+        {
+            console.log("--- Callback: didShowReader");
+        }
+        function willCloseReader()
+        {
+            console.log("--- Callback: willCloseReader");
+        }
+        function didCloseReader()
+        {
+            console.log("--- Callback: didCloseReader");
+        }
+        function didChangePage(page)
+        {
+            console.log("--- Callback: didChangePage: " + page);
+        }
+        function didSearchTerm(term)
+        {
+            console.log("--- Callback: didSearchTerm: " + term);
+        }
+        function didTapOnPage(page)
+        {
+            console.log("--- Callback: didTapOnPage: " + page);
+        }
+        function didTapOnAnnotationOfType(type)
+        {
+            console.log("--- Callback: didTapOnAnnotationOfType: " + type);
+        }
 		/*RadaeePDFPlugin.addToBookmarks(
             {
                 pdfPath: "file:///mnt/sdcard/Download/pdf/License.pdf",

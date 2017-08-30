@@ -1,5 +1,7 @@
 package com.radaee.util;
 
+import com.radaee.pdf.Page;
+
 /**
  * A class to manage callbacks between PDF viewer, and calling class.
  * Your class should implement PDFReaderListener to receive its events.
@@ -57,6 +59,16 @@ public class RadaeePluginCallback {
     public void didSearchTerm(String query, boolean found) {
         if(mListener != null)
             mListener.didSearchTerm(query, found);
+    }
+
+    public void onBlankTapped(int pageno) {
+        if(mListener != null)
+            mListener.onBlankTapped(pageno);
+    }
+
+    public void onAnnotTapped(Page.Annotation annot) {
+        if(mListener != null)
+            mListener.onAnnotTapped(annot);
     }
 
     public void onSetIconsBGColor(int color) {
@@ -120,6 +132,8 @@ public class RadaeePluginCallback {
         void didCloseReader();
         void didChangePage(int pageno);
         void didSearchTerm(String query, boolean found);
+        void onBlankTapped(int pageno);
+        void onAnnotTapped(Page.Annotation annot);
     }
 
     /**

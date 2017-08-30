@@ -36,7 +36,7 @@ module.exports = function (ctx) {
     
     var platformRoot = path.join(ctx.opts.projectRoot, 'platforms/android');
     var fileImportR = [
-		{filePath: 'src/com/radaee/cordova/RadaeePDFPlugin.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: 'src/com/radaee/cordova/RadaeePDFPlugin.java', importStatement: 'com.radaee.reader.R'}, 
     	{filePath: 'src/com/radaee/pdf/Global.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/reader/PDFLayoutView.java', importStatement: 'com.radaee.viewlib.R'},
     	{filePath: 'src/com/radaee/reader/PDFNavAct.java', importStatement: 'com.radaee.viewlib.R'},

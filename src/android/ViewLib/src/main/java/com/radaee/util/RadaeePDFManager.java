@@ -7,6 +7,7 @@ import android.webkit.URLUtil;
 import android.widget.Toast;
 
 import com.radaee.pdf.Global;
+import com.radaee.pdf.Page;
 import com.radaee.reader.PDFViewAct;
 import com.radaee.viewlib.R;
 
@@ -408,5 +409,17 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     public void didSearchTerm(String query, boolean found) {
         if(mListener != null)
             mListener.didSearchTerm(query, found);
+    }
+
+    @Override
+    public void onBlankTapped(int pageno) {
+        if(mListener != null)
+            mListener.onBlankTapped(pageno);
+    }
+
+    @Override
+    public void onAnnotTapped(Page.Annotation annot) {
+        if(mListener != null)
+            mListener.onAnnotTapped(annot);
     }
 }

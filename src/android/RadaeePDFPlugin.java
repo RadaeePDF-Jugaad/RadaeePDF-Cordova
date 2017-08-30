@@ -13,17 +13,19 @@
 	modified on 26/04/17 -->  added getPageCount, extractTextFromPage and encryptDocAs actions
 	
 	modified on 20/06/17 -->  added addToBookmarks, removeBookmark and getBookmarks actions
+	
+	modified on 30/08/17 -->  added support to js callbacks
 */
 package com.radaee.cordova;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.URLUtil;
 
 import com.radaee.pdf.Global;
+import com.radaee.pdf.Page;
 import com.radaee.reader.PDFViewAct;
-import com.radaee.viewlib.R;
+import com.radaee.reader.R; 
 import com.radaee.util.BookmarkHandler;
 import com.radaee.util.RadaeePDFManager;
 import com.radaee.util.RadaeePluginCallback;
@@ -32,6 +34,7 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +48,14 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
 
     private boolean showPdfInProgress;
     private static RadaeePDFManager mPdfManager;
+    private static CallbackContext sWillShowReader;
+    private static CallbackContext sDidShowReader;
+    private static CallbackContext sWillCloseReader;
+    private static CallbackContext sDidCloseReader;
+    private static CallbackContext sDidChangePage;
+    private static CallbackContext sDidSearchTerm;
+    private static CallbackContext sDidTapOnPage;
+    private static CallbackContext sDidTapOnAnnot;
     private static final String TAG = "RadaeePDFPlugin";
 
 	/**
@@ -195,6 +206,30 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "getBookmarks":
                 handleBookmarkActions(action, args.getJSONObject(0), callbackContext);
                 break;
+            case "willShowReaderCallback":
+                sWillShowReader = callbackContext;
+                break;
+            case "didShowReaderCallback":
+                sDidShowReader = callbackContext;
+                break;
+            case "willCloseReaderCallback":
+                sWillCloseReader = callbackContext;
+                break;
+            case "didCloseReaderCallback":
+                sDidCloseReader = callbackContext;
+                break;
+            case "didChangePageCallback":
+                sDidChangePage = callbackContext;
+                break;
+            case "didSearchTermCallback":
+                sDidSearchTerm = callbackContext;
+                break;
+            case "didTapOnPageCallback":
+                sDidTapOnPage = callbackContext;
+                break;
+            case "didTapOnAnnotationOfTypeCallback":
+                sDidTapOnAnnot = callbackContext;
+                break;
             default:
                 return false;
         }
@@ -204,33 +239,59 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
 
     @Override
     public void willShowReader() {
-        Log.d(TAG, "will show reader");
+        PluginResult result = new PluginResult(PluginResult.Status.OK);
+        result.setKeepCallback(true);
+        sWillShowReader.sendPluginResult(result);
     }
 
     @Override
     public void didShowReader() {
-        Log.d(TAG, "did show reader");
+        PluginResult result = new PluginResult(PluginResult.Status.OK);
+        result.setKeepCallback(true);
+        sDidShowReader.sendPluginResult(result);
         //Log.d(TAG, mPdfManager.encryptDocAs("/mnt/sdcard/Download/pdf/License_enc.pdf", "12345", "", 4, 4, "123456789abcdefghijklmnopqrstuvw"));
     }
 
     @Override
     public void willCloseReader() {
-        Log.d(TAG, "will close reader");
+        PluginResult result = new PluginResult(PluginResult.Status.OK);
+        result.setKeepCallback(true);
+        sWillCloseReader.sendPluginResult(result);
     }
 
     @Override
     public void didCloseReader() {
-        Log.d(TAG, "did close reader");
+        PluginResult result = new PluginResult(PluginResult.Status.OK);
+        result.setKeepCallback(true);
+        sDidCloseReader.sendPluginResult(result);
     }
 
     @Override
     public void didChangePage(int pageno) {
-        Log.d(TAG, "Did change page " + pageno);
+        PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
+        result.setKeepCallback(true);
+        sDidChangePage.sendPluginResult(result);
     }
 
     @Override
     public void didSearchTerm(String query, boolean found) {
-        Log.d(TAG, "did search term -> " + query + " and result = " + found);
+        PluginResult result = new PluginResult(PluginResult.Status.OK, query);
+        result.setKeepCallback(true);
+        sDidSearchTerm.sendPluginResult(result);
+    }
+
+    @Override
+    public void onBlankTapped(int pageno) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
+        result.setKeepCallback(true);
+        sDidTapOnPage.sendPluginResult(result);
+    }
+
+    @Override
+    public void onAnnotTapped(Page.Annotation annot) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, annot.GetType());
+        result.setKeepCallback(true);
+        sDidTapOnAnnot.sendPluginResult(result);
     }
 
     private void handleBookmarkActions(String action, JSONObject params, CallbackContext callbackContext) {

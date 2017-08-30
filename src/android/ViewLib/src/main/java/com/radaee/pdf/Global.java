@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.14
+ * @version 3.14.1
  */
 public class Global
 {
@@ -734,7 +734,7 @@ public class Global
 		findSecondaryColor = 0x40404040;// find secondary color
 		fling_dis = 1.0f;// 0.5-2
         fling_speed = 0.1f;// 0.05 - 0.2
-		def_view = 0;// 0,1,2,3,4,5,6 0:vertical 1:horizon 2:curl effect 3:single
+		def_view = 5;// 0,1,2,3,4,5,6 0:vertical 1:horizon 2:curl effect 3:single
 						// 4:SingleEx 5:Reflow, 6:show 2 page as 1 page in land
 						// scape mode
 		render_mode = recommandedRenderMode();// 0,1,2 0:draft 1:normal 2:best with over print support.

@@ -117,11 +117,13 @@ RadaeePDFPlugin.getFileState(
 	function(err){
 		console.log("Failure: " + err);
     });
-```
+```  
+
+For more examples, check demo/js/index.js  
 
 RadaeePDF library version included:
-- Android: v3.12
-- iOS: v3.8.0
+- Android: v3.14.1
+- iOS: v3.8.2
 
 Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  

@@ -236,6 +236,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
+		m_controller.onConfigChanged();
         super.onConfigurationChanged(newConfig);
     }
     @Override
@@ -349,12 +350,15 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	{
 		if(m_controller != null)
 			m_controller.OnAnnotTapped(annot);
+		if(annot != null)
+			RadaeePluginCallback.getInstance().onAnnotTapped(annot);
 	}
 	@Override
 	public void OnPDFBlankTapped()
 	{
 		if(m_controller != null)
 			m_controller.OnBlankTapped();
+		RadaeePluginCallback.getInstance().onBlankTapped(m_view.PDFGetCurrPage());
 	}
 	@Override
 	public void OnPDFSelectEnd(String text)

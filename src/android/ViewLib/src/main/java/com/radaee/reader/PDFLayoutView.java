@@ -229,58 +229,6 @@ public class PDFLayoutView extends View implements LayoutListener
 					else if( m_doc.CanSave() && m_annot.GetEditType() > 0 )//if form edit-box.
 					{
 						onEditAnnot();
-                        /*
-                        int[] location = new int[2];
-                        getLocationOnScreen(location);
-                        m_pEdit = new PopupWindow(LayoutInflater.from(getContext()).inflate(R.layout.pop_edit, null));//popup window
-                        Drawable dw = new ColorDrawable(0);
-                        m_pEdit.setTouchable(true);
-                        m_pEdit.setBackgroundDrawable(dw);//auto dismiss when click out of popup window
-                        m_pEdit.setWidth((int) (m_annot_rect[2] - m_annot_rect[0]));//width of edit-box
-                        m_pEdit.setHeight((int) (m_annot_rect[3] - m_annot_rect[1]));//height of edit-box
-                        final EditText edit = (EditText) m_pEdit.getContentView().findViewById(R.id.annot_text);
-                        //edit.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                        edit.setBackgroundColor(0xFFFFFFC0);
-                        float fsize = m_annot.GetEditTextSize() * m_layout.vGetScale();//font size.
-                        edit.setTextSize(TypedValue.COMPLEX_UNIT_PX, fsize);
-                        edit.setPadding(2, 2, 2, 2);
-                        switch (m_annot.GetEditType()) {
-                            case 1://single line
-                                edit.setSingleLine();
-                                edit.setInputType(InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_NORMAL);
-                                break;
-                            case 2://password
-                                edit.setSingleLine();
-                                edit.setInputType(InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                                break;
-                            case 3://multi-line
-                                edit.setSingleLine(false);
-                                edit.setInputType(InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_NORMAL);
-                                break;
-                        }
-                        int maxlen = m_annot.GetEditMaxlen();
-                        if (maxlen > 0)
-                            edit.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxlen)});
-                        else
-                            edit.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1020)});
-                        edit.setText(m_annot.GetEditText());
-                        m_edit_type = 1;
-                        m_pEdit.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                            @Override
-                            public void onDismiss() {
-                                if (m_edit_type == 1)//edit box
-                                {
-                                    m_annot.SetEditText(edit.getText().toString());
-                                    m_layout.vRenderSync(m_annot_page);
-                                    if (m_listener != null)
-                                        m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                                    PDFEndAnnot();
-                                }
-                                m_edit_type = 0;
-                            }
-                        });
-                        m_pEdit.showAtLocation(PDFLayoutView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int) m_annot_rect[1] + location[1]);
-                        */
 					}
 					else if( m_doc.CanSave() && m_annot.GetComboItemCount() >= 0 )//if form choice
 					{
