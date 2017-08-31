@@ -239,59 +239,75 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
 
     @Override
     public void willShowReader() {
-        PluginResult result = new PluginResult(PluginResult.Status.OK);
-        result.setKeepCallback(true);
-        sWillShowReader.sendPluginResult(result);
+        if(sWillShowReader != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            result.setKeepCallback(true);
+            sWillShowReader.sendPluginResult(result);
+        }
     }
 
     @Override
     public void didShowReader() {
-        PluginResult result = new PluginResult(PluginResult.Status.OK);
-        result.setKeepCallback(true);
-        sDidShowReader.sendPluginResult(result);
+        if(sDidShowReader != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            result.setKeepCallback(true);
+            sDidShowReader.sendPluginResult(result);
+        }
         //Log.d(TAG, mPdfManager.encryptDocAs("/mnt/sdcard/Download/pdf/License_enc.pdf", "12345", "", 4, 4, "123456789abcdefghijklmnopqrstuvw"));
     }
 
     @Override
     public void willCloseReader() {
-        PluginResult result = new PluginResult(PluginResult.Status.OK);
-        result.setKeepCallback(true);
-        sWillCloseReader.sendPluginResult(result);
+        if(sWillCloseReader != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            result.setKeepCallback(true);
+            sWillCloseReader.sendPluginResult(result);
+        }
     }
 
     @Override
     public void didCloseReader() {
-        PluginResult result = new PluginResult(PluginResult.Status.OK);
-        result.setKeepCallback(true);
-        sDidCloseReader.sendPluginResult(result);
+        if(sDidCloseReader != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            result.setKeepCallback(true);
+            sDidCloseReader.sendPluginResult(result);
+        }
     }
 
     @Override
     public void didChangePage(int pageno) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
-        result.setKeepCallback(true);
-        sDidChangePage.sendPluginResult(result);
+        if(sDidChangePage != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
+            result.setKeepCallback(true);
+            sDidChangePage.sendPluginResult(result);
+        }
     }
 
     @Override
     public void didSearchTerm(String query, boolean found) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, query);
-        result.setKeepCallback(true);
-        sDidSearchTerm.sendPluginResult(result);
+        if(sDidSearchTerm != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, query);
+            result.setKeepCallback(true);
+            sDidSearchTerm.sendPluginResult(result);
+        }
     }
 
     @Override
     public void onBlankTapped(int pageno) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
-        result.setKeepCallback(true);
-        sDidTapOnPage.sendPluginResult(result);
+        if(sDidTapOnPage != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
+            result.setKeepCallback(true);
+            sDidTapOnPage.sendPluginResult(result);
+        }
     }
 
     @Override
     public void onAnnotTapped(Page.Annotation annot) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, annot.GetType());
-        result.setKeepCallback(true);
-        sDidTapOnAnnot.sendPluginResult(result);
+        if(sDidTapOnAnnot != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, annot.GetType());
+            result.setKeepCallback(true);
+            sDidTapOnAnnot.sendPluginResult(result);
+        }
     }
 
     private void handleBookmarkActions(String action, JSONObject params, CallbackContext callbackContext) {
