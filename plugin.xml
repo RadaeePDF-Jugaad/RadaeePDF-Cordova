@@ -40,7 +40,6 @@
         <!-- Plugin source -->
         <source-file src="src/android/RadaeePDFPlugin.java" target-dir="src/com/radaee/cordova" />
         <source-file src="src/android/ViewLib/libs/com.radaee.view.jar" target-dir="libs" />
-		<source-file src="src/android/ViewLib/libs/android-support-v4.jar" target-dir="libs" />
 
         <!-- Radaee source - java.com.radaee.pdf -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/adv/Obj.java" target-dir="src/com/radaee/pdf/adv" />
