@@ -984,7 +984,7 @@ extern bool g_double_page_enabled;
         if( long_press )
         {
             if( m_delegate )
-                [m_delegate OnLongPressed:0 :0];
+                [m_delegate OnLongPressed:point.x :point.y];
         }
         
         if([self paginAvailable])

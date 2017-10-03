@@ -1625,10 +1625,6 @@ extern uint g_oval_color;
 {
     if (_delegate) {
         [_delegate didLongPressOnPage:(self.pagenow - 1) atPoint:CGPointMake(x, y)];
-        
-        if (x == 0 && y == 0) {
-            return;
-        }
     }
     
     [m_view vSelStart];//start to select
