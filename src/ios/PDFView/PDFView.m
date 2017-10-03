@@ -694,7 +694,8 @@ extern bool g_double_page_enabled;
 
 -(bool)OnAnnotTouchBegin:(CGPoint)point
 {
-	if( m_status != sta_annot ) return false;
+	if ( m_status != sta_annot ) return false;
+    if (![m_annot canMoveAnnot]) return false;
     m_px = point.x * m_scale;
     m_py = point.y * m_scale;
     m_tx = m_px;
@@ -704,7 +705,8 @@ extern bool g_double_page_enabled;
 
 -(bool)OnAnnotTouchMove:(CGPoint)point
 {
-	if( m_status != sta_annot ) return false;
+	if (m_status != sta_annot) return false;
+    if (![m_annot canMoveAnnot]) return false;
     if([self canSaveDocument])
     {
         m_tx = point.x * m_scale;
@@ -717,6 +719,15 @@ extern bool g_double_page_enabled;
 -(bool)OnAnnotTouchEnd:(CGPoint)point
 {
 	if( m_status != sta_annot ) return false;
+    
+    if (m_annot.type == 20) { // EditText
+        if (m_delegate) {
+            [m_delegate OnAnnotEnd];
+        }
+    }
+    
+    if (![m_annot canMoveAnnot]) return false;
+    
     if([self canSaveDocument])
     {
     	//[self setModified:YES force:NO];
@@ -965,6 +976,17 @@ extern bool g_double_page_enabled;
     }
     else
     {
+        bool long_press = true;
+        if( dx > 5 || dx < -5 )
+            long_press = false;
+        if( dy > 5 || dy < -5 )
+            long_press = false;
+        if( long_press )
+        {
+            if( m_delegate )
+                [m_delegate OnLongPressed:0 :0];
+        }
+        
         if([self paginAvailable])
         {
             struct PDFV_POS pos;

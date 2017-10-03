@@ -677,6 +677,16 @@
     self.cdv_didTapOnPage = command;
 }
 
+- (void)didDoubleTapOnPageCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didDoubleTapOnPage = command;
+}
+
+- (void)didLongPressOnPageCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_didLongPressOnPage = command;
+}
+
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command
 {
     self.cdv_didTapOnAnnotationOfType = command;
@@ -967,6 +977,16 @@
     */
     
     [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didTapOnPage];
+}
+
+- (void)didDoubleTapOnPage:(int)page atPoint:(CGPoint)point
+{
+    [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didDoubleTapOnPage];
+}
+
+- (void)didLongPressOnPage:(int)page atPoint:(CGPoint)point
+{
+    [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didLongPressOnPage];
 }
 
 - (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point

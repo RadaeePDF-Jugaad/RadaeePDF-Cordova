@@ -62,6 +62,8 @@
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didChangePage;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didSearchTerm;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnPage;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didDoubleTapOnPage;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didLongPressOnPage;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnAnnotationOfType;
 
 @property (nonatomic) int viewMode;
@@ -141,6 +143,8 @@
 - (void)didChangePageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didSearchTermCallback:(CDVInvokedUrlCommand *)command;
 - (void)didTapOnPageCallback:(CDVInvokedUrlCommand *)command;
+- (void)didDoubleTapOnPageCallback:(CDVInvokedUrlCommand *)command;
+- (void)didLongPressOnPageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command;
 
 @end
