@@ -197,6 +197,16 @@ RadaeePDFPlugin.prototype.didTapOnPageCallback = function (successCallback) {
 	exec(successCallback, function(err){console.log(err)}, 'RadaeePDFPlugin', 'didTapOnPageCallback', []);
 };
 
+RadaeePDFPlugin.prototype.didDoubleTapOnPageCallback = function (successCallback) {
+
+	exec(successCallback, function(err){console.log(err)}, 'RadaeePDFPlugin', 'didDoubleTapOnPageCallback', []);
+};
+
+RadaeePDFPlugin.prototype.didLongPressOnPageCallback = function (successCallback) {
+
+	exec(successCallback, function(err){console.log(err)}, 'RadaeePDFPlugin', 'didLongPressOnPageCallback', []);
+};
+
 RadaeePDFPlugin.prototype.didTapOnAnnotationOfTypeCallback = function (successCallback) {
 
 	exec(successCallback, function(err){console.log(err)}, 'RadaeePDFPlugin', 'didTapOnAnnotationOfTypeCallback', []);
