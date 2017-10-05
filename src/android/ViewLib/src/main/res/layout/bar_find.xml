@@ -41,6 +41,8 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/btn_left"
         android:layout_toRightOf="@+id/btn_back"
-        android:ems="10" />
+        android:inputType="text"
+        android:maxLines="1"
+        android:imeOptions="actionSearch"/>
 
 </RelativeLayout>

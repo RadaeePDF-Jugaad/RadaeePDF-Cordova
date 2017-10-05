@@ -15,6 +15,8 @@
 	modified on 20/06/17 -->  added addToBookmarks, removeBookmark and getBookmarks actions
 	
 	modified on 30/08/17 -->  added support to js callbacks
+	
+	modified on 05/10/17 -->  added double tap/long press js callbacks
 */
 package com.radaee.cordova;
 
@@ -56,6 +58,8 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
     private static CallbackContext sDidSearchTerm;
     private static CallbackContext sDidTapOnPage;
     private static CallbackContext sDidTapOnAnnot;
+	private static CallbackContext sDidDoubleTap;
+    private static CallbackContext sDidLongPress;
     private static final String TAG = "RadaeePDFPlugin";
 
 	/**
@@ -230,6 +234,12 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "didTapOnAnnotationOfTypeCallback":
                 sDidTapOnAnnot = callbackContext;
                 break;
+			case "didDoubleTapOnPageCallback":
+                sDidDoubleTap = callbackContext;
+                break;
+            case "didLongPressOnPageCallback":
+                sDidLongPress = callbackContext;
+                break;
             default:
                 return false;
         }
@@ -307,6 +317,24 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             PluginResult result = new PluginResult(PluginResult.Status.OK, annot.GetType());
             result.setKeepCallback(true);
             sDidTapOnAnnot.sendPluginResult(result);
+        }
+    }
+
+    @Override
+    public void onDoubleTapped(int pageno, float x, float y) {
+        if(sDidDoubleTap != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
+            result.setKeepCallback(true);
+            sDidDoubleTap.sendPluginResult(result);
+        }
+    }
+
+    @Override
+    public void onLongPressed(int pageno, float x, float y) {
+        if(sDidLongPress != null) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, pageno);
+            result.setKeepCallback(true);
+            sDidLongPress.sendPluginResult(result);
         }
     }
 

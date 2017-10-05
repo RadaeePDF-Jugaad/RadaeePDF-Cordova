@@ -53,6 +53,8 @@ var app = {
             RadaeePDFPlugin.didSearchTermCallback(function(message){didSearchTerm(message);});
             RadaeePDFPlugin.didTapOnPageCallback(function(message){didTapOnPage(message);});
             RadaeePDFPlugin.didTapOnAnnotationOfTypeCallback(function(message){didTapOnAnnotationOfType(message);});
+			RadaeePDFPlugin.didDoubleTapOnPageCallback(function(message){didDoubleTapOnPage(message);});
+            RadaeePDFPlugin.didLongPressOnPageCallback(function(message){didLongPressOnPage(message);});
         }
         
         function willShowReader()
@@ -86,6 +88,14 @@ var app = {
         function didTapOnAnnotationOfType(type)
         {
             console.log("--- Callback: didTapOnAnnotationOfType: " + type);
+        }
+		function didDoubleTapOnPage(page)
+        {
+            console.log("--- Callback: didDoubleTapOnPage: " + page);
+        }
+        function didLongPressOnPage(page)
+        {
+            console.log("--- Callback: didLongPressOnPage: " + page);
         }
 		/*RadaeePDFPlugin.addToBookmarks(
             {

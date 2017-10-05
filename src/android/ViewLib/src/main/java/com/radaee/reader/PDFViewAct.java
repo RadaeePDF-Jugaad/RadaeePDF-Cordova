@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +44,6 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 	private boolean mDidShowReader = false;
 
 	static public Document ms_tran_doc;
-	static private int m_tmp_index = 0;
 	private PDFAssetStream m_asset_stream = null;
 	private PDFHttpStream m_http_stream = null;
 	private Document m_doc = null;
@@ -60,7 +60,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 		finish();
     }
-    private final void ProcessOpenResult(int ret)
+    private void ProcessOpenResult(int ret)
     {
 		switch( ret )
 		{
@@ -85,7 +85,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 			break;
 		}
     }
-    class MyPDFFontDel implements Document.PDFFontDelegate
+    private class MyPDFFontDel implements Document.PDFFontDelegate
     {
         @Override
         public String GetExtFont(String collection, String fname, int flag, int[] ret_flags)
@@ -94,7 +94,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
             return null;
         }
     }
-    class OpenTask extends AsyncTask<Void, Integer, Integer>
+    private class OpenTask extends AsyncTask<Void, Integer, Integer>
     {
         private boolean need_save;
         private ProgressDialog dlg;
@@ -158,7 +158,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 
 		RadaeePluginCallback.getInstance().willShowReader();
 		if(!Global.cacheEnabled)
-			findViewById(R.id.progress).setVisibility(View.GONE);
+			m_layout.findViewById(R.id.progress).setVisibility(View.GONE);
 
         Intent intent = getIntent();
         String bmp_format = intent.getStringExtra("BMPFormat");
@@ -189,7 +189,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         	String pdf_path = intent.getStringExtra("PDFPath");
         	String pdf_pswd = intent.getStringExtra("PDFPswd");
         	String pdf_http = intent.getStringExtra("PDFHttp");
-        	if(pdf_http != null && pdf_http != "" )
+        	if(!TextUtils.isEmpty(pdf_http))
         	{
         		m_http_stream = new PDFHttpStream();
         		m_http_stream.open(pdf_http);
@@ -213,7 +213,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
                 */
         		ProcessOpenResult(ret);
         	}
-        	else if( pdf_asset != null && pdf_asset != "" )
+        	else if(!TextUtils.isEmpty(pdf_asset))
         	{
         		m_asset_stream = new PDFAssetStream();
         		m_asset_stream.open(getAssets(), pdf_asset);
@@ -221,7 +221,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         		int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
         		ProcessOpenResult(ret);
         	}
-        	else if( pdf_path != null && pdf_path != "" )
+        	else if(!TextUtils.isEmpty(pdf_path) )
         	{
         		m_doc = new Document();
         		int ret = m_doc.Open(pdf_path, pdf_pswd);
@@ -461,8 +461,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     }
 
     @Override
-    public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y)
-	{
+    public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y) {
 		float mCurZoomLevel = layout.vGetZoom();
 		if(m_view.PDFGetScale() <= m_view.PDFGetMinScale())
 			Global.zoomStep = 1;
@@ -471,8 +470,14 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 			Global.zoomStep *= -1;
 
 		layout.vZoomSet((int) x, (int) y, layout.vGetPos((int) x, (int) y), mCurZoomLevel + Global.zoomStep);
+		RadaeePluginCallback.getInstance().onDoubleTapped(m_view.PDFGetCurrPage(), x, y);
 		return true;
     }
+
+	@Override
+	public void OnPDFLongPressed(PDFLayout layout, float x, float y) {
+		RadaeePluginCallback.getInstance().onLongPressed(m_view.PDFGetCurrPage(), x, y);
+	}
 
 	@Override
 	public void onPDFPageRendered(int pageno) {

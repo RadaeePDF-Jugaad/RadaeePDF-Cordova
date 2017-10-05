@@ -3,6 +3,7 @@ package com.radaee.reader;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -14,7 +15,9 @@ import com.radaee.util.PDFHttpStream;
 import com.radaee.view.PDFViewPager;
 import com.radaee.reader.R;
 
-/**
+import java.util.Locale;
+
+/*
  * Created by radaee on 2015/5/14.
  */
 public class PDFPagerAct extends Activity
@@ -37,22 +40,22 @@ public class PDFPagerAct extends Activity
         switch( ret )
         {
             case -1://need input password
-                onFail("Open Failed: Invalid Password");
+                onFail(getString(R.string.failed_invalid_password));
                 break;
             case -2://unknown encryption
-                onFail("Open Failed: Unknown Encryption");
+                onFail(getString(R.string.failed_encryption));
                 break;
             case -3://damaged or invalid format
-                onFail("Open Failed: Damaged or Invalid PDF file");
+                onFail(getString(R.string.failed_invalid_format));
                 break;
             case -10://access denied or invalid file path
-                onFail("Open Failed: Access denied or Invalid path");
+                onFail(getString(R.string.failed_invalid_path));
                 break;
             case 0://succeeded, and continue
                 m_pager.PDFOpen(m_doc, 1);
                 break;
             default://unknown error
-                onFail("Open Failed: Unknown Error");
+                onFail(getString(R.string.failed_unknown));
                 break;
         }
     }
@@ -69,7 +72,7 @@ public class PDFPagerAct extends Activity
         String pdf_path = intent.getStringExtra("PDFPath");
         String pdf_pswd = intent.getStringExtra("PDFPswd");
         String pdf_http = intent.getStringExtra("PDFHttp");
-        if(pdf_http != null && pdf_http != "" )
+        if(!TextUtils.isEmpty(pdf_http))
         {
             m_http_stream = new PDFHttpStream();
             m_http_stream.open(pdf_http);
@@ -93,7 +96,7 @@ public class PDFPagerAct extends Activity
                 */
             ProcessOpenResult(ret);
         }
-        else if( pdf_asset != null && pdf_asset != "" )
+        else if(!TextUtils.isEmpty(pdf_asset) )
         {
             m_asset_stream = new PDFAssetStream();
             m_asset_stream.open(getAssets(), pdf_asset);
@@ -101,11 +104,11 @@ public class PDFPagerAct extends Activity
             int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
             ProcessOpenResult(ret);
         }
-        else if( pdf_path != null && pdf_path != "" )
+        else if(!TextUtils.isEmpty(pdf_path))
         {
             m_doc = new Document();
             int ret = m_doc.Open(pdf_path, pdf_pswd);
-            m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
+            m_doc.SetCache(String.format(Locale.ENGLISH, "%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
             m_tmp_index++;
             //m_doc.SetFontDel(m_font_del);
             ProcessOpenResult(ret);

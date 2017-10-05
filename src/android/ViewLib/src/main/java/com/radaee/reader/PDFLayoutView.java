@@ -15,6 +15,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -35,6 +36,7 @@ import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.util.ComboList;
+import com.radaee.util.CommonUtil;
 import com.radaee.util.PopupEditAct;
 import com.radaee.view.PDFLayout;
 import com.radaee.view.PDFLayout.LayoutListener;
@@ -129,6 +131,9 @@ public class PDFLayoutView extends View implements LayoutListener
         @Override
         public void onLongPress(MotionEvent e)
         {
+			if(m_layout == null) return;
+			if(m_status == STA_NONE && m_listener != null)
+				m_listener.OnPDFLongPressed(m_layout, e.getX(), e.getY());
         }
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
@@ -158,12 +163,13 @@ public class PDFLayoutView extends View implements LayoutListener
                     @Override
                     public void OnEditValue(String val) {
                         if(m_annot != null) {
-                        m_annot.SetEditText(val);
-                            m_layout.vRenderSync(m_annot_page);
-                            if (m_listener != null)
-                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                            PDFEndAnnot();
-                            m_edit_type = 0;
+							m_annot.SetEditText(val);
+							m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+							m_layout.vRenderSync(m_annot_page);
+							if (m_listener != null)
+								m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+							PDFEndAnnot();
+							m_edit_type = 0;
                         }
                     }
                 };
@@ -212,13 +218,16 @@ public class PDFLayoutView extends View implements LayoutListener
 						{
 							case 0:
 								m_annot.SetCheckValue(true);
+								m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 								break;
 							case 1:
 								m_annot.SetCheckValue(false);
+								m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 								break;
 							case 2:
 							case 3:
 								m_annot.SetRadio();
+								m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 								break;
 						}
 						m_layout.vRenderSync(m_annot_page);
@@ -269,6 +278,7 @@ public class PDFLayoutView extends View implements LayoutListener
 									{
 										if (m_combo_item >= 0) {
 											m_annot.SetComboItem(m_combo_item);
+											m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 											m_layout.vRenderSync(m_annot_page);
 											if (m_listener != null)
 												m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
@@ -319,6 +329,7 @@ public class PDFLayoutView extends View implements LayoutListener
         public void OnPDFZoomStart();
         public void OnPDFZoomEnd();
         public boolean OnPDFDoubleTapped( PDFLayout layout, float x, float y );
+        void OnPDFLongPressed( PDFLayout layout, float x, float y );
 	}
     class PDFVPageSet
     {
@@ -876,6 +887,7 @@ public class PDFLayoutView extends View implements LayoutListener
                     float rect[] = m_annot.GetRect();
                     m_opstack.push(new OPMove(pos.pageno, rect, pos.pageno, m_annot.GetIndexInPage(), m_annot_rect0));
 					m_annot.SetRect(m_annot_rect0[0], m_annot_rect0[1], m_annot_rect0[2], m_annot_rect0[3]);
+					m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 					m_layout.vRenderSync(m_annot_page);
 					if( m_listener != null )
 						m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
@@ -895,6 +907,7 @@ public class PDFLayoutView extends View implements LayoutListener
                         float rect[] = m_annot.GetRect();
                         m_opstack.push(new OPMove(m_annot_page.GetPageNo(), rect, pos.pageno, page.GetAnnotCount(), m_annot_rect0));
 						m_annot.MoveToPage(page, m_annot_rect0);
+						m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 						//page.CopyAnnot(m_annot, m_annot_rect0);
 						page.Close();
 					}
@@ -1024,6 +1037,7 @@ public class PDFLayoutView extends View implements LayoutListener
 				pt[0] = pos.x;
 				pt[1] = pos.y;
 				page.AddAnnotText(pt);
+				onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                 //add to redo/undo stack.
                 m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
 				m_layout.vRenderSync(vpage);
@@ -1037,6 +1051,15 @@ public class PDFLayoutView extends View implements LayoutListener
 		}
 		return true;
 	}
+
+	private void onAnnotCreated(Annotation annot) {
+		if(annot != null) {
+			annot.SetModifyDate(CommonUtil.getCurrentDate());
+			if(!TextUtils.isEmpty(Global.sAnnotAuthor))
+				annot.SetPopupLabel(Global.sAnnotAuthor);
+		}
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
@@ -1248,6 +1271,7 @@ public class PDFLayoutView extends View implements LayoutListener
 					mat.TransformInk(m_ink);
 					page.AddAnnotInk(m_ink);
 					mat.Destroy();
+					onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                     //add to redo/undo stack.
                     m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, page.GetAnnotCount() - 1));
 					m_layout.vRenderSync(m_annot_page);
@@ -1316,6 +1340,7 @@ public class PDFLayoutView extends View implements LayoutListener
 						mat.TransformRect(rect);
 						page.AddAnnotRect(rect, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
 						mat.Destroy();
+						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
                         m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
 						pset.Insert(vpage);
@@ -1387,6 +1412,7 @@ public class PDFLayoutView extends View implements LayoutListener
 						mat.TransformRect(rect);
 						page.AddAnnotEllipse(rect, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
 						mat.Destroy();
+						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
                         m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
 						page.Close();
@@ -1520,6 +1546,7 @@ public class PDFLayoutView extends View implements LayoutListener
 						mat.TransformPoint(pt2);
 						page.AddAnnotLine(pt1, pt2, 1, 0, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
 						mat.Destroy();
+						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
                         m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
 						page.Close();
@@ -1597,6 +1624,7 @@ public class PDFLayoutView extends View implements LayoutListener
 						page.ObjsStart();
 						page.AddAnnotBitmap(m_dicon, rect);
                         mat.Destroy();
+						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
                         m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
 						page.Close();
@@ -1689,6 +1717,7 @@ public class PDFLayoutView extends View implements LayoutListener
 				String str_content = content.getText().toString();
 				m_annot.SetPopupSubject(str_subj);
 				m_annot.SetPopupText(str_content);
+				m_annot.SetModifyDate(CommonUtil.getCurrentDate());
 				dialog.dismiss();
 				if(m_listener != null)
 					m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
@@ -1814,6 +1843,7 @@ public class PDFLayoutView extends View implements LayoutListener
 		{
             //add to redo/undo stack.
             Page page = m_sel.GetPage();
+			onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
             m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, page.GetAnnotCount() - 1));
 			m_layout.vRenderSync(m_annot_page);
 			invalidate();
@@ -1920,6 +1950,14 @@ public class PDFLayoutView extends View implements LayoutListener
 		if(m_layout != null)
 			return m_layout.vGetMinScale();
 		return 1;
+	}
+
+	public float PDFGetX() {
+		return m_layout != null ? m_layout.vGetX() : 0;
+	}
+
+	public float PDFGetY() {
+		return m_layout != null ? m_layout.vGetY() : 0;
 	}
 
 	public void refreshCurrentPage() {

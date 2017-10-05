@@ -675,7 +675,7 @@ public class Page
 			return Page.getAnnotEditTextRect(page.hand, hand, rect);
 		}
 		/**
-		 * get text size of edit-box.<br/>
+		 * get text size of edit-box and edit field.<br/>
 		 * this method require premium license
 		 * @return size of text, in PDF coordinate system.
 		 */

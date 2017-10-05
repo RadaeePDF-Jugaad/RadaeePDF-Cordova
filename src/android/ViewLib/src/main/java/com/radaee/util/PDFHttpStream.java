@@ -5,13 +5,25 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
 import com.radaee.pdf.Document.PDFStream;
+import com.radaee.pdf.Global;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * a class for HttpURLConnection.<br/>
@@ -124,6 +136,10 @@ public class PDFHttpStream implements PDFStream
 			{
 				URL url = new URL(m_url);
 				HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+
+				if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
+					trustAllHosts();
+
 				conn.setRequestMethod("GET");
 				conn.setRequestProperty("Connection", "Keep-Alive");
 				conn.setConnectTimeout(30 * 1000);
@@ -298,6 +314,10 @@ public class PDFHttpStream implements PDFStream
 		try
 		{
 			URL url = new URL(m_url);
+
+			if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
+				trustAllHosts();
+
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Connection", "Keep-Alive");
@@ -340,9 +360,13 @@ public class PDFHttpStream implements PDFStream
 		{
 			long time1 = System.currentTimeMillis();
 			URL url = new URL(m_url);
+
+			if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
+				trustAllHosts();
+
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Range", String.format("bytes=%d-%d", start, start + len - 1));
+			conn.setRequestProperty("Range", String.format(Locale.ENGLISH, "bytes=%d-%d", start, start + len - 1));
 			conn.setRequestProperty("Connection", "Keep-Alive");
 			conn.setConnectTimeout(30 * 1000);
 			conn.connect();
@@ -359,7 +383,7 @@ public class PDFHttpStream implements PDFStream
 			conn.disconnect();
 			long time2 = System.currentTimeMillis();
 			//it's better to comment this line in release version.
-			Log.d(String.format("Time:%06d %d", start/BLOCK_SIZE, len), String.valueOf(time2 - time1));
+			Log.d(String.format(Locale.ENGLISH, "Time:%06d %d", start/BLOCK_SIZE, len), String.valueOf(time2 - time1));
 			return data;
 		}
 		catch(Exception e)
@@ -465,4 +489,28 @@ public class PDFHttpStream implements PDFStream
         close();
         super.finalize();
     }
+
+	@SuppressLint("TrustAllX509TrustManager")
+	private void trustAllHosts() {
+		try {
+			HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+			SSLContext mSslContext = SSLContext.getInstance("TLS");
+			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+				public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[] {}; }
+				public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+				public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+			}};
+			mSslContext.init(null, trustAllCerts, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(mSslContext.getSocketFactory());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private class NullHostNameVerifier implements HostnameVerifier {
+		@Override
+		public boolean verify(String hostname, SSLSession session) {
+			return true;
+		}
+	}
 }

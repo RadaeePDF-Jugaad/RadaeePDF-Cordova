@@ -3,7 +3,6 @@ package com.radaee.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -20,13 +19,14 @@ import android.widget.RelativeLayout;
 import com.radaee.viewlib.R;
 
 public class PopupEditAct extends Activity {
+
     private EditText m_txt;
     private RelativeLayout m_layout;
 
-    public interface ActRetListener
-    {
+    public interface ActRetListener {
         void OnEditValue(String val);
     }
+
     static public ActRetListener ms_listener;
     private ActRetListener m_listener;
 
@@ -63,8 +63,6 @@ public class PopupEditAct extends Activity {
                 lp.topMargin = (int)y;
                 m_txt.setLayoutParams(lp);
                 m_txt.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
-                BitmapDrawable bitmap = new BitmapDrawable();//add back
-                m_txt.setBackgroundDrawable(bitmap);
                 m_txt.setBackgroundColor(0xFFFFFFC0);
                 m_txt.setPadding(2, 2, 2, 2);
                 m_txt.setTextColor(0xFF000000);
@@ -79,7 +77,7 @@ public class PopupEditAct extends Activity {
                         break;
                     case 3:
                         m_txt.setSingleLine(false);
-                        m_txt.setInputType(InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_NORMAL);
+                        m_txt.setInputType(InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_NORMAL + InputType.TYPE_TEXT_FLAG_MULTI_LINE);
                         break;
                 }
                 if(maxlen > 1020)
@@ -101,21 +99,25 @@ public class PopupEditAct extends Activity {
     @Override
     public void onBackPressed() {
         if(m_txt == null || !m_txt.isShown()) return;
-        Editable value = m_txt.getText();
-        if(value != null && m_listener != null)
-            m_listener.OnEditValue(value.toString());
+        updateAnnot();
         super.onBackPressed();
         overridePendingTransition(0, android.R.anim.fade_out);
     }
+
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        if(m_txt == null || !m_txt.isShown()) return false;
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getActionMasked() == MotionEvent.ACTION_UP) {
+            if (m_txt == null || !m_txt.isShown()) return false;
+            updateAnnot();
+            finish();
+            overridePendingTransition(0, android.R.anim.fade_out);
+        }
+        return true;
+    }
+
+    private void updateAnnot() {
         Editable value = m_txt.getText();
         if(value != null && m_listener != null)
             m_listener.OnEditValue(value.toString());
-        finish();
-        overridePendingTransition(0, android.R.anim.fade_out);
-        return true;
     }
 }

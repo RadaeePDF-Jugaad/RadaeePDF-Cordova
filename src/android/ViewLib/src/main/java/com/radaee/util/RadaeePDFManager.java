@@ -33,7 +33,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     public RadaeePDFManager(RadaeePluginCallback.PDFReaderListener listener) {
         Global.navigationMode = 0; //thumbnail navigation mode
         if(listener != null)
-        mListener = listener;
+            mListener = listener;
         RadaeePluginCallback.getInstance().setListener(this);
     }
 
@@ -64,7 +64,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param password the pdf's password, if no apssword, pass empty string
      */
     public void show(Context context, String url, String password) {
-        show(context, url, password, false, false, 0, null);
+        show(context, url, password, false, false, 0, null, null);
     }
 
     /**
@@ -77,8 +77,9 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param automaticSave if true, the modifications will be saved automatically, else a requester to save will be shown
      * @param gotoPage if greater than 0, the reader will render directly the passed page (0-index: from 0 to Document.GetPageCount - 1)
      * @param bmpFormat bmp format, can be RGB_565 or ARGB_4444, default is ALPHA_8
+     * @param author if not empty, it will be used to set annotations' author during creation.
      */
-    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave, int gotoPage, String bmpFormat) {
+    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave, int gotoPage, String bmpFormat, String author) {
         if(!TextUtils.isEmpty(url)) {
             String name;
             if(URLUtil.isHttpUrl(url) || URLUtil.isHttpsUrl(url))
@@ -89,6 +90,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
                 name = "PDFPath";
             } else
                 name = "PDFPath";
+            Global.sAnnotAuthor = author;
             Intent intent = new Intent(context, PDFViewAct.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra( name, url);
@@ -317,7 +319,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * Adds the given page to the bookmarks.
      *
      * @param mContext context object
-     * @param filePath the orignal pdf file
+     * @param filePath the original pdf file
      * @param page 0 based page no.
      * @param bookmarkLabel label of Bookmark (can be empty string)
      * @return a string that indicates the result
@@ -373,8 +375,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     @Override
     public void willShowReader() {
         Global.def_view = mViewMode;
-        if(mListener != null)
-            mListener.willShowReader();
+        if(mListener != null) mListener.willShowReader();
     }
 
     @Override
@@ -388,38 +389,42 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
 
     @Override
     public void willCloseReader() {
-        if(mListener != null)
-            mListener.willCloseReader();
+        if(mListener != null) mListener.willCloseReader();
     }
 
     @Override
     public void didCloseReader() {
-        if(mListener != null)
-            mListener.didCloseReader();
+        if(mListener != null) mListener.didCloseReader();
     }
 
     @Override
     public void didChangePage(int pageno) {
         mCurrentPage = pageno;
-        if(mListener != null)
-            mListener.didChangePage(pageno);
+        if(mListener != null) mListener.didChangePage(pageno);
     }
 
     @Override
     public void didSearchTerm(String query, boolean found) {
-        if(mListener != null)
-            mListener.didSearchTerm(query, found);
+        if(mListener != null) mListener.didSearchTerm(query, found);
     }
 
     @Override
     public void onBlankTapped(int pageno) {
-        if(mListener != null)
-            mListener.onBlankTapped(pageno);
+        if(mListener != null) mListener.onBlankTapped(pageno);
     }
 
     @Override
     public void onAnnotTapped(Page.Annotation annot) {
-        if(mListener != null)
-            mListener.onAnnotTapped(annot);
+        if(mListener != null) mListener.onAnnotTapped(annot);
+    }
+
+    @Override
+    public void onDoubleTapped(int pageno, float x, float y) {
+        if(mListener != null) mListener.onDoubleTapped(pageno, x, y);
+    }
+
+    @Override
+    public void onLongPressed(int pageno, float x, float y) {
+        if(mListener != null) mListener.onLongPressed(pageno, x, y);
     }
 }

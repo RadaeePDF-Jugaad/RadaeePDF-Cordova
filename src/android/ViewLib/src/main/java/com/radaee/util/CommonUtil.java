@@ -27,7 +27,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Davide created on 15/01/2016.
@@ -108,11 +111,15 @@ public class CommonUtil {
     }
 
     private static String md5(String input) {
+        return md5(input.getBytes());
+    }
+
+    public static String md5(byte[] input) {
         final String MD5 = "MD5";
         try {
             // Create MD5 Hash
             MessageDigest digest = java.security.MessageDigest.getInstance(MD5);
-            digest.update(input.getBytes());
+            digest.update(input);
             byte messageDigest[] = digest.digest();
 
             // Create Hex String
@@ -351,5 +358,25 @@ public class CommonUtil {
             e.printStackTrace();
         }
         return mPageText;
+    }
+
+    /**
+     * @return DateTime String object<br/>
+     * format as (D:YYYYMMDDHHmmSSOHH'mm') where:<br/>
+     * YYYY is the year<br/>
+     * MM is the month<br/>
+     * DD is the day (01–31)<br/>
+     * HH is the hour (00–23)<br/>
+     * mm is the minute (00–59)<br/>
+     * SS is the second (00–59)<br/>
+     * O is the relationship of local time to Universal Time (UT), denoted by one of the characters +, −, or Z (see below)<br/>
+     * HH followed by ' is the absolute value of the offset from UT in hours (00–23)<br/>
+     * mm followed by ' is the absolute value of the offset from UT in minutes (00–59)<br/>
+     * more details see PDF-Reference-1.7 section 3.8.3
+     */
+    public static String getCurrentDate() {
+        String datePattern = "yyyyMMddHHmmssZ''";
+        String date = new SimpleDateFormat(datePattern, Locale.getDefault()).format(new Date());
+        return "D:" + date.substring(0, date.length() - 3) + "'" + date.substring(date.length() - 3);
     }
 }
