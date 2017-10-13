@@ -156,8 +156,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 break;
             case "setFormFieldWithJSON":  //Set form fields' values
                 params = args.getJSONObject(0);
-                mPdfManager.setFormFieldsWithJSON(params.optString("json"));
-                callbackContext.success("property set successfully");
+                callbackContext.success("Result = " + mPdfManager.setFormFieldsWithJSON(params.optString("json")));
                 break;
             case "setReaderBGColor":  //sets reader view background color
                 params = args.getJSONObject(0);

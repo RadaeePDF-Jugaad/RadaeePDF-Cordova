@@ -1051,7 +1051,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                         CommonUtil.parsePageJsonFormFields(pagesArray.getJSONObject(i), m_view.PDFGetDoc());
                     }
                     m_view.refreshCurrentPage();
-                    return "";
+                    return "property set successfully";
                 } else return "\"Pages\" attribute is missing";
             } catch (Exception e) {
                 e.printStackTrace();
