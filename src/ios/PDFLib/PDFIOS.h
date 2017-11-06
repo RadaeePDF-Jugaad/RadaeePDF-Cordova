@@ -1086,6 +1086,8 @@ void Page_getAnnotRect( PDF_PAGE page, PDF_ANNOT annot, PDF_RECT *rect );
  *	@param 	rect 	rect of annotation area, in PDF coordinate.
  */
 void Page_setAnnotRect( PDF_PAGE page, PDF_ANNOT annot, const PDF_RECT *rect );
+const char *Page_getAnnotModifyDate(PDF_PAGE page, PDF_ANNOT annot);
+bool Page_setAnnotModifyDate(PDF_PAGE page, PDF_ANNOT annot, const char *val);
 PDF_PATH Page_getAnnotInkPath( PDF_PAGE page, PDF_ANNOT annot );
 bool Page_setAnnotInkPath( PDF_PAGE page, PDF_ANNOT annot, PDF_PATH path );
 PDF_PATH Page_getAnnotPolygonPath( PDF_PAGE page, PDF_ANNOT annot );

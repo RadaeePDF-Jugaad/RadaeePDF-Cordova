@@ -907,6 +907,19 @@ extern uint annotStrikeoutColor;
 {
 	Page_setAnnotRect( m_page, m_handle, rect );
 }
+
+-(NSString *)getModDate
+{
+	const char *sval = Page_getAnnotModifyDate(m_page, m_handle);
+	if(!sval) return nil;
+	return [NSString stringWithUTF8String:sval];
+}
+
+-(bool)setModDate:(NSString *)mdate
+{
+	return Page_setAnnotModifyDate(m_page, m_handle, [mdate UTF8String]);
+}
+
 -(int)getMarkupRects:(PDF_RECT *)rects :(int)cnt
 {
 	return Page_getAnnotMarkupRects(m_page, m_handle, rects, cnt);
