@@ -658,8 +658,11 @@
  * @param rect rect in PDF coordinate system
  */
 -(void)setRect:(const PDF_RECT *)rect;
+<<<<<<< HEAD
 -(NSString *)getModDate;
 -(bool)setModDate:(NSString *)mdate;
+=======
+>>>>>>> origin/master
 /**
 * @brief get markup annotation's rectangles.
 * this method valid in professional or premium version.
@@ -1000,7 +1003,10 @@
  * @return true or false.
  */
 -(bool)setComboSel:(int)index;
+<<<<<<< HEAD
 -(bool)isMultiSel;
+=======
+>>>>>>> origin/master
 /**
  * @brief get item count of list-box.
  * this method valid in premium version
