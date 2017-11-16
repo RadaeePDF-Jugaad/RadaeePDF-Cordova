@@ -400,8 +400,8 @@
         <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewController.xib" />
         <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewCell.xib" />
         
-        <source-file src="src/ios/Modules/RDUtils/RDFormManager.m" />
-        <header-file src="src/ios/Modules/RDUtils/RDFormManager.h" />
+        <source-file src="src/ios/Modules/FormManager/RDFormManager.m" />
+        <header-file src="src/ios/Modules/FormManager/RDFormManager.h" />
         
         <source-file src="src/ios/Modules/Utils/RDUtils.m" />
         <header-file src="src/ios/Modules/Utils/RDUtils.h" />
