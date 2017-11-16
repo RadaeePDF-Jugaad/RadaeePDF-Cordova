@@ -13,6 +13,7 @@
 - (void)didSearchTerm:(NSString *)term found:(BOOL)found;
 - (void)didTapOnPage:(int)page atPoint:(CGPoint)point;
 - (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point;
+- (void)onAnnotExported:(NSString *)path;
 @end;
 
 @interface RadaeePDFPlugin : CDVPlugin{
@@ -65,6 +66,7 @@
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didDoubleTapOnPage;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didLongPressOnPage;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnAnnotationOfType;
+@property (nonatomic, retain) CDVInvokedUrlCommand *cdv_onAnnotExported;
 
 @property (nonatomic) int viewMode;
 @property (strong, nonatomic) NSString *lastOpenedPath;
@@ -80,6 +82,7 @@
 @property (strong, nonatomic) UIImage *deleteImage;
 @property (strong, nonatomic) UIImage *doneImage;
 @property (strong, nonatomic) UIImage *removeImage;
+@property (strong, nonatomic) UIImage *exportImage;
 @property (strong, nonatomic) UIImage *prevImage;
 @property (strong, nonatomic) UIImage *nextImage;
 
@@ -117,6 +120,14 @@
 
 - (void)setFormFieldWithJSON:(CDVInvokedUrlCommand *)command;
 
+// FTS Methods
+- (void)FTS_SetIndexDB:(CDVInvokedUrlCommand*)command;
+- (void)FTS_AddIndex:(CDVInvokedUrlCommand*)command;
+- (void)FTS_RemoveFromIndex:(CDVInvokedUrlCommand*)command;
+- (void)FTS_Search:(CDVInvokedUrlCommand*)command;
+- (void)SetSearchType:(CDVInvokedUrlCommand*)command;
+- (void)GetSearchType:(CDVInvokedUrlCommand*)command;
+
 + (RadaeePDFPlugin *)pluginInit;
 
 // Bookmarks
@@ -146,5 +157,6 @@
 - (void)didDoubleTapOnPageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didLongPressOnPageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command;
+- (void)onAnnotExportedCallback:(CDVInvokedUrlCommand *)command;
 
 @end

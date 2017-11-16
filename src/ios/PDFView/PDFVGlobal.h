@@ -26,8 +26,8 @@ extern int g_def_view;
 extern float g_zoom_level;
 extern PDF_RENDER_MODE renderQuality;
 
-extern int g_MatchWholeWord;
-extern int g_CaseSensitive;
+extern bool g_MatchWholeWord;
+extern bool g_CaseSensitive;
 extern NSMutableString *pdfName;
 extern NSMutableString *pdfPath;
 
@@ -44,3 +44,5 @@ extern uint annotSquigglyColor;
 
 extern bool g_paging_enabled;
 extern bool g_double_page_enabled;
+extern NSString *g_author;
+

@@ -343,6 +343,7 @@
         <resource-file src="src/ios/Resources/btn_view_vert.png" />
         <resource-file src="src/ios/Resources/btn_view.png" />
         <resource-file src="src/ios/Resources/btn_grid.png" />
+        <resource-file src="src/ios/Resources/export_annot.png" />
 
         <!-- Radaee sources -->
         <source-file src="src/ios/PDFView/BookmarkTableViewController.m" />
@@ -391,8 +392,20 @@
         <!-- Radaee Utils -->
         <source-file src="src/ios/RDUtils/RDFormManager.m" />
         <header-file src="src/ios/RDUtils/RDFormManager.h" />
-        <source-file src="src/ios/RDUtils/ReaderHandler.m" />
-        <header-file src="src/ios/RDUtils/ReaderHandler.h" />
+        
+        <!-- Radaee Modules -->
+        <source-file src="src/ios/Modules/ReaderHandler/ReaderHandler.m" />
+        <header-file src="src/ios/Modules/ReaderHandler/ReaderHandler.h" />
+        
+        <source-file src="src/ios/Modules/SearchList/RDExtendedSearch.m" />
+        <header-file src="src/ios/Modules/SearchList/RDExtendedSearch.h" />
+        <source-file src="src/ios/Modules/SearchList/SearchResultTableViewController.m" />
+        <header-file src="src/ios/Modules/SearchList/SearchResultTableViewController.h" />
+        <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewController.xib" />
+        <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewCell.xib" />
+        
+        <source-file src="src/ios/Modules/Utils/RDUtils.m" />
+        <header-file src="src/ios/Modules/Utils/RDUtils.h" />
 
         <!-- Radaee resources -->
         <resource-file src="src/ios/cmaps/cmaps.dat" />

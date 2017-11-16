@@ -1951,7 +1951,7 @@ extern uint g_oval_color;
 }
 
 //End PopupView action
-- (void)OnAnnotCommboBox:(NSArray *)dataArray
+- (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index
 {
     NSLog(@"");
     pickViewArr = dataArray;
@@ -1960,7 +1960,12 @@ extern uint g_oval_color;
     [self.view bringSubviewToFront:confirmPickerBtn];
     [self.view bringSubviewToFront:pickerView];
     [pickerView reloadAllComponents];
-    
+    [pickerView selectRow:index inComponent:0 animated:NO];
+}
+
+- (void)OnAnnotListItems:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
+{
+    NSLog(@"list box");
 }
 
 #pragma mark - Immersive
@@ -2183,14 +2188,14 @@ extern uint g_oval_color;
     confirmPickerBtn.hidden = YES;
 }
 #pragma mark -EditBox delegate
-- (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText
+- (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText :(float)textSize
 {
     NSLog(@"annotRect = %@",NSStringFromCGRect(annotRect));
     textFd.hidden = NO;
     textFd.frame = annotRect;
     textFd.text = editText;
     textFd.backgroundColor = [UIColor whiteColor];
-    textFd.font = [UIFont systemFontOfSize:annotRect.size.height -3];
+    textFd.font = [UIFont systemFontOfSize:textSize]; // To use a custom font you should add it as external font in Xcode project
     [self.view bringSubviewToFront:textFd];
     [textFd becomeFirstResponder];
 }
@@ -2232,7 +2237,8 @@ extern uint g_oval_color;
     NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
     
-    float gap = (keyboardFrameBeginRect.size.height - 30) - (textFd.frame.origin.y + textFd.frame.size.height);
+    // push the frame up the gap adding 1 pixel so the text field is not exactly on top of the keyboard
+    float gap = (keyboardFrameBeginRect.origin.y - 1) - (textFd.frame.origin.y + textFd.frame.size.height);
     
     if (gap < 0) {
         [self.view setFrame:CGRectMake(0, gap, self.view.frame.size.width, self.view.frame.size.height)];

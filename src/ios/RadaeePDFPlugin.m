@@ -49,6 +49,8 @@
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
+    g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    
     if([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]){
         
         NSString *cacheFile = [[NSTemporaryDirectory() stringByAppendingString:@""] stringByAppendingString:@"cacheFile.pdf"];
@@ -93,6 +95,7 @@
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
+    g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:url ofType:nil];
 
@@ -104,6 +107,7 @@
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
+    g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     NSString *filePath = url;
     
@@ -334,11 +338,11 @@
     
     [m_pdf setDelegate:self];
     
-    [self setPagingEnabled:YES];
+    [self setPagingEnabled:NO];
     [self setDoublePageEnabled:YES];
     
     [m_pdf setFirstPageCover:firstPageCover];
-    [m_pdf setDoubleTapZoomMode:doubleTapZoomMode];
+    [m_pdf setDoubleTapZoomMode:2];
     [m_pdf setImmersive:NO];
     
     [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
@@ -351,6 +355,8 @@
     [m_pdf setGridImage:[UIImage imageNamed:@"btn_grid.png"]];
     
     [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
+    
+    [m_pdf setExportImage:[UIImage imageNamed:@"export_annot.png"]];
     
     [m_pdf setPrevImage:[UIImage imageNamed:@"btn_left.png"]];
     [m_pdf setNextImage:[UIImage imageNamed:@"btn_right.png"]];
@@ -676,7 +682,6 @@
 {
     self.cdv_didTapOnPage = command;
 }
-
 - (void)didDoubleTapOnPageCallback:(CDVInvokedUrlCommand *)command
 {
     self.cdv_didDoubleTapOnPage = command;
@@ -686,10 +691,14 @@
 {
     self.cdv_didLongPressOnPage = command;
 }
-
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command
 {
     self.cdv_didTapOnAnnotationOfType = command;
+}
+
+- (void)onAnnotExportedCallback:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_onAnnotExported = command;
 }
 
 + (NSString *)addToBookmarks:(NSString *)pdfPath page:(int)page label:(NSString *)label
@@ -900,6 +909,71 @@
     }
 }
 
+#pragma mark - FTS Methods
+#ifdef FTS_ENABLED
+- (void)FTS_SetIndexDB:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    [[FTSManager sharedInstance] FTS_SetIndexDB:[params objectForKey:@"dbPath"]];
+    [self cdvOkWithMessage:@"Success"];
+}
+- (void)FTS_AddIndex:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    if([[FTSManager sharedInstance] FTS_AddIndex:[params objectForKey:@"filePath"] password:[params objectForKey:@"password"]])
+        [self cdvOkWithMessage:@"Success"];
+    else
+        [self cdvErrorWithMessage:@"Failure"];
+}
+- (void)FTS_RemoveFromIndex:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    [[FTSManager sharedInstance] FTS_RemoveFromIndex:[params objectForKey:@"filePath"] password:[params objectForKey:@"password"]];
+    [self cdvOkWithMessage:@"Success"];
+}
+- (void)FTS_Search:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    [[FTSManager sharedInstance] FTS_Search:[params objectForKey:@"term"] filter:[params objectForKey:@"filePath"] password:[params objectForKey:@"password"] writeJSON:[params objectForKey:@"resultPath"] success:^(NSMutableArray *occurrences, BOOL didWriteFile) {
+        
+        // Return the JSON as string
+        if (!didWriteFile) {
+            NSMutableArray *jsonArray = [NSMutableArray arrayWithCapacity:occurrences.count];
+            
+            for (FTSOccurrence *occurrence in occurrences) {
+                [jsonArray addObject:[occurrence getDictionaryFormat]];
+            }
+            
+            NSString *jsonString = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:jsonArray options:NSJSONWritingPrettyPrinted error:nil] encoding:NSUTF8StringEncoding];
+            
+            [self cdvOkWithMessage:jsonString];
+        } else {
+            [self cdvOkWithMessage:@"Success"];
+        }
+    }];
+}
+- (void)SetSearchType:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    [[FTSManager sharedInstance] SetSearchType:[[params objectForKey:@"type"] intValue]];
+    [self cdvOkWithMessage:@"Success"];
+}
+- (void)GetSearchType:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    [self cdvOkWithMessage:[NSString stringWithFormat:@"%i",[[FTSManager sharedInstance] GetSearchType]]];
+}
+#endif
 #pragma mark - Reader Delegate
 
 - (void)willShowReader
@@ -998,6 +1072,11 @@
     */
     
     [self cdvSendCallback:[NSString stringWithFormat:@"%i", type] orCommand:self.cdv_didTapOnAnnotationOfType];
+}
+
+- (void)onAnnotExported:(NSString *)path
+{
+    [self cdvSendCallback:path orCommand:self.cdv_onAnnotExported];
 }
 
 #pragma mark - Path Utils

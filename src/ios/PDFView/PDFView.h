@@ -41,8 +41,10 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotMovie:(NSString *)fileName;
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotSound:(NSString *)fileName;
-- (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText;
-- (void)OnAnnotCommboBox:(NSArray *)dataArray;
+- (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText :(float)textSize;
+- (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index;
+- (void)OnAnnotListItems:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
+
 @end
 
 @interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
