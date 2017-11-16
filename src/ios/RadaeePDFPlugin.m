@@ -356,8 +356,6 @@
     
     [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
     
-    [m_pdf setExportImage:[UIImage imageNamed:@"export_annot.png"]];
-    
     [m_pdf setPrevImage:[UIImage imageNamed:@"btn_left.png"]];
     [m_pdf setNextImage:[UIImage imageNamed:@"btn_right.png"]];
     
