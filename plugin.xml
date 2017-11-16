@@ -389,10 +389,6 @@
         <source-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.m" />
         <header-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.h" />
 
-        <!-- Radaee Utils -->
-        <source-file src="src/ios/RDUtils/RDFormManager.m" />
-        <header-file src="src/ios/RDUtils/RDFormManager.h" />
-        
         <!-- Radaee Modules -->
         <source-file src="src/ios/Modules/ReaderHandler/ReaderHandler.m" />
         <header-file src="src/ios/Modules/ReaderHandler/ReaderHandler.h" />
@@ -403,6 +399,9 @@
         <header-file src="src/ios/Modules/SearchList/SearchResultTableViewController.h" />
         <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewController.xib" />
         <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewCell.xib" />
+        
+        <source-file src="src/ios/Modules/RDUtils/RDFormManager.m" />
+        <header-file src="src/ios/Modules/RDUtils/RDFormManager.h" />
         
         <source-file src="src/ios/Modules/Utils/RDUtils.m" />
         <header-file src="src/ios/Modules/Utils/RDUtils.h" />
