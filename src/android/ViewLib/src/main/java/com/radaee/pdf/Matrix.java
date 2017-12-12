@@ -61,6 +61,10 @@ public class Matrix
 	{
 		hand = createScale( sx, sy, x0, y0 );
 	}
+	protected Matrix(long handle)
+	{
+		hand = handle;
+	}
 	public final void Invert()
 	{
 		invert( hand );

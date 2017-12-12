@@ -42,6 +42,7 @@ import com.radaee.view.PDFLayout;
 import com.radaee.view.PDFLayout.LayoutListener;
 import com.radaee.view.PDFLayout.PDFPos;
 import com.radaee.view.PDFLayoutDual;
+import com.radaee.view.PDFLayoutHorz;
 import com.radaee.view.PDFLayoutVert;
 import com.radaee.view.VPage;
 import com.radaee.view.VSel;
@@ -315,6 +316,7 @@ public class PDFLayoutView extends View implements LayoutListener
 		void onPDFPageRendered(int pageno);
 		void onPDFCacheRendered(int pageno);
 		void onPDFSearchFinished(boolean found);
+		void onPDFPageDisplayed(Canvas canvas, VPage vpage);
 		public void OnPDFPageModified(int pageno);
 		public void OnPDFPageChanged(int pageno);
 		public void OnPDFAnnotTapped(VPage vpage, Annotation annot);
@@ -441,10 +443,12 @@ public class PDFLayoutView extends View implements LayoutListener
 			Paint paint1 = new Paint();
 			Paint paint2 = new Paint();
 			paint1.setStyle(Style.STROKE);
-			paint1.setStrokeWidth(3);
-			paint1.setARGB(0x80, 0xFF, 0, 0);
+			paint1.setStrokeWidth(Global.rect_annot_width);
+			paint1.setARGB((Global.rect_annot_color>>24)&0xFF, (Global.rect_annot_color>>16)&0xFF, (Global.rect_annot_color>>8)&0xFF,
+					Global.rect_annot_color&0xFF );
 			paint2.setStyle(Style.FILL);
-			paint2.setARGB(0x80, 0, 0, 0xFF);
+			paint2.setARGB((Global.rect_annot_fill_color>>24)&0xFF, (Global.rect_annot_fill_color>>16)&0xFF, (Global.rect_annot_fill_color>>8)&0xFF,
+					Global.rect_annot_fill_color&0xFF );
 			for( cur = 0; cur < len; cur += 4 )
 			{
 				float rect[] = new float[4];
@@ -481,8 +485,9 @@ public class PDFLayoutView extends View implements LayoutListener
 			int cur;
 			Paint paint1 = new Paint();
 			paint1.setStyle(Style.STROKE);
-			paint1.setStrokeWidth(3);
-			paint1.setARGB(0x80, 0xFF, 0, 0);
+			paint1.setStrokeWidth(Global.line_annot_width);
+			paint1.setARGB((Global.line_annot_color>>24)&0xFF, (Global.line_annot_color>>16)&0xFF, (Global.line_annot_color>>8)&0xFF,
+					Global.line_annot_color&0xFF );
 			for( cur = 0; cur < len; cur += 4 )
 			{
 				canvas.drawLine(m_rects[cur], m_rects[cur + 1], m_rects[cur + 2], m_rects[cur + 3], paint1);
@@ -539,10 +544,12 @@ public class PDFLayoutView extends View implements LayoutListener
 			Paint paint1 = new Paint();
 			Paint paint2 = new Paint();
 			paint1.setStyle(Style.STROKE);
-			paint1.setStrokeWidth(3);
-			paint1.setARGB(0x80, 0xFF, 0, 0);
+			paint1.setStrokeWidth(Global.ellipse_annot_width);
+			paint1.setARGB((Global.ellipse_annot_color>>24)&0xFF, (Global.ellipse_annot_color>>16)&0xFF, (Global.ellipse_annot_color>>8)&0xFF,
+					Global.ellipse_annot_color&0xFF );
 			paint2.setStyle(Style.FILL);
-			paint2.setARGB(0x80, 0, 0, 0xFF);
+			paint2.setARGB((Global.ellipse_annot_fill_color>>24)&0xFF, (Global.ellipse_annot_fill_color>>16)&0xFF, (Global.ellipse_annot_fill_color>>8)&0xFF,
+					Global.ellipse_annot_fill_color&0xFF );
 			for( cur = 0; cur < len; cur += 4 )
 			{
 				float rect[] = new float[4];
@@ -1090,6 +1097,9 @@ public class PDFLayoutView extends View implements LayoutListener
 		PDFClose();
         switch( style )
         {
+			case 1:
+				m_layout = new PDFLayoutHorz(getContext());
+				break;
         case 3:
         {
 			PDFLayoutDual layout = new PDFLayoutDual(getContext());
@@ -1133,7 +1143,6 @@ public class PDFLayoutView extends View implements LayoutListener
             break;
         }
         Global.def_view = style;
-        //m_layout.vOpen(m_doc, this);
         m_layout.vOpen(m_doc, this);
         if(m_bmp_format != Bitmap.Config.ALPHA_8)
         {
@@ -1236,6 +1245,7 @@ public class PDFLayoutView extends View implements LayoutListener
 	}
 	public void OnPageDisplayed(Canvas canvas, VPage vpage)
 	{
+		if(m_listener != null) m_listener.onPDFPageDisplayed(canvas, vpage);
 	}
 	public void OnTimer()
 	{
@@ -1338,7 +1348,7 @@ public class PDFLayoutView extends View implements LayoutListener
 							rect[3] = m_rects[cur + 3];
 						}
 						mat.TransformRect(rect);
-						page.AddAnnotRect(rect, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
+						page.AddAnnotRect(rect, vpage.ToPDFSize(Global.rect_annot_width), Global.rect_annot_color, Global.rect_annot_fill_color);
 						mat.Destroy();
 						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
@@ -1410,7 +1420,7 @@ public class PDFLayoutView extends View implements LayoutListener
 							rect[3] = m_rects[cur + 3];
 						}
 						mat.TransformRect(rect);
-						page.AddAnnotEllipse(rect, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
+						page.AddAnnotEllipse(rect, vpage.ToPDFSize(Global.ellipse_annot_width), Global.ellipse_annot_color, Global.ellipse_annot_fill_color);
 						mat.Destroy();
 						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
@@ -1544,7 +1554,7 @@ public class PDFLayoutView extends View implements LayoutListener
 						Matrix mat = vpage.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
 						mat.TransformPoint(pt1);
 						mat.TransformPoint(pt2);
-						page.AddAnnotLine(pt1, pt2, 1, 0, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
+						page.AddAnnotLine(pt1, pt2, Global.line_annot_style1, Global.line_annot_style2, vpage.ToPDFSize(Global.line_annot_width), Global.line_annot_color, Global.line_annot_fill_color);
 						mat.Destroy();
 						onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.

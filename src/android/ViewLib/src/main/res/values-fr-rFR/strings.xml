@@ -27,6 +27,7 @@
 <string name="pdf_outline">"Aperçu PDF"</string>
 <string name="single_page">"Une seule page"</string>
 <string name="vertical">"Vertical"</string>
+    <string name="horizontal">Horizontal</string>
 <string name="dual_page">"Double page"</string>
 <string name="save_msg">"Document modifié.
 Voulez-vous le sauvegarder ?"</string>

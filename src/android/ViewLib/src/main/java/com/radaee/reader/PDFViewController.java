@@ -103,6 +103,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	private SeekBar seek_page;
 	private TextView lab_page;
 	private View	view_vert;
+	private View	view_horz;
 	private View	view_single;
 	private View	view_dual;
 	private boolean m_set = false;
@@ -116,7 +117,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		m_bar_cmd = new PDFTopBar(m_parent, R.layout.bar_cmd);
 		m_bar_find = new PDFTopBar(m_parent, R.layout.bar_find);
 		m_bar_annot = new PDFTopBar(m_parent, R.layout.bar_annot);
-		m_menu_view = new PDFMenu(m_parent, R.layout.pop_view);
+		m_menu_view = new PDFMenu(m_parent, R.layout.pop_view, 160, 180);
 		m_menu_more = new PDFMenu(m_parent, R.layout.pop_more, 180,130);
 		RelativeLayout layout = (RelativeLayout)m_bar_cmd.BarGetView();
 		btn_view = (ImageView)layout.findViewById(R.id.btn_view);
@@ -147,6 +148,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		btn_annot_note = (ImageView)layout.findViewById(R.id.btn_annot_note);
 		LinearLayout layout1 = (LinearLayout)m_menu_view.MenuGetView();
 		view_vert = layout1.findViewById(R.id.view_vert);
+		view_horz = layout1.findViewById(R.id.view_horz);
 		view_single = layout1.findViewById(R.id.view_single);
 		view_dual = layout1.findViewById(R.id.view_dual);
 		LinearLayout moreLayout = (LinearLayout)m_menu_more.MenuGetView();
@@ -180,6 +182,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		btn_annot_stamp.setOnClickListener(this);
 		btn_annot_note.setOnClickListener(this);
 		view_vert.setOnClickListener(this);
+		view_horz.setOnClickListener(this);
 		view_single.setOnClickListener(this);
 		view_dual.setOnClickListener(this);
 		SetBtnEnabled(btn_annot, m_view.PDFCanSave());
@@ -400,6 +403,12 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		} else if(mNavigationMode == NAVIGATION_THUMBS)
 			mThumbView.thumbGotoPage(pageno);
 	}
+
+	public void onPageModified(int pageno) {
+		if(mNavigationMode == NAVIGATION_THUMBS)
+			mThumbView.thumbUpdatePage(pageno);
+	}
+
 	public void onConfigChanged() {
 		if(m_bar_status == BAR_ACT) {
 			m_view.PDFCancelAnnot();
@@ -457,6 +466,14 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			return false;
 		}
 	}
+
+	public void onDestroy() {
+		if( mThumbView != null ) {
+			mThumbView.thumbClose();
+			mThumbView = null;
+		}
+	}
+
 	private String m_find_str = null;
 	@Override
 	public void onClick(View arg0)
@@ -746,6 +763,11 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			m_view.PDFSetView(0);
 			m_menu_view.MenuDismiss();
 		}
+		else if( arg0 == view_horz )
+		{
+			m_view.PDFSetView(1);
+			m_menu_view.MenuDismiss();
+		}
 		else if( arg0 == view_single )
 		{
 			m_view.PDFSetView(3);
@@ -931,6 +953,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				btn_annot_stamp.setColorFilter(color);
 				btn_annot_note.setColorFilter(color);
 				((ImageView)view_vert.findViewById(R.id.imageView1)).setColorFilter(color);
+				((ImageView)view_horz.findViewById(R.id.horz)).setColorFilter(color);
 				((ImageView)view_single.findViewById(R.id.imageView2)).setColorFilter(color);
 				((ImageView)view_dual.findViewById(R.id.imageView3)).setColorFilter(color);
 				((ImageView)btn_add_bookmark.findViewById(R.id.add_bookmark_icon)).setColorFilter(color);

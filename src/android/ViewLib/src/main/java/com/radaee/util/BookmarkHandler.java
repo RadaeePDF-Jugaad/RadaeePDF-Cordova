@@ -158,9 +158,8 @@ public class BookmarkHandler {
             List<Bookmark> mBookmarks = null;
             if(recCount > 0) {
                 mBookmarks = new ArrayList<>();
-
-            for (int i = 0; i < recCount; i++)
-                mBookmarks.add(new Bookmark(mBMDatabase.RecItemGetPage(recHandle, i), mBMDatabase.RecItemGetName(recHandle, i)));
+                for (int i = 0; i < recCount; i++)
+                    mBookmarks.add(new Bookmark(mBMDatabase.RecItemGetPage(recHandle, i), mBMDatabase.RecItemGetName(recHandle, i)));
             }
 
             mBMDatabase.RecClose(recHandle);
@@ -170,6 +169,7 @@ public class BookmarkHandler {
         }
         return null;
     }
+
     public static String getBookmarksAsJson(String pdfPath) {
         List<Bookmark> mBookmarks = getBookmarks(pdfPath);
         try {

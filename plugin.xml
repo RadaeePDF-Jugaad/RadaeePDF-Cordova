@@ -61,6 +61,9 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResGState.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResImage.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Sign.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/VNBlock.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/VNCache.java" target-dir="src/com/radaee/pdf" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/VNPage.java" target-dir="src/com/radaee/pdf" />
 
         <!-- Radaee source - java.com.radaee.reader -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFBotBar.java" target-dir="src/com/radaee/reader" />
@@ -195,6 +198,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_add.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_bookmarks.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_more.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_horz.png" target-dir="res/drawable" />
 
 		<!-- Radaee values -->
 		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
@@ -249,6 +253,7 @@
 			<string name="pdf_outline">PDF Outlines</string>
 			<string name="single_page">Single Page</string>
 			<string name="vertical">Vertical</string>
+			<string name="horizontal">Horizontal</string>
 			<string name="dual_page">Dual Page</string>
 			<string name="save_msg">Document modified.\r\nDo you want to save it?</string>
 			<string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>

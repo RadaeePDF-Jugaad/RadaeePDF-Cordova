@@ -29,6 +29,7 @@
     <string name="pdf_outline">قائمة المحتويات للملف</string>
     <string name="single_page">صفحة وحيدة</string>
     <string name="vertical">رأسي</string>
+    <string name="horizontal">أفقي</string>
     <string name="dual_page">صفحة مزدوجة</string>
     <string name="save_msg">ملف معدل. هل تريد حفظه؟</string>
     <string name="page_change_block">لا يمكنك تغيير الصفحة عندما تكون في وضع التكبير ،يجب التصغير أولاً!</string>

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -219,6 +220,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
         		m_asset_stream.open(getAssets(), pdf_asset);
         		m_doc = new Document();
         		int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
+
         		ProcessOpenResult(ret);
         	}
         	else if(!TextUtils.isEmpty(pdf_path) )
@@ -312,8 +314,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
     {
 		RadaeePluginCallback.getInstance().willCloseReader();
 
-    	if(m_doc != null)
-    	{
+		if(m_controller != null)
+			m_controller.onDestroy();
+    	if(m_doc != null) {
 	    	m_view.PDFClose();
 	    	m_doc.Close();
 	    	m_doc = null;
@@ -334,9 +337,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 		RadaeePluginCallback.getInstance().didCloseReader();
     }
 	@Override
-	public void OnPDFPageModified(int pageno)
-	{
+	public void OnPDFPageModified(int pageno) {
 		m_modified = true;
+		if(m_controller != null) m_controller.onPageModified(pageno);
 	}
 	@Override
 	public void OnPDFPageChanged(int pageno)
@@ -499,6 +502,9 @@ public class PDFViewAct extends Activity implements PDFLayoutListener
 			RadaeePluginCallback.getInstance().didSearchTerm(mFindQuery, found);
 		}
 	}
+
+	@Override
+	public void onPDFPageDisplayed(Canvas canvas, VPage vpage) {	}
 
 	/**
 	 * To get the current file state.

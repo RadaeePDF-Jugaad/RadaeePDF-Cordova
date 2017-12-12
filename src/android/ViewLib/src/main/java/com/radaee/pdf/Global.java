@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.14.3
+ * @version 3.14.5
  */
 public class Global
 {
@@ -303,6 +303,7 @@ public class Global
 	/**
 	 * default view:<br/>
 	 * 0:vertical<br/>
+	 * 1:horizontal<br/>
 	 * 2:scroll<br/>
 	 * 3:single<br/>
 	 * 4:SingleEx<br/>
@@ -362,6 +363,29 @@ public class Global
     public static int strikeout_color = 0xFFC00000;//black red
     public static int squiggle_color = 0xFF00C000;//black green
 	public static String sAnnotAuthor; //if valorized, will be used to set the annotation author while its creation
+
+	/**
+	 *Annot Rect params
+	 */
+	public static float rect_annot_width = 3;
+	public static int rect_annot_color = 0x80FF0000;
+	public static int rect_annot_fill_color = 0x800000FF;
+
+    /**
+     *Annot Ellipse params
+     */
+    public static float ellipse_annot_width = 3;
+    public static int ellipse_annot_color = 0x80FF0000;
+    public static int ellipse_annot_fill_color = 0x800000FF;
+
+    /**
+     *Annot Line params
+     */
+    public static float line_annot_width = 3;
+    public static int line_annot_style1 = 1;
+    public static int line_annot_style2 = 0;
+    public static int line_annot_color = 0x80FF0000;
+    public static int line_annot_fill_color = 0x800000FF;
 
 	static private void load_file(Resources res, int res_id, File save_file)
 	{
@@ -500,6 +524,7 @@ public class Global
 		//save_font("/system/fonts/Roboto-Regular.ttf", "/sdcard/Roboto-Regular.ttf");
 
 		fontfileListAdd("/system/fonts/DroidSansFallback.ttf");
+		fontfileListAdd("/system/fonts/DroidSansChinese.ttf");
 		//save_font("/system/fonts/DroidSansFallback.ttf", "/sdcard/DroidSansFallback.ttf");
         fontfileListAdd("/system/fonts/NotoSansSC-Regular.otf");
 		//save_font("/system/fonts/NotoSansSC-Regular.otf", "/sdcard/NotoSansSC-Regular.otf");
@@ -507,6 +532,7 @@ public class Global
 		//save_font("/system/fonts/NotoSansTC-Regular.otf", "/sdcard/NotoSansTC-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansJP-Regular.otf");
         fontfileListAdd("/system/fonts/NotoSansKR-Regular.otf");
+		fontfileListAdd("/system/fonts/NotoSansCJK-Regular.ttc");
 		//fontfileListAdd("/system/fonts/NotoSansHebrew-Regular.ttf");
         load_truetype_font( res, R.raw.arimo, new File(files, "arimo.ttf") );//load from APP resource
         load_truetype_font( res, R.raw.arimob, new File(files, "arimob.ttf") );
@@ -681,33 +707,42 @@ public class Global
 
 		// set default font for Simplified Chinese. 简体
 		if (!setDefaultFont("GB1", "DroidSansFallback", true) &&
+			!setDefaultFont("GB1", "Noto Sans CJK SC Regular", true) &&
+			!setDefaultFont("GB1", "DroidSansChinese", true) &&
             !setDefaultFont("GB1", "Noto Sans SC Regular", true) && face_name != null)
 			setDefaultFont("GB1", face_name, true);
 		if (!setDefaultFont("GB1", "DroidSansFallback", false) &&
+			!setDefaultFont("GB1", "Noto Sans CJK SC Regular", false) &&
             !setDefaultFont("GB1", "Noto Sans SC Regular", false) && face_name != null)
 			setDefaultFont("GB1", face_name, false);
 
 		// set default font for Traditional Chinese. 繁體
 		if (!setDefaultFont("CNS1", "DroidSansFallback", true) &&
+			!setDefaultFont("GB1", "Noto Sans CJK TC Regular", true) &&
             !setDefaultFont("CNS1", "Noto Sans TC Regular", true) && face_name != null)
 			setDefaultFont("CNS1", face_name, true);
 		if (!setDefaultFont("CNS1", "DroidSansFallback", false) &&
+			!setDefaultFont("GB1", "Noto Sans CJK TC Regular", false) &&
             !setDefaultFont("CNS1", "Noto Sans TC Regular", false) && face_name != null)
 			setDefaultFont("CNS1", face_name, false);
 
 		// set default font for Japanese.
 		if (!setDefaultFont("Japan1", "DroidSansFallback", true) &&
+			!setDefaultFont("GB1", "Noto Sans CJK JP Regular", true) &&
             !setDefaultFont("Japan1", "Noto Sans JP Regular", true) && face_name != null)
 			setDefaultFont("Japan1", face_name, true);
 		if (!setDefaultFont("Japan1", "DroidSansFallback", false) &&
+			!setDefaultFont("GB1", "Noto Sans CJK JP Regular", false) &&
             !setDefaultFont("Japan1", "Noto Sans JP Regular", false) && face_name != null)
 			setDefaultFont("Japan1", face_name, false);
 
 		// set default font for Korean.
 		if (!setDefaultFont("Korea1", "DroidSansFallback", true) &&
+			!setDefaultFont("GB1", "Noto Sans CJK KR Regular", true) &&
             !setDefaultFont("Korea1", "Noto Sans KR Regular", true) && face_name != null)
 			setDefaultFont("Korea1", face_name, true);
 		if (!setDefaultFont("Korea1", "DroidSansFallback", false) &&
+			!setDefaultFont("GB1", "Noto Sans CJK KR Regular", false) &&
             !setDefaultFont("Korea1", "Noto Sans KR Regular", false) && face_name != null)
 			setDefaultFont("Korea1", face_name, false);
 

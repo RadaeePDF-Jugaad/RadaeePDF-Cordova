@@ -26,6 +26,7 @@
 <string name="pdf_outline">"Guías PDF"</string>
 <string name="single_page">"Página individual"</string>
 <string name="vertical">"Vertical"</string>
+    <string name="horizontal">Horizontal</string>
 <string name="dual_page">"Página doble"</string>
 <string name="save_msg">"Documento modificado.
 ¿Quieres guardarlo?"</string>

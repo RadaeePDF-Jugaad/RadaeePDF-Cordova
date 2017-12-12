@@ -1607,16 +1607,16 @@ public class Page
 	 */
     final public void Close()
 	{
-		long hand_page = hand;
-		hand = 0;
-        if(m_doc != null)
-        {
-            if(m_doc.hand_val != 0)
-                close( hand_page );
-            else
-                Log.e("Bad Coding", "Document object closed, but Page object not closed, will cause memory leaks.");
-			m_doc = null;
-        }
+			long hand_page = hand;
+			hand = 0;
+			if(m_doc != null)
+            {
+                if(m_doc.hand_val != 0)
+                    close( hand_page );
+                else
+                    Log.e("Bad Coding", "Document object closed, but Page object not closed, will cause memory leaks.");
+                m_doc = null;
+            }
 	}
 	/**
 	 * prepare to render. it reset dib pixels to white value, and reset page status.<br/>

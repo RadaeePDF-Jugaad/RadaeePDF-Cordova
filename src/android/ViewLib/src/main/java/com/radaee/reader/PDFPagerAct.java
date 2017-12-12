@@ -8,12 +8,12 @@ import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.radaee.reader.R;
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.view.PDFViewPager;
-import com.radaee.reader.R;
 
 import java.util.Locale;
 
