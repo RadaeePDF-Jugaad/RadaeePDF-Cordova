@@ -246,6 +246,19 @@
         [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): g_sel_color];
     }
 }
+- (void)find_draw_all:(PDFVCanvas *)canvas :(PDFVPage *)page
+{
+    if (DRAW_ALL == 1) {
+        m_page_find_index = 0;
+        
+        while (m_page_find_index < m_page_find_cnt) {
+            [self find_draw:canvas :page];
+            m_page_find_index++;
+        }
+    } else {
+        [self find_draw:canvas :page];
+    }
+}
 -(int)find_get_page
 {
     return m_page_no;

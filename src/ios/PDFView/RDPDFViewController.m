@@ -9,10 +9,12 @@
 #import "RDPDFViewController.h"
 #import "PopupMenu.h"
 #import "ViewModeTableViewController.h"
+#import "RDExtendedSearch.h"
+#import "SearchResultTableViewController.h"
 
 #define SYS_VERSION [[[UIDevice currentDevice]systemVersion] floatValue]
 
-@interface RDPDFViewController () <UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,ViewModeDelegate>
+@interface RDPDFViewController () <UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,ViewModeDelegate,SearchResultViewControllerDelegate>
 {
     UIPickerView *pickerView;
     NSArray *pickViewArr;
@@ -58,6 +60,7 @@ extern uint g_ink_color;
 extern uint g_rect_color;
 extern uint g_ellipse_color;
 bool b_outline;
+bool b_search_outline;
 extern uint g_oval_color;
 
 - (void)toolbarStyle
@@ -257,17 +260,19 @@ extern uint g_oval_color;
     popupMenu1.items = [NSArray arrayWithObjects:item1,item5,item4,item3,item6,nil];
 
     m_bSel = false;
-    float width = [UIScreen mainScreen].bounds.size.width;
-    pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 160, width, 60)];
+    pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 60, self.view.frame.size.width, 60)];
+    pickerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
     pickerView.delegate = self;
     pickerView.dataSource = self;
     pickerView.backgroundColor = [UIColor lightGrayColor];
+    
     [self.view addSubview:pickerView];
     [self.view bringSubviewToFront:pickerView];
     //pickerView.hidden = YES;
     
     confirmPickerBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    confirmPickerBtn.frame = CGRectMake(width - 60, pickerView.frame.origin.y - 40, 60, 40);
+    confirmPickerBtn.frame = CGRectMake(self.view.frame.size.width - 60, pickerView.frame.origin.y - 40, 60, 40);
+    confirmPickerBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [confirmPickerBtn setTitle:@"OK" forState:UIControlStateNormal];
     confirmPickerBtn.hidden = YES;
     [confirmPickerBtn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
@@ -284,6 +289,11 @@ extern uint g_oval_color;
 }
 -(void)viewWillAppear:(BOOL)animated
 {
+    if (SEARCH_LIST == 1 && b_search_outline == YES) {
+        b_search_outline = NO;
+        return;
+    }
+    
     if (_delegate) {
         [_delegate willShowReader];
     }
@@ -292,7 +302,7 @@ extern uint g_oval_color;
     [toolBar sizeToFit];
     b_findStart = NO;
 	[self createToolbarItems];
-    self.navigationItem.titleView =toolBar;
+    self.navigationItem.titleView = toolBar;
     
     [pageNumLabel setFrame:CGRectMake(0, 20+self.navigationController.navigationBar.frame.size.height+1, 65, 30)];
     
@@ -449,7 +459,8 @@ extern uint g_oval_color;
     searchToolBar = [UIToolbar new];
     [searchToolBar sizeToFit];
     
-    //searchToolBar.barStyle = UIBarStyleBlackOpaque;
+    UIBarButtonItem *searchButton=[[UIBarButtonItem alloc]initWithImage:_searchImage style:UIBarButtonItemStylePlain target:self action:@selector(showSearchList)];
+    searchButton.width =30;
     UIBarButtonItem *nextbutton= [[UIBarButtonItem alloc] initWithImage:_nextImage style:UIBarButtonItemStylePlain target:self action:@selector(nextword:)];
     nextbutton.width =30;
     UIBarButtonItem *prevbutton=[[UIBarButtonItem alloc] initWithImage:_prevImage style:UIBarButtonItemStylePlain target:self action:@selector(prevword:)];
@@ -457,7 +468,7 @@ extern uint g_oval_color;
     UIBarButtonItem *cancelbtn=[[UIBarButtonItem alloc] initWithImage:_removeImage style:UIBarButtonItemStylePlain target:self action:@selector(searchCancel:)];
     cancelbtn.width =30;
 
-    NSArray *toolbarItem = [[NSArray alloc]initWithObjects:prevbutton,nextbutton,cancelbtn,nil];
+    NSArray *toolbarItem = [[NSArray alloc]initWithObjects:searchButton,prevbutton,nextbutton,cancelbtn,nil];
     [self.searchToolBar setItems:toolbarItem animated:NO];
     self.navigationItem.titleView =searchToolBar;
 
@@ -486,7 +497,6 @@ extern uint g_oval_color;
 }
 - (IBAction)drawLine:(id) sender
 {
-  
     if(![m_view vInkStart])
     {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
@@ -1201,6 +1211,10 @@ extern uint g_oval_color;
 
 -(void)PDFClose
 {
+    if (SEARCH_LIST == 1) {
+        [[RDExtendedSearch sharedInstance] clearSearch];
+    }
+    
     if( m_view != nil )
     {
         b_outline = false;
@@ -1230,31 +1244,14 @@ extern uint g_oval_color;
     {
         return ;
     }
-    if(!b_findStart)
-    {
-        findString =text;
-        [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
-        b_findStart = YES;
-        [m_view vFind:1];
-    }
-    else if(text != nil && text.length > 0)
-    {
-        bool stringCmp =false;
-        if( findString != NULL )
-        {
-            if(g_CaseSensitive == true)
-                stringCmp=[text compare:findString] == NSOrderedSame;
-            else
-                stringCmp=[text caseInsensitiveCompare:findString] == NSOrderedSame;
-        }
-        if( !stringCmp )
-        {
-            [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
-            findString =text;
-        }
-        [m_view vFind:1];
+    
+    if (SEARCH_LIST == 1) {
+        [self showSearchList];
+    } else {
+        [self startSearch:text dir:1 reset:NO];
     }
 }
+
 -(IBAction)prevword:(id)sender
 {
     NSString *text = m_searchBar.text;
@@ -1263,29 +1260,16 @@ extern uint g_oval_color;
     {
         return ;
     }
-    if(!b_findStart)
-    {
-        findString =text;
-        [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
-        b_findStart = YES;
-        [m_view vFind:-1];
-    }
-    else if(text != nil && text.length > 0)
-    {
-        bool stringCmp =false;
-        if( findString != NULL )
-        {
-            if(g_CaseSensitive == true)
-                stringCmp=[text compare:findString] == NSOrderedSame;
-            else
-                stringCmp=[text caseInsensitiveCompare:findString] == NSOrderedSame;
+    
+    if (SEARCH_LIST == 1) {
+        int i = [[RDExtendedSearch sharedInstance] getPrevPageFromCurrentPage:self.pagenow];
+        
+        if (i >= 0) {
+            [self PDFGoto:i];
+            [self startSearch:text dir:-1 reset:YES];
         }
-        if( !stringCmp )
-        {
-            [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
-            findString =text;
-        }
-        [m_view vFind:-1];
+    } else {
+        [self startSearch:text dir:-1 reset:NO];
     }
 }
 
@@ -1297,12 +1281,55 @@ extern uint g_oval_color;
     {
         return ;
     }
+    
+    if (SEARCH_LIST == 1) {
+        int i = [[RDExtendedSearch sharedInstance] getNextPageFromCurrentPage:self.pagenow];
+        
+        if (i >= 0) {
+            [self PDFGoto:i];
+            [self startSearch:text dir:1 reset:YES];
+        }
+    } else {
+        NSString *text = m_searchBar.text;
+        [m_searchBar resignFirstResponder];
+        if (m_searchBar.text.length >40)
+        {
+            return;
+        }
+        
+        [self startSearch:text dir:1 reset:NO];
+    }
+}
+
+-(IBAction)searchCancel:(id)sender
+{
+    if (SEARCH_LIST == 1) {
+        [[RDExtendedSearch sharedInstance] clearSearch];
+    }
+    
+    [m_searchBar resignFirstResponder];
+    [m_searchBar removeFromSuperview];
+    self.navigationItem.titleView =toolBar;
+    findString = nil;
+    [m_view vFindEnd];
+    b_findStart = NO;
+    m_searchBar = NULL;
+}
+
+- (void)startSearch:(NSString *)text dir:(int)dir reset:(BOOL)reset
+{
+    if (reset) {
+        findString = nil;
+        [m_view vFindEnd];
+        b_findStart = NO;
+    }
+    
     if(!b_findStart)
     {
         findString =text;
         [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
         b_findStart = YES;
-        [m_view vFind:1];
+        [m_view vFind:dir];
     }
     else if(text != nil && text.length > 0)
     {
@@ -1319,24 +1346,58 @@ extern uint g_oval_color;
             [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
             findString =text;
         }
-        [m_view vFind:1];
+        [m_view vFind:dir];
     }
 }
 
--(IBAction)searchCancel:(id)sender
+#pragma mark - Search List
+- (void)showSearchList
 {
-    [m_searchBar resignFirstResponder];
-    [m_searchBar removeFromSuperview];
-    self.navigationItem.titleView =toolBar;
-    findString = nil;
-    [m_view vFindEnd];
-    b_findStart = NO;
-    m_searchBar = NULL;
+    if (SEARCH_LIST == 1) {
+        [[RDExtendedSearch sharedInstance] searchText:m_searchBar.text inDoc:m_doc success:^(NSMutableArray *occurrences) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([[[RDExtendedSearch sharedInstance] searchResults] count] > 0) {
+                    SearchResultTableViewController *viewController = [[SearchResultTableViewController alloc] initWithNibName:@"SearchResultTableViewController" bundle:nil];
+                    viewController.delegate = self;
+                    
+                    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                        
+                        viewController.modalPresentationStyle = UIModalPresentationPopover;
+                        UIPopoverPresentationController *popover = viewController.popoverPresentationController;
+                        popover.barButtonItem = (UIBarButtonItem *)[searchToolBar.items objectAtIndex:0]; // search bar button item
+                        
+                        [self presentViewController:viewController animated:YES completion:nil];
+                    }
+                    else
+                    {
+                        b_outline = YES;
+                        [self.navigationController pushViewController:viewController animated:YES];
+                    }
+                }
+            });
+        }];
+    }
 }
 
-- (void)didSelectItem:(int)page
+- (void)didSelectSelectSearchResult:(int)index
 {
-    [m_view vGoto:page];
+    if (b_outline) {
+        b_outline = NO;
+        b_search_outline = YES;
+        [self.navigationController popViewControllerAnimated:YES];
+        [self goToSearchResult:index];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [self goToSearchResult:index];
+        }];
+    }
+}
+
+- (void)goToSearchResult:(int)index
+{
+    [m_view resetZoomLevel];
+    [self PDFGoto:index];
+    [self startSearch:[[RDExtendedSearch sharedInstance] searchTxt] dir:1 reset:YES];
 }
 
 - (void)OnPageChanged :(int)pageno
@@ -1580,6 +1641,12 @@ extern uint g_oval_color;
     }
 
 }
+
+- (void)OnAnnotListItems:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
+{
+    NSLog(@"list sels");
+}
+
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotOpenURL:(NSString *)url
 {
@@ -1631,16 +1698,6 @@ extern uint g_oval_color;
     m_bSel = true;
 }
 
-/*
--(void)OnFound:(bool)found
-{
-    if( !found )//todo: show alert dialog
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Waring" message:@"Find Over" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-        [alert show];
-    }
-}
-*/
 -(void)OnSingleTapped:(float)x :(float)y :(NSString *)text
 {
     [m_searchBar resignFirstResponder];
@@ -1961,11 +2018,6 @@ extern uint g_oval_color;
     [self.view bringSubviewToFront:pickerView];
     [pickerView reloadAllComponents];
     [pickerView selectRow:index inComponent:0 animated:NO];
-}
-
-- (void)OnAnnotListItems:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
-{
-    NSLog(@"list box");
 }
 
 #pragma mark - Immersive

@@ -1231,7 +1231,7 @@ extern uint annotStrikeoutColor;
 }
 -(bool)isMultiSel
 {
-	return Page_isAnnotListMultiSel(m_page, m_handle);
+    return Page_isAnnotListMultiSel(m_page, m_handle);
 }
 -(int)getListItemCount
 {

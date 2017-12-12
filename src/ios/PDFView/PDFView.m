@@ -8,6 +8,7 @@
 
 #import "PDFView.h"
 #import <QuartzCore/QuartzCore.h>
+
 extern int g_def_view;
 extern float g_Ink_Width;
 extern float g_rect_Width;
@@ -16,6 +17,8 @@ extern uint g_rect_color;
 extern uint g_oval_color;
 extern bool g_paging_enabled;
 extern bool g_double_page_enabled;
+extern bool g_cover_page_enabled;
+extern NSString *g_author;
 
 @implementation PDFView
 
@@ -69,6 +72,10 @@ extern bool g_double_page_enabled;
     [self vClose];
 
     m_doc = doc;
+  
+    // Set meta tag UUID with the pdf id
+    [self setUUIDMeta];
+    
     bool *verts = (bool *)calloc( sizeof(bool), [doc pageCount] );
     bool *horzs = (bool *)calloc( sizeof(bool), [doc pageCount] );
     
@@ -253,14 +260,6 @@ extern bool g_double_page_enabled;
     }
     m_cur_page = -1;
     m_delegate = nil;
-    
-    
-    //do not close Document object in View class.
-    //this shall be closed in Controller class.
-    //this means: close Document in creator.
-    //GEAR
-    //Document_close(m_doc);
-    //END
 }
 
 -(void)refresh
@@ -729,6 +728,7 @@ extern bool g_double_page_enabled;
     if([self canSaveDocument])
     {
     	[self setModified:YES force:NO];
+        [self setModifyDateForAnnot:m_annot];
         
         m_tx = point.x * m_scale;
         m_ty = point.y * m_scale;
@@ -793,6 +793,10 @@ extern bool g_double_page_enabled;
 			pt.x = pos.x;
 			pt.y = pos.y;
 			[page addAnnotNote:&pt];
+            
+            // Set Author and Modify date
+            [self updateLastAnnotInfoAtPage:page];
+            
 			[m_view vRenderSync:pos.pageno];
 			[self refresh];
 		}
@@ -1014,6 +1018,9 @@ extern bool g_double_page_enabled;
             if (doubleTapZoomMode == 1) {
                 [self defaultZoom:touch];
             } else {
+#ifndef SMART_ZOOM
+                [self defaultZoom:touch];
+#else
                 [self initZoomWithPoint:[touch locationInView:self.window]];
                 struct PDFV_POS pos;
                 CGPoint p = [touch locationInView:self.window];
@@ -1049,6 +1056,7 @@ extern bool g_double_page_enabled;
                     
                     [self refresh];
                 }
+#endif
             }
         }
     }
@@ -1315,6 +1323,10 @@ extern bool g_double_page_enabled;
                 PDFPage *page = [vpage GetPage];
                 [mat transformInk:m_ink];
                 [page addAnnotInk:m_ink];
+                
+                // Set Author and Modify date
+                [self updateLastAnnotInfoAtPage:page];
+                
                 [m_view vRenderSync:pos.pageno];
             }
             [self setModified:YES force:NO];
@@ -1370,6 +1382,11 @@ extern bool g_double_page_enabled;
                 PDFVPage *vpage = [m_view vGetPage:pos.pageno];
                 cur = 0;
                 end = pages_cnt;
+                
+                if (cur >= 128) {
+                    return;
+                }
+                
                 while( cur < end )
                 {
                     if( pages[cur] == vpage ) break;
@@ -1404,6 +1421,9 @@ extern bool g_double_page_enabled;
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformRect:&rect];
                 [page addAnnotEllipse:&rect:g_rect_Width * m_scale / [vpage GetScale]:g_oval_color:0];
+                
+                // Set Author and Modify date
+                [self updateLastAnnotInfoAtPage:page];
             }
             pt_cur += 2;
         }
@@ -1501,6 +1521,9 @@ extern bool g_double_page_enabled;
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformRect:&rect];
                 [page addAnnotRect:&rect: g_rect_Width * m_scale / [vpage GetScale]: g_rect_color: 0];
+                
+                // Set Author and Modify date
+                [self updateLastAnnotInfoAtPage:page];
             }
             pt_cur += 2;
         }
@@ -1672,6 +1695,7 @@ extern bool g_double_page_enabled;
                         break;
                 }
                 [self setModified:YES force:NO];
+                [self setModifyDateForAnnot:m_annot];
                 
                 //need refresh PDFView and save annot status
                 [m_view vRenderSync:m_annot_pos.pageno];
@@ -1681,7 +1705,6 @@ extern bool g_double_page_enabled;
             
             nu = [m_annot getComboItemCount];
             if (nu != -1){
-                //int j= [m_annot getComboSel];
                 NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
                 for (int i = 0; i < nu; i++) {
                     NSString *str = [m_annot getComboItem:i];
@@ -1718,7 +1741,7 @@ extern bool g_double_page_enabled;
                 }
                 
                 if (m_delegate){
-                    [m_delegate OnAnnotListItems:arr selectedIndexes:selected_items]; // Modified method
+                    [m_delegate OnAnnotList:m_annot items:arr selectedIndexes:selected_items]; // Modified method
                 }
                 return ;
             }
@@ -1769,7 +1792,9 @@ extern bool g_double_page_enabled;
     
     [m_annot setComboSel:select :items.count];
     
-    [self refreshCurrentPage];
+    [m_view vRenderSync:m_cur_page];
+    
+    [self refresh];
     
     // Optional
     // Save the document
@@ -1849,6 +1874,10 @@ extern bool g_double_page_enabled;
         [page addAnnotNote:&pt];
         PDFAnnot *annot = [page annotAtIndex: [page annotCount] - 1];
         [annot setPopupText:text];
+        
+        // Set Author and Modify date
+        [self updateLastAnnotInfoAtPage:page];
+        
         [m_view vRenderSync:pos.pageno];
     }
 }
@@ -1914,6 +1943,7 @@ extern bool g_double_page_enabled;
         [self setModified:YES force:NO];
     }
     [m_annot setComboSel:item];
+    [self setModifyDateForAnnot:m_annot];
     [m_view vRenderSync:m_annot_pos.pageno];
     [self vAnnotEnd];
 }
@@ -1923,16 +1953,26 @@ extern bool g_double_page_enabled;
     if (m_status != sta_annot) return;
     if (![[m_annot getEditText] isEqualToString:text]) {
         [self setModified:YES force:NO];
+        [self setModifyDateForAnnot:m_annot];
     }
     [m_annot setEditText:text];
     [m_view vRenderSync:m_annot_pos.pageno];
     [self vAnnotEnd];
-    
 }
 
 - (BOOL)paginAvailable
 {
     return (g_def_view == 3 || g_def_view == 4);
+}
+
+- (BOOL)canSaveDocument
+{
+    return ([m_doc canSave] && !readOnlyEnabled);
+}
+
+- (void)setReadOnly:(BOOL)enabled
+{
+    readOnlyEnabled = enabled;
 }
 
 - (void)setReaderBackgroundColor:(int)color
@@ -1974,14 +2014,30 @@ extern bool g_double_page_enabled;
     }
 }
 
-- (BOOL)canSaveDocument
+- (void)updateLastAnnotInfoAtPage:(PDFPage *)page
 {
-    return ([m_doc canSave] && !readOnlyEnabled);
+    PDFAnnot *annot = [page annotAtIndex:(page.annotCount - 1)];
+    if (annot) {
+        [self setAuthorForAnnot:annot];
+        [self setModifyDateForAnnot:annot];
+    }
 }
 
-- (void)setReadOnly:(BOOL)enabled
+- (void)setAuthorForAnnot:(PDFAnnot *)annot
 {
-    readOnlyEnabled = enabled;
+    [annot setPopupLabel:g_author];
+}
+
+- (void)setModifyDateForAnnot:(PDFAnnot *)annot
+{
+    [annot setModDate:[RDUtils pdfDateFromDate:[NSDate date]]];
+}
+
+- (void)setUUIDMeta
+{
+    if ([m_doc meta:UUID].length == 0) {
+        [m_doc setMeta:UUID :[RDUtils getPDFIDForDoc:m_doc]];
+    }
 }
 
 @end

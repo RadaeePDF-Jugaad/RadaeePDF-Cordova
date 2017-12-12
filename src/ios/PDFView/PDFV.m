@@ -107,6 +107,16 @@
     [self vLayout];
 }
 
+- (float)getWidth
+{
+    return [m_doc pageWidth:m_pageno] * m_scale;
+}
+
+- (float)getHeight
+{
+    return [m_doc pageHeight:m_pageno] * m_scale;
+}
+
 -(int)vGetPage:(int)x :(int)y
 {
     return 0;
@@ -204,7 +214,7 @@
 -(void)vGetPos:(struct PDFV_POS *)pos :(int)x :(int)y
 {
     if( !pos ) return;
-    int pageno = [self vGetPage:x :y];
+    int pageno = [self vGetPage:x:y];
     pos->pageno = pageno;
     if( pageno < 0 )
     {
@@ -254,8 +264,10 @@
         {
             PDFVPage *vpage = m_pages[cur];
             [vpage Draw: canvas];
-            if( cur == find_page )
-                [m_finder find_draw:canvas : vpage];
+            if( cur == find_page ) {
+                [m_finder find_draw_all:canvas :vpage];
+                //[m_finder find_draw:canvas : vpage];
+            }
             vpage = nil;
             cur++;
         }
@@ -271,8 +283,10 @@
             if( ![vpage NeedBmp] ) [vpage DeleteBmp];
             [m_thread start_render:vpage];
             [vpage Draw: canvas];
-            if( cur == find_page )
-                [m_finder find_draw:canvas : vpage];
+            if( cur == find_page ) {
+                [m_finder find_draw_all:canvas :vpage];
+                //[m_finder find_draw:canvas : vpage];
+            }
             vpage = nil;
             cur++;
         }
@@ -298,7 +312,7 @@
 -(void)vFindStart:(NSString *)pat : (bool)match_case :(bool)whole_word
 {
     struct PDFV_POS pos;
-    [self vGetPos:&pos: 0: 0];
+    [self vGetPos:&pos: m_w / 2: m_h / 2];
     [m_finder find_start :m_doc :pos.pageno :pat :match_case :whole_word];
 }
 -(int)vFind:(int) dir

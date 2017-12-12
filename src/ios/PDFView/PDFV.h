@@ -75,6 +75,8 @@ struct PDFV_POS
 -(int)vGetDocH;
 -(void)vRenderAsync:(int)pageno;
 -(void)vRenderSync:(int)pageno;
+- (float)getWidth;
+- (float)getHeight;
 @end
 
 @interface PDFVVert: PDFV

@@ -3,6 +3,8 @@
 #import "PDFVGlobal.h"
 #include "PDFVPage.h"
 
+#define DRAW_ALL 0
+
 @interface PDFVFinder : NSObject
 {
 	NSString *m_str;
@@ -22,11 +24,13 @@
 	bool is_waitting;
 	PDFVEvent *m_eve;
 }
+
 -(void)find_start:(PDFDoc *)doc :(int)page_start :(NSString *)str :(bool)match_case :(bool) whole;
 -(int)find_prepare:(int) dir;
 -(int)find;
 -(bool)find_get_pos:(PDF_RECT *)rect;//get current found's bound.
 -(void)find_draw:(PDFVCanvas *)canvas :(PDFVPage *)page;//draw current found
+-(void)find_draw_all:(PDFVCanvas *)canvas :(PDFVPage *)page;//draw all occurrences found
 -(int)find_get_page;//get current found's page NO
 -(void)find_end;
 @end

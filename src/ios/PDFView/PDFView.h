@@ -12,6 +12,7 @@
 #import <OpenGLES/ES1/glext.h>
 #import "PDFV.h"
 #import "ReaderHandler.h"
+#import "RDUtils.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
@@ -43,7 +44,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotSound:(NSString *)fileName;
 - (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText :(float)textSize;
 - (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index;
-- (void)OnAnnotListItems:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
+- (void)OnAnnotList:(PDFAnnot *)annot items :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
 
 @end
 
@@ -132,6 +133,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(void)vAnnotRemove;
 //end annotation status.
 -(void)vAnnotEnd;
+//get current annotation
+-(PDFAnnot *)vGetCurrentAnnot;
 
 //enter ink annotation status.
 -(bool)vNoteStart;
@@ -193,6 +196,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (BOOL)isModified;
 - (void)setModified:(BOOL)modified force:(BOOL)force;
+
+- (void)selectListBoxItems:(NSArray *)items;
 
 - (BOOL)canSaveDocument;
 - (void)setReadOnly:(BOOL)enabled;

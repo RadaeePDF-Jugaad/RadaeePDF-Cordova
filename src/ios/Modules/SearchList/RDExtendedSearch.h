@@ -12,7 +12,7 @@
 #import "PDFVGlobal.h"
 #include "PDFVPage.h"
 
-#define SEARCH_LIST 1
+#define SEARCH_LIST 0
 
 @interface RDSearchResult : NSObject
 
