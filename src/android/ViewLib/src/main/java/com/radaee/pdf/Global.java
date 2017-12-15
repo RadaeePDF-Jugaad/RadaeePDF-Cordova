@@ -777,7 +777,6 @@ public class Global
 		render_mode = recommandedRenderMode();// 0,1,2 0:draft 1:normal 2:best with over print support.
 		dark_mode = false;// dark mode
 		zoomLevel = 3;
-        debug_mode = true;
 		setAnnotTransparency(annotTransparencyColor);
 	}
 
