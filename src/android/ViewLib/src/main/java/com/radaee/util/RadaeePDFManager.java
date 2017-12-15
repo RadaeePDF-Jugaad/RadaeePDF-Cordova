@@ -186,6 +186,16 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     public void setThumbHeight(int height) {
         if(height > 0) Global.thumbViewHeight = height;
     }
+	
+	/**
+     * Sets the debug mode in Global
+     * Should be called before show, open methods
+     *
+     * @param debugMode if true you will see (available memory debug message)
+     */
+    public void setDebugMode(boolean debugMode) {
+        Global.debug_mode = debugMode;
+    }
 
     /**
      * Sets if the first page should be rendered as cover or dual

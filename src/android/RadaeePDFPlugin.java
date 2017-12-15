@@ -173,6 +173,11 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 mPdfManager.setThumbHeight(params.optInt("height"));
                 callbackContext.success("Height passed to the reader");
                 break;
+			case "setDebugMode":  //Sets the debug mode in Global
+                params = args.getJSONObject(0);
+                mPdfManager.setDebugMode(params.optBoolean("mode"));
+                callbackContext.success("property set successfully");
+                break;
             case "setFirstPageCover":  //sets if the first page should be rendered as cover or dual
                 params = args.getJSONObject(0);
                 mPdfManager.setFirstPageCover(params.optBoolean("cover"));
