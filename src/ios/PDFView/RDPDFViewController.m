@@ -2103,7 +2103,7 @@ extern uint g_oval_color;
         }
         case 2:
         {
-            g_def_view = 3;
+            g_def_view = 4;
             g_double_page_enabled = YES;
             break;
         }

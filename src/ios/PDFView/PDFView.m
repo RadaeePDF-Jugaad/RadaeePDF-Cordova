@@ -87,6 +87,7 @@ extern NSString *g_author;
     
     switch(g_def_view)
     {
+        /*
         case 1:
             m_view = [[PDFVHorz alloc] init:false];
             break;
@@ -114,6 +115,47 @@ extern NSString *g_author;
             //doublePage = NO;
             break;
         default:
+            m_view = [[PDFVVert alloc] init];
+            break;
+         */
+            
+        // Horizontal
+        case 1:
+            g_paging_enabled = NO;
+            m_view = [[PDFVHorz alloc] init:false];
+            break;
+        
+        // Horizontal rtol
+        case 2:
+            g_paging_enabled = NO;
+            m_view = [[PDFVHorz alloc] init:true];
+            break;
+            
+        // Single Page (paging enabled)
+        case 3:
+            doublePage = NO;
+            g_paging_enabled = YES;
+            m_view = [[PDFVDual alloc] init:false :NULL :0 :verts :doc.pageCount];
+            
+            break;
+        
+        // Double Page (paging enabled)
+        case 4:
+            doublePage = YES;
+            g_paging_enabled = YES;
+            m_view = [[PDFVDual alloc] init:false :NULL :0 : NULL :doc.pageCount];
+            
+            break;
+           
+        // Double Page first page single (paging enabled)
+        case 6:
+            doublePage = YES;
+            g_paging_enabled = YES;
+            m_view = [[PDFVDual alloc] init:false :NULL :0 : horzs :doc.pageCount];
+            
+            break;
+        default:
+            g_paging_enabled = NO;
             m_view = [[PDFVVert alloc] init];
             break;
     }
@@ -155,7 +197,7 @@ extern NSString *g_author;
     
     self.contentSize = CGSizeMake([m_view vGetDocW]/m_scale, [m_view vGetDocH]/m_scale);
    
-    if( m_type == 2 || m_type == 4)//rtol mode, first page is placed at right side.
+    if( m_type == 2)//rtol mode, first page is placed at right side.
     	self.contentOffset = CGPointMake( self.contentSize.width - self.frame.size.width, 0 );
     else
     	self.contentOffset = CGPointMake( 0, 0 );
