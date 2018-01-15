@@ -2004,7 +2004,7 @@ extern NSString *g_author;
 
 - (BOOL)paginAvailable
 {
-    return (g_def_view == 3 || g_def_view == 4);
+    return (g_def_view == 3 || g_def_view == 4 || g_def_view == 6);
 }
 
 - (BOOL)canSaveDocument

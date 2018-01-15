@@ -528,9 +528,7 @@
     
     int mode = [[params objectForKey:@"mode"] intValue];
     
-    if (mode > 0 && mode < 5) {
-        _viewMode = mode;
-    }
+    _viewMode = mode;
 }
 
 - (void)setToolbarEnabled:(CDVInvokedUrlCommand *)command
