@@ -65,6 +65,7 @@
         NSLog(@"%d", result);
         if(result != err_ok && result != err_open){
             [self pdfChargeDidFailWithError:@"Error open pdf" andCode:(NSInteger) result];
+            return;
         }
         
         [self showReader];
