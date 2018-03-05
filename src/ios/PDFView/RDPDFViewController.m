@@ -896,6 +896,8 @@ extern uint g_oval_color;
     case err_password:
         return 2;
         break;
+    case err_bad_file:
+        return 4;
     default: return 0;
     }
     CGRect rect = [[UIScreen mainScreen]bounds];
