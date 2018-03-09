@@ -31,14 +31,13 @@ http://www.radaeepdf.com/ecommerce/technical-specification
    `cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git --save`
 	
 4. Build the app.  
-   `cordova build`
-    
+   `cordova build`	
+
+After doing these steps, you will have a ready to use project.
+
 ## Compatibility
 
 We do not yet support cordova-android 7.0.0, latest supported version is 6.4.0
-	
-
-After doing these steps, you will have a ready to use project.
 
 ## The JavaScript Interfaces
 
