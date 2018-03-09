@@ -112,6 +112,8 @@
 - (void)setToolbarEnabled:(CDVInvokedUrlCommand*)command;
 - (void)extractTextFromPage:(CDVInvokedUrlCommand*)command;
 - (void)encryptDocAs:(CDVInvokedUrlCommand *)command;
+- (void)addAnnotAttachment:(CDVInvokedUrlCommand *)command;
+- (void)renderAnnotToFile:(CDVInvokedUrlCommand *)command;
 
 // Form Manager
 

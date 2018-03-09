@@ -229,6 +229,10 @@
 
 - (void)refreshCurrentPage;
 
+- (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
+
+- (BOOL)addAttachmentFromPath:(NSString *)path;
+
 //GEAR
 - (void)moviePlayedDidFinish:(NSNotification *)notification;
 //END

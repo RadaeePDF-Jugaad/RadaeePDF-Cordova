@@ -1798,6 +1798,14 @@ extern uint g_oval_color;
 {
     [annotToolBar removeFromSuperview];
 }
+
+- (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
+{
+    if (_delegate) {
+        [_delegate didTapOnAnnotationOfType:annot.type atPage:page atPoint:point];
+    }
+}
+
 //enter annotation status.
 -(void)OnAnnotClicked:(PDFPage *)page :(PDFAnnot *)annot :(float)x :(float)y
 {
@@ -2594,6 +2602,20 @@ extern uint g_oval_color;
         [alert addAction:ok];
         [self presentViewController:alert animated:YES completion:nil];
     }
+}
+
+#pragma mark - Attachments
+
+- (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
+{
+    return [m_view saveImageFromAnnotAtIndex:index atPage:pageno savePath:path size:size];
+}
+
+#pragma mark - Annot render
+
+- (BOOL)addAttachmentFromPath:(NSString *)path
+{
+    return [m_view addAttachmentFromPath:path];
 }
 
 #pragma mark - PickerView DataSource and Delegate

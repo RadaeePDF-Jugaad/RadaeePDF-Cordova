@@ -47,6 +47,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index;
 - (void)OnAnnotList:(PDFAnnot *)annot items :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
 
+- (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
+
 @end
 
 @interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
@@ -237,9 +239,11 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)selectListBoxItems:(NSArray *)items;
 - (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum;
 
-- (void)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
+- (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
 - (NSString *)getImageFromAnnot:(PDFAnnot *)annot;
 - (NSString *)emptyAnnotWithSize:(CGSize)size;
+
+- (BOOL)addAttachmentFromPath:(NSString *)path;
 
 -(BOOL)forceSave;
 

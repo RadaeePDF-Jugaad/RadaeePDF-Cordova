@@ -510,6 +510,56 @@
     }
 }
 
+- (void)addAnnotAttachment:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    NSString *path = [params objectForKey:@"path"];
+    
+    PDFDoc *doc = [m_pdf getDoc];
+    
+    if (m_pdf == nil || doc == nil) {
+        [self cdvErrorWithMessage:@"Error in pdf instance"];
+        return;
+    }
+    
+    if([m_pdf addAttachmentFromPath:path])
+    {
+        [self cdvOkWithMessage:@"Success"];
+    } else {
+        [self cdvErrorWithMessage:@"Failure"];
+    }
+}
+
+- (void)renderAnnotToFile:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    int pageno = [[params objectForKey:@"page"] intValue];
+    int index = [[params objectForKey:@"annotIndex"] intValue];
+    NSString *path = [params objectForKey:@"renderPath"];
+    int width = [[params objectForKey:@"width"] intValue];
+    int height = [[params objectForKey:@"height"] intValue];
+    
+    PDFDoc *doc = [m_pdf getDoc];
+    
+    if (m_pdf == nil || doc == nil) {
+        [self cdvErrorWithMessage:@"Error in pdf instance"];
+        return;
+    }
+    
+    if([m_pdf saveImageFromAnnotAtIndex:index atPage:pageno savePath:path size:CGSizeMake(width, height)])
+    {
+        [self cdvOkWithMessage:@"Success"];
+    } else {
+        [self cdvErrorWithMessage:@"Failure"];
+    }
+}
+
 #pragma mark - Settings
 
 - (void)toggleThumbSeekBar:(int)mode
@@ -841,6 +891,13 @@
                                messageAsDictionary:dict]];
 }
 
+- (void)cdvSendDictCallback:(NSDictionary *)message orCommand:(CDVInvokedUrlCommand *)command
+{
+    CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:message];
+    [res setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:res callbackId:[command callbackId]];
+}
+
 - (void)cdvSendCallback:(NSString *)message orCommand:(CDVInvokedUrlCommand *)command
 {
     CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
@@ -1073,8 +1130,7 @@
         [_delegate didTapOnAnnotationOfType:type atPage:page atPoint:point];
     }
     */
-    
-    [self cdvSendCallback:[NSString stringWithFormat:@"%i", type] orCommand:self.cdv_didTapOnAnnotationOfType];
+    [self cdvSendDictCallback:@{@"index": [NSNumber numberWithInt:page], @"type": [NSNumber numberWithInt:type]} orCommand:self.cdv_didTapOnAnnotationOfType];
 }
 
 - (void)onAnnotExported:(NSString *)path

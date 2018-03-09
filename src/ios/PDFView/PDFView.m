@@ -1232,19 +1232,26 @@ extern NSString *g_author;
     }
 }
 
-- (void)addAttachmentFromPath:(NSString *)path
+- (BOOL)addAttachmentFromPath:(NSString *)path
 {
     PDF_RECT rect;
     rect.left = rect.top = rect.right = rect.bottom = 0;
-    [self addAttachmentAtPage:0 fromPath:path inRect:rect];
+    return [self addAttachmentAtPage:0 fromPath:path inRect:rect];
 }
 
-- (void)addAttachmentAtPage:(int)pageno fromPath:(NSString *)path inRect:(PDF_RECT)rect
+- (BOOL)addAttachmentAtPage:(int)pageno fromPath:(NSString *)path inRect:(PDF_RECT)rect
 {
-    PDFPage *page = [m_doc page:pageno];
-    [page addAnnotAttachment:path :0 :&rect];
+    if([[NSFileManager defaultManager] fileExistsAtPath:path])
+    {
+        PDFPage *page = [m_doc page:pageno];
+        [page addAnnotAttachment:path :0 :&rect];
+        
+        [self setModified:YES force:NO];
+        
+        return YES;
+    }
     
-    [self setModified:YES force:NO];
+    return NO;
 }
 
 - (void)OnDoubleTap:(UITouch *)touch
@@ -2100,6 +2107,11 @@ extern NSString *g_author;
         m_annot = [page annotAtPoint:m_annot_pos.x: m_annot_pos.y];
         if( m_annot )
         {
+            if(m_delegate)
+            {
+                [m_delegate didTapAnnot:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
+            }
+            
             if (![self canSaveDocument] && m_annot.type != 1) {
                 if( m_delegate )
                 {
@@ -2514,7 +2526,7 @@ extern NSString *g_author;
     }
 }
 
-- (void)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
+- (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
 {
     PDFPage *page = [m_doc page:pageno];
     PDFAnnot *annot = [page annotAtIndex:index];
@@ -2529,11 +2541,16 @@ extern NSString *g_author;
         resizedImage = [self imageWithImage:img scaledToSize:size];
     }
     
+    if(resizedImage)
+    {
+        // Save image.
+        [UIImagePNGRepresentation(resizedImage) writeToFile:path atomically:YES];
+        [[NSFileManager defaultManager] removeItemAtPath:annotPath error:nil];
+        
+        return [[NSFileManager defaultManager] fileExistsAtPath:path];
+    }
     
-    // Save image.
-    [UIImagePNGRepresentation(resizedImage) writeToFile:path atomically:YES];
-    
-    [[NSFileManager defaultManager] removeItemAtPath:annotPath error:nil];
+    return NO;
 }
 
 - (NSString *)getImageFromAnnot:(PDFAnnot *)annot
