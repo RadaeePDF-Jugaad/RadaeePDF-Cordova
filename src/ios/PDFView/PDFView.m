@@ -1241,14 +1241,19 @@ extern NSString *g_author;
 
 - (BOOL)addAttachmentAtPage:(int)pageno fromPath:(NSString *)path inRect:(PDF_RECT)rect
 {
+    if ([path containsString:@"file://"])
+        path = [path stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+    
     if([[NSFileManager defaultManager] fileExistsAtPath:path])
     {
         PDFPage *page = [m_doc page:pageno];
-        [page addAnnotAttachment:path :0 :&rect];
+        BOOL res = [page addAnnotAttachment:path :0 :&rect];
         
-        [self setModified:YES force:NO];
-        
-        return YES;
+        if(res)
+        {
+            [self setModified:YES force:NO];
+            return YES;
+        }
     }
     
     return NO;
@@ -2528,6 +2533,12 @@ extern NSString *g_author;
 
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
 {
+    if ([path containsString:@"file://"])
+        path = [path stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+    
+    if([[NSFileManager defaultManager] fileExistsAtPath:path])
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    
     PDFPage *page = [m_doc page:pageno];
     PDFAnnot *annot = [page annotAtIndex:index];
 
@@ -2537,6 +2548,8 @@ extern NSString *g_author;
     
     if (size.width == 0 || size.height == 0) {
         [[NSFileManager defaultManager] moveItemAtPath:annotPath toPath:path error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:annotPath error:nil];
+        return YES;
     } else {
         resizedImage = [self imageWithImage:img scaledToSize:size];
     }
