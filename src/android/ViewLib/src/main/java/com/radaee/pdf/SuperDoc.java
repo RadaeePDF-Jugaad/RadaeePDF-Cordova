@@ -598,6 +598,14 @@ public class SuperDoc extends Document
         return m_docs[0].doc.GetPage0();
     }
     @Override
+	public long CreateVNPage(int pageno, int cw, int ch, Bitmap.Config format)
+	{
+		if(m_docs == null) return 0;
+		int index = lookup_doc(pageno);
+		if( index < 0 ) return 0;
+		return m_docs[index].doc.CreateVNPage(pageno - m_docs[index].page_start, cw,ch, format);
+	}
+    @Override
     protected void finalize() throws Throwable
     {
         Close();

@@ -54,6 +54,29 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/save_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/save"
+            tools:ignore="ContentDescription"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:text="@string/save"
+            android:gravity="center_vertical"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/print"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

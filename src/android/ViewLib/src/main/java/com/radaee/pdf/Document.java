@@ -1391,7 +1391,7 @@ public class Document
 	 * verify the signature<br/>
 	 * a premium license is required for this method.
 	 * @param sign signature object from Annotation.GetSign()
-	 * @return 0 if veriify OK, others are error.
+	 * @return 0 if verify OK, others are error.
 	 */
 	public int VerifySign(Sign sign)
 	{
@@ -1429,7 +1429,11 @@ public class Document
         super.finalize();
     }
 
-	public String getDocPath() { //Nermeen
+	public String getDocPath() {
 		return mDocPath;
+	}
+	public long CreateVNPage(int pageno, int cw, int ch, Bitmap.Config format)
+	{
+		return VNPage.create(hand_val, pageno, cw, ch, format);
 	}
 }

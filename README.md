@@ -32,6 +32,10 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 	
 4. Build the app.  
    `cordova build`
+    
+## Compatibility
+
+We do not yet support cordova-android 7.0.0, latest supported version is 6.4.0
 	
 
 After doing these steps, you will have a ready to use project.
@@ -122,8 +126,8 @@ RadaeePDFPlugin.getFileState(
 For more examples, check demo/js/index.js  
 
 RadaeePDF library version included:
-- Android: v3.14.5
-- iOS: v3.8.3
+- Android: v3.15
+- iOS: v3.8.4
 
 Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  

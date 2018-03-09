@@ -3,7 +3,7 @@ package com.radaee.pdf;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-/**
+/*
  * Created by radaee on 2017/11/16.
  */
 
@@ -16,11 +16,7 @@ public class VNPage {
         void BlkDealloc(long block);
         boolean Draw(long block, Canvas canvas, int src_left, int src_top, int src_right, int src_bottom, int dst_left, int dst_top, int dst_right, int dst_bottom);
     }
-    private static native long create(long doc, int pageno, int cw, int ch, Bitmap.Config format);
-    public static long Create(Document doc, int pageno, int cw, int ch, Bitmap.Config format)
-    {
-        return create(doc.hand_val, pageno, cw, ch, format);
-    }
+    protected static native long create(long doc, int pageno, int cw, int ch, Bitmap.Config format);
     public static native void destroy(long vpage, VNPageListener callback);
     public static native boolean blkRendered(long vpage);
     public static native boolean blkDraw(long vpage, VNPageListener callback, Canvas canvas, float pdfx1, float pdfy1, float pdfx2, float pdfy2, int x, int y);

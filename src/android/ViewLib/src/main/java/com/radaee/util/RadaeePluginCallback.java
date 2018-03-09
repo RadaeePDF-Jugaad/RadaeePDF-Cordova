@@ -107,6 +107,15 @@ public class RadaeePluginCallback {
         return mControlListener != null && mControlListener.onEncryptDocAs(dst, upswd, opswd, perm, method, id);
     }
 
+    public boolean onAddAnnotAttachment(String attachmentPath) {
+        return mControlListener != null && mControlListener.onAddAnnotAttachment(attachmentPath);
+    }
+
+    public String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight) {
+        return mControlListener != null ? mControlListener.renderAnnotToFile(page, annotIndex,
+                renderPath, bitmapWidth, bitmapHeight) : "ERROR";
+    }
+
     /**
      * An interface that can help in recognizing some events.
      */
@@ -135,6 +144,8 @@ public class RadaeePluginCallback {
         String onGetJsonFormFields();
         String onGetJsonFormFieldsAtPage(int pageno);
         String onSetFormFieldsWithJSON(String json);
+        boolean onAddAnnotAttachment(String attachmentPath);
         boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id);
+        String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight);
     }
 }

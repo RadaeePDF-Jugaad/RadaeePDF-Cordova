@@ -42,7 +42,7 @@ var app = {
         document.getElementById("open").addEventListener("click", this.open, false);
         document.getElementById("openHttp").addEventListener("click", this.openHttp, false);
         document.getElementById("openFromAssets").addEventListener("click", this.openAssets, false);
-		
+
 		function registerCallbacks()
         {
             RadaeePDFPlugin.willShowReaderCallback(willShowReader);
@@ -56,7 +56,7 @@ var app = {
 			RadaeePDFPlugin.didDoubleTapOnPageCallback(function(message){didDoubleTapOnPage(message);});
             RadaeePDFPlugin.didLongPressOnPageCallback(function(message){didLongPressOnPage(message);});
         }
-        
+
         function willShowReader()
         {
             console.log("--- Callback: willShowReader");
@@ -84,10 +84,22 @@ var app = {
         function didTapOnPage(page)
         {
             console.log("--- Callback: didTapOnPage: " + page);
+            /*RadaeePDFPlugin.renderAnnotToFile(
+                        {
+                            page: 4,
+                            annotIndex: 3,
+                            renderPath: "/mnt/sdcard/signature.png"
+                        },
+                        function(message) {
+                             console.log("Success: " + message);
+                        },
+                        function(err){
+                            console.log("Failure: " + err);}
+                    );*/
         }
-        function didTapOnAnnotationOfType(type)
+        function didTapOnAnnotationOfType(info)
         {
-            console.log("--- Callback: didTapOnAnnotationOfType: " + type);
+            console.log("--- Callback: didTapOnAnnotationOfType: " + info['type'] + " and index: " + info['index']);
         }
 		function didDoubleTapOnPage(page)
         {
@@ -132,6 +144,17 @@ var app = {
             function(err){
                 console.log("Failure: " + err);}
         );*/
+
+        /*RadaeePDFPlugin.addAnnotAttachment(
+            {
+                path: "/mnt/sdcard/untitled.png"
+            },
+            function(message) {
+                 console.log("Success: " + message);
+            },
+            function(err){
+                console.log("Failure: " + err);}
+        );*/
     },
 
     //activate license
@@ -163,7 +186,7 @@ var app = {
 
         RadaeePDFPlugin.open(
             {
-                url: "file:///mnt/sdcard/Download/Test.pdf",
+                url: "file:///mnt/sdcard/Download/pdf/Sign.pdf",
                 password: "" //password if needed
             },
             function(message) {

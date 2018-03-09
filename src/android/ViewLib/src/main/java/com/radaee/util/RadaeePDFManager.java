@@ -24,6 +24,18 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     private int mCurrentPage = -1;
     private int mIconsBgColor = -1;
     private int mTitleBgColor = -1;
+    public static boolean sHideSaveButton = false;
+    public static boolean sHideMoreButton = false;
+    public static boolean sHideUndoButton = false;
+    public static boolean sHideRedoButton = false;
+    public static boolean sHidePrintButton = false;
+    public static boolean sHideAnnotButton = false;
+    public static boolean sHideSelectButton = false;
+    public static boolean sHideSearchButton = false;
+    public static boolean sHideOutlineButton = false;
+    public static boolean sHideViewModeButton = false;
+    public static boolean sHideAddBookmarkButton = false;
+    public static boolean sHideShowBookmarksButton = false;
     private RadaeePluginCallback.PDFReaderListener mListener;
 
     public RadaeePDFManager() {
@@ -186,8 +198,8 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     public void setThumbHeight(int height) {
         if(height > 0) Global.thumbViewHeight = height;
     }
-	
-	/**
+
+    /**
      * Sets the debug mode in Global
      * Should be called before show, open methods
      *
@@ -380,6 +392,30 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
             filePath = filePath.substring(filePath.indexOf(prefix) + prefix.length());
         }
         return BookmarkHandler.getBookmarksAsJson(filePath);
+    }
+
+    /**
+     * add a file as an attachment.<br/>
+     * this can be invoked after ObjsStart or Render or RenderToBmp.<br/>
+     * this method require professional or premium license.
+     * @param attachmentPath absolute path name to the file.
+     * @return true or false.<br/>
+     */
+    public boolean addAnnotAttachment(String attachmentPath) {
+        return RadaeePluginCallback.getInstance().onAddAnnotAttachment(attachmentPath);
+    }
+
+    /**
+     * Render annot to a bitmap, and save it to the given path
+     * @param page the page number, 0-index (from 0 to Document.GetPageCount - 1)
+     * @param annotIndex annotation index
+     * @param renderPath the directory path in which the annotation will be saved (ex:/mnt/sdcard/bitmap.png)
+     *                      (in case of sdcard make sure the WRITE_EXTERNAL_STORAGE permission is granted)
+     * @param bitmapWidth the desired width of the result bitmap, 0 in case of using original width
+     * @param bitmapHeight the desired height of the result bitmap, 0 in case of using original height
+     */
+    public String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight) {
+        return RadaeePluginCallback.getInstance().renderAnnotToFile(page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
     }
 
     @Override

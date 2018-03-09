@@ -55,6 +55,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	{
 		public void OnCtrlSelect(boolean set);
 	}
+	static final public int NOT_MODIFIED = 0;
+	static final public int MODIFIED_NOT_SAVED = 1;
+	static final public int MODIFIED_AND_SAVED = 2;
+	static private int sFileState = NOT_MODIFIED;
 	static public final int BAR_NONE = 0;
 	static public final int BAR_CMD = 1;
 	static public final int BAR_ANNOT = 2;
@@ -84,6 +88,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     private ImageView btn_more;
     private View btn_add_bookmark;
     private View btn_show_bookmarks;
+    private View btn_save;
     private View btn_print;
 	private ImageView btn_find_back;
 	private ImageView btn_find_prev;
@@ -113,12 +118,13 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	{
 		m_parent = parent;
 		m_view = view;
+		sFileState = NOT_MODIFIED;
 		m_bar_act = new PDFTopBar(m_parent, R.layout.bar_act);
 		m_bar_cmd = new PDFTopBar(m_parent, R.layout.bar_cmd);
 		m_bar_find = new PDFTopBar(m_parent, R.layout.bar_find);
 		m_bar_annot = new PDFTopBar(m_parent, R.layout.bar_annot);
 		m_menu_view = new PDFMenu(m_parent, R.layout.pop_view, 160, 180);
-		m_menu_more = new PDFMenu(m_parent, R.layout.pop_more, 180,130);
+		m_menu_more = new PDFMenu(m_parent, R.layout.pop_more, 180,180);
 		RelativeLayout layout = (RelativeLayout)m_bar_cmd.BarGetView();
 		btn_view = (ImageView)layout.findViewById(R.id.btn_view);
 		btn_find = (ImageView)layout.findViewById(R.id.btn_find);
@@ -152,6 +158,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		view_single = layout1.findViewById(R.id.view_single);
 		view_dual = layout1.findViewById(R.id.view_dual);
 		LinearLayout moreLayout = (LinearLayout)m_menu_more.MenuGetView();
+		btn_save = moreLayout.findViewById(R.id.save);
 		btn_print = moreLayout.findViewById(R.id.print);
 		btn_add_bookmark = moreLayout.findViewById(R.id.add_bookmark);
 		btn_show_bookmarks = moreLayout.findViewById(R.id.show_bookmarks);
@@ -164,6 +171,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_undo.setOnClickListener(this);
         btn_redo.setOnClickListener(this);
         btn_more.setOnClickListener(this);
+        btn_save.setOnClickListener(this);
         btn_print.setOnClickListener(this);
         btn_add_bookmark.setOnClickListener(this);
         btn_show_bookmarks.setOnClickListener(this);
@@ -186,6 +194,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		view_single.setOnClickListener(this);
 		view_dual.setOnClickListener(this);
 		SetBtnEnabled(btn_annot, m_view.PDFCanSave());
+		SetBtnEnabled(btn_save, m_view.PDFCanSave());
 		SetBtnEnabled(btn_print, m_view.PDFCanSave());
 
 		//Nermeen, show/hide buttons based on license type
@@ -251,7 +260,25 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				}
 			});
 		}
+
+		btn_save.setVisibility(RadaeePDFManager.sHideSaveButton ? View.GONE : View.VISIBLE);
+		btn_more.setVisibility(RadaeePDFManager.sHideMoreButton ? View.GONE : View.VISIBLE);
+		btn_undo.setVisibility(RadaeePDFManager.sHideUndoButton ? View.GONE : View.VISIBLE);
+		btn_redo.setVisibility(RadaeePDFManager.sHideRedoButton ? View.GONE : View.VISIBLE);
+		btn_print.setVisibility(RadaeePDFManager.sHidePrintButton ? View.GONE : View.VISIBLE);
+		btn_annot.setVisibility(RadaeePDFManager.sHideAnnotButton ? View.GONE : View.VISIBLE);
+		btn_find.setVisibility(RadaeePDFManager.sHideSearchButton ? View.GONE : View.VISIBLE);
+		btn_select.setVisibility(RadaeePDFManager.sHideSelectButton ? View.GONE : View.VISIBLE);
+		btn_view.setVisibility(RadaeePDFManager.sHideViewModeButton ? View.GONE : View.VISIBLE);
+		btn_outline.setVisibility(RadaeePDFManager.sHideOutlineButton ? View.GONE : View.VISIBLE);
+		btn_add_bookmark.setVisibility(RadaeePDFManager.sHideAddBookmarkButton ? View.GONE : View.VISIBLE);
+		btn_show_bookmarks.setVisibility(RadaeePDFManager.sHideShowBookmarksButton ? View.GONE : View.VISIBLE);
 	}
+
+	public static int getFileState() {
+		return sFileState;
+	}
+
 	private void SetBtnEnabled(View btn, boolean enable)
 	{
 		if(enable)
@@ -405,6 +432,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	}
 
 	public void onPageModified(int pageno) {
+		sFileState = MODIFIED_NOT_SAVED;
 		if(mNavigationMode == NAVIGATION_THUMBS)
 			mThumbView.thumbUpdatePage(pageno);
 	}
@@ -517,6 +545,9 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             m_view.PDFRedo();
         } else if(arg0 == btn_more) {
 			m_menu_more.MenuShow(m_view.getWidth() - m_menu_more.getWidth(), m_bar_cmd.BarGetHeight());
+		} else if(arg0 == btn_save) {
+			savePDF();
+			m_menu_more.MenuDismiss();
 		} else if(arg0 == btn_print) {
 			printPDF();
 			m_menu_more.MenuDismiss();
@@ -796,6 +827,12 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		}
 	}
 
+	public void savePDF() {
+		m_view.PDFGetDoc().Save();
+		sFileState = MODIFIED_AND_SAVED;
+		Toast.makeText(m_parent.getContext(), R.string.saved_message, Toast.LENGTH_SHORT).show();
+	}
+
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private void printPDF() {
 		PrintManager mPrintManager = (PrintManager) m_parent.getContext().getSystemService(Context.PRINT_SERVICE);
@@ -958,6 +995,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				((ImageView)view_dual.findViewById(R.id.imageView3)).setColorFilter(color);
 				((ImageView)btn_add_bookmark.findViewById(R.id.add_bookmark_icon)).setColorFilter(color);
 				((ImageView)btn_show_bookmarks.findViewById(R.id.show_bookmarks_icon)).setColorFilter(color);
+				((ImageView)btn_save.findViewById(R.id.save_icon)).setColorFilter(color);
 				((ImageView)btn_print.findViewById(R.id.print_icon)).setColorFilter(color);
 			} catch (Exception e) {e.getMessage();}
 		}
@@ -1098,8 +1136,21 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 
 		@Override
 		public boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id) {
-			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
-			return m_view.PDFGetDoc().EncryptAs(dst, upswd, opswd, perm, method, id);
+			return !(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened())
+					&& m_view.PDFGetDoc().EncryptAs(dst, upswd, opswd, perm, method, id);
+		}
+
+		@Override
+		public boolean onAddAnnotAttachment(String attachmentPath) {
+			return !(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened() || !m_view.PDFCanSave())
+					&& m_view.PDFSetAttachment(attachmentPath);
+		}
+
+		@Override
+		public String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight) {
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return "Document not set";
+			if(page >= m_view.PDFGetDoc().GetPageCount()) return "Page index error";
+			return CommonUtil.renderAnnotToFile(m_view.PDFGetDoc(), page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
 		}
 	};
 }

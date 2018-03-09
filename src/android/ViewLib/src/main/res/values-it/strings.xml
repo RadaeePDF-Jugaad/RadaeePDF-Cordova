@@ -68,5 +68,12 @@
     <string name="no_pdf_outlines">Il file non contiene un elenco di contenuti</string>
     <string name="pdf_print_not_available">File PDF non è disponibile per la stampa.</string>
     <string name="pdf_print_calculation_failed">Impossibile contare le pagine.</string>
+    <string name="confirm">Conferma</string>
+    <string name="clear">Elimina</string>
+    <string name="delete">Elimina</string>
+    <string name="save">Salva</string>
+    <string name="saved_message">Documento salvato</string>
+    <string name="delete_signature_message">È già presente una firma, vuoi cancellarla?</string>
+    <string name="warning">Avviso</string>
 
 </resources>

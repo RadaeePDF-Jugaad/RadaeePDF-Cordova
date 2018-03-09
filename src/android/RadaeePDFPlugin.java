@@ -17,6 +17,8 @@
 	modified on 30/08/17 -->  added support to js callbacks
 	
 	modified on 05/10/17 -->  added double tap/long press js callbacks
+	
+	modified on 09/03/18 -->  added addAnnotAttachment, renderAnnotToFile
 */
 package com.radaee.cordova;
 
@@ -27,6 +29,7 @@ import android.webkit.URLUtil;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
 import com.radaee.reader.PDFViewAct;
+import com.radaee.reader.PDFViewController;
 import com.radaee.reader.R; 
 import com.radaee.util.BookmarkHandler;
 import com.radaee.util.RadaeePDFManager;
@@ -105,13 +108,13 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 break;
             case "fileState":  //get last opened file's state
                 switch (PDFViewAct.getFileState()) {
-                    case PDFViewAct.NOT_MODIFIED:
+                    case PDFViewController.NOT_MODIFIED:
                         callbackContext.success("File has not been modified");
                         break;
-                    case PDFViewAct.MODIFIED_NOT_SAVED:
+                    case PDFViewController.MODIFIED_NOT_SAVED:
                         callbackContext.success("File has been modified but not saved");
                         break;
-                    case PDFViewAct.MODIFIED_AND_SAVED:
+                    case PDFViewController.MODIFIED_AND_SAVED:
                         callbackContext.success("File has been modified and saved");
                         break;
                 }
@@ -213,6 +216,16 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "removeBookmark":
             case "getBookmarks":
                 handleBookmarkActions(action, args.getJSONObject(0), callbackContext);
+                break;
+			case "addAnnotAttachment":
+                boolean result = mPdfManager.addAnnotAttachment(args.getJSONObject(0).optString("path"));
+                if(result) callbackContext.success("Attachment added successfully");
+                else callbackContext.error("Attachment error");
+                break;
+            case "renderAnnotToFile":
+                params = args.getJSONObject(0);
+                callbackContext.success("Result = " + mPdfManager.renderAnnotToFile(params.optInt("page"), params.optInt("annotIndex"),
+                        params.optString("renderPath"), params.optInt("width"), params.optInt("height")));
                 break;
             case "willShowReaderCallback":
                 sWillShowReader = callbackContext;
@@ -317,10 +330,17 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
 
     @Override
     public void onAnnotTapped(Page.Annotation annot) {
-        if(sDidTapOnAnnot != null) {
-            PluginResult result = new PluginResult(PluginResult.Status.OK, annot.GetType());
-            result.setKeepCallback(true);
-            sDidTapOnAnnot.sendPluginResult(result);
+        try {
+            if(sDidTapOnAnnot != null) {
+                JSONObject resultObject = new JSONObject();
+                resultObject.put("index", annot.GetIndexInPage());
+                resultObject.put("type", annot.GetType());
+                PluginResult result = new PluginResult(PluginResult.Status.OK, resultObject);
+                result.setKeepCallback(true);
+                sDidTapOnAnnot.sendPluginResult(result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

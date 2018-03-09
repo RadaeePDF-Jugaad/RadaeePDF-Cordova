@@ -81,5 +81,11 @@
     <string name="no_bookmarks">No bookmarks to show</string>
     <string name="loading">Loading…</string>
     <string name="delete">Delete</string>
+    <string name="confirm">Confirm</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="saved_message">Document saved</string>
+    <string name="delete_signature_message">A signature is already present, do you want to delete it?</string>
+    <string name="warning">Warning</string>
 
 </resources>

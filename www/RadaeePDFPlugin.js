@@ -22,6 +22,10 @@
 //      added js callbacks
 //  v1.5.0
 
+// modified by Nermeen Solaiman/Emanuele on 31/01/17
+//      added addAnnotAttachment, renderAnnotToFile
+//  v1.6.0
+
 var argscheck = require('cordova/argscheck'),
     exec      = require('cordova/exec');
 
@@ -128,7 +132,7 @@ RadaeePDFPlugin.prototype.setToolbarEnabled = function(params, successCallback, 
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setToolbarEnabled', [params]);
-}
+};
 
 RadaeePDFPlugin.prototype.getPageCount = function (params, successCallback, errorCallback) {
         params = params || {};
@@ -164,6 +168,18 @@ RadaeePDFPlugin.prototype.getBookmarks = function (params, successCallback, erro
         params = params || {};
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getBookmarks', [params]);
+};
+
+RadaeePDFPlugin.prototype.addAnnotAttachment = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'addAnnotAttachment', [params]);
+};
+
+RadaeePDFPlugin.prototype.renderAnnotToFile = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'renderAnnotToFile', [params]);
 };
 
 // Callbacks

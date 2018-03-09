@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.14.5
+ * @version 3.15
  */
 public class Global
 {
@@ -243,7 +243,7 @@ public class Global
 	 * @param color
 	 *            formated as 0xAARRGGBB
 	 */
-	private static native void setAnnotTransparency(int color);
+	public static native void setAnnotTransparency(int color);
 
 	/**
 	 * color for ink annotation
@@ -364,6 +364,11 @@ public class Global
     public static int squiggle_color = 0xFF00C000;//black green
 	public static String sAnnotAuthor; //if valorized, will be used to set the annotation author while its creation
 
+	public static boolean sEnableGraphicalSignature = true;
+	public static boolean sFitSignatureToField = true; //if true, the blank space will be trimmed from the signature bitmap
+	public static String sSignPadDescr = "Sign Here";
+
+	public static boolean sExecuteAnnotJS = true;
 	/**
 	 *Annot Rect params
 	 */
