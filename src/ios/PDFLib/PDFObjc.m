@@ -88,6 +88,15 @@ extern uint annotStrikeoutColor;
     Global_dibFree(tmp_dib);
 }
 
+-(void)erase:(int)color
+{
+	int *pix = (int *)Global_dibGetData(m_dib);
+	int *pix_end = pix + Global_dibGetWidth(m_dib) * Global_dibGetHeight(m_dib);
+	while(pix < pix_end) *pix++ = color;
+
+
+}
+
 -(CGImageRef)image
 {
     if(!m_dib) return nil;
@@ -895,9 +904,10 @@ extern uint annotStrikeoutColor;
 	Page_setAnnotHide( m_page, m_handle, hide );
 	return true;
 }
--(bool)renderToBmp:(CGImageRef)img
+-(bool)render:(PDFDIB *)dib withBackgroundColor:(int)bgColor
 {
-	return Page_renderAnnotToBmp(m_page, m_handle, img);
+    [dib erase:bgColor];
+	return Page_renderAnnot(m_page, m_handle, [dib handle]);
 }
 -(void)getRect:(PDF_RECT *)rect
 {
@@ -1231,7 +1241,7 @@ extern uint annotStrikeoutColor;
 }
 -(bool)isMultiSel
 {
-    return Page_isAnnotListMultiSel(m_page, m_handle);
+	return Page_isAnnotListMultiSel(m_page, m_handle);
 }
 -(int)getListItemCount
 {
@@ -1248,7 +1258,7 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotListSels( m_page, m_handle, sels, sels_max );
 }
--(bool)setComboSel:(const int *)sels :(int)sels_cnt
+-(bool)setListSels:(const int *)sels :(int)sels_cnt
 {
 	return Page_setAnnotListSels( m_page, m_handle, sels, sels_cnt );
 }
@@ -1314,6 +1324,10 @@ extern uint annotStrikeoutColor;
     return (self.type == 4 || self.type == 5 || self.type == 6 || self.type == 15);
 }
 
+-(PDF_OBJ_REF)getRef
+{
+	return Page_getAnnotRef(m_page, m_handle);
+}
 @end
 
 @implementation PDFPage
@@ -1452,6 +1466,10 @@ extern uint annotStrikeoutColor;
 -(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect
 {
 	return Page_copyAnnot( m_page, [annot handle], rect );
+}
+-(bool)addAnnot:(PDF_OBJ_REF)ref
+{
+	return Page_addAnnot(m_page, ref);
 }
 
 -(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open

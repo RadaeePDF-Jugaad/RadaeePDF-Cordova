@@ -1067,7 +1067,7 @@ int Page_getAnnotFieldFullName( PDF_PAGE page, PDF_ANNOT annot, char *buf, int b
 int Page_getAnnotFieldFullName2( PDF_PAGE page, PDF_ANNOT annot, char *buf, int buf_size );
 bool Page_getAnnotFieldJS(PDF_PAGE page, PDF_ANNOT annot, int idx, char *text, int len);
 
-bool Page_renderAnnotToBmp(PDF_PAGE page, PDF_ANNOT annot, CGImageRef img);
+bool Page_renderAnnot(PDF_PAGE page, PDF_ANNOT annot, PDF_DIB dib);
 /**
  *	@brief	get annotation rect.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1544,6 +1544,8 @@ bool Page_setAnnotEditTextColor(PDF_PAGE page, PDF_ANNOT annot, int color);
 
 int Page_exportAnnot(PDF_PAGE page, PDF_ANNOT annot, unsigned char *data, int data_len);
 bool Page_importAnnot(PDF_PAGE page, const PDF_RECT *rect, const unsigned char *data, int data_len);
+PDF_OBJ_REF Page_getAnnotRef(PDF_PAGE page, PDF_ANNOT annot);
+bool Page_addAnnot(PDF_PAGE page, PDF_OBJ_REF ref);
 
 /**
  *	@brief	add an edit-box.

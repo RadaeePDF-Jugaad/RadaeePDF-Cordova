@@ -56,6 +56,7 @@
  *	@return height in pixels
  */
 -(int)height;
+-(void)erase:(int)color;
 -(CGImageRef)image;
 @end
 
@@ -644,7 +645,7 @@
  * @param hide true or false.
  */
 -(bool)setHidden:(bool)hide;
--(bool)renderToBmp:(CGImageRef)img;
+-(bool)render:(PDFDIB *)dib withBackgroundColor:(int)bgColor;
 /**
  * @brief get annotation's box rectangle.
  *			this method valid in professional or premium version
@@ -1026,7 +1027,7 @@
  * @param sels 0 based indexes of items.
  * @return true or false
  */
--(bool)setComboSel:(const int *)sels :(int)sels_cnt;
+-(bool)setListSels:(const int *)sels :(int)sels_cnt;
 /**
  * @brief get status of check-box and radio-box.
  * this method valid in premium version
@@ -1090,6 +1091,8 @@
 -(PDFSign *)getSign;
 -(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect;
 -(BOOL)canMoveAnnot;
+-(PDF_OBJ_REF)getRef;
+
 @end
 
 @interface PDFPage : NSObject
@@ -1207,6 +1210,8 @@
 -(PDFAnnot *)annotAtPoint:(float)x :(float)y;
 -(PDFAnnot *)annotByName:(NSString *)name;
 -(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect;
+-(bool)addAnnot:(PDF_OBJ_REF)ref;
+
 -(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open;
 /**
  * @brief add a text-markup annotation to page.

@@ -75,8 +75,6 @@
     int pageno = [[arr objectAtIndex:0] intValue];
     
     [_delegate didSelectItem:pageno];
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 // Override to support conditional editing of the table view.

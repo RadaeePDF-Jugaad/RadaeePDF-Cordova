@@ -19,6 +19,39 @@
     }
     return self;
 }
+
+-(void)DrawThumbBmp:(PDFDIB *)dib :(int)x :(int)y :(int)page
+{
+    NSString *opage = [NSString stringWithFormat:@"%i", page + 1];
+    
+    Byte *data = (Byte *)[dib data];
+    int w = [dib width];
+    int h = [dib height];
+    CGDataProviderRef provider = CGDataProviderCreateWithData( NULL, data, w * h * 4, NULL );
+    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+    CGImageRef img = CGImageCreate( w, h, 8, 32, w<<2, cs, kCGBitmapByteOrder32Little|kCGImageAlphaNoneSkipFirst, provider, NULL, FALSE, kCGRenderingIntentDefault );
+    CGColorSpaceRelease(cs);
+    CGDataProviderRelease(provider);
+    
+    CGContextSaveGState(m_ctx);
+    float tmp = 1/m_scale;
+    CGContextTranslateCTM(m_ctx, x * tmp, (y + h) * tmp);
+    CGContextScaleCTM(m_ctx, tmp, -tmp);
+    CGContextDrawImage(m_ctx, CGRectMake(0, 0, w, h), img);
+    
+    // Add the page number
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    [paragraphStyle setAlignment:NSTextAlignmentCenter];
+    CGContextTranslateCTM(m_ctx, 0.0f, h);
+    CGContextScaleCTM(m_ctx, 1.0f, -1.0f);
+    
+    // Set font and color
+    [opage drawInRect:CGRectMake(0, h/2 - h/5, w, h/5) withAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"Helvetica" size:h/5], NSForegroundColorAttributeName: [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:1.0f], NSParagraphStyleAttributeName: paragraphStyle}];
+    
+    CGContextRestoreGState(m_ctx);
+    CGImageRelease(img);
+}
+
 -(void)DrawBmp:(PDFDIB *)dib :(int)x :(int)y
 {
 	Byte *data = (Byte *)[dib data];

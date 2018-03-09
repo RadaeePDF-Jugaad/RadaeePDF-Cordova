@@ -13,6 +13,7 @@
 #import "PDFV.h"
 #import "ReaderHandler.h"
 #import "RDUtils.h"
+#import "ActionStackManager.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
@@ -50,6 +51,14 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 @interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
 {
+#ifdef FTS_ENABLED
+    FTSOccurrence *currentOccurrence;
+#endif
+    
+    ActionStackManager *actionManger;
+    
+    UIImageView *imgAnnot;
+    
     BOOL readOnlyEnabled;
     BOOL autoSaveEnabled;
     
@@ -61,6 +70,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     PDFDoc *m_doc;
     PDFV *m_view;
     PDFInk *m_ink;
+    PDF_POINT *m_lines;
     PDF_POINT *m_rects;
     PDF_POINT *m_ellipse;
     UIView *m_child;
@@ -69,6 +79,10 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 	struct PDFV_POS m_annot_pos;
 	PDF_RECT m_annot_rect;
 	
+    int m_lines_cnt;
+    int m_lines_max;
+    bool m_lines_drawing;
+    
     int m_rects_cnt;
     int m_rects_max;
     bool m_rects_drawing;
@@ -99,8 +113,10 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         sta_annot,
         sta_note,
         sta_ink,
+        sta_line,
         sta_rect,
         sta_ellipse,
+        sta_image,
     };
     enum STATUS m_status;
     NSTimeInterval m_tstamp;
@@ -114,6 +130,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     float m_scale;
     id<PDFViewDelegate> m_delegate;
 }
+
+@property (nonatomic) BOOL isCurling;
 
 -(void)vOpen:(PDFDoc *)doc :(id<PDFViewDelegate>)delegate;
 -(void)vClose;
@@ -148,6 +166,13 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 //end ink annotation status, and add ink to page.
 -(void)vInkEnd;
 
+//enter line annotation status.
+-(bool)vLineStart;
+//end line annotation status.
+-(void)vLineCancel;
+//end line annotation status, and add line to page.
+-(void)vLineEnd;
+
 //enter rect annotation status.
 -(bool)vRectStart;
 //end rect annotation status.
@@ -161,6 +186,10 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(void)vEllipseCancel;
 //end ellipse annotation status, and add ellipse to page.
 -(void)vEllipseEnd;
+
+- (BOOL)vImageStart;
+- (void)vImageCancel;
+- (void)vImageEnd;
 
 -(void)vLockSide:(bool)lock;
 	
@@ -177,11 +206,14 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 //set position to left-top on the screen;
 -(void)vSetPos:(const struct PDFV_POS*)pos;
 
+- (void)vUndo;
+- (void)vRedo;
+
 //goto page.
 -(void)vGoto:(int)pageno;
 //-(void)vAddTextAnnot:(int)x :(int)y :(NSString *)text;
 -(PDFAnnot *)vGetTextAnnot :(int)x :(int)y;
--(void)vAddTextAnnot:(int)x :(int)y :(NSString *)text;
+-(void)vAddTextAnnot:(int)x :(int)y :(NSString *)text :(NSString *)subject;
 - (int)vGetCurrentPage;
 - (void)resetZoomLevel;
 
@@ -192,15 +224,31 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
 
+- (CGImageRef )vGetImageForPage:(int)pg withSize:(CGSize)size withBackground:(BOOL)hasBackground;
+- (float)getViewWidth;
+- (float)getViewHeight;
+- (BOOL)isCurlEnabled;
+
 - (void)refreshCurrentPage;
 
 - (BOOL)isModified;
 - (void)setModified:(BOOL)modified force:(BOOL)force;
 
 - (void)selectListBoxItems:(NSArray *)items;
+- (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum;
+
+- (void)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
+- (NSString *)getImageFromAnnot:(PDFAnnot *)annot;
+- (NSString *)emptyAnnotWithSize:(CGSize)size;
+
+-(BOOL)forceSave;
 
 - (BOOL)canSaveDocument;
 - (void)setReadOnly:(BOOL)enabled;
+
+#ifdef FTS_ENABLED
+- (void)applyFTSOccurrence:(FTSOccurrence *)occurrence;
+#endif
 
 @end
 

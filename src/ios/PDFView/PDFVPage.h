@@ -61,8 +61,10 @@
 -(void)Reset;
 -(void)Clear;
 -(void)SetSel:(float)x1 : (float)y1 : (float)x2 : (float)y2;
--(bool)SetSelMarkup:(int) type;
+-(bool)SetSelMarkup:(int)type :(int)color;
 -(NSString *)GetSelString;
+- (int)getStartIndex;
+- (int)getEndIndex;
 -(void)DrawSel:(PDFVCanvas *)canvas :(float)scale :(float)page_height :(int)orgx :(int)orgy;
 @end
 
@@ -88,8 +90,9 @@
 -(PDFVCache *)CancelRender;
 -(void)SetSel:(float)x1 :(float)y1 :(float)x2 :(float)y2;
 -(void)SetSelWholeWord:(float)x1 : (float)y1 : (float)x2 : (float)y2;
--(bool)SetSelMarkup:(int) type;
+-(bool)SetSelMarkup:(int)type :(int)color;
 -(NSString *)GetSel;
+-(PDF_RECT )GetSelRect;
 -(void)ClearSel;
 -(void)Draw:(PDFVCanvas *)canvas;
 -(int)ThumbPrepare;

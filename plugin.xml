@@ -349,6 +349,20 @@
         <resource-file src="src/ios/Resources/btn_view.png" />
         <resource-file src="src/ios/Resources/btn_grid.png" />
         <resource-file src="src/ios/Resources/export_annot.png" />
+        <resource-file src="src/ios/Resources/btn_back.png" />
+        <resource-file src="src/ios/Resources/btn_more.png" />
+        <resource-file src="src/ios/Resources/btn_select.png" />
+        <resource-file src="src/ios/Resources/btn_show.png" />
+        <resource-file src="src/ios/Resources/btn_view_horz.png" />
+        <resource-file src="src/ios/Resources/btn_add.png" />
+        <resource-file src="src/ios/Resources/btn_save.png" />
+        <resource-file src="src/ios/Resources/btn_ink.png" />
+        <resource-file src="src/ios/Resources/btn_annot_line.png" />
+        <resource-file src="src/ios/Resources/pdf_custom_stamp.png" />
+        <resource-file src="src/ios/Resources/btn_annot_note.png" />
+        <resource-file src="src/ios/Resources/btn_undo.png" />
+        <resource-file src="src/ios/Resources/btn_redo.png" />
+        
 
         <!-- Radaee sources -->
         <source-file src="src/ios/PDFView/BookmarkTableViewController.m" />
@@ -387,12 +401,15 @@
         <source-file src="src/ios/PDFLib/libRDPDFLib.a" framework="true" />
 
         <!-- Radaee sources -->
-        <source-file src="src/ios/PDFView/PopUpView/PopupMenu.m" />
-        <header-file src="src/ios/PDFView/PopUpView/PopupMenu.h" />
-        <source-file src="src/ios/PDFView/PopUpView/PopupMenuItem.m" />
-        <header-file src="src/ios/PDFView/PopUpView/PopupMenuItem.h" />
-        <source-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.m" />
-        <header-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.h" />
+        <source-file src="src/ios/PDFView/More/RDMoreTableViewController.m" />
+        <header-file src="src/ios/PDFView/More/RDMoreTableViewController.h" />
+        <resource-file src="src/ios/PDFView/More/RDMoreTableViewController.xib" />
+        <source-file src="src/ios/PDFView/ListBox/RDAnnotListViewController.m" />
+        <header-file src="src/ios/PDFView/ListBox/RDAnnotListViewController.h" />
+        <resource-file src="src/ios/PDFView/ListBox/RDAnnotListViewController.xib" />
+        <source-file src="src/ios/PDFView/DrawMode/DrawModeTableViewController.m" />
+        <header-file src="src/ios/PDFView/DrawMode/DrawModeTableViewController.h" />
+
 
         <!-- Radaee Modules -->
         <source-file src="src/ios/Modules/ReaderHandler/ReaderHandler.m" />
@@ -410,6 +427,14 @@
         
         <source-file src="src/ios/Modules/Utils/RDUtils.m" />
         <header-file src="src/ios/Modules/Utils/RDUtils.h" />
+        
+        <source-file src="src/ios/Modules/ActionStack/ActionStackManager.m" />
+        <header-file src="src/ios/Modules/ActionStack/ActionStackManager.h" />
+        
+        <source-file src="src/ios/Modules/Signature/SignatureViewController.m" />
+        <header-file src="src/ios/Modules/Signature/SignatureViewController.h" />
+        <source-file src="src/ios/Modules/Signature/UviSignatureView.m" />
+        <header-file src="src/ios/Modules/Signature/UviSignatureView.h" />
 
         <!-- Radaee resources -->
         <resource-file src="src/ios/cmaps/cmaps.dat" />

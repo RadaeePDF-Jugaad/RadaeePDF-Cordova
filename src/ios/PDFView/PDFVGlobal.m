@@ -98,7 +98,9 @@ PDF_RENDER_MODE renderQuality = mode_normal;
 
 float g_Ink_Width = 2;
 float g_rect_Width = 2;
+float g_line_Width = 2;
 uint g_rect_color = 0xFFFF0000;
+uint g_line_color = 0xFFFF0000;
 uint g_ink_color = 0xFFFF0000;
 uint g_sel_color = 0x400000C0;
 uint g_oval_color = 0xFF0000FF;
@@ -108,6 +110,7 @@ uint annotStrikeoutColor = 0xFFFF0000;
 uint annotSquigglyColor = 0xFF00FF00;
 
 bool g_double_page_enabled = false;
+bool g_fit_signature_to_field = true;
 
 NSString *g_author = @"";
 

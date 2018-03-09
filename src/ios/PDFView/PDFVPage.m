@@ -273,13 +273,9 @@ extern uint annotSquigglyColor;
     
     //NSLog(@"%@", [m_page objsString:m_index1 :m_index2]);
 }
--(bool)SetSelMarkup:(int) type
+-(bool)SetSelMarkup:(int)type :(int)color
 {
     if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return false;
-    int color = annotHighlightColor;
-    if( type == 1 ) color = annotUnderlineColor;
-    if( type == 2 ) color = annotStrikeoutColor;
-    if( type == 4 ) color = annotSquigglyColor;
     return [m_page addAnnotMarkup :m_index1 :m_index2 :type : color];
 }
 
@@ -287,6 +283,15 @@ extern uint annotSquigglyColor;
 {
     if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return nil;
     return [m_page objsString:m_index1 :m_index2];
+}
+
+- (int)getStartIndex
+{
+    return m_index1;
+}
+- (int)getEndIndex
+{
+    return m_index2;
 }
 
 -(void)DrawSel:(PDFVCanvas *)canvas :(float)scale :(float)page_height :(int)orgx :(int)orgy
@@ -425,9 +430,9 @@ extern uint annotSquigglyColor;
     [m_sel SetSelWholeWord: [self ToPDFX:x1]: [self ToPDFY:y1]: [self ToPDFX: x2]: [self ToPDFY: y2]];
 }
                    
--(bool)SetSelMarkup:(int) type
+-(bool)SetSelMarkup:(int)type :(int)color
 {
-    if( m_sel != nil ) return [m_sel SetSelMarkup:type];
+    if( m_sel != nil ) return [m_sel SetSelMarkup:type :color];
     return false;
 }
                    
@@ -435,6 +440,30 @@ extern uint annotSquigglyColor;
 {
     if( m_sel == nil ) return nil;
     return [m_sel GetSelString];
+}
+
+-(PDF_RECT )GetSelRect
+{
+    int start = [m_sel getStartIndex];
+    int end = [m_sel getEndIndex];
+    
+    PDFPage *page = [self GetPage];
+    [page objsStart];
+    
+    PDF_RECT rectStart;
+    PDF_RECT rectEnd;
+    
+    [page objsCharRect:start :&rectStart];
+    [page objsCharRect:end :&rectEnd];
+    
+    PDF_RECT rectSel;
+    
+    rectSel.left = rectStart.left;
+    rectSel.top = rectStart.top;
+    rectSel.right = rectEnd.right;
+    rectSel.bottom = rectEnd.bottom;
+        
+    return rectSel;
 }
                    
 -(void)ClearSel
@@ -483,7 +512,7 @@ extern uint annotSquigglyColor;
 -(void)DrawThumb:(PDFVCanvas *)canvas
 {
     if( m_thumb != nil && [m_thumb Bmp] != nil )
-        [canvas DrawBmp: [m_thumb Bmp]: m_x: m_y ];
+        [canvas DrawThumbBmp:[m_thumb Bmp] :m_x :m_y :m_pageno]; // New method
     else
         [canvas FillRect: CGRectMake(m_x, m_y, m_w, m_h): 0xFFFFFFFF];
     if( m_sel != nil )

@@ -355,6 +355,9 @@
     [m_pdf setOutlineImage:[UIImage imageNamed:@"btn_outline.png"]];
     [m_pdf setPrintImage:[UIImage imageNamed:@"btn_print.png"]];
     [m_pdf setGridImage:[UIImage imageNamed:@"btn_grid.png"]];
+    [m_pdf setUndoImage:[UIImage imageNamed:@"btn_undo.png"]];
+    [m_pdf setRedoImage:[UIImage imageNamed:@"btn_redo.png"]];
+    [m_pdf setMoreImage:[UIImage imageNamed:@"btn_more.png"]];
     
     [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
     
@@ -369,25 +372,23 @@
     [m_pdf setHideGridImage:YES];
     
     if (disableToolbar) {
-        [m_pdf setHideLineImage:YES];
-        [m_pdf setHideRectImage:YES];
-        [m_pdf setHidePrintImage:YES];
-        [m_pdf setHideSearchImage:YES];
-        [m_pdf setHideEllipseImage:YES];
-        [m_pdf setHideOutlineImage:YES];
-        [m_pdf setHideBookmarkImage:YES];
         [m_pdf setHideViewModeImage:YES];
-        [m_pdf setHideBookmarkListImage:YES];
+        [m_pdf setHideSearchImage:YES];
+        [m_pdf setHideDrawImage:YES];
+        [m_pdf setHideSelImage:YES];
+        [m_pdf setHideOutlineImage:YES];
+        [m_pdf setHideUndoImage:YES];
+        [m_pdf setHideRedoImage:YES];
+        [m_pdf setHideMoreImage:YES];
     } else {
-        [m_pdf setHideLineImage:NO];
-        [m_pdf setHideRectImage:NO];
-        [m_pdf setHidePrintImage:NO];
-        [m_pdf setHideSearchImage:NO];
-        [m_pdf setHideEllipseImage:NO];
-        [m_pdf setHideOutlineImage:NO];
-        [m_pdf setHideBookmarkImage:NO];
         [m_pdf setHideViewModeImage:NO];
-        [m_pdf setHideBookmarkListImage:NO];
+        [m_pdf setHideSearchImage:NO];
+        [m_pdf setHideDrawImage:NO];
+        [m_pdf setHideSelImage:NO];
+        [m_pdf setHideOutlineImage:NO];
+        [m_pdf setHideUndoImage:NO];
+        [m_pdf setHideRedoImage:NO];
+        [m_pdf setHideMoreImage:NO];
     }
     
     /*
@@ -440,10 +441,14 @@
     
     if (titleBackgroundColor != 0) {
         navController.navigationBar.barTintColor = UIColorFromRGB(titleBackgroundColor);
+    } else {
+        navController.navigationBar.barTintColor = [UIColor blackColor];
     }
     
     if (iconsBackgroundColor != 0) {
         navController.navigationBar.tintColor = UIColorFromRGB(iconsBackgroundColor);
+    } else {
+        navController.navigationBar.tintColor = [UIColor orangeColor];
     }
     
     [navController.navigationBar setTranslucent:NO];

@@ -36,7 +36,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    return 4;
 }
 
 
@@ -57,11 +57,17 @@
         }
         case 1:
         {
+            cell.textLabel.text = @"Horizontal";
+            cell.imageView.image = [UIImage imageNamed:@"btn_view_horz.png"];
+            break;
+        }
+        case 2:
+        {
             cell.textLabel.text = @"Single Page";
             cell.imageView.image = [UIImage imageNamed:@"btn_view_single.png"];
             break;
         }
-        case 2:
+        case 3:
         {
             cell.textLabel.text = @"Double Page";
             cell.imageView.image = [UIImage imageNamed:@"btn_view_dual.png"];

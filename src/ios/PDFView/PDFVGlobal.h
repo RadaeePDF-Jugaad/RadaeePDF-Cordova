@@ -33,7 +33,9 @@ extern NSMutableString *pdfPath;
 
 extern float g_Ink_Width;
 extern float g_rect_Width;
+extern float g_line_Width;
 extern uint g_rect_color;
+extern uint g_line_color;
 extern uint g_ink_color;
 extern uint g_sel_color;
 extern uint g_oval_color;
@@ -44,5 +46,6 @@ extern uint annotSquigglyColor;
 
 extern bool g_paging_enabled;
 extern bool g_double_page_enabled;
+extern bool g_fit_signature_to_field;
 extern NSString *g_author;
 

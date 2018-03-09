@@ -11,14 +11,19 @@
 
 extern int g_def_view;
 extern float g_Ink_Width;
+extern float g_line_Width;
 extern float g_rect_Width;
 extern uint g_ink_color;
 extern uint g_rect_color;
+extern uint g_line_color;
 extern uint g_oval_color;
 extern bool g_paging_enabled;
 extern bool g_double_page_enabled;
 extern bool g_cover_page_enabled;
 extern NSString *g_author;
+
+#define TEMP_SIGNATURE @"radaee_signature_temp.png"
+#define TEMP_SIGNATURE_EMPTY @"radaee_empty_signature_temp.png"
 
 @implementation PDFView
 
@@ -67,11 +72,22 @@ extern NSString *g_author;
     //float logich = h/m_scale;
     //bool finished = [page IsFinished];
 }
+- (float)getViewWidth
+{
+    return [m_view getWidth] / m_scale;
+}
+
+- (float)getViewHeight
+{
+    return [m_view getHeight] / m_scale;
+}
 -(void)vOpen:(PDFDoc *)doc :(id<PDFViewDelegate>)delegate
 {
     [self vClose];
 
     m_doc = doc;
+    
+    actionManger = [[ActionStackManager alloc] init];
   
     // Set meta tag UUID with the pdf id
     [self setUUIDMeta];
@@ -177,6 +193,10 @@ extern NSString *g_author;
     m_ink = NULL;
     [self setModified:NO force:NO];
     
+    m_lines = NULL;
+    m_lines_cnt = 0;
+    m_lines_max = 0;
+    
     m_rects = NULL;
     m_rects_cnt = 0;
     m_rects_max = 0;
@@ -220,6 +240,24 @@ extern NSString *g_author;
         int dy;
         [m_view vGetDeltaToCenterPage:pos.pageno :&dx :&dy];
         [self scrollRectToVisible:CGRectMake(self.contentOffset.x + dx/m_scale, self.contentOffset.y + dy/m_scale, m_w/m_scale, m_h/m_scale) animated:true];
+    }
+}
+
+- (void)vUndo
+{
+    ASItem *item = [actionManger undo];
+    if (item) {
+        [item undo:m_doc];
+        [self refreshCurrentPage];
+    }
+}
+
+- (void)vRedo
+{
+    ASItem *item = [actionManger redo];
+    if (item) {
+        [item redo:m_doc];
+        [self refreshCurrentPage];
     }
 }
 
@@ -286,6 +324,13 @@ extern NSString *g_author;
     {
         m_ink = NULL;
     }
+    if( m_lines )
+    {
+        free( m_lines );
+        m_lines = NULL;
+        m_lines_cnt = 0;
+        m_lines_max = 0;
+    }
     if( m_rects )
     {
         free( m_rects );
@@ -318,7 +363,6 @@ extern NSString *g_author;
         [m_view vRenderSync:m_cur_page + 1];
     }
     
-
     [m_view vRenderSync:m_cur_page];
     
     [self refresh];
@@ -445,7 +489,7 @@ extern NSString *g_author;
     }
 }
 
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
 {
     if( m_status == sta_zoom )
     {
@@ -527,6 +571,30 @@ extern NSString *g_author;
                                   (m_annot_rect.right - m_annot_rect.left)/m_scale,
                                   (m_annot_rect.bottom - m_annot_rect.top)/m_scale);
         CGContextStrokeRect(context, rect1);
+    }
+}
+
+-(void)drawLines:(CGContextRef)context
+{
+    if( m_status == sta_line && (m_lines_cnt || m_lines_drawing) )
+    {
+        CGContextSetLineWidth(context, g_line_Width);
+        float red = ((g_line_color>>16)&0xFF)/255.0f;
+        float green = ((g_line_color>>8)&0xFF)/255.0f;
+        float blue = (g_line_color&0xFF)/255.0f;
+        float alpha = ((g_line_color>>24)&0xFF)/255.0f;
+        CGContextSetRGBFillColor(context, red, green, blue, alpha);
+        PDF_POINT *pt_cur = m_lines;
+        PDF_POINT *pt_end = m_lines + (m_lines_cnt<<1);
+        if( m_lines_drawing ) pt_end += 2;
+        while( pt_cur < pt_end )
+        {
+            CGPoint start = CGPointMake(self.contentOffset.x + pt_cur->x/m_scale, self.contentOffset.y + pt_cur->y/m_scale);
+            CGPoint end = CGPointMake(self.contentOffset.x + pt_cur[1].x/m_scale, self.contentOffset.y + pt_cur[1].y/m_scale);
+            CGPoint points[2] = {start, end};
+            CGContextStrokeLineSegments(context, points, 2);
+            pt_cur += 2;
+        }
     }
 }
 
@@ -636,8 +704,55 @@ extern NSString *g_author;
     }
     [self drawAnnot:context];
     [self drawInk:context];
+    [self drawLines:context];
     [self drawRects:context];
     [self drawEllipse:context];
+
+#ifdef FTS_ENABLED
+    [self drawSearchRect:context];
+#endif
+}
+
+#ifdef FTS_ENABLED
+- (void)drawSearchRect:(CGContextRef)context
+{
+    if (m_cur_page == currentOccurrence.page) {
+        PDF_RECT drawRect;
+        
+        PDFVPage *vpage = [m_view vGetPage:m_cur_page];
+        
+        drawRect.left = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:currentOccurrence.rect_l];
+        drawRect.right = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:currentOccurrence.rect_r];
+        drawRect.top = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:currentOccurrence.rect_b];
+        drawRect.bottom = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:currentOccurrence.rect_t];
+        
+        int dx = m_tx - m_px;
+        int dy = m_ty - m_py;
+        
+        CGContextSetRGBFillColor(context, 0.5, 0.0, 0.93, 0.25);
+        
+        CGRect rect1 = CGRectMake(self.contentOffset.x + (drawRect.left+dx)/m_scale,
+                                  self.contentOffset.y + (drawRect.top+dy)/m_scale,
+                                  (drawRect.right - drawRect.left)/m_scale,
+                                  (drawRect.bottom - drawRect.top)/m_scale);
+        CGContextFillRect(context, rect1);
+    }
+}
+
+- (void)applyFTSOccurrence:(FTSOccurrence *)occurrence
+{
+    currentOccurrence = occurrence;
+}
+#endif
+
+-(BOOL)forceSave
+{
+    if ([m_doc save]) {
+        [self setModified:NO force:YES];
+        return YES;
+    }
+    
+    return NO;
 }
 
 - (void)vOnTimer:(NSTimer *)sender
@@ -726,9 +841,24 @@ extern NSString *g_author;
 {
 	if( m_status != sta_sel ) return false;
 	[m_view vSetSel:m_tx: m_ty: point.x * m_scale: point.y * m_scale];
+    
+    PDFVPage *vpage = [m_view vGetPage:m_cur_page];
+    PDF_RECT rect = [vpage GetSelRect];
+    
+    rect.left = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:rect.left];
+    rect.right = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:rect.right];
+    float tmp = rect.top;
+    rect.top = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:rect.bottom];
+    rect.bottom = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:tmp];
+    
+    CGRect rect1 = CGRectMake(self.contentOffset.x + rect.left/m_scale, self.contentOffset.y + rect.top/m_scale,
+                              (rect.right - rect.left)/m_scale,
+                              (rect.bottom - rect.top)/m_scale);
+
 	[self refresh];
+    
 	if( m_delegate )
-		[m_delegate OnSelEnd :m_tx/m_scale: m_ty/m_scale:point.x :point.y];
+		[m_delegate OnSelEnd :rect1.origin.x - self.contentOffset.x: rect1.origin.y - self.contentOffset.y:rect1.origin.x + rect1.size.width - self.contentOffset.x :rect1.origin.y + rect1.size.height - self.contentOffset.y];
 	return true;
 }
 
@@ -766,7 +896,6 @@ extern NSString *g_author;
     }
     
     if (![m_annot canMoveAnnot]) return false;
-    
     if([self canSaveDocument])
     {
     	[self setModified:YES force:NO];
@@ -785,6 +914,12 @@ extern NSString *g_author;
         {
 	        PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
 	        [mat transformRect:&m_annot_rect];
+            
+            //Action Stack Manger
+            PDF_RECT rect;
+            [m_annot getRect:&rect];
+            [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot.getIndex]];
+            
 	        [m_annot setRect:&m_annot_rect];
 	        [m_view vRenderSync:m_annot_pos.pageno];
 	        [self vAnnotEnd];
@@ -797,6 +932,12 @@ extern NSString *g_author;
         	{
 		        PDFMatrix *mat = [vdest CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
 		        [mat transformRect:&m_annot_rect];
+                
+                //Action Stack Manger
+                PDF_RECT rect;
+                [m_annot getRect:&rect];
+                [actionManger push:[[ASMove alloc] initWithPage:m_annot_pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot.getIndex]];
+                
 		        [m_annot MoveToPage:dpage:&m_annot_rect];
 		        [m_view vRenderSync:m_annot_pos.pageno];
 		        [m_view vRenderSync:pos.pageno];
@@ -836,6 +977,9 @@ extern NSString *g_author;
 			pt.y = pos.y;
 			[page addAnnotNote:&pt];
             
+            //Action Stack Manger
+            [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+            
             // Set Author and Modify date
             [self updateLastAnnotInfoAtPage:page];
             
@@ -872,6 +1016,50 @@ extern NSString *g_author;
 	[m_ink onUp:point.x * m_scale: point.y * m_scale];
     [self refresh];
 	return true;
+}
+
+-(bool)OnLineTouchBegin:(CGPoint)point
+{
+    if( m_status != sta_line ) return false;
+    if( m_lines_cnt >= m_lines_max )
+    {
+        m_lines_max += 8;
+        m_lines = (PDF_POINT *)realloc(m_lines, (m_lines_max<<1) * sizeof(PDF_POINT));
+    }
+    m_tx = point.x * m_scale;
+    m_ty = point.y * m_scale;
+    PDF_POINT *pt_cur = &m_lines[m_lines_cnt<<1];
+    pt_cur->x = m_tx;
+    pt_cur->y = m_ty;
+    pt_cur[1].x = m_tx;
+    pt_cur[1].y = m_ty;
+    m_lines_drawing = true;
+    return true;
+}
+
+-(bool)OnLineTouchMove:(CGPoint)point
+{
+    if( m_status != sta_line ) return false;
+    PDF_POINT *pt_cur = &m_lines[m_lines_cnt<<1];
+    pt_cur[1].x = point.x * m_scale;
+    pt_cur[1].y = point.y * m_scale;
+    [self refresh];
+    return true;
+}
+
+-(bool)OnLineTouchEnd:(CGPoint)point
+{
+    if( m_status != sta_line ) return false;
+    PDF_POINT *pt_cur = &m_lines[m_lines_cnt<<1];
+    pt_cur[1].x = point.x * m_scale;
+    pt_cur[1].y = point.y * m_scale;
+    m_lines_cnt++;
+    if( m_lines_drawing )
+    {
+        m_lines_drawing = false;
+        [self refresh];
+    }
+    return true;
 }
 
 -(bool)OnRectTouchBegin:(CGPoint)point
@@ -1044,6 +1232,21 @@ extern NSString *g_author;
     }
 }
 
+- (void)addAttachmentFromPath:(NSString *)path
+{
+    PDF_RECT rect;
+    rect.left = rect.top = rect.right = rect.bottom = 0;
+    [self addAttachmentAtPage:0 fromPath:path inRect:rect];
+}
+
+- (void)addAttachmentAtPage:(int)pageno fromPath:(NSString *)path inRect:(PDF_RECT)rect
+{
+    PDFPage *page = [m_doc page:pageno];
+    [page addAnnotAttachment:path :0 :&rect];
+    
+    [self setModified:YES force:NO];
+}
+
 - (void)OnDoubleTap:(UITouch *)touch
 {
     isDoubleTapping = YES;
@@ -1144,8 +1347,10 @@ extern NSString *g_author;
         if( [self OnAnnotTouchBegin:point] ) return;
         if( [self OnNoteTouchBegin:point] ) return;
         if( [self OnInkTouchBegin:point] ) return;
+        if( [self OnLineTouchBegin:point] ) return;
         if( [self OnRectTouchBegin:point] ) return;
         if( [self OnEllipseTouchBegin:point] ) return;
+        if( [self OnImageTouchBegin:point] ) return;
         [self OnNoneTouchBegin:point:touch.timestamp];
     }
 }
@@ -1165,8 +1370,10 @@ extern NSString *g_author;
         if( [self OnAnnotTouchMove:point] ) return;
         if( [self OnNoteTouchMove:point] ) return;
         if( [self OnInkTouchMove:point] ) return;
+        if( [self OnLineTouchMove:point] ) return;
         if( [self OnRectTouchMove:point] ) return;
         if( [self OnEllipseTouchMove:point] ) return;
+        if( [self OnImageTouchMove:point] ) return;
         [self OnNoneTouchMove:point:touch.timestamp];
     }
 }
@@ -1192,8 +1399,10 @@ extern NSString *g_author;
             if( [self OnAnnotTouchEnd:point] ) return;
             if( [self OnNoteTouchEnd:point] ) return;
             if( [self OnInkTouchEnd:point] ) return;
+            if( [self OnLineTouchEnd:point] ) return;
             if( [self OnRectTouchEnd:point] ) return;
             if( [self OnEllipseTouchEnd:point] ) return;
+            if( [self OnImageTouchEnd:point] ) return;
             [self OnNoneTouchEnd:point:touch.timestamp];
         }
     }
@@ -1265,7 +1474,7 @@ extern NSString *g_author;
     if( pos.pageno >= 0 )
     {
         PDFVPage *vpage = [m_view vGetPage:pos.pageno];
-        [self setModified:[vpage SetSelMarkup:type] force:NO];
+        [self setModified:[vpage SetSelMarkup:type :color] force:NO];
         
         [m_view vRenderSync:pos.pageno];
         [self refresh];
@@ -1331,6 +1540,7 @@ extern NSString *g_author;
     if( m_status == sta_none )
     {
         self.scrollEnabled = false;
+        
         m_ink = NULL;
         m_status = sta_ink;
         return true;
@@ -1365,6 +1575,9 @@ extern NSString *g_author;
                 PDFPage *page = [vpage GetPage];
                 [mat transformInk:m_ink];
                 [page addAnnotInk:m_ink];
+                
+                //Action Stack Manger
+                [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
                 
                 // Set Author and Modify date
                 [self updateLastAnnotInfoAtPage:page];
@@ -1464,6 +1677,9 @@ extern NSString *g_author;
                 [mat transformRect:&rect];
                 [page addAnnotEllipse:&rect:g_rect_Width * m_scale / [vpage GetScale]:g_oval_color:0];
                 
+                //Action Stack Manger
+                [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+                
                 // Set Author and Modify date
                 [self updateLastAnnotInfoAtPage:page];
             }
@@ -1482,6 +1698,112 @@ extern NSString *g_author;
             cur++;
         }
         [self refresh];
+        [self enableScroll];
+    }
+}
+-(bool)vLineStart
+{
+    if(![self canSaveDocument]) return false;
+    if( m_status == sta_none )
+    {
+        self.scrollEnabled = false;
+        m_status = sta_line;
+        m_lines_drawing = false;
+        return true;
+    }
+    return false;
+}
+-(void)vLineCancel
+{
+    if( m_status == sta_line )
+    {
+        [self enableScroll];
+        m_lines_cnt = 0;
+        m_lines_drawing = false;
+        m_status = sta_none;
+        [self refresh];
+    }
+}
+-(void)vLineEnd
+{
+    if( m_status == sta_line )
+    {
+        PDFVPage *pages[128];
+        int cur;
+        int end;
+        int pages_cnt = 0;
+        PDF_POINT *pt_cur = m_lines;
+        PDF_POINT *pt_end = pt_cur + (m_lines_cnt<<1);
+        while( pt_cur < pt_end )
+        {
+            PDF_RECT rect;
+            struct PDFV_POS pos;
+            [m_view vGetPos:&pos :pt_cur->x :pt_cur->y];
+            if( pos.pageno >= 0 )
+            {
+                PDFVPage *vpage = [m_view vGetPage:pos.pageno];
+                cur = 0;
+                end = pages_cnt;
+                //PDFVPage *vpage2;
+                while( cur < end )
+                {
+                    if( pages[cur] == vpage ) break;
+                    cur++;
+                }
+                if( cur >= end )
+                {
+                    pages[cur] = vpage;
+                    pages_cnt++;
+                }
+                if( pt_cur->x > pt_cur[1].x )
+                {
+                    rect.right = pt_cur->x;
+                    rect.left = pt_cur[1].x;
+                }
+                else
+                {
+                    rect.left = pt_cur->x;
+                    rect.right = pt_cur[1].x;
+                }
+                if( pt_cur->y > pt_cur[1].y )
+                {
+                    rect.bottom = pt_cur->y;
+                    rect.top = pt_cur[1].y;
+                }
+                else
+                {
+                    rect.top = pt_cur->y;
+                    rect.bottom = pt_cur[1].y;
+                }
+                PDFPage *page = [vpage GetPage];
+                PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
+                [mat transformPoint:pt_cur];
+                [mat transformPoint:&pt_cur[1]];
+                [page addAnnotLine:pt_cur :&pt_cur[1] :g_rect_Width :0 :1 :g_rect_color :g_rect_color];
+                
+                //Action Stack Manger
+                [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+                
+                // Set Author and Modify date
+                [self updateLastAnnotInfoAtPage:page];
+            }
+            pt_cur += 2;
+        }
+        [self setModified:(m_lines_cnt != 0) force:NO];
+        
+        m_lines_cnt = 0;
+        m_lines_drawing = false;
+        m_status = sta_none;
+        
+        cur = 0;
+        end = pages_cnt;
+        while( cur < end )
+        {
+            [m_view vRenderSync:[pages[cur] GetPageNo]];
+            cur++;
+        }
+        [self refresh];
+        
         [self enableScroll];
     }
 }
@@ -1564,6 +1886,9 @@ extern NSString *g_author;
                 [mat transformRect:&rect];
                 [page addAnnotRect:&rect: g_rect_Width * m_scale / [vpage GetScale]: g_rect_color: 0];
                 
+                //Action Stack Manger
+                [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+                
                 // Set Author and Modify date
                 [self updateLastAnnotInfoAtPage:page];
             }
@@ -1584,10 +1909,6 @@ extern NSString *g_author;
         }
         [self refresh];
 
-        //GEAR
-        //Save Annotations
-       	//Document_save(m_doc);
-        //END
         [self enableScroll];
     }
 }
@@ -1595,6 +1916,79 @@ extern NSString *g_author;
 - (void)enableScroll
 {
     self.scrollEnabled = true;
+}
+
+- (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum
+{
+    // Create path.
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
+    
+    UIImage *image = [UIImage imageWithContentsOfFile:filePath];
+    
+    //get the PDFVPage
+    PDFVPage *vpage = [m_view vGetPage:pageNum];
+    if( !vpage ) return NO;
+    
+    //get the PDFPage
+    PDFPage *page = [vpage GetPage];
+    if (!page) {
+        return NO;
+    }
+    
+    //get the annotation
+    PDFAnnot *annot = [page annotAtIndex:index];
+    
+    //init PDFDocForm and PDFPageContent
+    PDFDocForm *form = [m_doc newForm];
+    PDFPageContent *content = [[PDFPageContent alloc] init];
+    [content gsSave];
+    
+    //create PDFDocImage with CGImageRef
+    CGImageRef ref = [image CGImage];
+    PDFDocImage *docImage = [m_doc newImage:ref :YES];
+    PDF_PAGE_IMAGE rimg = [form addResImage:docImage];
+    
+    PDF_RECT rect;
+    [annot getRect:&rect];
+    
+    float width = (rect.right - rect.left);
+    float height = (rect.bottom - rect.top);
+    float originalWidth = image.size.width;
+    float originalHeight = image.size.height;
+    float scale = height / originalHeight;
+    float scaleW = width / originalWidth;
+    if (scaleW < scale) scale = scaleW;
+    
+    float xTranslation = (width - originalWidth * scale) / 2.0f;
+    float yTranslation = (height - originalHeight * scale) / 2.0f;
+    
+    //set the matrix 20x20
+    PDFMatrix *matrix = [[PDFMatrix alloc] init:scale * originalWidth :scale * originalHeight :xTranslation :yTranslation];
+    [content gsCatMatrix:matrix];
+    matrix = nil;
+    
+    //draw the image on the PDFPageContent
+    [content drawImage:rimg];
+    [content gsRestore];
+    
+    //set the content on the PDFDocForm
+    [form setContent:0 :0 :width :height :content];
+    
+    //set the custom icon
+    BOOL success = [annot setIcon2:@"myIcon" :form];
+    
+    //free objects
+    content = nil;
+    page = nil;
+    
+    [m_view vRenderSync:m_cur_page];
+    [self refresh];
+    
+    // Delete temp signature image
+    [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+    
+    return success;
 }
 
 -(void)vAnnotPerform
@@ -1660,6 +2054,11 @@ extern NSString *g_author;
     }
 	if( m_status != sta_annot ) return;
     [self setModified:YES force:NO];
+    
+    //Action Stack Manger
+    PDFPage *page = [m_doc page:m_annot_pos.pageno];
+    [actionManger push:[[ASDel alloc] initWithPage:m_annot_pos.pageno page:page index:[m_annot getIndex]]];
+    
     [m_annot removeFromPage];
 	[self vAnnotEnd];
 	[m_view vRenderSync:m_annot_pos.pageno];
@@ -1687,6 +2086,7 @@ extern NSString *g_author;
     [self vGetTextFromPoint:CGPointMake(x, y)];
 
     [m_view vGetPos:&m_annot_pos :x * m_scale :y * m_scale];
+    
     if( m_annot_pos.pageno >= 0 )
     {
         PDFVPage *vpage = [m_view vGetPage:m_annot_pos.pageno];
@@ -1695,7 +2095,6 @@ extern NSString *g_author;
         	if( m_delegate ) [m_delegate OnSingleTapped:x:y];
         	return;
        	}
-        
         PDFPage *page = [vpage GetPage];
         if( !page ) return;
         m_annot = [page annotAtPoint:m_annot_pos.x: m_annot_pos.y];
@@ -1832,11 +2231,15 @@ extern NSString *g_author;
         select[i] = [[items objectAtIndex:i] intValue];
     }
     
-    [m_annot setComboSel:select :items.count];
+    [m_annot setListSels:select :(int)items.count];
     
     [m_view vRenderSync:m_cur_page];
     
     [self refresh];
+    
+    [self setModified:YES force:NO];
+    
+    [self vAnnotEnd];
     
     // Optional
     // Save the document
@@ -1850,6 +2253,30 @@ extern NSString *g_author;
     }
 }
 
+-(void)addIcon
+{
+    BOOL b = [m_doc canSave];
+    
+    PDFPageContent *content = [[PDFPageContent alloc] init];
+    UIImage *img = [UIImage imageNamed:@"image"];
+    PDFDocImage *image = [m_doc newImage:img.CGImage :YES];
+    
+    
+    PDFDocForm *form = [m_doc newForm];
+    PDF_PAGE_IMAGE rimg = [form addResImage:image];
+    [content gsSave];
+    PDFMatrix *matrix = [[PDFMatrix alloc] init:20 :20 :0 :0];
+    [content gsCatMatrix:matrix];
+    matrix = nil;
+    
+    [content drawImage:rimg];
+    [content gsRestore];
+    
+    [form setContent:0 :0 :20 :20 :content];
+    
+    BOOL success = [m_annot setIcon2:@"image" :form];
+    content = nil;
+}
 /*
 -(void)vAddTextAnnot:(int)x :(int)y :(NSString *)text
 {
@@ -1896,7 +2323,7 @@ extern NSString *g_author;
     }
     return annot;
 }
--(void)vAddTextAnnot :(int)x :(int)y :(NSString *)text
+-(void)vAddTextAnnot :(int)x :(int)y :(NSString *)text :(NSString *)subject
 {
     struct PDFV_POS pos;
     [m_view vGetPos:&pos :x * m_scale :y * m_scale];
@@ -1914,7 +2341,12 @@ extern NSString *g_author;
         pt.x = pos.x ;
         pt.y = pos.y ;
         [page addAnnotNote:&pt];
+        
+        //Action Stack Manger
+        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+        
         PDFAnnot *annot = [page annotAtIndex: [page annotCount] - 1];
+        [annot setPopupSubject:subject];
         [annot setPopupText:text];
         
         // Set Author and Modify date
@@ -2080,6 +2512,203 @@ extern NSString *g_author;
     if ([m_doc meta:UUID].length == 0) {
         [m_doc setMeta:UUID :[RDUtils getPDFIDForDoc:m_doc]];
     }
+}
+
+- (void)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
+{
+    PDFPage *page = [m_doc page:pageno];
+    PDFAnnot *annot = [page annotAtIndex:index];
+
+    NSString *annotPath = [self getImageFromAnnot:annot];
+    UIImage *img = [UIImage imageWithContentsOfFile:annotPath];
+    UIImage *resizedImage = nil;
+    
+    if (size.width == 0 || size.height == 0) {
+        [[NSFileManager defaultManager] moveItemAtPath:annotPath toPath:path error:nil];
+    } else {
+        resizedImage = [self imageWithImage:img scaledToSize:size];
+    }
+    
+    
+    // Save image.
+    [UIImagePNGRepresentation(resizedImage) writeToFile:path atomically:YES];
+    
+    [[NSFileManager defaultManager] removeItemAtPath:annotPath error:nil];
+}
+
+- (NSString *)getImageFromAnnot:(PDFAnnot *)annot
+{
+    PDF_RECT rect;
+    [m_annot getRect:&rect];
+    int width = (rect.right - rect.left) * m_scale;
+    int height = (rect.bottom- rect.top) * m_scale;
+    PDFDIB *dib = [[PDFDIB alloc] init:width : height];
+    Global_setAnnotTransparency(0x00000000);
+    [m_annot render:dib withBackgroundColor:0xffffffff];
+    Global_setAnnotTransparency(0x200040FF);
+    
+    UIImage *img = [UIImage imageWithCGImage:[dib image]];
+    
+    // Create path.
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
+    
+    // Save image.
+    [UIImagePNGRepresentation(img) writeToFile:filePath atomically:YES];
+    
+    return filePath;
+}
+
+- (NSString *)emptyAnnotWithSize:(CGSize)size
+{
+    PDFDIB *emptyDib = [[PDFDIB alloc] init:size.width : size.height];
+    [emptyDib erase:0xffffffff];
+    UIImage *emptyImg = [UIImage imageWithCGImage:[emptyDib image]];
+    
+    // Create path.
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE_EMPTY];
+    
+    // Save image.
+    [UIImagePNGRepresentation(emptyImg) writeToFile:filePath atomically:YES];
+    
+    return filePath;
+}
+
+- (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
+    //UIGraphicsBeginImageContext(newSize);
+    // In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+    // Pass 1.0 to force exact pixel size.
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 1.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+#pragma mark - Stamp
+- (BOOL)vImageStart
+{
+    if( ![m_doc canSave] ) return false;
+    if( m_status == sta_none )
+    {
+        self.scrollEnabled = false;
+        m_status = sta_image;
+        return true;
+    }
+    
+    return false;
+}
+
+-(void)vImageCancel
+{
+    if( m_status == sta_image )
+    {
+        self.scrollEnabled = true;
+        m_status = sta_none;
+        [self refresh];
+    }
+}
+- (void)vImageEnd
+{
+    if( m_status == sta_image )
+    {
+        m_modified = true;
+        m_status = sta_none;
+        
+        [self refresh];
+        
+        self.scrollEnabled = true;
+    }
+}
+
+-(bool)OnImageTouchBegin:(CGPoint)point
+{
+    if( m_status != sta_image ) return false;
+    
+    imgAnnot = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"btn_add"]];
+    
+    imgAnnot.center = CGPointMake(self.contentOffset.x + point.x - (imgAnnot.frame.size.width / 2), self.contentOffset.y + point.y  - (imgAnnot.frame.size.height / 2));
+    
+    [self addSubview:imgAnnot];
+    
+    return true;
+}
+
+-(bool)OnImageTouchMove:(CGPoint)point
+{
+    if( m_status != sta_image ) return false;
+    
+    CGRect origin = imgAnnot.frame;
+    
+    float deltaMoveX = self.contentOffset.x + point.x - origin.origin.x - origin.size.width;
+    float deltaMoveY = self.contentOffset.y + point.y - origin.origin.y - origin.size.height;
+    float prop = imgAnnot.frame.size.width / imgAnnot.frame.size.height;
+    
+    if (self.contentOffset.x + point.x > origin.origin.x && self.contentOffset.y + point.y > origin.origin.y) {
+        float width = (deltaMoveX > deltaMoveY) ? self.contentOffset.x + point.x - origin.origin.x : (self.contentOffset.y + point.y - origin.origin.y) * prop;
+        float height = (deltaMoveX < deltaMoveY) ? self.contentOffset.y + point.y - origin.origin.y : (self.contentOffset.x + point.x - origin.origin.x) / prop;
+        [imgAnnot setFrame:CGRectMake(origin.origin.x, origin.origin.y, width, height)];
+    }
+    
+    return true;
+}
+
+-(bool)OnImageTouchEnd:(CGPoint)point
+{
+    if( m_status != sta_image ) return false;
+    
+    struct PDFV_POS pos1;
+    struct PDFV_POS pos2;
+    
+    [m_view vGetPos:&pos1 :(imgAnnot.frame.origin.x - self.contentOffset.x) * m_scale :(imgAnnot.frame.origin.y - self.contentOffset.y) * m_scale];
+    [m_view vGetPos:&pos2 :(imgAnnot.frame.origin.x - self.contentOffset.x + imgAnnot.frame.size.width) * m_scale :(imgAnnot.frame.origin.y - self.contentOffset.y + imgAnnot.frame.size.height) * m_scale];
+    
+    PDF_RECT rect;
+    
+    rect.left = pos1.x;
+    rect.right = pos2.x;
+    rect.top = pos2.y;
+    rect.bottom = pos1.y;
+    
+    [self vAddImageWithImage:imgAnnot.image withRect:rect];
+    
+    [imgAnnot removeFromSuperview];
+    
+    return true;
+}
+
+- (void)vAddImageWithImage:(UIImage *)image withRect:(PDF_RECT)rect
+{
+    // Create the cache file
+    //NSString *tp = NSTemporaryDirectory();
+    //tp = [tp stringByAppendingPathComponent:@"cache.dat"];
+    //[m_doc setCache:tp];
+    
+    // Create the PDFPage instance of the current page
+    PDFPage *page = [m_doc page:m_cur_page];
+    [page objsStart];
+    
+    // Create the CGImageRef of the image
+    CGImageRef ref = [image CGImage];
+    
+    // Get PDFDocImage instance from CGImageRef (keeping alpha channel)
+    PDFDocImage *i = [m_doc newImage:ref :YES];
+    
+    // Add the image
+    [page addAnnotBitmap:i :&rect];
+    
+    //Action Stack Manger
+    [actionManger push:[[ASAdd alloc] initWithPage:m_cur_page page:page index:(page.annotCount - 1)]];
+    
+    // Re-render the current page
+    [m_view vRenderSync:m_cur_page];
+    [self refresh];
+    
+    [self setModified:YES force:NO];
+    
+    // Set Author and Modify date
+    [self updateLastAnnotInfoAtPage:page];
 }
 
 @end

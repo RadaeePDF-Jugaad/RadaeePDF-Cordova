@@ -9,19 +9,21 @@
 #import <UIKit/UIKit.h>
 @protocol saveTextAnnotDelegate <NSObject>
 
--(void)OnSaveTextAnnot :(NSString*)textAnnot;
+-(void)OnSaveTextAnnot :(NSString *)textAnnot subject:(NSString *)subject;
 @end
 
 
 @interface TextAnnotViewController : UIViewController
 {
     id<saveTextAnnotDelegate> m_delegate;
-    UITextView *_textView;
+    UITextField *textField;
+    UITextView *textView;
     NSString* text;
 }
 @property(readwrite) int pos_x;
 @property(readwrite) int pos_y;
-@property(strong,nonatomic)NSString *text;
+@property(strong, nonatomic) NSString *text;
+@property(strong, nonatomic) NSString *subject;
 
 
 -(void)setDelegate:(id<saveTextAnnotDelegate>)delegate;

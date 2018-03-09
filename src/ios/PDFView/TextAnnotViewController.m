@@ -13,10 +13,6 @@
 @end
 
 @implementation TextAnnotViewController
-@synthesize pos_x;
-@synthesize pos_y;
-
-@synthesize text;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -30,8 +26,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    NSString *title =[[NSString alloc]initWithFormat:NSLocalizedString(@"Text Annot", @"Localizable")];
+	NSString *title =[[NSString alloc]initWithFormat:NSLocalizedString(@"Text Annot", @"Localizable")];
     self.title = title;
     
     UIBarButtonItem *cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelTextAnnot)];
@@ -40,19 +35,31 @@
     
     self.navigationItem.leftBarButtonItem = cancelBtn;
     self.navigationItem.rightBarButtonItem = saveBtn;
-    self.view.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor lightGrayColor];
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
+    UILabel *subjectLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height + 15, 90, 50)];
+    subjectLabel.text = @"Subject:";
+    subjectLabel.textAlignment = NSTextAlignmentCenter;
     
-    _textView = [UITextView new];
-    _textView = [[UITextView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height, self.view.bounds.size.width, self.view.bounds.size.height - self.navigationController.navigationBar.frame.size.height)];
+    UILabel *contentLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, subjectLabel.frame.origin.y + subjectLabel.frame.size.height + 5, 90, 50)];
+    contentLabel.text = @"Content:";
+    contentLabel.textAlignment = NSTextAlignmentCenter;
     
-    [self.view addSubview:_textView];
+    textField = [[UITextField alloc] initWithFrame:CGRectMake(subjectLabel.frame.size.width, subjectLabel.frame.origin.y, self.view.bounds.size.width  - (subjectLabel.frame.size.width + 5) - 5, 44)];
+    textField.backgroundColor = [UIColor whiteColor];
     
-    _textView.text = text;
-    [_textView becomeFirstResponder];
+    textView = [[UITextView alloc] initWithFrame:CGRectMake(contentLabel.frame.size.width, contentLabel.frame.origin.y, self.view.bounds.size.width - (contentLabel.frame.size.width + 5) - 5, self.view.bounds.size.height - contentLabel.frame.origin.y - 5)];
+    
+    [self.view addSubview:subjectLabel];
+    [self.view addSubview:contentLabel];
+    [self.view addSubview:textField];
+    [self.view addSubview:textView];
+    
+    textField.text = _subject;
+    textView.text = _text;
 }
 
 - (void)didReceiveMemoryWarning
@@ -64,7 +71,7 @@
 {
     if(m_delegate)
     {
-        [m_delegate OnSaveTextAnnot:@""];
+        [m_delegate OnSaveTextAnnot:@"" subject:@""];
     }
     [self dismissViewControllerAnimated:YES completion:^{
        
@@ -77,7 +84,7 @@
 {
     if(m_delegate)
     {
-        [m_delegate OnSaveTextAnnot:_textView.text];
+        [m_delegate OnSaveTextAnnot:textView.text subject:textField.text];
     }
     [self dismissViewControllerAnimated:YES completion:^{
         
