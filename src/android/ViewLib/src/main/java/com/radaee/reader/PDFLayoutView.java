@@ -271,7 +271,7 @@ public class PDFLayoutView extends View implements LayoutListener {
                     m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
                     m_status = STA_ANNOT;
                     int check = m_annot.GetCheckStatus();
-                    if (m_doc.CanSave() && check >= 0) {
+                    if (PDFCanSave() && check >= 0) {
                         switch (check) {
                             case 0:
                                 m_annot.SetCheckValue(true);
@@ -293,10 +293,10 @@ public class PDFLayoutView extends View implements LayoutListener {
                         if (m_listener != null)
                             m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
                         PDFEndAnnot();
-                    } else if (m_doc.CanSave() && m_annot.GetEditType() > 0)//if form edit-box.
+                    } else if (PDFCanSave() && m_annot.GetEditType() > 0)//if form edit-box.
                     {
                         onEditAnnot();
-                    } else if (m_doc.CanSave() && m_annot.GetComboItemCount() >= 0)//if form choice
+                    } else if (PDFCanSave() && m_annot.GetComboItemCount() >= 0)//if form choice
                     {
                         try {
                             int[] location = new int[2];
@@ -352,11 +352,11 @@ public class PDFLayoutView extends View implements LayoutListener {
                             m_pCombo.showAtLocation(PDFLayoutView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int) (m_annot_rect[3] + location[1]));
                         } catch (Exception exc) {
                         }
-                    } else if (m_doc.CanSave() && m_annot.GetListItemCount() >= 0)  //if list choice
+                    } else if (PDFCanSave() && m_annot.GetListItemCount() >= 0)  //if list choice
                         onListAnnot();
-                    else if (m_doc.CanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
+                    else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
                         handleSignatureField();
-                    else if (m_listener != null)
+                    else if (PDFCanSave() && m_listener != null)
                         m_listener.OnPDFAnnotTapped(m_annot_page, m_annot);
                     invalidate();
                 }
@@ -1671,7 +1671,7 @@ public class PDFLayoutView extends View implements LayoutListener {
     }
 
     public void PDFRemoveAnnot() {
-        if (m_status != STA_ANNOT || !m_doc.CanSave()) return;
+        if (m_status != STA_ANNOT || !PDFCanSave()) return;
         //add to redo/undo stack.
         Page page = m_doc.GetPage(m_annot_page.GetPageNo());
         page.ObjsStart();
@@ -1804,7 +1804,7 @@ public class PDFLayoutView extends View implements LayoutListener {
         }
 
         boolean reset = m_annot.GetReset();
-        if (reset && m_doc.CanSave()) {
+        if (reset && PDFCanSave()) {
             m_annot.SetReset();
             m_layout.vRenderSync(m_annot_page);
             if (m_listener != null)

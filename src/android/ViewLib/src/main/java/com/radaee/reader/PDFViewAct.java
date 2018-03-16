@@ -346,7 +346,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener {
                     android.content.ClipData clip = android.content.ClipData.newPlainText("Radaee", sel_text);
                     clipboard.setPrimaryClip(clip);
                     Toast.makeText(PDFViewAct.this, getString(R.string.copy_text, sel_text), Toast.LENGTH_SHORT).show();
-                } else if (m_doc.CanSave() && !getIntent().getBooleanExtra("READ_ONLY", false)) {
+                } else if (m_view.PDFCanSave()) {
                     boolean ret = false;
                     if (rad_group.getCheckedRadioButtonId() == R.id.rad_highlight)
                         ret = m_view.PDFSetSelMarkup(0);
