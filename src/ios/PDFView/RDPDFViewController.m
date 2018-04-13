@@ -331,10 +331,10 @@ extern uint g_oval_color;
     }
     
     _toolBar = [UIToolbar new];
-    [_toolBar sizeToFit];
+    [_toolBar setFrame:CGRectMake(0, 0, self.navigationController.navigationBar.frame.size.width, self.navigationController.navigationBar.frame.size.height)];
     b_findStart = NO;
-	[self createToolbarItems];
-    self.navigationItem.titleView = _toolBar;
+    [self createToolbarItems];
+    [self.navigationController.navigationBar addSubview:_toolBar];
     
     [_pageNumLabel setFrame:CGRectMake(0, 20+self.navigationController.navigationBar.frame.size.height+1, 65, 30)];
     
@@ -509,10 +509,12 @@ extern uint g_oval_color;
     
     CGRect boundsc = [[UIScreen mainScreen]bounds];
     int cwidth = boundsc.size.width;
+    CGRect statusbarRect = [[UIApplication sharedApplication] statusBarFrame];
+    
     if(SYS_VERSION>=7.0)
     {
         float hi = self.navigationController.navigationBar.bounds.size.height;
-        _m_searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, hi+20, cwidth, 41)];
+        _m_searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, hi+statusbarRect.size.height, cwidth, 41)];
     }
     else
     {
@@ -528,6 +530,11 @@ extern uint g_oval_color;
     
     [self _toolBarStyle];
 
+}
+
+-(BOOL)prefersHomeIndicatorAutoHidden
+{
+    return YES;
 }
 
 - (BOOL)canBecomeFirstResponder
@@ -1150,13 +1157,15 @@ extern uint g_oval_color;
         rect.size.width = height;
     }
     //END
+    CGRect statusbarRect = [[UIApplication sharedApplication] statusBarFrame];
+    
     if(SYS_VERSION>=7.0)
     {
         m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height)];
     }
     else
     {
-        m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-44)];
+        m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-statusbarRect.size.height-44)];
     }
     
     [m_view setFirstPageCover:firstPageCover];
@@ -1203,13 +1212,15 @@ extern uint g_oval_color;
         rect.size.width = height;
     }
     //END
+    CGRect statusbarRect = [[UIApplication sharedApplication] statusBarFrame];
+    
     if(SYS_VERSION>=7.0)
     {
         m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height)];
     }
     else
     {
-        m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-44)];
+        m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-statusbarRect.size.height-44)];
     }
     [m_view setFirstPageCover:firstPageCover];
     [m_view setDoubleTapZoomMode:doubleTapZoomMode];
@@ -1245,13 +1256,15 @@ extern uint g_oval_color;
         rect.size.width = height;
     }
     //END
+    CGRect statusbarRect = [[UIApplication sharedApplication] statusBarFrame];
+    
     if(SYS_VERSION>=7.0)
     {
         m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height)];
     }
     else
     {
-        m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-44)];
+        m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-statusbarRect.size.height-44)];
     }
     [m_view setFirstPageCover:firstPageCover];
     [m_view setDoubleTapZoomMode:doubleTapZoomMode];
@@ -1334,17 +1347,18 @@ extern uint g_oval_color;
     int cheight = boundsc.size.height;
     
     
-    float hi = self.navigationController.navigationBar.bounds.size.height;
-    CGRect rect;
-    rect = [[UIApplication sharedApplication] statusBarFrame];
-
+    float hi = 44;
+    CGRect statusbarRect = [[UIApplication sharedApplication] statusBarFrame];
+    
+    thumbViewHeight = 99;
+    
     if(SYS_VERSION>=7.0)
     {
-        m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, cheight-thumbHeight, cwidth, thumbHeight)];
-        _pageNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 20+hi+1, 65, 30)];
+        m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, cheight-thumbViewHeight, cwidth, thumbViewHeight)];
+        _pageNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, statusbarRect.size.height+hi+1, 65, 30)];
     }
     else{
-        m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, cheight-hi-thumbHeight-20, cwidth, thumbHeight)];
+        m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, cheight-hi-thumbViewHeight-statusbarRect.size.height, cwidth, thumbViewHeight)];
         _pageNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 65, 30)];
     }
     [m_Thumbview vOpen :m_doc :(id<PDFThumbViewDelegate>)self];
