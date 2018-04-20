@@ -51,7 +51,9 @@ extern uint annotStrikeoutColor;
 {
     if( self = [super init] )
     {
+        _cached = false;
 	    m_dib = Global_dibGet(NULL, width, height);
+        memset([self data],255,width * height *4);
     }
     return self;
 }
@@ -91,10 +93,8 @@ extern uint annotStrikeoutColor;
 -(void)erase:(int)color
 {
 	int *pix = (int *)Global_dibGetData(m_dib);
-	int *pix_end = pix + Global_dibGetWidth(m_dib) * Global_dibGetHeight(m_dib);
+	int *pix_end = pix + Global_dibGetWidth(m_dib) * Global_dibGetHeight(m_dib) * 4;
 	while(pix < pix_end) *pix++ = color;
-
-
 }
 
 -(CGImageRef)image
@@ -904,9 +904,10 @@ extern uint annotStrikeoutColor;
 	Page_setAnnotHide( m_page, m_handle, hide );
 	return true;
 }
--(bool)render:(PDFDIB *)dib withBackgroundColor:(int)bgColor
+
+-(bool)render:(PDFDIB *)dib :(int)back_color
 {
-    [dib erase:bgColor];
+	[dib erase:back_color];
 	return Page_renderAnnot(m_page, m_handle, [dib handle]);
 }
 -(void)getRect:(PDF_RECT *)rect
@@ -1037,6 +1038,12 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotJS( m_page, m_handle );
 }
+
+-(NSString *)getAdditionalJS :(int)idx
+{
+	return Page_getAnnotAdditionalJS(m_page, m_handle, idx);
+}
+
 -(NSString *)get3D
 {
 	char buf[1024];
@@ -1332,7 +1339,7 @@ extern uint annotStrikeoutColor;
 
 @implementation PDFPage
 @synthesize handle = m_page;
--(id)init;
+-(id)init
 {
     if( self = [super init] )
     {
@@ -1650,6 +1657,27 @@ extern uint annotStrikeoutColor;
         const char *pwd = [password UTF8String];
         m_doc = Document_openStream(stream, pwd, &err);
     }
+    return err;
+}
+
+-(int)openWithCert:(NSString *)path :(NSString *)cert_file :(NSString *)password
+{
+    PDF_ERR err;
+    m_doc = Document_openWithCert([path UTF8String], [cert_file UTF8String], [password UTF8String], &err);
+    return err;
+}
+
+-(int)openMemWithCert:(void *)data :(int)data_size :(NSString *)cert_file :(NSString *)password
+{
+    PDF_ERR err;
+    m_doc = Document_openMemWithCert(data, data_size, [cert_file UTF8String], [password UTF8String], &err);
+    return err;
+}
+
+-(int)openStreamWithCert:(id<PDFStream>)stream :(NSString *)cert_file :(NSString *)password
+{
+    PDF_ERR err;
+    m_doc = Document_openStreamWithCert(stream, [cert_file UTF8String], [password UTF8String], &err);
     return err;
 }
 

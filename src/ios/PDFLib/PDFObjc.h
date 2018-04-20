@@ -25,6 +25,9 @@
 {
     PDF_DIB m_dib;
 }
+
+@property (nonatomic) bool cached;
+
 @property (readonly) PDF_DIB handle;
 /**
  *	@brief	create a DIB object
@@ -645,7 +648,7 @@
  * @param hide true or false.
  */
 -(bool)setHidden:(bool)hide;
--(bool)render:(PDFDIB *)dib withBackgroundColor:(int)bgColor;
+-(bool)render:(PDFDIB *)dib :(int)back_color;
 /**
  * @brief get annotation's box rectangle.
  *			this method valid in professional or premium version
@@ -836,6 +839,7 @@
  */
 -(NSString *)getURI;
 -(NSString *)getJS;
+-(NSString *)getAdditionalJS :(int)idx;
 /**
  * @brief get annotation's 3D object name.
  * this method valid in professional or premium version
@@ -1438,9 +1442,17 @@
  * -10:access denied or invalid file path
  * others:unknown error
  */
--(int)open:(NSString *)path : (NSString *)password;
--(int)openMem:(void *)data : (int)data_size : (NSString *)password;
--(int)openStream:(id<PDFStream>)stream : (NSString *)password;
+-(int)open:(NSString *)path :(NSString *)password;
+-(int)openMem:(void *)data :(int)data_size :(NSString *)password;
+-(int)openStream:(id<PDFStream>)stream :(NSString *)password;
+-(int)openWithCert:(NSString *)path :(NSString *)cert_file :(NSString *)password;
+-(int)openMemWithCert:(void *)data :(int)data_size : (NSString *)cert_file :(NSString *)password;
+-(int)openStreamWithCert:(id<PDFStream>)stream : (NSString *)cert_file :(NSString *)password;
+
+
+
+
+
 /**
  * @brief create a empty PDF document
  * @param path path to create

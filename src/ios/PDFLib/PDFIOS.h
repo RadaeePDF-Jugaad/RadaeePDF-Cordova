@@ -339,6 +339,9 @@ PDF_DOC Document_openMem( void *data, int data_size, const char *password, PDF_E
 -(bool)seek:(unsigned long long)pos;
 @end
 PDF_DOC Document_openStream( id<PDFStream> stream, const char *password, PDF_ERR *err );
+PDF_DOC Document_openWithCert(const char *path, const char *cert_file, const char *password, PDF_ERR *err);
+PDF_DOC Document_openMemWithCert(void *data, int data_size, const char *cert_file, const char *password, PDF_ERR *err);
+PDF_DOC Document_openStreamWithCert(id<PDFStream> stream, const char *cert_file, const char *password, PDF_ERR *err);
 
 /**
  *	@brief	create document and return Document object.
@@ -1283,6 +1286,7 @@ int Page_getAnnotDest( PDF_PAGE page, PDF_ANNOT annot );
  */
 int Page_getAnnotURI( PDF_PAGE page, PDF_ANNOT annot, char *uri, int len );
 NSString *Page_getAnnotJS(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotAdditionalJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
 /**
  *	@brief	get annotation's 3D play action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
