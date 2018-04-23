@@ -428,33 +428,33 @@ public class CommonUtil {
 
     public static String renderAnnotToFile(Document document, int pageno, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight) {
         String result;
-		Page page = document.GetPage(pageno);
-		if (page != null) {
-			page.ObjsStart();
-			Page.Annotation signAnnot = page.GetAnnot(annotIndex);
-			if (signAnnot != null) {
-				if(bitmapHeight == 0 || bitmapWidth == 0) {
-					float[] annotRect = signAnnot.GetRect();
-					bitmapWidth = (int) (annotRect[2] - annotRect[0]);
-					bitmapHeight = (int) (annotRect[3] - annotRect[1]);
-				}
+        Page page = document.GetPage(pageno);
+        if (page != null) {
+            page.ObjsStart();
+            Page.Annotation signAnnot = page.GetAnnot(annotIndex);
+            if (signAnnot != null) {
+                if(bitmapHeight == 0 || bitmapWidth == 0) {
+                    float[] annotRect = signAnnot.GetRect();
+                    bitmapWidth = (int) (annotRect[2] - annotRect[0]);
+                    bitmapHeight = (int) (annotRect[3] - annotRect[1]);
+                }
 
-				Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
-				Global.setAnnotTransparency(0x00000000);
-				signAnnot.RenderToBmp(bitmap);
-				Global.setAnnotTransparency(Global.annotTransparencyColor);
-				Bitmap emptyBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
-				if(bitmap.sameAs(emptyBitmap))
-					result = "Empty Annot";
-				else {
-					saveThumb(bitmap, new File(renderPath));
-					result = "Annotation rendered successfully";
-				}
-				bitmap.recycle();
-				emptyBitmap.recycle();
-			} else result = "Cannot get annotation with the indicated index";
-			page.Close();
-		} else result = "Cannot get indicated page";
+                Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+                Global.setAnnotTransparency(0x00000000);
+                signAnnot.RenderToBmp(bitmap);
+                Global.setAnnotTransparency(Global.annotTransparencyColor);
+                Bitmap emptyBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+                if(bitmap.sameAs(emptyBitmap))
+                    result = "Empty Annot";
+                else {
+                    saveThumb(bitmap, new File(renderPath));
+                    result = "Annotation rendered successfully";
+                }
+                bitmap.recycle();
+                emptyBitmap.recycle();
+            } else result = "Cannot get annotation with the indicated index";
+            page.Close();
+        } else result = "Cannot get indicated page";
 
         return result;
     }

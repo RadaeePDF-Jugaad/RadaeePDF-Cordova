@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.15
+ * @version 3.15.1
  */
 public class Global
 {

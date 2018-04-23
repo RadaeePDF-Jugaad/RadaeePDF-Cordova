@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.util.Log;
 import com.radaee.pdf.Document.PDFStream;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 
 /**
  * Asset stream, an implement class for PDFStream, which used in Document.OpenStream
@@ -11,18 +12,19 @@ import java.io.InputStream;
  */
 public class PDFAssetStream implements PDFStream
 {
-	private InputStream m_stream;
+	private byte[] m_buf;
 	private int m_pos;
 	private int m_len;
 	public boolean open( AssetManager assets, String symbol )
 	{
 		try
 		{
-			m_stream = assets.open(symbol);
-			seek(0x7FFFFFFF);
-			m_len = m_pos;
+			InputStream stream = assets.open(symbol);
+			m_len = (int)stream.skip(0x7FFFFFFF);
 			m_pos = 0;
-			seek(0);
+			stream.reset();
+			m_buf = new byte[m_len];
+			stream.read(m_buf);
 			return true;
 		}
 		catch( Exception e )
@@ -32,15 +34,7 @@ public class PDFAssetStream implements PDFStream
 	}
 	public void close()
 	{
-		try
-		{
-            if(m_stream != null)
-			    m_stream.close();
-		}
-		catch( Exception e )
-		{
-		}
-		m_stream = null;
+		m_buf = null;
 	}
 	public boolean writeable()
 	{
@@ -53,23 +47,13 @@ public class PDFAssetStream implements PDFStream
 
 	public int read(byte[] data)
 	{
-		try
-		{
-			int len = m_stream.read(data);
-			if( len < 0 )
-				return 0;
-			else
-			{
+		int len = data.length;
+		if(len + m_pos > m_len) len = m_len - m_pos;
+		if(len <= 0) return 0;
+		System.arraycopy(m_buf, m_pos, data, 0, len);
 				m_pos += len;
 				return len;
 			}
-		}
-		catch( Exception e )
-		{
-			Log.d("read", e.getMessage());
-			return 0;
-		}
-	}
 
 	public int write(byte[] data)
 	{
@@ -78,20 +62,9 @@ public class PDFAssetStream implements PDFStream
 
 	public void seek(int pos)
 	{
-		try
-		{
-			m_stream.reset();
-			m_pos = (int)m_stream.skip(pos);
-		}
-		catch( Exception e )
-		{
-			if( e != null )
-			{
-				String err = e.getMessage();
-				if( err != null )
-					Log.d("seek", err);
-			}
-		}
+		m_pos = pos;
+		if(m_pos < 0) m_pos = 0;
+		if(m_pos > m_len) m_pos = m_len;
 	}
 
 	public int tell()

@@ -1207,7 +1207,10 @@ public class PDFLayoutView extends View implements LayoutListener {
                 m_goto_pos = null;
                 invalidate();
             } else if (pos != null) {
-                m_layout.vSetPos(0, 0, pos);
+                if(style == 3 || style == 4 || style == 6)
+					m_layout.vGotoPage(pos.pageno);
+				else
+				    m_layout.vSetPos(0, 0, pos);
                 m_layout.vMoveEnd();
             }
         }
@@ -1821,6 +1824,10 @@ public class PDFLayoutView extends View implements LayoutListener {
 
     public final void PDFFindStart(String key, boolean match_case, boolean whole_word) {
         m_layout.vFindStart(key, match_case, whole_word);
+    }
+
+    public final void PDFFindStart(String key, boolean match_case, boolean whole_word, boolean skipBlank) {
+        m_layout.vFindStart(key, match_case, whole_word, skipBlank);
     }
 
     public final void PDFFind(int dir) {

@@ -1364,13 +1364,17 @@ public class Page
 			return Page.findGetCount( hand );
 		}
 		/**
-		 * get find count in this page.
+		 * get first char index.
 		 * @param index 0 based index value. range:[0, FindGetCount()-1]
 		 * @return the first char index of texts, see: ObjsGetString. range:[0, ObjsGetCharCount()-1]
 		 */
 		public final int GetFirstChar( int index )
 		{
 			return Page.findGetFirstChar( hand, index );
+		}
+		public final int GetEndChar(int index)
+		{
+			return Page.findGetEndChar( hand, index );
 		}
 		/**
 		 * free memory of find session.
@@ -1435,8 +1439,10 @@ public class Page
 	static private native int objsGetCharIndex( long hand, float[] pt );
 
 	static private native long findOpen( long hand, String str, boolean match_case, boolean whole_word );
+	static private native long findOpen2( long hand, String str, boolean match_case, boolean whole_word, boolean skip_blank );
 	static private native int findGetCount( long hand_finder );
 	static private native int findGetFirstChar( long hand_finder, int index );
+	static private native int findGetEndChar( long hand_finder, int index );
 	static private native void findClose( long hand_finder );
 
 	private static native int getRotate( long hand );
@@ -1633,7 +1639,7 @@ public class Page
 
 	/**
 	 * Sign and save the PDF file.<br/>
-	 * this method required premium license.
+	 * this method required premium license, and signed feature native libs, which has bigger size.
 	 * @param form appearance for sign field.
 	 * @param rect rectangle for sign field
 	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
@@ -1896,6 +1902,24 @@ public class Page
 	public Finder FindOpen( String str, boolean match_case, boolean whole_word )
 	{
 		long ret = findOpen( hand, str, match_case, whole_word );
+		if( ret == 0 ) return null;
+		Finder find = new Finder();
+		find.hand = ret;
+		return find;
+	}
+
+	/**
+	 * create a find session. this can be invoked after ObjsStart<br/>
+	 * this function treats line break as blank char.
+	 * @param str key string to find.
+	 * @param match_case match case?
+	 * @param whole_word match whole word?
+	 * @param skip_blank skip blank?
+	 * @return handle of find session, or 0 if no found.
+	 */
+	public Finder FindOpen( String str, boolean match_case, boolean whole_word, boolean skip_blank )
+	{
+		long ret = findOpen2( hand, str, match_case, whole_word, skip_blank );
 		if( ret == 0 ) return null;
 		Finder find = new Finder();
 		find.hand = ret;

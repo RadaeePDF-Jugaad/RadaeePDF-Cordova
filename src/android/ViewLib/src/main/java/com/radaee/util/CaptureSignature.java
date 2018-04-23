@@ -84,7 +84,7 @@ public class CaptureSignature extends Activity {
         ((TextView) findViewById(R.id.signature_pad_description)).setText(getIntent().getStringExtra(SIGNATURE_PAD_DESCR));
 
         mSignaturePad = (SignaturePad) findViewById(R.id.signature_pad);
-		mSignaturePad.setMinWidth(3);
+        mSignaturePad.setMinWidth(3);
         mSignaturePad.setMaxWidth(3);
         mSignaturePad.setOnSignedListener(new SignaturePad.OnSignedListener() {
             @Override
