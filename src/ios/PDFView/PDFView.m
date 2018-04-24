@@ -2574,7 +2574,7 @@ extern NSString *g_author;
     int height = (rect.bottom- rect.top) * m_scale;
     PDFDIB *dib = [[PDFDIB alloc] init:width : height];
     Global_setAnnotTransparency(0x00000000);
-    [m_annot render:dib withBackgroundColor:0xffffffff];
+    [m_annot render:dib :0xffffffff];
     Global_setAnnotTransparency(0x200040FF);
     
     UIImage *img = [UIImage imageWithCGImage:[dib image]];
