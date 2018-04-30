@@ -1487,9 +1487,10 @@ extern NSString *g_author;
     {
         PDFVPage *vpage = [m_view vGetPage:pos.pageno];
         [self setModified:[vpage SetSelMarkup:type :color] force:NO];
-        
         [m_view vRenderSync:pos.pageno];
         [self refresh];
+        PDFPage *page = [vpage GetPage];
+        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
         return true;
     }
     [self refresh];
