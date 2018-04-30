@@ -63,7 +63,6 @@
     int doubleTapZoomMode;
     
     float thumbHeight;
-    float thumbViewHeight;
     
     //GEAR
     MPMoviePlayerViewController *mpvc;
