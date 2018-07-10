@@ -583,7 +583,7 @@ extern NSString *g_author;
         float green = ((g_line_color>>8)&0xFF)/255.0f;
         float blue = (g_line_color&0xFF)/255.0f;
         float alpha = ((g_line_color>>24)&0xFF)/255.0f;
-        CGContextSetRGBFillColor(context, red, green, blue, alpha);
+        CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_lines;
         PDF_POINT *pt_end = m_lines + (m_lines_cnt<<1);
         if( m_lines_drawing ) pt_end += 2;
@@ -1798,7 +1798,7 @@ extern NSString *g_author;
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
-                [page addAnnotLine:pt_cur :&pt_cur[1] :g_rect_Width :0 :1 :g_rect_color :g_rect_color];
+                [page addAnnotLine:pt_cur :&pt_cur[1] :g_rect_Width :0 :1 :g_line_color :g_line_color];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
