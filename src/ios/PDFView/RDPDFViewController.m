@@ -195,7 +195,7 @@ extern uint g_oval_color;
                                            [self bookmarkList];
                                        }];
         
-        UIAlertAction *viewMenu =  [UIAlertAction actionWithTitle:@"View menu" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
+        UIAlertAction *viewMenu =  [UIAlertAction actionWithTitle:@"TOC" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
                                     {
                                         [self viewMenu:nil];
                                     }];
@@ -2418,7 +2418,9 @@ extern uint g_oval_color;
         UIAlertController *action = [UIAlertController alertControllerWithTitle:@"Select View Mode" message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            [self dismissViewControllerAnimated:YES completion:nil];
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
         }];
         
         UIAlertAction *vert = [UIAlertAction actionWithTitle:@"Vertical" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
