@@ -26,7 +26,7 @@
     UIImage *savePDF = [UIImage imageNamed:@"btn_save.png"];
     UIImage *printPDF = [UIImage imageNamed:@"btn_print.png"];
     
-    actionTitle = [NSArray arrayWithObjects:@"Add book mark", @"Book mark list", @"View menu", @"Save", @"Print", nil];
+    actionTitle = [NSArray arrayWithObjects:@"Add book mark", @"Book mark list", @"TOC", @"Save", @"Print", nil];
     actionImage = [NSArray arrayWithObjects:addBookMark, bookMarkList, viewMenu, savePDF, printPDF, nil];
     self.tableView.scrollEnabled = NO;
 }
