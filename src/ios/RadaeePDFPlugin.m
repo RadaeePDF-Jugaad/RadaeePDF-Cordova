@@ -38,6 +38,7 @@
     highlightColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
     ovalColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"OvalColor"];
     selColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SelColor"];
+    arrowColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ArrowColor"];
 }
 
 #pragma mark - Plugin API
@@ -401,6 +402,7 @@
      4: highlightColor
      5: ovalColor
      6: selColor
+     7: arrowColor
      
      */
     
@@ -411,6 +413,7 @@
     [self setColor:0xFFFFFF00 forFeature:4];
     [self setColor:0xFF000000 forFeature:5];
     [self setColor:0x400000C0 forFeature:6];
+    [self setColor:0xFF000000 forFeature:7];
     
     [self loadSettingsWithDefaults];
 }
@@ -630,6 +633,10 @@
             selColor = color;
             break;
             
+        case 7:
+            arrowColor = color;
+            break;
+            
         default:
             break;
     }
@@ -654,6 +661,7 @@
     [[NSUserDefaults standardUserDefaults] setInteger:ovalColor forKey:@"OvalColor"];
     [[NSUserDefaults standardUserDefaults] setInteger:_viewMode forKey:@"DefView"];
     [[NSUserDefaults standardUserDefaults] setInteger:selColor forKey:@"SelColor"];
+    [[NSUserDefaults standardUserDefaults] setInteger:arrowColor forKey:@"ArrowColor"];
     
     g_def_view = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"DefView"];
     g_MatchWholeWord = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"MatchWholeWord"];
@@ -662,6 +670,7 @@
     g_ink_color = inkColor;
     g_sel_color = selColor;
     g_oval_color = ovalColor;
+    g_line_color = arrowColor;
     annotHighlightColor = highlightColor;
     annotUnderlineColor = underlineColor;
     annotStrikeoutColor = strikeoutColor;
