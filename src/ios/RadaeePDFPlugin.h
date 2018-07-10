@@ -33,6 +33,7 @@
     int highlightColor;
     int ovalColor;
     int selColor;
+    int arrowColor;
     
     int thumbBackgroundColor;
     int gridBackgroundColor;
