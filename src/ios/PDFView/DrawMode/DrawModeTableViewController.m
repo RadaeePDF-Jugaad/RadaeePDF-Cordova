@@ -55,7 +55,7 @@
         }
         case 1:
         {
-            cell.textLabel.text = @"Line";
+            cell.textLabel.text = @"Arrow";
             cell.imageView.image = [UIImage imageNamed:@"btn_annot_line.png"];
             break;
         }

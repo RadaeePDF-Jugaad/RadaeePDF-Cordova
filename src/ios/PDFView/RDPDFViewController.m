@@ -599,7 +599,7 @@ extern uint g_oval_color;
         }];
         [ink setValue:[[UIImage imageNamed:@"btn_annot_ink.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
-        UIAlertAction *line = [UIAlertAction actionWithTitle:@"Line" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *line = [UIAlertAction actionWithTitle:@"Arrow" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self didSelectDrawMode:1];
         }];
         [line setValue:[[UIImage imageNamed:@"btn_annot_line.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
