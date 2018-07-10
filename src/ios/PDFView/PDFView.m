@@ -748,6 +748,11 @@ extern NSString *g_author;
 -(BOOL)forceSave
 {
     if ([m_doc save]) {
+        
+        if ([self isModified]) {
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"fileStat"];
+        }
+        
         [self setModified:NO force:YES];
         return YES;
     }
