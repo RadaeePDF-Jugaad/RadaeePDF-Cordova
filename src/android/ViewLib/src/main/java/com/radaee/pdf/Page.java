@@ -460,10 +460,10 @@ public class Page
 		 * @param idx ievent type as below:<br/>
 		 * 0:(Optional; PDF 1.2) An action to be performed when the cursor enters the annotation’s active area.<br/>
 		 * 1:(Optional; PDF 1.2) An action to be performed when the cursor exits the annotation’s active area.<br/>
-		 * 2 (Optional; PDF 1.2) An action to be performed when the mouse button is pressed inside the annotation’s active area. (The name D stands for “down.”)<br/>
-		 * 3:(Optional; PDF 1.2) An action to be performed when the mouse button is released inside the annotation’s active area. (The name U stands for “up.”)<br/>
+		 * 2 (Optional; PDF 1.2) An action to be performed when the mouse button is pressed inside the annotation’s active area. (The name D stands for "down.")<br/>
+		 * 3:(Optional; PDF 1.2) An action to be performed when the mouse button is released inside the annotation’s active area. (The name U stands for "up.")<br/>
 		 * 4:(Optional; PDF 1.2; widget annotations only) An action to be performed when the annotation receives the input focus.<br/>
-		 * 5:(Optional; PDF 1.2; widget annotations only) (Uppercase B, lowercase L) An action to be performed when the annotation loses the input focus. (The name Bl stands for “blurred.”)<br/>
+		 * 5:(Optional; PDF 1.2; widget annotations only) (Uppercase B, lowercase L) An action to be performed when the annotation loses the input focus. (The name Bl stands for "blurred.")<br/>
 		 * 6:(Optional; PDF 1.5) An action to be performed when the page containing the annotation is opened (for example, when the user navigates to it from the next or previous page or by means of a link annotation or outline item). The action is executed after the O action in the page’s additional-actions dictionary (see Table 8.45) and the OpenAction entry in the document catalog (see Table 3.25), if such actions are present.<br/>
 		 * 7:(Optional; PDF 1.5) An action to be performed when the page containing the annotation is closed (for example, when the user navigates to the next or previous page, or follows a link annotation or outline item). The action is executed before the C action in the page’s additional-actions dictionary (see Table 8.45), if present.<br/>
 		 * 8:(Optional; PDF 1.5) An action to be performed when the page containing the annotation becomes visible in the viewer application’s user interface.<br/>

@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.15.1
+ * @version 3.15.3
  */
 public class Global
 {
@@ -331,9 +331,25 @@ public class Global
 	 */
 	public static int thumbViewBgColor = 0x40CCCCCC;
 	/**
+	 * Thumb grid view's background color
+	 */
+	public static int thumbGridBgColor = 0xFFCCCCCC;
+	/**
 	 * Thumb view height in dp, i.e. 100 = 100dp
 	 */
 	public static int thumbViewHeight = 100;
+	/**
+	 * Thumb grid view's element height in dp, i.e. 100 = 100dp
+	 */
+	public static int thumbGridElementHeight = 150;
+	/**
+	 * Thumb grid view's element gap (the vertical/horizontal spacing)
+	 */
+	public static int thumbGridElementGap = 10;
+	/**
+	 * Thumb grid view's render mode, 0:full screen 1:justify center
+	 */
+	public static int thumbGridViewMode = 0;
 	/**
 	 * Reader view background color
 	 */

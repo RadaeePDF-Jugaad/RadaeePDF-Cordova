@@ -95,7 +95,16 @@ public class PDFThumbView extends View implements PDFViewListener {
         m_thumb.vResize(getWidth(), getHeight());
     }
 
-    public void thumbClose() {
+	public void thumbOpen( Document doc, PDFThumbListener listener, int thumbHeight, int orientation, int bgColor, int gap) {
+		m_thumb.vSetOrientation(orientation);
+		m_thumb.setThumbHeight(thumbHeight);
+		m_thumb.vOpen(doc, gap, bgColor, this);
+		m_thumb.vSetThumbListener(listener);
+		m_thumb.vResize(getWidth(), getHeight());
+	}
+
+	public void thumbClose()
+	{
         if (m_thumb != null) {
             m_thumb.vClose();
         }
@@ -133,6 +142,8 @@ public class PDFThumbView extends View implements PDFViewListener {
         int right = left + vpage.GetWidth();
         if (m_thumb.vGetOrientation() == 1)//vertical
             m_paint.setTextSize(m_thumb.vGetWinW() / 5);
+		else if(m_thumb.vGetOrientation() == 3) //grid
+			m_paint.setTextSize(m_thumb.getThumbHeight() / 5);
         else
             m_paint.setTextSize(m_thumb.vGetWinH() / 5);
         m_paint.setTextAlign(Align.CENTER);

@@ -263,6 +263,7 @@ public class Document
 	private static native int getPageCount( long hand );
 	private static native float getPageWidth( long hand, int pageno );
 	private static native float getPageHeight( long hand, int pageno );
+	private static native String getPageLabel(long hand, int pageno);
     private static native float[] getPagesMaxSize(long hand);
 	private static native boolean changePageRect( long hand, int pageno, float dl, float dt, float dr, float db );
 	private static native boolean setPageRotate( long hand, int pageno, int degree );
@@ -1001,6 +1002,23 @@ public class Document
 		float h = getPageHeight( hand_val, pageno );
 		if( h <= 0 ) return 1;
 		else return h;
+	}
+
+	/**
+	 * get label of page
+	 * @param pageno 0 based page index number
+	 * @return json string or pure text. for json: name is style name of number.<br/>
+	 * for example:<br/>
+	 * {"D":2} is "2"<br/>
+	 * {"R":3} is "III"<br/>
+	 * {"r":4} is "iv"<br/>
+	 * {"A":5} is "E"<br/>
+	 * {"a":6} is "f"<br/>
+	 * for pure text: the text is the label.
+	 */
+	public String GetPageLabel(int pageno)
+	{
+		return getPageLabel(hand_val, pageno);
 	}
 
     /**

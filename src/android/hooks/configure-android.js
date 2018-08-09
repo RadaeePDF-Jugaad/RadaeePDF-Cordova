@@ -49,7 +49,8 @@ module.exports = function (ctx) {
 		{filePath: 'src/com/radaee/util/CommonUtil.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: 'src/com/radaee/util/RadaeePDFManager.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: 'src/com/radaee/util/BookmarkHandler.java', importStatement: 'com.radaee.viewlib.R'},
-		{filePath: 'src/com/radaee/util/CaptureSignature.java', importStatement: 'com.radaee.viewlib.R'}
+		{filePath: 'src/com/radaee/util/CaptureSignature.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: 'src/com/radaee/util/PDFThumbGrid.java', importStatement: 'com.radaee.viewlib.R'}
     ];
 
 

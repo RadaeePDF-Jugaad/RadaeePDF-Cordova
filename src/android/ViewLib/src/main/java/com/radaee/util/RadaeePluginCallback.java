@@ -11,6 +11,7 @@ import com.radaee.pdf.Page;
 public class RadaeePluginCallback {
 
     private PDFReaderListener mListener;
+    private PDFThumbListener mThumbListener;
     private PDFControllerListener mControlListener;
     private static RadaeePluginCallback mInstance;
 
@@ -25,6 +26,10 @@ public class RadaeePluginCallback {
 
     public void setListener(PDFReaderListener listener) {
         mListener = listener;
+    }
+
+    public void setThumbListener(PDFThumbListener listener) {
+        mThumbListener = listener;
     }
 
     public void setControllerListener(PDFControllerListener listener) {
@@ -61,6 +66,11 @@ public class RadaeePluginCallback {
 
     public void onAnnotTapped(Page.Annotation annot) {
         if(mListener != null) mListener.onAnnotTapped(annot);
+    }
+
+    public void onThumbPageClick(int pageno) {
+        if(mThumbListener != null)
+            mThumbListener.onPageClicked(pageno);
     }
 
     public void onDoubleTapped(int pageno, float x, float y) {
@@ -130,6 +140,13 @@ public class RadaeePluginCallback {
         void onAnnotTapped(Page.Annotation annot);
         void onDoubleTapped(int pageno, float x, float y);
         void onLongPressed(int pageno, float x, float y);
+    }
+
+    /**
+     * An interface that recognizes the thumbnail grid page click event
+     */
+    public interface PDFThumbListener {
+        void onPageClicked( int pageno );
     }
 
     /**

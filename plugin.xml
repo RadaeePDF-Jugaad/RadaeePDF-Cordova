@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.3.2">
+        id="com.radaee.cordova" version="1.3.3">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -98,6 +98,7 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
 
         <!-- Radaee source - java.com.radaee.util -->
         <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlMesh.java" target-dir="src/main/java/fi/harism/curl" />
@@ -106,10 +107,7 @@
         <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlView.java" target-dir="src/main/java/fi/harism/curl" />
 
         <source-file src="src/android/ViewLib/src/main/jniLibs/arm64-v8a/librdpdf.so" target-dir="libs/arm64-v8a" />
-        <source-file src="src/android/ViewLib/src/main/jniLibs/armeabi/librdpdf.so" target-dir="libs/armeabi" />
         <source-file src="src/android/ViewLib/src/main/jniLibs/armeabi-v7a/librdpdf.so" target-dir="libs/armeabi-v7a" />
-        <source-file src="src/android/ViewLib/src/main/jniLibs/mips/librdpdf.so" target-dir="libs/mips" />
-        <source-file src="src/android/ViewLib/src/main/jniLibs/mips64/librdpdf.so" target-dir="libs/mips64" />
         <source-file src="src/android/ViewLib/src/main/jniLibs/x86/librdpdf.so" target-dir="libs/x86" />
         <source-file src="src/android/ViewLib/src/main/jniLibs/x86_64/librdpdf.so" target-dir="libs/x86_64" />
 
@@ -141,6 +139,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_row.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_popup_menu.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
 
         <!-- Radaee raw -->
         <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
@@ -214,6 +213,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/values-es-rES/strings.xml" target-dir="res/values-es-rES" />
 		<source-file src="src/android/ViewLib/src/main/res/values-fr-rFR/strings.xml" target-dir="res/values-fr-rFR" />
 		<source-file src="src/android/ViewLib/src/main/res/values-it/strings.xml" target-dir="res/values-it" />
+		<source-file src="src/android/ViewLib/src/main/res/values-zh-rCN/strings.xml" target-dir="res/values-zh-rCN" />
 		<source-file src="src/android/ViewLib/src/main/res/values-sw600dp/bools.xml" target-dir="res/values-sw600dp" />
 		<source-file src="src/android/ViewLib/src/main/res/values-xlarge/bools.xml" target-dir="res/values-xlarge" />
 

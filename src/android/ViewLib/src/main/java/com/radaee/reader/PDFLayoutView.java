@@ -271,7 +271,10 @@ public class PDFLayoutView extends View implements LayoutListener {
                     m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
                     m_status = STA_ANNOT;
                     int check = m_annot.GetCheckStatus();
-                    if (PDFCanSave() && check >= 0) {
+                    if(m_annot.IsReadOnly()) {
+                        Toast.makeText(getContext(), "Readonly annotation", Toast.LENGTH_SHORT).show();
+                        if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_page, m_annot);
+                    } else if (PDFCanSave() && check >= 0) {
                         switch (check) {
                             case 0:
                                 m_annot.SetCheckValue(true);
@@ -1966,6 +1969,10 @@ public class PDFLayoutView extends View implements LayoutListener {
 
     public void setReadOnly(boolean readonly) {
         mReadOnly = readonly;
+    }
+
+    public void PDFSetZoom(int vx, int vy, PDFPos pos, float zoom) {
+        if(m_layout != null) m_layout.vZoomSet(vx, vy, pos, zoom);
     }
 
     private static int tmp_idx = 0;
