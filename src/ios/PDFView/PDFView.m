@@ -2124,7 +2124,7 @@ extern NSString *g_author;
                 [m_delegate didTapAnnot:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
             }
             
-            if (![self canSaveDocument] && m_annot.type != 1) {
+            if (![self canSaveDocument] && m_annot.type != 1 && [m_annot getDest] < 0 && [m_annot getURI] == nil) {
                 if( m_delegate )
                 {
                     if (!isDoubleTapping) {

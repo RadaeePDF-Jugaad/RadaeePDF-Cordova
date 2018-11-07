@@ -686,7 +686,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -727,7 +727,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -770,7 +770,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -812,7 +812,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -854,7 +854,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -2207,7 +2207,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -2229,7 +2229,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -2250,7 +2250,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
@@ -2270,7 +2270,7 @@ extern uint g_oval_color;
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+        UIAlertView *alter = [[UIAlertView alloc] initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
         [alter show];
         return;
     }
