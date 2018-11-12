@@ -35,6 +35,7 @@ import com.radaee.util.PDFThumbView;
 import com.radaee.util.RadaeePDFManager;
 import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.PDFViewThumb;
+import com.radaee.view.VPage;
 import com.radaee.viewlib.R;
 
 import org.json.JSONArray;
