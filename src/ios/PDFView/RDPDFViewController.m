@@ -1793,6 +1793,10 @@ extern uint g_oval_color;
 #pragma mark annotToolBar
 -(void)addannotToolBar
 {
+    // remove annot toolbar before adding the new one (if exists)
+    if (annotToolBar) {
+        [annotToolBar removeFromSuperview];
+    }
     annotToolBar = [UIToolbar new];
     [annotToolBar sizeToFit];
     //annotToolBar.barStyle = UIBarStyleBlackOpaque;
