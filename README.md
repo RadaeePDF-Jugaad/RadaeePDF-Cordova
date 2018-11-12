@@ -25,7 +25,7 @@ http://www.radaeepdf.com/ecommerce/technical-specification
 	
 2. Add the android/iOS platform.  
    `cd RadaeePDF-Cordova`    
-	`cordova platform add android --save` and/or `cordova platform add ios --save`
+	`cordova platform add android@6 --save` and/or `cordova platform add ios --save`
 	
 3. Add the plugin.  
    `cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git --save`
