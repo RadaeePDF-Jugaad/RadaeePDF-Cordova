@@ -110,6 +110,9 @@
 
 + (NSDate *)dateFromPdfDate:(NSString *)dateString
 {
+    if (!dateString || dateString.length == 0) {
+        return nil;
+    }
     // Remove "D:"
     dateString = [dateString stringByReplacingOccurrencesOfString:@"D:" withString:@""];
     
@@ -134,7 +137,7 @@
     [dateFormat setDateFormat:@"yyyyMMddHHmmssZZZZZ"];
     NSString* dateString = [dateFormat stringFromDate:date];
     
-    dateString = [[dateString stringByReplacingOccurrencesOfString:@":" withString:@"'"] stringByAppendingString:@"'"];
+    dateString = [@"D:" stringByAppendingString:[[dateString stringByReplacingOccurrencesOfString:@":" withString:@"'"] stringByAppendingString:@"'"]];
     
     return dateString;
 }

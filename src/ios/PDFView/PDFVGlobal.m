@@ -85,37 +85,34 @@
 @end
 
 int g_def_view = 0;
-int g_render_quality;
-
-bool g_MatchWholeWord;
-bool g_CaseSensitive;
-NSMutableString *pdfName;
-NSMutableString *pdfPath;
-
 float g_zoom_level = 5;
-bool g_paging_enabled = true;
+bool g_static_scale = false;
+bool g_paging_enabled = false;
+bool g_double_page_enabled = false;
+bool g_curl_enabled = false;
+bool g_cover_page_enabled = false;
+bool g_fit_signature_to_field = true;
+bool g_execute_annot_JS = true;
+bool g_dark_mode = false;
 PDF_RENDER_MODE renderQuality = mode_normal;
 
-float g_Ink_Width = 2;
-float g_rect_Width = 2;
-float g_line_Width = 2;
-uint g_rect_color = 0xFFFF0000;
-uint g_line_color = 0xFFFF0000;
-uint g_ink_color = 0xFFFF0000;
-uint g_sel_color = 0x400000C0;
-uint g_oval_color = 0xFF0000FF;
 uint annotHighlightColor = 0xFFFFFF00;
 uint annotUnderlineColor = 0xFF0000FF;
 uint annotStrikeoutColor = 0xFFFF0000;
 uint annotSquigglyColor = 0xFF00FF00;
 
-bool g_double_page_enabled = false;
-bool g_fit_signature_to_field = true;
-
 NSString *g_author = @"";
 
 void APP_Init()
 {
+    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"Radaee" forKey:@"actCompany"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"radaee_com@yahoo.cn" forKey:@"actEmail"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"89WG9I-HCL62K-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO" forKey:@"actSerial"];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"actActivationType"];
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     BOOL isActive = NO;
     int licenseType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"actActivationType"] intValue];
     NSLog(@"LICENSE: %i", licenseType);
@@ -128,7 +125,7 @@ void APP_Init()
         case 0:
         {
             NSLog(@"standard");
-             isActive = Global_activeStandard([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
+            isActive = Global_activeStandard([[[NSUserDefaults standardUserDefaults] objectForKey:@"actBundleId"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actCompany"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actEmail"] UTF8String], [[[NSUserDefaults standardUserDefaults] objectForKey:@"actSerial"] UTF8String]);
             break;
         }
         case 1:
@@ -156,82 +153,49 @@ void APP_Init()
     else
         NSLog(@"License not active");
     
+    NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat" inDirectory:@"cmaps"];
+    NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat" inDirectory:@"cmaps"];
+    NSString *cmyk_path = [[NSBundle mainBundle] pathForResource:@"cmyk_rgb" ofType:@"dat" inDirectory:@"cmaps"];
     
-    [[NSUserDefaults standardUserDefaults] setBool:isActive forKey:@"actIsActive"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    // check resources
+    if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
+        NSLog(@"Check resources files: cmaps.dat not found.");
+        NSLog(@"Include fdat and cmaps folders as resources (like demo project)");
+        return;
+    }
     
-    NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat"];
-    NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat"];
-    NSString *cmyk_path = [[NSBundle mainBundle] pathForResource:@"cmyk_rgb" ofType:@"dat"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
+        NSLog(@"Check resources files: umaps.dat not found.");
+        NSLog(@"Include fdat and cmaps folders as resources (like demo project)");
+        return;
+    }
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
+        NSLog(@"Check resources files: cmyk_rgb.dat not found.");
+        NSLog(@"Include fdat and cmaps folders as resources (like demo project)");
+        return;
+    }
     
     Global_setCMapsPath([cmaps_path UTF8String], [umaps_path UTF8String]);
     Global_setCMYKProfile([cmyk_path UTF8String]);
-
-    NSString *fpath;
-    fpath = [[NSBundle mainBundle] pathForResource:@"res00" ofType:nil];
-    Global_loadStdFont( 0, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res01" ofType:nil];
-    Global_loadStdFont( 1, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res02" ofType:nil];
-    Global_loadStdFont( 2, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res03" ofType:nil];
-    Global_loadStdFont( 3, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res04" ofType:nil];
-    Global_loadStdFont( 4, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res05" ofType:nil];
-    Global_loadStdFont( 5, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res06" ofType:nil];
-    Global_loadStdFont( 6, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res07" ofType:nil];
-    Global_loadStdFont( 7, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res08" ofType:nil];
-    Global_loadStdFont( 8, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res09" ofType:nil];
-    Global_loadStdFont( 9, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res10" ofType:nil];
-    Global_loadStdFont( 10, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res11" ofType:nil];
-    Global_loadStdFont( 11, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res12" ofType:nil];
-    Global_loadStdFont( 12, [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"res13" ofType:nil];
-    Global_loadStdFont( 13, [fpath UTF8String] );
     
+    // Add Standard Resources
+    NSString *stdResFolder = [[NSBundle mainBundle] pathForResource:@"fdat/stdRes" ofType:nil];
+    int i = 0;
+    for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stdResFolder error:nil]) {
+        NSLog(@"%@", [stdResFolder stringByAppendingPathComponent:fpath]);
+        Global_loadStdFont(i, [[stdResFolder stringByAppendingPathComponent:fpath] UTF8String]);
+        i++;
+    }
+    
+    // Add Standard Fonts
     Global_fontfileListStart();
-
-    fpath = [[NSBundle mainBundle] pathForResource:@"argbsn00lp.ttf" ofType:nil];
-    if( fpath )
-        Global_fontfileListAdd( [fpath UTF8String] );
-   
-    fpath = [[NSBundle mainBundle] pathForResource:@"arimo.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"arimob.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"arimobi.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"arimoi.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"cousine.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"cousineb.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"cousinebi.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"cousinei.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"rdf008.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"rdf013.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"tinos.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"tinosb.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"tinosbi.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-    fpath = [[NSBundle mainBundle] pathForResource:@"tinosi.ttf" ofType:nil];
-    Global_fontfileListAdd( [fpath UTF8String] );
-   
+    NSString *stdFontFolder = [[NSBundle mainBundle] pathForResource:@"fdat/stdFont" ofType:nil];
+    for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stdFontFolder error:nil]) {
+        NSLog(@"%@", [stdFontFolder stringByAppendingPathComponent:fpath]);
+        Global_fontfileListAdd([[stdFontFolder stringByAppendingPathComponent:fpath] UTF8String]);
+    }
+    
     Global_fontfileListEnd();
     
     Global_fontfileMapping("Arial",                    "Arimo");
@@ -355,10 +319,21 @@ void APP_Init()
     Global_setAnnotFont( "Arimo" );//Global_setAnnotFont( "BousungEG-Light-GB" );
     
     
-    Global_setAnnotTransparency(0x200040FF);
+	Global_setAnnotTransparency(0x200040FF);
+	g_def_view = 0;
+	renderQuality = mode_normal;
+	g_zoom_level = 5;
+    g_paging_enabled = false;
+    g_double_page_enabled = true;
+    g_curl_enabled = false;
+    g_cover_page_enabled = false;
+    
+    g_Ink_Width = 2;
+    g_rect_Width = 2;
+    g_line_Width = 2;
+    g_rect_color = 0xFFFF0000;
+    g_line_color = 0xFFFF0000;
+    g_ink_color = 0xFFFF0000;
     g_sel_color = 0x400000C0;
-    g_def_view = 0;
-    renderQuality = mode_normal;
-    g_zoom_level = 5;
-    g_paging_enabled = true;
+    g_oval_color = 0xFF0000FF;
 }

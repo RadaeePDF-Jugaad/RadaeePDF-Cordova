@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "RDExtendedSearch.h"
 
 @interface SearchResultTableViewCell : UITableViewCell
 
