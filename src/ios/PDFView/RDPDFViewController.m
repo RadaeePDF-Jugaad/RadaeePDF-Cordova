@@ -2416,6 +2416,32 @@ extern NSMutableString *pdfPath;
     return [m_view addAttachmentFromPath:path];
 }
 
+#pragma mark - Flat annot
+
+- (bool)flatAnnotAtPage:(int)page
+{
+    PDFPage *ppage = [m_doc page:page];
+    if ([ppage flatAnnots]) return YES;
+    else return NO;
+    
+}
+- (bool)flatAnnots
+{
+    for (int page = 0; page != [m_doc pageCount]; page++) {
+        [self flatAnnotAtPage:page];
+        if (page == [m_view vGetCurrentPage]) [m_view refreshCurrentPage];
+    }
+    return nil;
+}
+
+#pragma mark - Save document
+
+- (bool)saveDocumentAtPath:(NSString *)path
+{
+    if ([m_doc saveAs:path: NO]) return YES;
+    else return NO;
+}
+
 #pragma mark - Form Manager
 
 - (NSString *)getJSONFormFields
