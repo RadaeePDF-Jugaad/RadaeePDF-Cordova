@@ -343,7 +343,7 @@
         <source-file src="src/ios/PDFView/RDPDFViewController.m" />
         <header-file src="src/ios/PDFView/RDPDFViewController.h" />
         <resource-file src="src/ios/PDFView/RDPDFViewController.xib" />
-        <resource-file src="src/ios/Resources/annot_remove.png" />
+        <resource-file src="src/ios/Resources/btn_annot_remove.png" />
         <resource-file src="src/ios/Resources/backImage.png" />
         <resource-file src="src/ios/Resources/btn_annot_ellipse.png" />
         <resource-file src="src/ios/Resources/btn_annot_ink.png" />
