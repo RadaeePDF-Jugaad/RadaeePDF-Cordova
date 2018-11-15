@@ -173,6 +173,10 @@
 - (BOOL)addAttachmentFromPath:(NSString *)path;
 - (void)refreshCurrentPage;
 
+- (bool)flatAnnotAtPage:(int)page;
+- (bool)flatAnnots;
+- (bool)saveDocumentAtPath:(NSString *)path;
+
 // Form Manager
 
 - (NSString *)getJSONFormFields;
