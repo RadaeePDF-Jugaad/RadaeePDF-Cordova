@@ -134,8 +134,8 @@ public class RadaeePluginCallback {
         return mControlListener != null && mControlListener.flatAnnots();
     }
 
-    public boolean saveDocumentAtPath(String path) {
-        return mControlListener != null && mControlListener.saveDocumentAtPath(path);
+    public boolean saveDocumentToPath(String path) {
+        return mControlListener != null && mControlListener.saveDocumentToPath(path);
     }
 
     /**
@@ -178,6 +178,6 @@ public class RadaeePluginCallback {
         String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight);
 		boolean flatAnnotAtPage(int page);
         boolean flatAnnots();
-        boolean saveDocumentAtPath(String path);
+        boolean saveDocumentToPath(String path);
     }
 }

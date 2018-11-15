@@ -426,8 +426,8 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().flatAnnots();
     }
 
-    public boolean saveDocumentAtPath(String path) {
-        return RadaeePluginCallback.getInstance().saveDocumentAtPath(path);
+    public boolean saveDocumentToPath(String path) {
+        return RadaeePluginCallback.getInstance().saveDocumentToPath(path);
     }
 	
     @Override

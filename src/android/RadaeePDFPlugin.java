@@ -238,9 +238,9 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 if(flatsResult) callbackContext.success("Document flattering success");
                 else callbackContext.error("Document flattering error");
                 break;
-            case "saveDocumentAtPath":
+            case "saveDocumentToPath":
                 params = args.getJSONObject(0);
-                boolean saveAsResult = mPdfManager.saveDocumentAtPath(params.optString("path"));
+                boolean saveAsResult = mPdfManager.saveDocumentToPath(params.optString("path"));
                 if(saveAsResult) callbackContext.success("Document save success");
                 else callbackContext.error("Document save error");
                 break;

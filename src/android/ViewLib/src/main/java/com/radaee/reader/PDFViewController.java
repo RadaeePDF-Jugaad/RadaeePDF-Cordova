@@ -35,6 +35,7 @@ import com.radaee.util.PDFThumbView;
 import com.radaee.util.RadaeePDFManager;
 import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.PDFViewThumb;
+import com.radaee.view.VPage;
 import com.radaee.viewlib.R;
 
 import org.json.JSONArray;
@@ -1180,9 +1181,11 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		}
 
 		@Override
-		public boolean saveDocumentAtPath(String path) {
+		public boolean saveDocumentToPath(String path) {
 			String prefix = "file://";
-			path = path.substring(path.indexOf(prefix) + prefix.length());
+			if (path.indexOf(prefix) != -1) {
+				path = path.substring(path.indexOf(prefix) + prefix.length());
+			}
 			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
 			if (m_view.PDFGetDoc().IsEncrypted()) {
 				byte[] id = "123456789abcdefghijklmnopqrstuvw".getBytes();
