@@ -585,7 +585,7 @@
     }
     
 }
-- (void)saveDocumentAtPath:(CDVInvokedUrlCommand *)command
+- (void)saveDocumentToPath:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
     
@@ -593,7 +593,7 @@
     
     NSString *path = [params objectForKey:@"path"];
     
-    if([m_pdf saveDocumentAtPath:path])
+    if([m_pdf saveDocumentToPath:path])
     {
         [self cdvOkWithMessage:@"Success"];
     } else {

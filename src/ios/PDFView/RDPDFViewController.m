@@ -2436,7 +2436,7 @@ extern NSMutableString *pdfPath;
 
 #pragma mark - Save document
 
-- (bool)saveDocumentAtPath:(NSString *)path
+- (bool)saveDocumentToPath:(NSString *)path
 {
     if ([m_doc saveAs:path: NO]) return YES;
     else return NO;

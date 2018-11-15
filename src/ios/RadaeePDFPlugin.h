@@ -117,7 +117,7 @@
 - (void)renderAnnotToFile:(CDVInvokedUrlCommand *)command;
 - (void)flatAnnots:(CDVInvokedUrlCommand *)command;
 - (void)flatAnnotAtPage:(CDVInvokedUrlCommand *)command;
-- (void)saveDocumentAtPath:(CDVInvokedUrlCommand *)command;
+- (void)saveDocumentToPath:(CDVInvokedUrlCommand *)command;
 
 // Form Manager
 

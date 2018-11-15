@@ -175,7 +175,7 @@
 
 - (bool)flatAnnotAtPage:(int)page;
 - (bool)flatAnnots;
-- (bool)saveDocumentAtPath:(NSString *)path;
+- (bool)saveDocumentToPath:(NSString *)path;
 
 // Form Manager
 

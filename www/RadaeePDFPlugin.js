@@ -194,10 +194,10 @@ RadaeePDFPlugin.prototype.flatAnnots = function (params, successCallback, errorC
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'flatAnnots', [params]);
 };
 
-RadaeePDFPlugin.prototype.saveDocumentAtPath = function (params, successCallback, errorCallback) {
+RadaeePDFPlugin.prototype.saveDocumentToPath = function (params, successCallback, errorCallback) {
         params = params || {};
 
-        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'saveDocumentAtPath', [params]);
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'saveDocumentToPath', [params]);
 };
 
 // Callbacks
