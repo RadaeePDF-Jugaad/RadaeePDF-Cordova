@@ -27,34 +27,21 @@
 {
 }
 
--(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate mode:(int)mode elementGap:(int)gap elementHeight:(int)height gridMode:(int)gridMode
+-(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate
 {
     //GEAR
     [self vClose];
     //END
     m_doc = doc;
-    
-    if (mode == 2) {
-        m_view = [[PDFVThmb alloc] init:mode:false :height * m_scale :gridMode];
-    } else {
-        m_view = [[PDFVThmb alloc] init:mode:false];
-    }
-    
-    
+    m_view = [[PDFVThmb alloc] init:0:false];
     m_delegate = delegate;
     
     struct PDFVThreadBack tback;
     tback.OnPageRendered = @selector(OnPageRendered:);
     //tback.OnFound = @selector(OnFound:);
     self.backgroundColor = (thumbBackgroundColor != 0) ? UIColorFromRGB(thumbBackgroundColor) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
-    
-    if (mode == 2) {
-        [m_view vOpen:doc :gap : self: &tback];
-    }
-    else {
-        [m_view vOpen:doc :gap : self: &tback];
-    }
-    
+    int gap = 4;
+    [m_view vOpen:doc :gap: self: &tback];
     [m_view vResize:m_w :m_h];
     self.contentSize = CGSizeMake([m_view vGetDocW]/m_scale, [m_view vGetDocH]/m_scale);
     CGPoint pt;
@@ -68,11 +55,7 @@
     [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
     m_status = tsta_none;
     self.delegate = self;
-}
-
--(void)vOpen:(PDFDoc *)doc :(id<PDFThumbViewDelegate>)delegate
-{
-    [self vOpen:doc :delegate mode:0 elementGap:4 elementHeight:0 gridMode:0];
+//    m_delegate = nil;
 }
 
 -(void)vGoto:(int)pageno
@@ -136,31 +119,6 @@
     //NSLog(@"scrollViewDidEndDecelerating");
 }
 
-- (void)didRotate
-{
-    //needed if set a static scale
-    [self refresh];
-    
-    //for dynamic scale need to destroy and re-render the thumbview
-    /*
-    [m_view vClose];
-    m_view = [[PDFVThmb alloc] init:2:false];
-    
-    struct PDFVThreadBack tback;
-    tback.OnPageRendered = @selector(OnPageRendered:);
-    [m_view vOpen:m_doc :20 : self: &tback];
-    
-    [m_view vResize:m_w :m_h];
-    self.contentSize = CGSizeMake([m_view vGetDocW]/m_scale, [m_view vGetDocH]/m_scale);
-    CGPoint pt;
-    pt.x = [m_view vGetX]/m_scale;
-    pt.y = [m_view vGetY]/m_scale;
-    self.contentOffset = pt;
-    
-    [self refresh];
-     */
-}
-
 -(void)refresh
 {
     [self setNeedsDisplay];
@@ -219,7 +177,7 @@
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    NSUInteger cnt = [allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
@@ -240,7 +198,7 @@
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    NSUInteger cnt = [allTouches count];
     
     if( cnt == 1 )
     {
@@ -257,7 +215,7 @@
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    NSUInteger cnt = [allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
@@ -314,6 +272,12 @@
     if (thumbBackgroundColor != 0) {
         self.backgroundColor = UIColorFromRGB(thumbBackgroundColor);
     }
+}
+
+- (void)didRotate
+{
+    //needed if set a static scale
+    [self refresh];
 }
 
 @end

@@ -7,13 +7,9 @@
 //
 
 #import "SearchResultTableViewController.h"
+#import "RDExtendedSearch.h"
 
 @implementation SearchResultTableViewCell
-
-- (void)awakeFromNib
-{
-    // Initialization code
-}
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {

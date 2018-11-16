@@ -25,7 +25,6 @@
 {
     PDF_DIB m_dib;
 }
-
 @property (nonatomic) bool cached;
 
 @property (readonly) PDF_DIB handle;
@@ -973,6 +972,7 @@
  * @param text contents to be set.in MultiLine mode: '\r' or '\n' means change line.in password mode the edit box always display "*". 
  * @return true or false.
  */
+- (bool)addEditText:(PDFPage *)page rect:(PDF_RECT)rect;
 -(bool)setEditText:(NSString *)val;
 -(bool)setEditFont:(PDFDocFont *)font;
 
@@ -1094,7 +1094,7 @@
 -(int)getSignStatus;
 -(PDFSign *)getSign;
 -(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect;
--(BOOL)canMoveAnnot;
+- (BOOL)canMoveAnnot;
 -(PDF_OBJ_REF)getRef;
 
 @end
@@ -1405,6 +1405,7 @@
  * @return true or false.
  */
 -(bool)addContent:(PDFPageContent *)content :(bool)flush;
+- (bool)addAnnotEditText:(const PDF_RECT *)rect;
 @end
 
 @interface PDFImportCtx : NSObject
@@ -1448,11 +1449,6 @@
 -(int)openWithCert:(NSString *)path :(NSString *)cert_file :(NSString *)password;
 -(int)openMemWithCert:(void *)data :(int)data_size : (NSString *)cert_file :(NSString *)password;
 -(int)openStreamWithCert:(id<PDFStream>)stream : (NSString *)cert_file :(NSString *)password;
-
-
-
-
-
 /**
  * @brief create a empty PDF document
  * @param path path to create
@@ -1553,6 +1549,7 @@
  * @return height value.
  */
 -(float)pageHeight:(int) pageno;
+-(NSString *)pageLabel:(int)pageno;
 /**
  * @brief get first root outline item.
  * @return handle value of first root outline item. or null if no outlines.

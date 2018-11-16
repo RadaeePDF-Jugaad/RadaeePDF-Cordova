@@ -24,7 +24,6 @@
 	bool is_waitting;
 	PDFVEvent *m_eve;
 }
-
 -(void)find_start:(PDFDoc *)doc :(int)page_start :(NSString *)str :(bool)match_case :(bool) whole;
 -(int)find_prepare:(int) dir;
 -(int)find;

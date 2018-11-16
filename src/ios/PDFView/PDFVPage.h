@@ -2,6 +2,7 @@
 #include "PDFObjc.h"
 #include "PDFVGlobal.h"
 #include "PDFVCanvas.h"
+#include "RDGlobal.h"
 
 @interface PDFVCache : NSObject
 {

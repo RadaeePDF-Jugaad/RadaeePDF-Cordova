@@ -7,11 +7,12 @@
 {
     CGContextRef m_ctx;
     float m_scale;
+    bool darkMode;
 }
 -(id)init:(CGContextRef)ctx :(float)scale;
--(void)DrawThumbBmp:(PDFDIB *)dib :(int)x :(int)y :(int)page;
--(void)DrawBmp : (PDFDIB *)dib : (int)x :(int)y ;
--(void)DrawBmp : (PDFDIB *)dib : (int)x : (int)y : (int)w : (int)h;
+-(void)DrawThumbBmp:(PDFDIB *)dib :(int)x :(int)y :(int)page :(bool)complete;
+-(void)DrawBmp : (PDFDIB *)dib : (int)x :(int)y :(bool)complete;
+-(void)DrawBmp : (PDFDIB *)dib : (int)x : (int)y : (int)w : (int)h :(bool)complete;
 //-(void)Erase: (int) color;
 -(void)FillRect:(CGRect)rect : (int)color;
 -(CGContextRef)context;

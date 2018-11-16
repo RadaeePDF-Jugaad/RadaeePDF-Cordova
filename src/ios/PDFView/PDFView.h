@@ -14,6 +14,7 @@
 #import "ReaderHandler.h"
 #import "RDUtils.h"
 #import "ActionStackManager.h"
+#import "RDFormManager.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
@@ -46,25 +47,33 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText :(float)textSize;
 - (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index;
 - (void)OnAnnotList:(PDFAnnot *)annot items :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
-
 - (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
 
+//touches delegate methods
+- (void)touchesOnViewBegan:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)touchesOnViewMoved:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)touchesOnViewEnded:(NSSet *)touches withEvent:(UIEvent *)event;
 @end
 
-@interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,UIPickerViewDelegate,UIPickerViewDataSource>
+@interface PDFView : UIScrollView<PDFVInnerDel, UIScrollViewDelegate,PDFJSDelegate>
 {
 #ifdef FTS_ENABLED
     FTSOccurrence *currentOccurrence;
 #endif
-    
+    UIView *aview;
     ActionStackManager *actionManger;
     
     UIImageView *imgAnnot;
+    NSString *tmpImage;
+    double lastAngle;
     
     BOOL readOnlyEnabled;
     BOOL autoSaveEnabled;
     
     BOOL coverPage;
+    
+    BOOL isResizing;
+    BOOL isRotating;
     
     int doubleTapZoomMode;
     int readerBackgroundColor;
@@ -192,6 +201,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (BOOL)vImageStart;
 - (void)vImageCancel;
 - (void)vImageEnd;
+- (BOOL)useTempImage;
 
 -(void)vLockSide:(bool)lock;
 	

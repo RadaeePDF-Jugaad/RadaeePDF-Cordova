@@ -115,6 +115,9 @@
 - (void)encryptDocAs:(CDVInvokedUrlCommand *)command;
 - (void)addAnnotAttachment:(CDVInvokedUrlCommand *)command;
 - (void)renderAnnotToFile:(CDVInvokedUrlCommand *)command;
+- (void)flatAnnots:(CDVInvokedUrlCommand *)command;
+- (void)flatAnnotAtPage:(CDVInvokedUrlCommand *)command;
+- (void)saveDocumentToPath:(CDVInvokedUrlCommand *)command;
 
 // Form Manager
 

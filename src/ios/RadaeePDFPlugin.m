@@ -130,7 +130,7 @@
     
     [self readerInit];
     
-    int result = [m_pdf PDFOpen:filePath :password atPage:page readOnly:readOnly autoSave:autoSave];
+    int result = [m_pdf PDFOpen:filePath :password atPage:page readOnly:readOnly autoSave:autoSave author:@""];
     
     NSLog(@"%d", result);
     if(result != err_ok && result != err_open){
@@ -373,20 +373,16 @@
     [m_pdf setHideGridImage:YES];
     
     if (disableToolbar) {
-        [m_pdf setHideViewModeImage:YES];
         [m_pdf setHideSearchImage:YES];
         [m_pdf setHideDrawImage:YES];
         [m_pdf setHideSelImage:YES];
-        [m_pdf setHideOutlineImage:YES];
         [m_pdf setHideUndoImage:YES];
         [m_pdf setHideRedoImage:YES];
         [m_pdf setHideMoreImage:YES];
     } else {
-        [m_pdf setHideViewModeImage:NO];
         [m_pdf setHideSearchImage:NO];
         [m_pdf setHideDrawImage:NO];
         [m_pdf setHideSelImage:NO];
-        [m_pdf setHideOutlineImage:NO];
         [m_pdf setHideUndoImage:NO];
         [m_pdf setHideRedoImage:NO];
         [m_pdf setHideMoreImage:NO];
@@ -561,6 +557,49 @@
     } else {
         [self cdvErrorWithMessage:@"Failure"];
     }
+}
+
+- (void)flatAnnots:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    if([m_pdf flatAnnots])
+    {
+        [self cdvOkWithMessage:@"Success"];
+    } else {
+        [self cdvErrorWithMessage:@"Failure"];
+    }
+}
+- (void)flatAnnotAtPage:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    int pageno = [[params objectForKey:@"page"] intValue];
+    
+    if([m_pdf flatAnnotAtPage:pageno])
+    {
+        [self cdvOkWithMessage:@"Success"];
+    } else {
+        [self cdvErrorWithMessage:@"Failure"];
+    }
+    
+}
+- (void)saveDocumentToPath:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    NSString *path = [params objectForKey:@"path"];
+    
+    if([m_pdf saveDocumentToPath:path])
+    {
+        [self cdvOkWithMessage:@"Success"];
+    } else {
+        [self cdvErrorWithMessage:@"Failure"];
+    }
+    
 }
 
 #pragma mark - Settings

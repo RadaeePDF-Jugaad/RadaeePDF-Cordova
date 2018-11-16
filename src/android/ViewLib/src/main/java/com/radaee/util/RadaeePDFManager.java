@@ -418,6 +418,18 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().renderAnnotToFile(page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
     }
 
+	public boolean flatAnnotAtPage(int page) {
+        return RadaeePluginCallback.getInstance().flatAnnotAtPage(page);
+    }
+
+    public boolean flatAnnots() {
+        return RadaeePluginCallback.getInstance().flatAnnots();
+    }
+
+    public boolean saveDocumentToPath(String path) {
+        return RadaeePluginCallback.getInstance().saveDocumentToPath(path);
+    }
+	
     @Override
     public void willShowReader() {
         Global.def_view = mViewMode;

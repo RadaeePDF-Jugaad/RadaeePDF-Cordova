@@ -46,6 +46,13 @@ struct PDFV_POS
 	PDFVThread *m_thread;
 	PDFVFinder *m_finder;
 	id<PDFVInnerDel> m_del;
+    
+    // custom scales
+    float *m_widths;
+    float *m_heights;
+    float *m_scales_min;
+    float *m_scales_max;
+    float *m_scales;
 }
 -(void)vResize:(int)w : (int)h;
 -(void)vClose;
@@ -64,8 +71,11 @@ struct PDFV_POS
 -(void)vMoveTo:(int)x :(int)y;
 -(void)vZoomStart;
 -(float)vGetScale;
+-(float)vGetScale:(int)page;
 -(float)vGetScaleMin;
+-(float)vGetScaleMin:(int)page;
 -(void)vSetScale:(float) scale;
+-(void)vSetScale:(float)scale page:(int)page;
 -(void)vSetSel:(int)x1 :(int)y1 :(int)x2 :(int)y2;
 -(void)vSetSelWholeWord:(int)x1 : (int)y1 : (int)x2 : (int)y2;
 -(void)vClearSel;
@@ -77,6 +87,7 @@ struct PDFV_POS
 -(void)vRenderSync:(int)pageno;
 - (float)getWidth;
 - (float)getHeight;
+- (CGImageRef )vGetImageRefForPage:(int)pg withWidth:(int)iw andHeight:(int)ih withBackground:(BOOL)hasBackground;
 @end
 
 @interface PDFVVert: PDFV
@@ -122,10 +133,27 @@ struct PDFV_POS
 
 @interface PDFVThmb: PDFV
 {
-    int m_grid_mode;
-    int m_element_height;
 	int m_orientation;
 	int m_sel;
+    bool m_rtol;
+}
+-(id)init:(int)orientation :(bool)rtol;
+-(void)vOpen:(PDFDoc *) doc :(int)page_gap :(id<PDFVInnerDel>)notifier :(const struct PDFVThreadBack *)disp;
+-(void)vClose;
+-(void)vLayout;
+-(void)vDraw:(PDFVCanvas *)canvas :(bool)zooming;
+-(void)vSetSel:(int)pageno;
+-(int)vGetSel;
+-(void)vRenderAsync:(int)pageno;
+-(void)vRenderSync:(int)pageno;
+@end
+
+@interface PDFVGrid: PDFV
+{
+    int m_grid_mode;
+    int m_element_height;
+    int m_orientation;
+    int m_sel;
     bool m_rtol;
 }
 -(id)init:(int)orientation :(bool)rtol;
@@ -133,7 +161,6 @@ struct PDFV_POS
 -(void)vOpen:(PDFDoc *) doc :(int)page_gap :(id<PDFVInnerDel>)notifier :(const struct PDFVThreadBack *)disp;
 -(void)vClose;
 -(void)vLayout;
-//-(void)vGetPos :(struct PDFV_POS *)pos :(int)x :(int)y;
 -(void)vDraw:(PDFVCanvas *)canvas :(bool)zooming;
 -(void)vSetSel:(int)pageno;
 -(int)vGetSel;

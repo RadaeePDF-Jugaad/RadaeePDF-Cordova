@@ -42,6 +42,7 @@ extern uint annotStrikeoutColor;
 {
     if( self = [super init] )
     {
+        _cached = false;
 	    m_dib = NULL;
     }
     return self;
@@ -51,7 +52,6 @@ extern uint annotStrikeoutColor;
 {
     if( self = [super init] )
     {
-        _cached = false;
 	    m_dib = Global_dibGet(NULL, width, height);
         memset([self data],255,width * height *4);
     }
@@ -904,7 +904,6 @@ extern uint annotStrikeoutColor;
 	Page_setAnnotHide( m_page, m_handle, hide );
 	return true;
 }
-
 -(bool)render:(PDFDIB *)dib :(int)back_color
 {
 	[dib erase:back_color];
@@ -1328,7 +1327,7 @@ extern uint annotStrikeoutColor;
 
 - (BOOL)canMoveAnnot
 {
-    return (self.type == 4 || self.type == 5 || self.type == 6 || self.type == 15);
+    return (self.type == 4 || self.type == 5 || self.type == 6 || self.type == 13 || self.type == 15 || self.type == 1);
 }
 
 -(PDF_OBJ_REF)getRef
@@ -1339,7 +1338,7 @@ extern uint annotStrikeoutColor;
 
 @implementation PDFPage
 @synthesize handle = m_page;
--(id)init
+-(id)init;
 {
     if( self = [super init] )
     {
@@ -1422,7 +1421,6 @@ extern uint annotStrikeoutColor;
 -(NSString *)objsString:(int)from :(int)to
 {
     if( to <= from ) return NULL;
-    to++;
     char *buf = (char *)malloc(4 * (to - from) + 8);
     Page_objsGetString(m_page, from, to, buf, 4 * (to - from) + 4);
     NSString *str = [NSString stringWithUTF8String:buf];
@@ -1565,6 +1563,10 @@ extern uint annotStrikeoutColor;
 -(bool)addContent:(PDFPageContent *)content :(bool)flush
 {
 	return Page_addContent( m_page, content.handle, flush );
+}
+- (bool)addAnnotEditText:(const PDF_RECT *)rect
+{
+    return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF000000);
 }
 -(void)dealloc
 {
@@ -1826,6 +1828,10 @@ extern uint annotStrikeoutColor;
 -(float)pageHeight:(int) pageno
 {
     return Document_getPageHeight(m_doc, pageno);
+}
+-(NSString *)pageLabel:(int) pageno
+{
+    return Document_getPageLabel(m_doc, pageno);
 }
 
 -(PDFOutline *)rootOutline

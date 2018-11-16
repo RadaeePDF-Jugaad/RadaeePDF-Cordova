@@ -447,6 +447,12 @@ extern uint annotSquigglyColor;
     int start = [m_sel getStartIndex];
     int end = [m_sel getEndIndex];
     
+    if (start < 0 || end == 0) {
+        PDF_RECT rectNull;
+        rectNull.left = rectNull.right = rectNull.top = rectNull.bottom = 0;
+        return rectNull;
+    }
+    
     PDFPage *page = [self GetPage];
     [page objsStart];
     
@@ -476,13 +482,13 @@ extern uint annotSquigglyColor;
     if( m_bmp )
     {
         //NSTimeInterval time0 = [[NSDate date] timeIntervalSince1970]*1000;
-        [canvas DrawBmp: m_bmp: m_x: m_y: m_w: m_h];
+        [canvas DrawBmp: m_bmp: m_x: m_y: m_w: m_h :([m_cache Stat] == 1)];
         //NSTimeInterval time1 = [[NSDate date] timeIntervalSince1970]*1000 - time0;
         //NSLog(@"draw %d time: %d", m_pageno, (int)time1);
     }
     else if( m_cache && [m_cache Bmp] )
     {
-        [canvas DrawBmp: [m_cache Bmp]: m_x: m_y];
+        [canvas DrawBmp: [m_cache Bmp]: m_x: m_y :([m_cache Stat] == 1)];
     }
     else
         [canvas FillRect: CGRectMake(m_x, m_y, m_w, m_h): 0xFFFFFFFF];
@@ -512,7 +518,7 @@ extern uint annotSquigglyColor;
 -(void)DrawThumb:(PDFVCanvas *)canvas
 {
     if( m_thumb != nil && [m_thumb Bmp] != nil )
-        [canvas DrawThumbBmp:[m_thumb Bmp] :m_x :m_y :m_pageno]; // New method
+        [canvas DrawThumbBmp:[m_thumb Bmp] :m_x :m_y :m_pageno :([m_thumb Stat] == 1)]; // New method
     else
         [canvas FillRect: CGRectMake(m_x, m_y, m_w, m_h): 0xFFFFFFFF];
     if( m_sel != nil )

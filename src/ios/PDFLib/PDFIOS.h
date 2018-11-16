@@ -510,6 +510,7 @@ float Document_getPageWidth( PDF_DOC doc, int pageno );
  *	@return	height of page.
  */
 float Document_getPageHeight( PDF_DOC doc, int pageno );
+NSString *Document_getPageLabel(PDF_DOC doc, int pageno);
 /**
  *	@brief	get page count.
  *

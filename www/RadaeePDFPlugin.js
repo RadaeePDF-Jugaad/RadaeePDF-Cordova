@@ -182,6 +182,24 @@ RadaeePDFPlugin.prototype.renderAnnotToFile = function (params, successCallback,
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'renderAnnotToFile', [params]);
 };
 
+RadaeePDFPlugin.prototype.flatAnnotAtPage = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'flatAnnotAtPage', [params]);
+};
+
+RadaeePDFPlugin.prototype.flatAnnots = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'flatAnnots', [params]);
+};
+
+RadaeePDFPlugin.prototype.saveDocumentToPath = function (params, successCallback, errorCallback) {
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'saveDocumentToPath', [params]);
+};
+
 // Callbacks
                
 RadaeePDFPlugin.prototype.willShowReaderCallback = function (successCallback) {

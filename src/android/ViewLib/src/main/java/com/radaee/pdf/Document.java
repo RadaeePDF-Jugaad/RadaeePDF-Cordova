@@ -241,6 +241,7 @@ public class Document
 	protected long hand_val = 0;
 	private int page_count = 0;
 	private String mDocPath; //Nermeen
+	private String mDocPwd; //Manu
 	private static native long create( String path );
 	private static native long createForStream( PDFStream stream ) throws Exception;
 	private static native long open( String path, String password ) throws Exception;
@@ -712,6 +713,7 @@ public class Document
 	 */
 	public int Open( String path, String password )
 	{
+		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -752,6 +754,7 @@ public class Document
 	 */
 	public int OpenMem( byte[] data, String password )
 	{
+		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -790,6 +793,7 @@ public class Document
 	 */
 	public int OpenStream( PDFStream stream, String password )
 	{
+		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -813,6 +817,7 @@ public class Document
 	}
     public int OpenStreamWithoutLoadingPages( PDFStream stream, String password )
     {
+		mDocPwd = password; //Manu
         if( hand_val == 0 )
         {
             int ret = 0;
@@ -1449,6 +1454,9 @@ public class Document
 
 	public String getDocPath() {
 		return mDocPath;
+	}
+	public String getDocPwd() {
+		return mDocPwd;
 	}
 	public long CreateVNPage(int pageno, int cw, int ch, Bitmap.Config format)
 	{

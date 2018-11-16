@@ -1154,5 +1154,47 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			if(page >= m_view.PDFGetDoc().GetPageCount()) return "Page index error";
 			return CommonUtil.renderAnnotToFile(m_view.PDFGetDoc(), page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
 		}
+		
+		@Override
+		public boolean flatAnnotAtPage(int page) {
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+			if(page >= m_view.PDFGetDoc().GetPageCount()) return false;
+			Page ppage = m_view.PDFGetDoc().GetPage(page);
+			if (ppage != null) {
+				boolean res = ppage.FlatAnnots();
+				if (res && page == m_view.PDFGetCurrPage()){
+					VPage vpage = m_view.m_layout.vGetPage(m_view.PDFGetCurrPage());
+					m_view.m_layout.vRenderAsync(vpage);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean flatAnnots() {
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+			for (int i = 0 ; i < m_view.PDFGetDoc().GetPageCount() ; i++) {
+				if (!this.flatAnnotAtPage(i))
+					return false;
+			}
+			return true;
+		}
+
+		@Override
+		public boolean saveDocumentToPath(String path) {
+			String prefix = "file://";
+			if (path.indexOf(prefix) != -1) {
+				path = path.substring(path.indexOf(prefix) + prefix.length());
+			}
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+			if (m_view.PDFGetDoc().IsEncrypted()) {
+				byte[] id = "123456789abcdefghijklmnopqrstuvw".getBytes();
+				String pwd = m_view.PDFGetDoc().getDocPwd();
+				return m_view.PDFGetDoc().EncryptAs(path, pwd, pwd, 0x4, 4, id);
+			} else {
+				return m_view.PDFGetDoc().SaveAs(path, false);
+			}
+		}
 	};
 }
