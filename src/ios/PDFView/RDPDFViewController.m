@@ -506,7 +506,7 @@ extern NSMutableString *pdfPath;
                                                                 preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction* ok = [UIAlertAction
-                             actionWithTitle:@"Yes"
+                             actionWithTitle:NSLocalizedString(@"Yes", nil)
                              style:UIAlertActionStyleDefault
                              handler:^(UIAlertAction * action)
                              {
@@ -517,7 +517,7 @@ extern NSMutableString *pdfPath;
                                  
                              }];
         UIAlertAction* cancel = [UIAlertAction
-                                 actionWithTitle:@"No"
+                                 actionWithTitle:NSLocalizedString(@"No", nil)
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action)
                                  {
@@ -1984,7 +1984,7 @@ extern NSMutableString *pdfPath;
                                                                     preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction* ok = [UIAlertAction
-                                 actionWithTitle:@"Yes"
+                                 actionWithTitle:NSLocalizedString(@"Yes", nil)
                                  style:UIAlertActionStyleDefault
                                  handler:nil];
             
