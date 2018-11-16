@@ -2420,11 +2420,15 @@ extern NSMutableString *pdfPath;
 
 - (bool)flatAnnotAtPage:(int)page
 {
-    PDFPage *ppage = [m_doc page:page];
-    if ([ppage flatAnnots]) return YES;
-    else return NO;
+    if(page >= 0 && page < m_doc.pageCount)
+    {
+        PDFPage *ppage = [m_doc page:page];
+        return [ppage flatAnnots];
+    }
     
+    return NO;
 }
+
 - (bool)flatAnnots
 {
     for (int page = 0; page != [m_doc pageCount]; page++) {
@@ -2438,8 +2442,12 @@ extern NSMutableString *pdfPath;
 
 - (bool)saveDocumentToPath:(NSString *)path
 {
-    if ([m_doc saveAs:path: NO]) return YES;
-    else return NO;
+    NSString *prefix = @"file://";
+    if([path rangeOfString:prefix].location != NSNotFound)
+    {
+        path = [path substringFromIndex:prefix.length];
+    }
+    return [m_doc saveAs:path: NO];
 }
 
 #pragma mark - Form Manager
