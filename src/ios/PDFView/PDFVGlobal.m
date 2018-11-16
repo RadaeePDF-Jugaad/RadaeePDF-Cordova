@@ -17,72 +17,72 @@
 
 @implementation PDFVLocker
 -(id)init
-{
-    if( self = [super init] )
     {
-        pthread_mutex_init( &mutex, NULL );
+        if( self = [super init] )
+        {
+            pthread_mutex_init( &mutex, NULL );
+        }
+        return self;
     }
-    return self;
-}
 -(void)dealloc
-{
-    pthread_mutex_destroy( &mutex );
-}
+    {
+        pthread_mutex_destroy( &mutex );
+    }
 -(void)lock
-{
-    pthread_mutex_lock( &mutex );
-}
+    {
+        pthread_mutex_lock( &mutex );
+    }
 -(void)unlock
-{
-    pthread_mutex_unlock( &mutex );
-}
-@end
+    {
+        pthread_mutex_unlock( &mutex );
+    }
+    @end
 
 @implementation PDFVEvent
 -(id)init
-{
-    if( self = [super init] )
     {
-        pthread_cond_init( &m_event, NULL );
-        pthread_mutex_init( &mutex, NULL );
-        flags = 0;
+        if( self = [super init] )
+        {
+            pthread_cond_init( &m_event, NULL );
+            pthread_mutex_init( &mutex, NULL );
+            flags = 0;
+        }
+        return self;
     }
-    return self;
-}
 -(void)dealloc
-{
-    pthread_cond_destroy( &m_event );
-    pthread_mutex_destroy( &mutex );
-}
--(void)reset
-{
-    pthread_mutex_lock( &mutex );
-    flags = 0;
-    pthread_mutex_unlock( &mutex );
-}
--(void)notify
-{
-    pthread_mutex_lock( &mutex );
-    if( flags & 2 )
-        pthread_cond_signal( &m_event );
-    else
-        flags |= 1;
-    pthread_mutex_unlock( &mutex );
-}
--(void)wait
-{
-    pthread_mutex_lock( &mutex );
-    if( !(flags & 1) )
     {
-        flags |= 2;
-        pthread_cond_wait( &m_event, &mutex );
-        flags &= (~2);
+        pthread_cond_destroy( &m_event );
+        pthread_mutex_destroy( &mutex );
     }
-    else
+-(void)reset
+    {
+        pthread_mutex_lock( &mutex );
+        flags = 0;
+        pthread_mutex_unlock( &mutex );
+    }
+-(void)notify
+    {
+        pthread_mutex_lock( &mutex );
+        if( flags & 2 )
+        pthread_cond_signal( &m_event );
+        else
+        flags |= 1;
+        pthread_mutex_unlock( &mutex );
+    }
+-(void)wait
+    {
+        pthread_mutex_lock( &mutex );
+        if( !(flags & 1) )
+        {
+            flags |= 2;
+            pthread_cond_wait( &m_event, &mutex );
+            flags &= (~2);
+        }
+        else
         flags &= (~1);
-    pthread_mutex_unlock( &mutex );
-}
-@end
+        pthread_mutex_unlock( &mutex );
+    }
+    @end
 
 int g_def_view = 0;
 float g_zoom_level = 5;
@@ -149,13 +149,13 @@ void APP_Init()
     }
     
     if (isActive)
-        NSLog(@"License active");
+    NSLog(@"License active");
     else
-        NSLog(@"License not active");
+    NSLog(@"License not active");
     
-    NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat" inDirectory:@"cmaps"];
-    NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat" inDirectory:@"cmaps"];
-    NSString *cmyk_path = [[NSBundle mainBundle] pathForResource:@"cmyk_rgb" ofType:@"dat" inDirectory:@"cmaps"];
+    NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat"];
+    NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat"];
+    NSString *cmyk_path = [[NSBundle mainBundle] pathForResource:@"cmyk_rgb" ofType:@"dat"];
     
     // check resources
     if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
@@ -180,21 +180,69 @@ void APP_Init()
     Global_setCMYKProfile([cmyk_path UTF8String]);
     
     // Add Standard Resources
-    NSString *stdResFolder = [[NSBundle mainBundle] pathForResource:@"fdat/stdRes" ofType:nil];
-    int i = 0;
-    for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stdResFolder error:nil]) {
-        NSLog(@"%@", [stdResFolder stringByAppendingPathComponent:fpath]);
-        Global_loadStdFont(i, [[stdResFolder stringByAppendingPathComponent:fpath] UTF8String]);
-        i++;
-    }
+    NSString *fpath;
+    fpath = [[NSBundle mainBundle] pathForResource:@"00" ofType:nil];
+    Global_loadStdFont( 0, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"01" ofType:nil];
+    Global_loadStdFont( 1, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"02" ofType:nil];
+    Global_loadStdFont( 2, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"03" ofType:nil];
+    Global_loadStdFont( 3, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"04" ofType:nil];
+    Global_loadStdFont( 4, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"05" ofType:nil];
+    Global_loadStdFont( 5, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"06" ofType:nil];
+    Global_loadStdFont( 6, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"07" ofType:nil];
+    Global_loadStdFont( 7, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"08" ofType:nil];
+    Global_loadStdFont( 8, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"09" ofType:nil];
+    Global_loadStdFont( 9, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"10" ofType:nil];
+    Global_loadStdFont( 10, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"11" ofType:nil];
+    Global_loadStdFont( 11, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"12" ofType:nil];
+    Global_loadStdFont( 12, [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"13" ofType:nil];
+    Global_loadStdFont( 13, [fpath UTF8String] );
     
     // Add Standard Fonts
     Global_fontfileListStart();
-    NSString *stdFontFolder = [[NSBundle mainBundle] pathForResource:@"fdat/stdFont" ofType:nil];
-    for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stdFontFolder error:nil]) {
-        NSLog(@"%@", [stdFontFolder stringByAppendingPathComponent:fpath]);
-        Global_fontfileListAdd([[stdFontFolder stringByAppendingPathComponent:fpath] UTF8String]);
-    }
+    fpath = [[NSBundle mainBundle] pathForResource:@"argbsn00lp.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"arimo.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"arimob.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"arimobi.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"arimoi.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"cousine.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"cousineb.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"cousinebi.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"cousinei.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"rdf008.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"rdf013.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"tinos.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"tinosb.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"tinosbi.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    fpath = [[NSBundle mainBundle] pathForResource:@"tinosi.ttf" ofType:nil];
+    Global_fontfileListAdd( [fpath UTF8String] );
+    
     
     Global_fontfileListEnd();
     
@@ -319,10 +367,10 @@ void APP_Init()
     Global_setAnnotFont( "Arimo" );//Global_setAnnotFont( "BousungEG-Light-GB" );
     
     
-	Global_setAnnotTransparency(0x200040FF);
-	g_def_view = 0;
-	renderQuality = mode_normal;
-	g_zoom_level = 5;
+    Global_setAnnotTransparency(0x200040FF);
+    g_def_view = 0;
+    renderQuality = mode_normal;
+    g_zoom_level = 5;
     g_paging_enabled = false;
     g_double_page_enabled = true;
     g_curl_enabled = false;
