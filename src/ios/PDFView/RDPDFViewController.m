@@ -1167,17 +1167,6 @@ extern NSMutableString *pdfPath;
 
 - (void)drawRectangle
 {
-<<<<<<< HEAD
-    // remove annot toolbar before adding the new one (if exists)
-    if (annotToolBar) {
-        [annotToolBar removeFromSuperview];
-    }
-    annotToolBar = [UIToolbar new];
-    [annotToolBar sizeToFit];
-    //annotToolBar.barStyle = UIBarStyleBlackOpaque;
-=======
->>>>>>> beta
-    
     if(![m_view vRectStart]) {
         [self showDocReadonlyAlert];
     }
