@@ -555,7 +555,7 @@ extern NSMutableString *pdfPath;
                                message:@""
                                preferredStyle:UIAlertControllerStyleActionSheet];
         
-        UIAlertAction *viewMode = [UIAlertAction actionWithTitle:NSLocalizedString(@"View mode", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
+        UIAlertAction *viewMode = [UIAlertAction actionWithTitle:NSLocalizedString(@"View Mode", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
                                    {
                                        [self showViewModeTableView];
                                    }];
