@@ -105,14 +105,6 @@ NSString *g_author = @"";
 
 void APP_Init()
 {
-    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"Radaee" forKey:@"actCompany"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"radaee_com@yahoo.cn" forKey:@"actEmail"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"89WG9I-HCL62K-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO" forKey:@"actSerial"];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"actActivationType"];
-    
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
     BOOL isActive = NO;
     int licenseType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"actActivationType"] intValue];
     NSLog(@"LICENSE: %i", licenseType);
@@ -152,6 +144,8 @@ void APP_Init()
     NSLog(@"License active");
     else
     NSLog(@"License not active");
+    
+    [[NSUserDefaults standardUserDefaults] setBool:isActive forKey:@"actIsActive"];
     
     NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat"];
     NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat"];
