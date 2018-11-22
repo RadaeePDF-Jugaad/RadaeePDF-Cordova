@@ -617,7 +617,7 @@ extern NSMutableString *pdfPath;
     {
         moreTVContainer = [[RDMoreTableViewController alloc] init];
         moreTVContainer.modalPresentationStyle = UIModalPresentationPopover;
-        [moreTVContainer setPreferredContentSize:CGSizeMake(300, 300)];
+        [moreTVContainer setPreferredContentSize:CGSizeMake(300, 320)];
         moreTVContainer.delegate = self;
         moreTVContainer.viewModeImage = _viewModeImage;
         moreTVContainer.addBookmarkImage = _addBookmarkImage;
@@ -1344,7 +1344,15 @@ extern NSMutableString *pdfPath;
                                         UIActivityTypeAddToReadingList, UIActivityTypePostToFlickr,
                                         UIActivityTypePostToVimeo, UIActivityTypePostToTencentWeibo];
         a.excludedActivityTypes = excludedActivities;
-        b_outline = true;
+        
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            a.modalPresentationStyle = UIModalPresentationPopover;
+            UIPopoverPresentationController *popover = a.popoverPresentationController;
+            popover.barButtonItem = rdToolBar.moreButton; // search bar button item
+        } else {
+            b_outline = true;
+        }
+        
         [self presentViewController:a animated:YES completion:nil];
         
     }
