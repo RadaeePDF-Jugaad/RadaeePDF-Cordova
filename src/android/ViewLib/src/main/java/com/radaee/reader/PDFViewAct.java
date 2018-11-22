@@ -26,15 +26,13 @@ import android.widget.Toast;
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page.Annotation;
-import com.radaee.reader.PDFLayoutView.PDFLayoutListener;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.util.RadaeePluginCallback;
-import com.radaee.view.PDFLayout;
-import com.radaee.view.VPage;
+import com.radaee.view.ILayoutView;
 import com.radaee.viewlib.R;
 
-public class PDFViewAct extends Activity implements PDFLayoutListener {
+public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListener {
     private String mFindQuery = "";
     private boolean mDidShowReader = false;
 
@@ -317,7 +315,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener {
     }
 
     @Override
-    public void OnPDFAnnotTapped(VPage vpage, Annotation annot) {
+    public void OnPDFAnnotTapped(int pageno, Annotation annot) {
         if (m_controller != null)
             m_controller.OnAnnotTapped(annot);
         if (annot != null)
@@ -424,39 +422,35 @@ public class PDFViewAct extends Activity implements PDFLayoutListener {
     }
 
     @Override
-    public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y) {
-        float mCurZoomLevel = layout.vGetZoom();
+    public boolean OnPDFDoubleTapped(float x, float y) {
+        float mCurZoomLevel = m_view.PDFGetZoom();
         if (m_view.PDFGetScale() <= m_view.PDFGetMinScale())
             Global.zoomStep = 1;
         if ((mCurZoomLevel > Global.zoomLevel && Global.zoomStep > 0) ||
                 (mCurZoomLevel == 1 && Global.zoomStep < 0)) //reverse zoom step
             Global.zoomStep *= -1;
 
-        layout.vZoomSet((int) x, (int) y, layout.vGetPos((int) x, (int) y), mCurZoomLevel + Global.zoomStep);
+        m_view.PDFSetZoom((int) x, (int) y, m_view.PDFGetPos((int) x, (int) y), mCurZoomLevel + Global.zoomStep);
         RadaeePluginCallback.getInstance().onDoubleTapped(m_view.PDFGetCurrPage(), x, y);
         return true;
     }
 
     @Override
-    public void OnPDFLongPressed(PDFLayout layout, float x, float y) {
+    public void OnPDFLongPressed(float x, float y) {
         RadaeePluginCallback.getInstance().onLongPressed(m_view.PDFGetCurrPage(), x, y);
     }
 
     @Override
-    public void onPDFPageRendered(int pageno) {
+    public void OnPDFPageRendered(ILayoutView.IVPage vpage) {
         if (!mDidShowReader) {
             RadaeePluginCallback.getInstance().didShowReader();
             mDidShowReader = true;
         }
-    }
-
-    @Override
-    public void onPDFCacheRendered(int pageno) {
         findViewById(R.id.progress).setVisibility(View.GONE);
     }
 
     @Override
-    public void onPDFSearchFinished(boolean found) {
+    public void OnPDFSearchFinished(boolean found) {
         if (!mFindQuery.equals(m_controller.getFindQuery())) {
             mFindQuery = m_controller.getFindQuery();
             RadaeePluginCallback.getInstance().didSearchTerm(mFindQuery, found);
@@ -464,7 +458,7 @@ public class PDFViewAct extends Activity implements PDFLayoutListener {
     }
 
     @Override
-    public void onPDFPageDisplayed(Canvas canvas, VPage vpage) {
+    public void OnPDFPageDisplayed(Canvas canvas, ILayoutView.IVPage vpage) {
     }
 
     /**

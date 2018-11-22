@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="15dp"
-        android:text="Subject:" />
+        android:text="@string/note_subject" />
 
     <EditText
         android:id="@+id/txt_subj"
@@ -28,9 +28,9 @@
         android:id="@+id/lab_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/txt_subj"
-        android:text="Content:" />
+        android:layout_alignParentLeft="true"
+        android:text="@string/note_text" />
 
     <EditText
         android:id="@+id/txt_content"

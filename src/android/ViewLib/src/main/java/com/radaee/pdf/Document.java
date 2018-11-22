@@ -2,6 +2,7 @@ package com.radaee.pdf;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.radaee.pdf.adv.Obj;
 import com.radaee.pdf.adv.Ref;
@@ -242,11 +243,15 @@ public class Document
 	private int page_count = 0;
 	private String mDocPath; //Nermeen
 	private String mDocPwd; //Manu
+	private boolean isAsset = false; // Dario
 	private static native long create( String path );
 	private static native long createForStream( PDFStream stream ) throws Exception;
 	private static native long open( String path, String password ) throws Exception;
 	private static native long openMem( byte[] data, String password ) throws Exception;
 	private static native long openStream( PDFStream stream, String password ) throws Exception;
+	private static native long openWithCert( String path, String cert_file, String password ) throws Exception;
+	private static native long openMemWithCert( byte[] data, String cert_file, String password ) throws Exception;
+	private static native long openStreamWithCert( PDFStream stream, String cert_file, String password ) throws Exception;
     private static native long openStreamNoLoadPages( PDFStream stream, String password ) throws Exception;
 	private static native boolean setCache( long hand, String path );
     private static native boolean runJS(long hand, String js, PDFJSDelegate del) throws Exception;
@@ -734,6 +739,45 @@ public class Document
 			else {
 				page_count = getPageCount(hand_val);
 				mDocPath = path; // Nermeen
+				isAsset = false;
+			}
+			return ret;
+		}
+		return 0;
+	}
+
+	/**
+	 * open PDF, and decrypt PDF using public-key.<br/>
+	 * this feature only enabled on signed feature version. which native libs has bigger size.
+	 * @param path PDF file path
+	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
+	 * @param password password to open cert file.
+	 * @return same as password version.
+	 */
+	public int Open( String path, String cert_file, String password )
+	{
+		mDocPwd = password; //Manu
+		if( hand_val == 0 )
+		{
+			int ret = 0;
+			try {
+				hand_val = openWithCert(path, cert_file, password);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				hand_val = -10;
+			}
+			if( hand_val <= 0 && hand_val >= -10 )//error
+			{
+				ret = (int)hand_val;
+				hand_val = 0;
+				page_count = 0;
+			}
+			else {
+				page_count = getPageCount(hand_val);
+				mDocPath = path; // Nermeen
+				isAsset = false;
 			}
 			return ret;
 		}
@@ -779,6 +823,40 @@ public class Document
 		return 0;
 	}
 	/**
+	 * open PDF, and decrypt PDF using public-key.<br/>
+	 * this feature only enabled on signed feature version. which native libs has bigger size.
+	 * @param data data for whole PDF file in byte array. developers should retain array data, till document closed.
+	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
+	 * @param password password to open cert file.
+	 * @return same as password version.
+	 */
+	public int OpenMem( byte[] data, String cert_file, String password )
+	{
+		mDocPwd = password; //Manu
+		if( hand_val == 0 )
+		{
+			int ret = 0;
+			try {
+				hand_val = openMemWithCert(data, cert_file, password);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				hand_val = -10;
+			}
+			if( hand_val <= 0 && hand_val >= -10 )//error
+			{
+				ret = (int)hand_val;
+				hand_val = 0;
+				page_count = 0;
+			}
+			else
+				page_count = getPageCount(hand_val);
+			return ret;
+		}
+		return 0;
+	}
+	/**
 	 * open document from stream.
 	 * first time, SDK try password as user password, and then try password as owner password.
 	 * @param stream PDFStream object.
@@ -803,6 +881,40 @@ public class Document
             {
                 e.printStackTrace();
             }
+			if( hand_val <= 0 && hand_val >= -10 )//error
+			{
+				ret = (int)hand_val;
+				hand_val = 0;
+				page_count = 0;
+			}
+			else
+				page_count = getPageCount(hand_val);
+			return ret;
+		}
+		return 0;
+	}
+
+	// Method to store the Asset name.
+	// Optionally used to allow the framework to enable Printing feature
+	public int OpenStream( String name, PDFStream stream, String password ) {
+		mDocPath = name;
+		isAsset = true;
+		mDocPwd = password; //Manu
+		return OpenStream(stream, password);
+	}
+
+	public int OpenStream( PDFStream stream, String cert_file, String password )
+	{
+		mDocPwd = password; //Manu
+		if( hand_val == 0 )
+		{
+			int ret = 0;
+			try {
+				hand_val = openStreamWithCert(stream, cert_file, password);
+			}catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 			if( hand_val <= 0 && hand_val >= -10 )//error
 			{
 				ret = (int)hand_val;
@@ -1455,9 +1567,13 @@ public class Document
 	public String getDocPath() {
 		return mDocPath;
 	}
+
 	public String getDocPwd() {
 		return mDocPwd;
 	}
+
+	public boolean isAsset() { return isAsset; }
+
 	public long CreateVNPage(int pageno, int cw, int ch, Bitmap.Config format)
 	{
 		return VNPage.create(hand_val, pageno, cw, ch, format);

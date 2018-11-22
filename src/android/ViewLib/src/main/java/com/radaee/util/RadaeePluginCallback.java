@@ -125,8 +125,8 @@ public class RadaeePluginCallback {
         return mControlListener != null ? mControlListener.renderAnnotToFile(page, annotIndex,
                 renderPath, bitmapWidth, bitmapHeight) : "ERROR";
     }
-	
-	public boolean flatAnnotAtPage(int page) {
+
+    public boolean flatAnnotAtPage(int page) {
         return mControlListener != null && mControlListener.flatAnnotAtPage(page);
     }
 
@@ -176,7 +176,7 @@ public class RadaeePluginCallback {
         boolean onAddAnnotAttachment(String attachmentPath);
         boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id);
         String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight);
-		boolean flatAnnotAtPage(int page);
+        boolean flatAnnotAtPage(int page);
         boolean flatAnnots();
         boolean saveDocumentToPath(String path);
     }

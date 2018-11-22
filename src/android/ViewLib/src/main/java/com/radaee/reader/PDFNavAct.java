@@ -29,6 +29,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
 	private LinearLayout m_layout;
 	private PDFGridView m_grid;
 	private EditText m_path;
+	private String m_engine;
     private boolean m_pending = false;
     class OpenTask extends AsyncTask<Void, Integer, Integer>
     {
@@ -107,6 +108,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
         //    android:configChanges="orientation|keyboardHidden|screenSize"
         //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate. 
         Global.Init( this );
+        m_engine = getIntent().getStringExtra("ENGINE");
 		m_layout = (LinearLayout)LayoutInflater.from(this).inflate(R.layout.pdf_nav, null);
 		m_grid = (PDFGridView)m_layout.findViewById(R.id.pdf_nav);
 		m_path = (EditText)m_layout.findViewById(R.id.txt_path);
@@ -177,8 +179,17 @@ public class PDFNavAct extends Activity implements OnItemClickListener
 	}
     private void InitView(Document doc)//process to view PDF file
     {
+        if(m_engine != null && m_engine.compareTo("OPENGL") == 0)
+        {
+            PDFGLViewAct.ms_tran_doc = doc;
+            Intent intent = new Intent(this, PDFGLViewAct.class);
+            startActivity(intent);
+        }
+        else
+        {
 		PDFViewAct.ms_tran_doc = doc;
 		Intent intent = new Intent(this, PDFViewAct.class);  
 		startActivity(intent);
+        }
     }
 }

@@ -19,6 +19,6 @@
         android:id="@+id/chk_show"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Password" />
+        android:text="@string/show_password" />
 
 </LinearLayout>

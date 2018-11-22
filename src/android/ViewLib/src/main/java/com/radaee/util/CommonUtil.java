@@ -19,7 +19,7 @@ import com.radaee.pdf.PageContent;
 import com.radaee.pdf.ResImage;
 import com.radaee.pdf.adv.Obj;
 import com.radaee.pdf.adv.Ref;
-import com.radaee.reader.PDFLayoutView;
+import com.radaee.view.ILayoutView;
 import com.radaee.viewlib.R;
 
 import org.json.JSONArray;
@@ -269,7 +269,7 @@ public class CommonUtil {
         }
     }
 
-    public static void showPDFOutlines(final PDFLayoutView mPdfLayoutView, Context mContext) {
+    public static void showPDFOutlines(final ILayoutView mPdfLayoutView, Context mContext) {
         if (mPdfLayoutView.PDFGetDoc() != null) {
             if (mPdfLayoutView.PDFGetDoc().GetOutlines() == null) {
                 Toast.makeText(mContext, R.string.no_pdf_outlines, Toast.LENGTH_SHORT).show();

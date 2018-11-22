@@ -69,4 +69,5 @@
     <string name="pdf_print_not_available">الملف غير متاح للطباعة.</string>
     <string name="pdf_print_calculation_failed">فشل في إحصاء الصفحات.</string>
 
+    <string name="pdf_share_not_available">الملف غير متاح للطباعة.</string>
 </resources>

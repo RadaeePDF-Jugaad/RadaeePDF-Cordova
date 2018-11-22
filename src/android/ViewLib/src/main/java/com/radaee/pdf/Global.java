@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.15.3
+ * @version 3.50
  */
 public class Global
 {
@@ -408,6 +408,8 @@ public class Global
     public static int line_annot_color = 0x80FF0000;
     public static int line_annot_fill_color = 0x800000FF;
 
+	public static boolean fit_different_page_size = false;
+
 	static private void load_file(Resources res, int res_id, File save_file)
 	{
 		if( !save_file.exists() )
@@ -496,9 +498,10 @@ public class Global
 		load_cmaps( res, R.raw.cmaps, new File(files, "cmaps"), R.raw.umaps, new File(files, "umaps") );
 
 		// create temporary dictionary, to save media or attachment data.
-		File sdDir = Environment.getExternalStorageDirectory();
+		File sdDir = act.getExternalFilesDir("");
+		//File sdDir = Environment.getExternalStorageDirectory();
         File ftmp;
-		if (sdDir != null && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+		if (sdDir != null)
             ftmp = new File(sdDir, "rdtmp");
 		else
             ftmp = new File(act.getFilesDir(), "rdtmp");
@@ -772,7 +775,7 @@ public class Global
         // but not good support france, german and some EUR languages.
         // if DroidSansFallback not exits, we using Arimo, loading from resource, which has good support EUR languages.
 		// For arabic support use setAnnotFont("Amiri-Regular")
-        if (!setAnnotFont("DroidSansFallback") &&
+        if (//!setAnnotFont("DroidSansFallback") &&
             !setAnnotFont("Arimo") && face_name != null) {
             setAnnotFont(face_name);
         }
@@ -798,6 +801,7 @@ public class Global
 		render_mode = recommandedRenderMode();// 0,1,2 0:draft 1:normal 2:best with over print support.
 		dark_mode = false;// dark mode
 		zoomLevel = 3;
+		//hideAnnots(true);
 		setAnnotTransparency(annotTransparencyColor);
 	}
 

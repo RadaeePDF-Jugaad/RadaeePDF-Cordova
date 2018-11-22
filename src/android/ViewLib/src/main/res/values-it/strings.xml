@@ -31,10 +31,16 @@
     <string name="vertical">Verticale</string>
     <string name="horizontal">Orizzontale</string>
     <string name="dual_page">Pagina Doppia</string>
-    <string name="save_msg">Documento modificato.\r\nVuoi salvarlo?</string>
+    <string name="curl">Sfoglia</string>
+    <string name="reflow">Modalità testo</string>
+    <string name="save_msg">Documento modificato.\nVuoi salvarlo?</string>
     <string name="page_change_block">Non è possibile modificare la pagina mentre la pagina è ingrandita, fai uno Zoom-out prima!</string>
-	
+
+    <string name="read_only_annotation">La nota è in sola lettura</string>
 	<string name="note_content">Contenuto della Nota</string>
+    <string name="note_subject">Oggetto:</string>
+    <string name="show_password">Mostra password</string>
+    <string name="note_text">Testo:</string>
 	<string name="input_password">Inserire la Password</string>
 	<string name="loading_pdf">Caricamento PDF in corso…</string>
 	<string name="browse_open_file">Sfoglia e Apri il File</string>
@@ -68,6 +74,7 @@
     <string name="no_pdf_outlines">Il file non contiene un elenco di contenuti</string>
     <string name="pdf_print_not_available">File PDF non è disponibile per la stampa.</string>
     <string name="pdf_print_calculation_failed">Impossibile contare le pagine.</string>
+    <string name="pdf_share_not_available">File PDF non è disponibile per la condivisione.</string>
     <string name="confirm">Conferma</string>
     <string name="clear">Elimina</string>
     <string name="delete">Elimina</string>

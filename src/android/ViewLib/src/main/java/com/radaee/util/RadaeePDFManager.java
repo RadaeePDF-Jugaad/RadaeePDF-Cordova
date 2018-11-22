@@ -141,6 +141,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         intent.putExtra( "PDFAsset", path);
         intent.putExtra( "PDFPswd", password);
         intent.putExtra( "BMPFormat", bmpFormat);
+
         context.startActivity(intent);
     }
 
@@ -156,6 +157,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra( "PDFPath", path);
         intent.putExtra( "PDFPswd", password);
+
         context.startActivity(intent);
     }
 
@@ -418,7 +420,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().renderAnnotToFile(page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
     }
 
-	public boolean flatAnnotAtPage(int page) {
+    public boolean flatAnnotAtPage(int page) {
         return RadaeePluginCallback.getInstance().flatAnnotAtPage(page);
     }
 
@@ -429,7 +431,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     public boolean saveDocumentToPath(String path) {
         return RadaeePluginCallback.getInstance().saveDocumentToPath(path);
     }
-	
+
     @Override
     public void willShowReader() {
         Global.def_view = mViewMode;

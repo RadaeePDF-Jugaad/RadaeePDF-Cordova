@@ -30,10 +30,16 @@
     <string name="vertical">Vertical</string>
     <string name="horizontal">Horizontal</string>
     <string name="dual_page">Dual Page</string>
-    <string name="save_msg">Document modified.\r\nDo you want to save it?</string>
+    <string name="curl">Curl</string>
+    <string name="reflow">Text reflow</string>
+    <string name="save_msg">Document modified.\nDo you want to save it?</string>
     <string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
 
+    <string name="read_only_annotation">Read only annotation</string>
     <string name="note_content">Note Content</string>
+    <string name="note_subject">Subject:</string>
+    <string name="note_text">Content:</string>
+    <string name="show_password">Show password</string>
     <string name="input_password">Input Password</string>
     <string name="loading_pdf">Loading PDF file…</string>
     <string name="browse_open_file">Browse And Open File</string>

@@ -41,6 +41,7 @@ import com.radaee.util.CaptureSignature;
 import com.radaee.util.ComboList;
 import com.radaee.util.CommonUtil;
 import com.radaee.util.PopupEditAct;
+import com.radaee.view.ILayoutView;
 import com.radaee.view.PDFLayout;
 import com.radaee.view.PDFLayout.LayoutListener;
 import com.radaee.view.PDFLayout.PDFPos;
@@ -54,7 +55,8 @@ import com.radaee.viewlib.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PDFLayoutView extends View implements LayoutListener {
+public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
+
     static final protected int STA_NONE = 0;
     static final protected int STA_ZOOM = 1;
     static final protected int STA_SELECT = 2;
@@ -89,7 +91,7 @@ public class PDFLayoutView extends View implements LayoutListener {
     private float m_rects[];
     private VPage m_note_pages[];
     private int m_note_indecs[];
-    private PDFLayoutListener m_listener;
+	private ILayoutView.PDFLayoutListener m_listener;
     private VSel m_sel = null;
     private int m_edit_type = 0;
     private int m_combo_item = -1;
@@ -120,7 +122,7 @@ public class PDFLayoutView extends View implements LayoutListener {
             if (m_layout == null) return false;
             if (m_status == STA_NONE && e.getActionMasked() == MotionEvent.ACTION_UP) {
                 if (m_listener == null ||
-                        !m_listener.OnPDFDoubleTapped(m_layout, e.getX(), e.getY()))
+                        !m_listener.OnPDFDoubleTapped(e.getX(), e.getY()))
                     return false;
                 return true;
             }
@@ -136,7 +138,7 @@ public class PDFLayoutView extends View implements LayoutListener {
         public void onLongPress(MotionEvent e) {
             if (m_layout == null) return;
             if (m_status == STA_NONE && m_listener != null)
-                m_listener.OnPDFLongPressed(m_layout, e.getX(), e.getY());
+                m_listener.OnPDFLongPressed(e.getX(), e.getY());
         }
 
         @Override
@@ -179,8 +181,7 @@ public class PDFLayoutView extends View implements LayoutListener {
                     }
                 };
                 getContext().startActivity(intent);
-            } catch (Exception e) {
-            }
+            } catch (Exception e) { e.getMessage();  }
         }
 
         boolean[] mCheckedItems;
@@ -251,15 +252,15 @@ public class PDFLayoutView extends View implements LayoutListener {
                 if (page == null) m_annot = null;
                 else m_annot = page.GetAnnotFromPoint(m_annot_pos.x, m_annot_pos.y);
                 if (m_annot == null) {
-                    m_annot_page = null;
-                    m_annot_pos = null;
-                    m_annot_rect = null;
                     if (m_listener != null) {
                         if (m_status == STA_ANNOT)
-                            m_listener.OnPDFAnnotTapped(m_annot_page, null);
+                            m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, null);
                         else
                             m_listener.OnPDFBlankTapped();
                     }
+                    m_annot_page = null;
+                    m_annot_pos = null;
+                    m_annot_rect = null;
                     m_status = STA_NONE;
                 } else {
                     page.ObjsStart();
@@ -273,7 +274,7 @@ public class PDFLayoutView extends View implements LayoutListener {
                     int check = m_annot.GetCheckStatus();
                     if(m_annot.IsReadOnly()) {
                         Toast.makeText(getContext(), "Readonly annotation", Toast.LENGTH_SHORT).show();
-                        if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_page, m_annot);
+                        if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                     } else if (PDFCanSave() && check >= 0) {
                         switch (check) {
                             case 0:
@@ -360,7 +361,7 @@ public class PDFLayoutView extends View implements LayoutListener {
                     else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
                         handleSignatureField();
                     else if (PDFCanSave() && m_listener != null)
-                        m_listener.OnPDFAnnotTapped(m_annot_page, m_annot);
+                        m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                     invalidate();
                 }
                 return true;
@@ -419,46 +420,6 @@ public class PDFLayoutView extends View implements LayoutListener {
                 }
             }
         }
-    }
-
-    public interface PDFLayoutListener {
-        void onPDFPageRendered(int pageno);
-
-        void onPDFCacheRendered(int pageno);
-
-        void onPDFSearchFinished(boolean found);
-
-        void onPDFPageDisplayed(Canvas canvas, VPage vpage);
-
-        public void OnPDFPageModified(int pageno);
-
-        public void OnPDFPageChanged(int pageno);
-
-        public void OnPDFAnnotTapped(VPage vpage, Annotation annot);
-
-        public void OnPDFBlankTapped();
-
-        public void OnPDFSelectEnd(String text);
-
-        public void OnPDFOpenURI(String uri);
-
-        public void OnPDFOpenJS(String js);
-
-        public void OnPDFOpenMovie(String path);
-
-        public void OnPDFOpenSound(int[] paras, String path);
-
-        public void OnPDFOpenAttachment(String path);
-
-        public void OnPDFOpen3D(String path);
-
-        public void OnPDFZoomStart();
-
-        public void OnPDFZoomEnd();
-
-        public boolean OnPDFDoubleTapped(PDFLayout layout, float x, float y);
-
-        void OnPDFLongPressed(PDFLayout layout, float x, float y);
     }
 
     class PDFVPageSet {
@@ -1220,7 +1181,7 @@ public class PDFLayoutView extends View implements LayoutListener {
         invalidate();
     }
 
-    public void PDFOpen(Document doc, PDFLayoutListener listener) {
+    public void PDFOpen(Document doc, ILayoutView.PDFLayoutListener listener) {
         m_doc = doc;
         m_listener = listener;
         PDFSetView(Global.def_view);
@@ -1274,24 +1235,23 @@ public class PDFLayoutView extends View implements LayoutListener {
     public void OnPageRendered(int pageno) {
         invalidate();
         if (m_listener != null)
-            m_listener.onPDFPageRendered(pageno);
+            m_listener.OnPDFPageRendered(m_layout.vGetPage(pageno));
     }
 
     @Override
     public void OnCacheRendered(int pageno) {
-        if (m_listener != null)
-            m_listener.onPDFCacheRendered(pageno);
+        invalidate();
     }
 
     public void OnFound(boolean found) {
         if (found) invalidate();
         else Toast.makeText(getContext(), R.string.no_more_found, Toast.LENGTH_SHORT).show();
         if (m_listener != null)
-            m_listener.onPDFSearchFinished(found);
+            m_listener.OnPDFSearchFinished(found);
     }
 
     public void OnPageDisplayed(Canvas canvas, VPage vpage) {
-        if (m_listener != null) m_listener.onPDFPageDisplayed(canvas, vpage);
+        if (m_listener != null) m_listener.OnPDFPageDisplayed(canvas, vpage);
     }
 
     public void OnTimer() {
@@ -1300,8 +1260,6 @@ public class PDFLayoutView extends View implements LayoutListener {
                 m_zooming = false;
                 invalidate();
             }
-            //else if(!m_layout.vRenderFinished())
-            //invalidate();
         }
     }
 
@@ -1702,11 +1660,9 @@ public class PDFLayoutView extends View implements LayoutListener {
         try {
             if (m_pEdit != null && m_pEdit.isShowing()) m_pEdit.dismiss();
             if (m_pCombo != null && m_pCombo.isShowing()) m_pCombo.dismiss();
-        } catch (Exception e) {
-
-        }
+        } catch (Exception e) { e.getMessage(); }
         if (m_listener != null)
-            m_listener.OnPDFAnnotTapped(null, null);
+            m_listener.OnPDFAnnotTapped(-1, null);
     }
 
     public void PDFEditAnnot() {
@@ -1862,6 +1818,8 @@ public class PDFLayoutView extends View implements LayoutListener {
         return m_pageno;
     }
 
+
+
     public final PDFPos PDFGetPos(int x, int y) {
         if (m_layout != null)
             return m_layout.vGetPos(x, y);
@@ -1957,7 +1915,7 @@ public class PDFLayoutView extends View implements LayoutListener {
         return m_layout != null ? m_layout.vGetY() : 0;
     }
 
-    public void refreshCurrentPage() {
+    public void PDFUpdateCurrPage() {
         if (m_layout != null)
             m_layout.vRenderSync(m_layout.vGetPage(m_pageno));
     }
@@ -1973,6 +1931,10 @@ public class PDFLayoutView extends View implements LayoutListener {
 
     public void PDFSetZoom(int vx, int vy, PDFPos pos, float zoom) {
         if(m_layout != null) m_layout.vZoomSet(vx, vy, pos, zoom);
+    }
+
+    public float PDFGetZoom() {
+        return m_layout != null ? m_layout.vGetZoom() : 0;
     }
 
     private static int tmp_idx = 0;
