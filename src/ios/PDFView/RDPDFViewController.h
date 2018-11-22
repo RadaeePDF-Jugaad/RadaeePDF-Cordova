@@ -104,6 +104,7 @@
 @property (strong, nonatomic) UIImage *noteImage;
 @property (strong, nonatomic) UIImage *signatureImage;
 @property (strong, nonatomic) UIImage *printImage;
+@property (strong, nonatomic) UIImage *shareImage;
 @property (strong, nonatomic) UIImage *gridImage;
 @property (strong, nonatomic) UIImage *deleteImage;
 @property (strong, nonatomic) UIImage *doneImage;

@@ -25,9 +25,10 @@
     UIImage *viewMenu = (_outlineImage) ? _outlineImage : [UIImage imageNamed:@"btn_outline"];
     UIImage *savePDF = (_saveImage) ? _saveImage : [UIImage imageNamed:@"btn_save"];
     UIImage *printPDF = (_printImage) ? _printImage : [UIImage imageNamed:@"btn_print"];
+    UIImage *share = (_shareImage) ? _shareImage : [UIImage imageNamed:@"btn_save"];
     
-    actionTitle = [NSArray arrayWithObjects:NSLocalizedString(@"View Mode", nil),NSLocalizedString(@"Add Bookmark", nil), NSLocalizedString(@"Bookmark List", nil), NSLocalizedString(@"View Menu", nil), NSLocalizedString(@"Save", nil), NSLocalizedString(@"Print", nil), nil];
-    actionImage = [NSArray arrayWithObjects:viewMode, addBookMark, bookMarkList, viewMenu, savePDF, printPDF, nil];
+    actionTitle = [NSArray arrayWithObjects:NSLocalizedString(@"View Mode", nil),NSLocalizedString(@"Add Bookmark", nil), NSLocalizedString(@"Bookmark List", nil), NSLocalizedString(@"View Menu", nil), NSLocalizedString(@"Save", nil), NSLocalizedString(@"Print", nil), NSLocalizedString(@"Share", nil), nil];
+    actionImage = [NSArray arrayWithObjects:viewMode, addBookMark, bookMarkList, viewMenu, savePDF, printPDF, share, nil];
     self.tableView.scrollEnabled = NO;
 }
 
@@ -59,10 +60,8 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    if (indexPath.row < 6) {
+    if (indexPath.row < 7) {
         [_delegate selectAction:(int)indexPath.row];
-    } else {
-        [_delegate selectAction:6];
     }
 }
 

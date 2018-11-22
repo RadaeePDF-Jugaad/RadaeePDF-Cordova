@@ -584,6 +584,11 @@ extern NSMutableString *pdfPath;
                                         [self printPdf];
                                     }];
         
+        UIAlertAction *sharePDF =  [UIAlertAction actionWithTitle:NSLocalizedString(@"Share", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
+                                    {
+                                        [self sharePDF];
+                                    }];
+        
         UIAlertAction *cancel =  [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * action)
                                   {
                                       [moreItemsContainer dismissViewControllerAnimated:YES completion:nil];
@@ -595,7 +600,7 @@ extern NSMutableString *pdfPath;
         [viewMenu setValue:[(_outlineImage) ? _outlineImage : [UIImage imageNamed:@"btn_outline"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         [savePDF setValue:[(_saveImage) ? _saveImage : [UIImage imageNamed:@"btn_save"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         [printPDF setValue:[(_printImage) ? _printImage : [UIImage imageNamed:@"btn_print"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
-        
+        [sharePDF setValue:[(_shareImage) ? _shareImage : [UIImage imageNamed:@"btn_share"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         [moreItemsContainer addAction:viewMode];
         [moreItemsContainer addAction:addBookMark];
@@ -603,6 +608,7 @@ extern NSMutableString *pdfPath;
         [moreItemsContainer addAction:viewMenu];
         [moreItemsContainer addAction:savePDF];
         [moreItemsContainer addAction:printPDF];
+        [moreItemsContainer addAction:sharePDF];
         [moreItemsContainer addAction:cancel];
         
         [self presentViewController:moreItemsContainer animated:YES completion:nil];
@@ -619,6 +625,7 @@ extern NSMutableString *pdfPath;
         moreTVContainer.outlineImage = _outlineImage;
         moreTVContainer.saveImage = _saveImage;
         moreTVContainer.printImage = _printImage;
+        moreTVContainer.shareImage = _shareImage;
         UIPopoverPresentationController *popPresenter = [moreTVContainer
                                                          popoverPresentationController];
         popPresenter.barButtonItem = rdToolBar.moreButton;
@@ -650,6 +657,8 @@ extern NSMutableString *pdfPath;
         case 5:
             [self printPdf];
             break;
+        case 6:
+            [self sharePDF];
             
         default:
             break;
@@ -1167,6 +1176,7 @@ extern NSMutableString *pdfPath;
 
 - (void)drawRectangle
 {
+    
     if(![m_view vRectStart]) {
         [self showDocReadonlyAlert];
     }
@@ -1318,6 +1328,39 @@ extern NSMutableString *pdfPath;
     {
         UIAlertView *alter = [[UIAlertView alloc]initWithTitle:@"Warning" message:@"Cannot print the file"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
         [alter show];
+    }
+}
+
+-(void) sharePDF
+{
+    NSURL *url = [NSURL fileURLWithPath:[pdfPath stringByAppendingPathComponent:pdfName]];
+    if(url)
+    {
+        UIActivityViewController *a = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
+        NSArray *excludedActivities = @[UIActivityTypePostToTwitter, UIActivityTypePostToFacebook,
+                                        UIActivityTypePostToWeibo, UIActivityTypeMessage,
+                                        UIActivityTypePrint, UIActivityTypeCopyToPasteboard,
+                                        UIActivityTypeAssignToContact, UIActivityTypeSaveToCameraRoll,
+                                        UIActivityTypeAddToReadingList, UIActivityTypePostToFlickr,
+                                        UIActivityTypePostToVimeo, UIActivityTypePostToTencentWeibo];
+        a.excludedActivityTypes = excludedActivities;
+        b_outline = true;
+        [self presentViewController:a animated:YES completion:nil];
+        
+    }
+    else
+    {
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Waring", nil)
+                                                                       message:NSLocalizedString(@"Error", nil)
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* ok = [UIAlertAction
+                             actionWithTitle:NSLocalizedString(@"OK", nil)
+                             style:UIAlertActionStyleDefault
+                             handler:nil];
+        
+        [alert addAction:ok];
+        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 

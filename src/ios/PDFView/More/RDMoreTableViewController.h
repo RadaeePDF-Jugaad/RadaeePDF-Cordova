@@ -19,4 +19,5 @@
 @property (strong, nonatomic) UIImage *outlineImage;
 @property (strong, nonatomic) UIImage *saveImage;
 @property (strong, nonatomic) UIImage *printImage;
+@property (strong, nonatomic) UIImage *shareImage;
 @end
