@@ -1319,7 +1319,7 @@ extern NSString *g_author;
 }
 
 - (void)OnDoubleTap:(UITouch *)touch
-{   
+{
     isDoubleTapping = YES;
     
     NSLog(@"double tap");
@@ -2739,6 +2739,41 @@ extern NSString *g_author;
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return newImage;
+}
+
+- (void)imageFromPage:(int)index inPDFRect:(CGRect )rect withScale:(float)scale {
+    
+    // Get the page
+    PDFPage *page = [m_doc page:index];
+    
+    // Initialize the DIB with the annotation size
+    float w = rect.size.width * scale;
+    float h = rect.size.height * scale;
+    PDF_DIB bmp = Global_dibGet(NULL, w, h);
+    
+    // Create the matrix to render only the correct portion of the page
+    PDF_MATRIX mat = Matrix_createScale(scale, -scale, -(rect.origin.x  * scale), (rect.origin.y * scale) + h);
+    
+    // Render the portion of the page into bmp
+    Page_renderPrepare(page.handle, bmp);
+    Page_render(page.handle, bmp, mat, false, 2);
+    Matrix_destroy(mat);
+    page = nil;
+    
+    // Create the image ref
+    void *data = Global_dibGetData(bmp);
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, data, w * h * 4, NULL);
+    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+    CGImageRef ref = CGImageCreate(w, h, 8, 32, (int)w<<2, cs, kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst, provider, NULL, FALSE, kCGRenderingIntentDefault);
+    CGColorSpaceRelease(cs);
+    CGDataProviderRelease(provider);
+    
+    // Save the image
+    NSString *filePath = [pdfPath stringByAppendingPathComponent:@"test.png"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+    }
+    [[NSFileManager defaultManager] createFileAtPath:filePath contents:UIImagePNGRepresentation([UIImage imageWithCGImage:ref]) attributes:nil];
 }
 
 #pragma mark - PDFJSDelegate Methods
