@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.radaee.pdf.Global;
+import com.radaee.pdf.Document;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.util.BookmarkHandler;
@@ -1245,7 +1246,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 			if (is_closing) doc.Close();
 			return true;
 		}
-		
+
 		@Override
 		public boolean saveDocumentToPath(String path) {
 			String prefix = "file://";
