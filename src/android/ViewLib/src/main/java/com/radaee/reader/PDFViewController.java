@@ -116,6 +116,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	private View	view_dual;
 	private boolean m_set = false;
 	private PDFThumbView mThumbView;
+	private boolean is_closing = false;
 
 	public PDFViewController(RelativeLayout parent, ILayoutView view)
 	{
@@ -502,6 +503,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	}
 
 	public void onDestroy() {
+		is_closing = true;
 		if( mThumbView != null ) {
 			mThumbView.thumbClose();
 			mThumbView = null;
@@ -1193,29 +1195,57 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 
 		@Override
 		public boolean flatAnnotAtPage(int page) {
-			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
-			if(page >= m_view.PDFGetDoc().GetPageCount()) return false;
-			Page ppage = m_view.PDFGetDoc().GetPage(page);
+			Document doc = new Document();
+			if (is_closing) {
+				doc.Open(m_view.PDFGetDoc().getDocPath(), m_view.PDFGetDoc().getDocPwd());
+			} else {
+				if(m_view.PDFGetDoc() == null) return false;
+				if (m_view.PDFGetDoc().IsOpened()) {
+					doc = m_view.PDFGetDoc();
+				}
+			}
+
+			boolean res = flatAnnotAtPage(page, doc);
+			doc.Save();
+            if (is_closing) doc.Close();
+			return res;
+		}
+
+		public boolean flatAnnotAtPage(int page, Document doc) {
+			if(page >= doc.GetPageCount()) return false;
+			Page ppage = doc.GetPage(page);
+			ppage.ObjsStart();
 			if (ppage != null) {
 				boolean res = ppage.FlatAnnots();
 				if (res && page == m_view.PDFGetCurrPage()){
 					m_view.PDFUpdateCurrPage();
-					return true;
 				}
+				return true;
 			}
 			return false;
 		}
 
 		@Override
 		public boolean flatAnnots() {
-			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
-			for (int i = 0 ; i < m_view.PDFGetDoc().GetPageCount() ; i++) {
-				if (!this.flatAnnotAtPage(i))
+			Document doc = new Document();
+			if (is_closing) {
+				doc.Open(m_view.PDFGetDoc().getDocPath(), m_view.PDFGetDoc().getDocPwd());
+			} else {
+				if(m_view.PDFGetDoc() == null) return false;
+				if (m_view.PDFGetDoc().IsOpened()) {
+					doc = m_view.PDFGetDoc();
+				}
+			}
+
+			for (int i = 0 ; i < doc.GetPageCount() ; i++) {
+				if (!this.flatAnnotAtPage(i, doc))
 					return false;
 			}
+			doc.Save();
+			if (is_closing) doc.Close();
 			return true;
 		}
-
+		
 		@Override
 		public boolean saveDocumentToPath(String path) {
 			String prefix = "file://";
