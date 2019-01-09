@@ -1502,7 +1502,7 @@ extern NSMutableString *pdfPath;
 
 -(void)PDFClose
 {
-    if (_delegate && [_delegate respondsToSelector:@selector(willCloseReader)]) {
+    if (_delegate && [_delegate respondsToSelector:@selector(willCloseReader)] && m_doc != nil) {
         [_delegate willCloseReader];
     }
     
@@ -2468,12 +2468,20 @@ extern NSMutableString *pdfPath;
 
 #pragma mark - Flat annot
 
-- (bool)flatAnnotAtPage:(int)page
+- (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc
 {
-    if(page >= 0 && page < m_doc.pageCount)
+    if (doc == nil) {
+        doc = [[PDFDoc alloc] init];
+        [doc open:[pdfPath stringByAppendingPathComponent:pdfName] :@""];
+    }
+    
+    if(page >= 0 && page < doc.pageCount)
     {
-        PDFPage *ppage = [m_doc page:page];
-        return [ppage flatAnnots];
+        PDFPage *ppage = [doc page:page];
+        [ppage objsStart];
+        if ([ppage flatAnnots]) {
+            return [doc save];
+        }
     }
     
     return NO;
@@ -2481,8 +2489,14 @@ extern NSMutableString *pdfPath;
 
 - (bool)flatAnnots
 {
-    for (int page = 0; page != [m_doc pageCount]; page++) {
-        [self flatAnnotAtPage:page];
+    PDFDoc *doc = [[PDFDoc alloc] init];
+    if (m_doc == nil) {
+        [doc open:[pdfPath stringByAppendingPathComponent:pdfName] :@""];
+    } else {
+        doc = m_doc;
+    }
+    for (int page = 0; page != [doc pageCount]; page++) {
+        [self flatAnnotAtPage:page doc:doc];
         if (page == [m_view vGetCurrentPage]) [m_view refreshCurrentPage];
     }
     return nil;

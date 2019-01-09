@@ -577,7 +577,7 @@
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     int pageno = [[params objectForKey:@"page"] intValue];
     
-    if([m_pdf flatAnnotAtPage:pageno])
+    if([m_pdf flatAnnotAtPage:pageno doc:nil])
     {
         [self cdvOkWithMessage:@"Success"];
     } else {

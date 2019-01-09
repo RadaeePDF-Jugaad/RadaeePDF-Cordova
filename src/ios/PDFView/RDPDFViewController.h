@@ -174,7 +174,7 @@
 - (BOOL)addAttachmentFromPath:(NSString *)path;
 - (void)refreshCurrentPage;
 
-- (bool)flatAnnotAtPage:(int)page;
+- (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc;
 - (bool)flatAnnots;
 - (bool)saveDocumentToPath:(NSString *)path;
 
