@@ -106,10 +106,6 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
         
         <!-- Radaee source - java.com.radaee.util -->
-        <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlMesh.java" target-dir="src/main/java/fi/harism/curl" />
-        <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlPage.java" target-dir="src/main/java/fi/harism/curl" />
-        <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlRenderer.java" target-dir="src/main/java/fi/harism/curl" />
-        <source-file src="src/android/ViewLib/src/main/java/fi/harism/curl/CurlView.java" target-dir="src/main/java/fi/harism/curl" />
 
         <source-file src="src/android/ViewLib/src/main/jniLibs/arm64-v8a/librdpdf.so" target-dir="libs/arm64-v8a" />
         <source-file src="src/android/ViewLib/src/main/jniLibs/armeabi-v7a/librdpdf.so" target-dir="libs/armeabi-v7a" />
