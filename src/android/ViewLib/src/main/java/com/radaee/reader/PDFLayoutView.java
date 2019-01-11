@@ -1980,4 +1980,29 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void PDFAddAnnotRect(float x, float y, float width, float height, int p)
+    {
+        // init the page
+        VPage vpage = m_layout.vGetPage(p);
+        Page page = m_doc.GetPage(p);
+
+        // init objects
+        page.ObjsStart();
+
+        // create the annotation rect
+        float rect[] = new float[4];
+        rect[0] = x;            //left
+        rect[1] = y;            //top
+        rect[2] = x + width;    //right
+        rect[3] = y + height;   //bottom
+
+        // add the annotation
+        boolean res = page.AddAnnotRect(rect, vpage.ToPDFSize(Global.rect_annot_width), Global.rect_annot_color, Global.rect_annot_fill_color);
+        page.Close();
+
+        // reload the page
+        m_layout.vRenderSync(vpage);
+    }
 }
