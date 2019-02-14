@@ -73,7 +73,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      *
      * @param context the current context.
      * @param url the url can be remote (starts with http/https), or local
-     * @param password the pdf's password, if no apssword, pass empty string
+     * @param password the pdf's password, if no password, pass empty string
      */
     public void show(Context context, String url, String password) {
         show(context, url, password, false, false, 0, null, null);
@@ -84,7 +84,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      *
      * @param context the current context.
      * @param url the url can be remote (starts with http/https), or local
-     * @param password the pdf's password, if no apssword, pass empty string
+     * @param password the pdf's password, if no password, pass empty string
      * @param readOnlyMode if true, the document will be opened in read-only mode
      * @param automaticSave if true, the modifications will be saved automatically, else a requester to save will be shown
      * @param gotoPage if greater than 0, the reader will render directly the passed page (0-index: from 0 to Document.GetPageCount - 1)
@@ -121,7 +121,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      *
      * @param context the current context.
      * @param path the asset name/path
-     * @param password the pdf's password, if no apssword, pass empty string
+     * @param password the pdf's password, if no password, pass empty string
      */
     public void openFromAssets(Context context, String path, String password) {
         openFromAssets(context, path, password, null);
@@ -132,7 +132,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      *
      * @param context the current context.
      * @param path the asset name/path
-     * @param password the pdf's password, if no apssword, pass empty string
+     * @param password the pdf's password, if no password, pass empty string
      * @param bmpFormat bmp format, can be RGB_565 or ARGB_4444, default is ALPHA_8
      */
     public void openFromAssets(Context context, String path, String password, String bmpFormat) {
@@ -150,7 +150,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      *
      * @param context the current context.
      * @param path the pdf file path
-     * @param password the pdf's password, if no apssword, pass empty string
+     * @param password the pdf's password, if no password, pass empty string
      */
     public void openFromPath(Context context, String path, String password) {
         Intent intent = new Intent(context, PDFViewAct.class);
