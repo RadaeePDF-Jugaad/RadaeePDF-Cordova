@@ -2109,7 +2109,7 @@ extern NSMutableString *pdfPath;
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         //2strikethrough
-        [m_view vSelMarkup:annotUnderlineColor :2];
+        [m_view vSelMarkup:annotStrikeoutColor :2];
         
         if(m_bSel)
         {
