@@ -104,7 +104,6 @@
 {
     if (m_doc) {
         [m_doc setMeta:UUID :tag];
-        [m_doc save];
     }
 }
 
