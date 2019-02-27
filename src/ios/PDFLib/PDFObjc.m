@@ -10,6 +10,8 @@
 extern uint annotHighlightColor;
 extern uint annotUnderlineColor;
 extern uint annotStrikeoutColor;
+extern bool g_annot_lock;
+extern bool g_annot_readonly;
 
 @implementation PDFSign
 @synthesize handle = m_sign;
@@ -1327,7 +1329,23 @@ extern uint annotStrikeoutColor;
 
 - (BOOL)canMoveAnnot
 {
-    return (self.type == 4 || self.type == 5 || self.type == 6 || self.type == 13 || self.type == 15 || self.type == 1);
+    return (self.type == 4 || self.type == 5 || self.type == 6 || self.type == 13 || self.type == 15 || self.type == 1) && ![self isAnnotLocked];
+}
+
+- (BOOL)isAnnotLocked
+{
+    if (g_annot_lock && [self isLocked])
+        return YES;
+    
+    return NO;
+}
+
+- (BOOL)isAnnotReadOnly
+{
+    if (g_annot_readonly && [self isReadonly])
+        return YES;
+    
+    return NO;
 }
 
 -(PDF_OBJ_REF)getRef

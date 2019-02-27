@@ -1095,6 +1095,8 @@
 -(PDFSign *)getSign;
 -(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect;
 - (BOOL)canMoveAnnot;
+- (BOOL)isAnnotLocked;
+- (BOOL)isAnnotReadOnly;
 -(PDF_OBJ_REF)getRef;
 
 @end
