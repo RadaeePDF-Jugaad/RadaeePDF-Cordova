@@ -17,72 +17,72 @@
 
 @implementation PDFVLocker
 -(id)init
+{
+    if( self = [super init] )
     {
-        if( self = [super init] )
-        {
-            pthread_mutex_init( &mutex, NULL );
-        }
-        return self;
+        pthread_mutex_init( &mutex, NULL );
     }
+    return self;
+}
 -(void)dealloc
-    {
-        pthread_mutex_destroy( &mutex );
-    }
+{
+    pthread_mutex_destroy( &mutex );
+}
 -(void)lock
-    {
-        pthread_mutex_lock( &mutex );
-    }
+{
+    pthread_mutex_lock( &mutex );
+}
 -(void)unlock
-    {
-        pthread_mutex_unlock( &mutex );
-    }
-    @end
+{
+    pthread_mutex_unlock( &mutex );
+}
+@end
 
 @implementation PDFVEvent
 -(id)init
+{
+    if( self = [super init] )
     {
-        if( self = [super init] )
-        {
-            pthread_cond_init( &m_event, NULL );
-            pthread_mutex_init( &mutex, NULL );
-            flags = 0;
-        }
-        return self;
-    }
--(void)dealloc
-    {
-        pthread_cond_destroy( &m_event );
-        pthread_mutex_destroy( &mutex );
-    }
--(void)reset
-    {
-        pthread_mutex_lock( &mutex );
+        pthread_cond_init( &m_event, NULL );
+        pthread_mutex_init( &mutex, NULL );
         flags = 0;
-        pthread_mutex_unlock( &mutex );
     }
+    return self;
+}
+-(void)dealloc
+{
+    pthread_cond_destroy( &m_event );
+    pthread_mutex_destroy( &mutex );
+}
+-(void)reset
+{
+    pthread_mutex_lock( &mutex );
+    flags = 0;
+    pthread_mutex_unlock( &mutex );
+}
 -(void)notify
-    {
-        pthread_mutex_lock( &mutex );
-        if( flags & 2 )
+{
+    pthread_mutex_lock( &mutex );
+    if( flags & 2 )
         pthread_cond_signal( &m_event );
-        else
+    else
         flags |= 1;
-        pthread_mutex_unlock( &mutex );
-    }
+    pthread_mutex_unlock( &mutex );
+}
 -(void)wait
+{
+    pthread_mutex_lock( &mutex );
+    if( !(flags & 1) )
     {
-        pthread_mutex_lock( &mutex );
-        if( !(flags & 1) )
-        {
-            flags |= 2;
-            pthread_cond_wait( &m_event, &mutex );
-            flags &= (~2);
-        }
-        else
-        flags &= (~1);
-        pthread_mutex_unlock( &mutex );
+        flags |= 2;
+        pthread_cond_wait( &m_event, &mutex );
+        flags &= (~2);
     }
-    @end
+    else
+        flags &= (~1);
+    pthread_mutex_unlock( &mutex );
+}
+@end
 
 int g_def_view = 0;
 float g_zoom_level = 5;
@@ -94,6 +94,8 @@ bool g_cover_page_enabled = false;
 bool g_fit_signature_to_field = true;
 bool g_execute_annot_JS = true;
 bool g_dark_mode = false;
+bool g_annot_lock = false;
+bool g_annot_readonly = false;
 PDF_RENDER_MODE renderQuality = mode_normal;
 
 uint annotHighlightColor = 0xFFFFFF00;
@@ -141,9 +143,9 @@ void APP_Init()
     }
     
     if (isActive)
-    NSLog(@"License active");
+        NSLog(@"License active");
     else
-    NSLog(@"License not active");
+        NSLog(@"License not active");
     
     [[NSUserDefaults standardUserDefaults] setBool:isActive forKey:@"actIsActive"];
     
@@ -361,10 +363,10 @@ void APP_Init()
     Global_setAnnotFont( "Arimo" );//Global_setAnnotFont( "BousungEG-Light-GB" );
     
     
-    Global_setAnnotTransparency(0x200040FF);
-    g_def_view = 0;
-    renderQuality = mode_normal;
-    g_zoom_level = 5;
+	Global_setAnnotTransparency(0x200040FF);
+	g_def_view = 0;
+	renderQuality = mode_normal;
+	g_zoom_level = 5;
     g_paging_enabled = false;
     g_double_page_enabled = true;
     g_curl_enabled = false;

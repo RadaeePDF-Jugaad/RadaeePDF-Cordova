@@ -254,8 +254,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (NSString *)emptyAnnotWithSize:(CGSize)size;
 
 - (BOOL)addAttachmentFromPath:(NSString *)path;
-
--(BOOL)forceSave;
+- (BOOL)forceSave;
 
 - (BOOL)canSaveDocument;
 - (void)setReadOnly:(BOOL)enabled;

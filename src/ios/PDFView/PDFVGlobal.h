@@ -33,6 +33,8 @@ extern bool g_cover_page_enabled;
 extern bool g_fit_signature_to_field;
 extern bool g_execute_annot_JS;
 extern bool g_dark_mode;
+extern bool g_annot_lock;
+extern bool g_annot_readonly;
 extern PDF_RENDER_MODE renderQuality;
 
 extern uint annotHighlightColor;

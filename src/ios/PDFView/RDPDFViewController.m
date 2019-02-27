@@ -21,7 +21,7 @@
 #import "SignatureViewController.h"
 #import "ViewModeTableViewController.h"
 
-@interface RDPDFViewController () <UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,RDToolBarDelegate,DrawModeDelegate,RDMoreTableViewControllerDelegate, SignatureDelegate, ViewModeDelegate, BookmarkTableViewDelegate, RDAnnotListViewControllerDelegate, SearchResultViewControllerDelegate,saveTextAnnotDelegate>
+@interface RDPDFViewController () <UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,UIDocumentInteractionControllerDelegate,RDToolBarDelegate,DrawModeDelegate,RDMoreTableViewControllerDelegate, SignatureDelegate, ViewModeDelegate, BookmarkTableViewDelegate, RDAnnotListViewControllerDelegate, SearchResultViewControllerDelegate,saveTextAnnotDelegate>
 {
     int             selectItem;
     UIPickerView    *pickerView;
@@ -61,7 +61,7 @@ extern NSMutableString *pdfPath;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self = [super initWithNibName:nil bundle:nil]) {
-        
+ 
     }
     return self;
 }
@@ -78,7 +78,7 @@ extern NSMutableString *pdfPath;
     b_sigleTap =false;
     b_keyboard = false;
     statusBarHidden = NO;
-    
+ 
     tempfiles = [[NSMutableArray alloc]init];
     
     if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
@@ -93,7 +93,7 @@ extern NSMutableString *pdfPath;
     pickerView.backgroundColor = [UIColor lightGrayColor];
     [self.view addSubview:pickerView];
     [self.view bringSubviewToFront:pickerView];
-    
+
     confirmPickerBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     confirmPickerBtn.frame = CGRectMake(width - 60, pickerView.frame.origin.y - 40, 60, 40);
     [confirmPickerBtn setTitle:@"OK" forState:UIControlStateNormal];
@@ -140,14 +140,14 @@ extern NSMutableString *pdfPath;
     self.navigationItem.hidesBackButton = YES;
 }
 
--(void)viewWillAppear:(BOOL)animated
+-(void)viewWillAppear:(BOOL)animated 
 {
     if (_delegate && [_delegate respondsToSelector:@selector(willShowReader)]) {
         [_delegate willShowReader];
     }
     
     b_findStart = NO;
-    
+
     [rdToolBar removeFromSuperview];
     [rdToolBar setFrame:CGRectMake(0, 0, self.navigationController.navigationBar.frame.size.width, self.navigationController.navigationBar.frame.size.height)];
     [self.navigationController.navigationBar addSubview:rdToolBar];
@@ -321,7 +321,7 @@ extern NSMutableString *pdfPath;
     pagecount =[m_doc pageCount];
     [self.view addSubview:m_view];
     m_bSel = false;
-    
+
     if (page > 0) {
         [self PDFGoto:page];
     }
@@ -397,7 +397,7 @@ extern NSMutableString *pdfPath;
     [m_slider addTarget:self action:@selector(OnSliderValueChange:) forControlEvents:UIControlEventValueChanged];
     
     [m_slider setBackgroundColor:[UIColor blackColor]];
-    
+
     [self.view addSubview:m_slider];
     
     [self pageNumLabelInit:pageno];
@@ -547,9 +547,9 @@ extern NSMutableString *pdfPath;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){
         
         moreItemsContainer = [UIAlertController
-                              alertControllerWithTitle:NSLocalizedString(@"Select Action", nil)
-                              message:@""
-                              preferredStyle:UIAlertControllerStyleActionSheet];
+                               alertControllerWithTitle:NSLocalizedString(@"Select Action", nil)
+                               message:@""
+                               preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *viewMode = [UIAlertAction actionWithTitle:NSLocalizedString(@"View Mode", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
                                    {
@@ -912,7 +912,7 @@ extern NSMutableString *pdfPath;
         } else {
             pop.barButtonItem = [rdToolBar.items objectAtIndex:2];
         }
-        
+                
         [self presentViewController:vm animated:YES completion:nil];
     }
     else
@@ -949,11 +949,11 @@ extern NSMutableString *pdfPath;
         }];
         [note setValue:[(_noteImage) ? _noteImage : [UIImage imageNamed:@"btn_annot_note"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         /*
-         UIAlertAction *sign = [UIAlertAction actionWithTitle:NSLocalizedString(@"Signature", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-         [self didSelectDrawMode:6];
-         }];
-         [sign setValue:[(_signatureImage) ? _signatureImage : [UIImage imageNamed:@"btn_annot_ink"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
-         */
+        UIAlertAction *sign = [UIAlertAction actionWithTitle:NSLocalizedString(@"Signature", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self didSelectDrawMode:6];
+        }];
+        [sign setValue:[(_signatureImage) ? _signatureImage : [UIImage imageNamed:@"btn_annot_ink"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
+        */
         UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
             [self dismissViewControllerAnimated:YES completion:nil];
         }];
@@ -998,7 +998,7 @@ extern NSMutableString *pdfPath;
         case 5:
             b_noteAnnot = YES;
             break;
-            //case 6:
+        //case 6:
             //[self drawSignature];
             //break;
         default:
@@ -1007,19 +1007,19 @@ extern NSMutableString *pdfPath;
 }
 
 /*
- - (void)drawSignature
- {
- b_outline = YES;
- AdvSignatureViewController *sign = [[AdvSignatureViewController alloc] init];
- sign.delegate = self;
- 
- if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
- sign.modalPresentationStyle = UIModalPresentationFormSheet;
- }
- 
- [self presentViewController:sign animated:YES completion:nil];
- }
- */
+- (void)drawSignature
+{
+    b_outline = YES;
+    AdvSignatureViewController *sign = [[AdvSignatureViewController alloc] init];
+    sign.delegate = self;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        sign.modalPresentationStyle = UIModalPresentationFormSheet;
+    }
+    
+    [self presentViewController:sign animated:YES completion:nil];
+}
+*/
 
 - (NSString *)composeFile
 {
@@ -1405,7 +1405,7 @@ extern NSMutableString *pdfPath;
     [m_Thumbview refresh];
     
     [m_view resetZoomLevel];
-    
+
     [rdToolBar sizeToFit];
     [searchToolBar sizeToFit];
     
@@ -1465,7 +1465,7 @@ extern NSMutableString *pdfPath;
 
 -(int)PDFOpenPage:(NSString *)path :(int)pageno :(float)x :(float)y :(NSString *)pwd
 {
-    
+   
     PDF_ERR err = 0;
     err = [m_doc open:path :pwd];
     switch(err){
@@ -1476,11 +1476,11 @@ extern NSMutableString *pdfPath;
             break;
         default: return 0;
     }
-    
+
     CGRect rect = [self screenRect];
     
     m_view = [[PDFView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height-20-self.navigationController.navigationBar.bounds.size.height)];
-    // [m_view vOpenPage:m_doc :pageno :x :y :self];
+   // [m_view vOpenPage:m_doc :pageno :x :y :self];
     [m_view vGoto:pageno];
     pagecount = [m_doc pageCount];
     [self.view addSubview:m_view];
@@ -1523,12 +1523,12 @@ extern NSMutableString *pdfPath;
     CGRect boundsc = [[UIScreen mainScreen]bounds];
     int cwidth = boundsc.size.width;
     [m_searchBar setFrame:CGRectMake(0,[self barHeightDistance],cwidth,41)];
-    
+
     NSString *text = m_SearchBar.text;
     [m_SearchBar resignFirstResponder];
     if (m_SearchBar.text.length >40)
     {
-        return ;
+        return;
     }
     
     if (SEARCH_LIST == 1) {
@@ -1544,7 +1544,7 @@ extern NSMutableString *pdfPath;
     [m_searchBar resignFirstResponder];
     if (m_searchBar.text.length >40)
     {
-        return ;
+        return;
     }
     
     if (SEARCH_LIST == 1) {
@@ -1565,7 +1565,7 @@ extern NSMutableString *pdfPath;
     [m_searchBar resignFirstResponder];
     if (m_searchBar.text.length >40)
     {
-        return ;
+        return;
     }
     
     if (SEARCH_LIST == 1) {
@@ -1650,7 +1650,7 @@ extern NSMutableString *pdfPath;
                         rdToolBar.hidden = YES;
                         searchToolBar.hidden = YES;
                     }
-                    
+                   
                     SearchResultTableViewController *viewController = [[SearchResultTableViewController alloc] init];
                     viewController.delegate = self;
                     
@@ -1730,7 +1730,7 @@ extern NSMutableString *pdfPath;
         confirmPickerBtn.hidden = YES;
     }
     [m_searchBar resignFirstResponder];
-    
+   
     if(isImmersive)
     {
         [self showBars];
@@ -1817,10 +1817,6 @@ extern NSMutableString *pdfPath;
 //enter annotation status.
 -(void)OnAnnotClicked:(PDFPage *)page :(PDFAnnot *)annot :(float)x :(float)y
 {
-    //TEST EditText method
-    //if([annot fieldType]==2){
-    //    [annot setEditText:@"123"];
-    //}
     m_Thumbview.hidden = NO;
     [pageNumLabel setHidden:false];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
@@ -1854,7 +1850,7 @@ extern NSMutableString *pdfPath;
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotGoto:(int)pageno
 {
-    [m_view vGoto:pageno];
+     [m_view vGoto:pageno];
 }
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotPopup:(PDFAnnot *)annot :(NSString *)subj :(NSString *)text
@@ -1866,6 +1862,8 @@ extern NSMutableString *pdfPath;
         [textAnnotVC setPos_y:posy];
         [textAnnotVC setText:text];
         [textAnnotVC setSubject:subj];
+        if ([annot isAnnotReadOnly])
+            textAnnotVC.readOnly = YES;
         textAnnotVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         UINavigationController *navController = [[UINavigationController alloc]
                                                  initWithRootViewController:textAnnotVC];
@@ -1921,7 +1919,7 @@ extern NSMutableString *pdfPath;
 - (void)OnAnnotMovie:(NSString *)fileName
 {
     [tempfiles addObject:fileName];
-    
+
     NSURL *urlPath = [NSURL fileURLWithPath:fileName];
     if ([[NSFileManager defaultManager] fileExistsAtPath:fileName]) {
         
@@ -1962,7 +1960,7 @@ extern NSMutableString *pdfPath;
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
     [m_searchBar setHidden:NO];
-    
+
     b_outline = true;
     m_bSel = false;
     [m_view vSelEnd];
@@ -2198,7 +2196,7 @@ extern NSMutableString *pdfPath;
 - (void)OnMovie:(NSString *)fileName
 {
     [tempfiles addObject:fileName];
-    
+
     NSURL *urlPath = [NSURL fileURLWithPath:fileName];
     if ([[NSFileManager defaultManager] fileExistsAtPath:fileName]) {
         AVPlayer *player = [AVPlayer playerWithURL:urlPath];
@@ -2549,4 +2547,5 @@ extern NSMutableString *pdfPath;
     
     return @"";
 }
+
 @end

@@ -939,7 +939,11 @@ extern NSString *g_author;
         }
     }
     
-    if (![m_annot canMoveAnnot]) return false;
+    if (![m_annot canMoveAnnot]) {
+        [self vAnnotEnd];
+        return false;
+    }
+    
     if([self canSaveDocument])
     {
     	[self setModified:YES force:NO];
@@ -1457,6 +1461,7 @@ extern NSString *g_author;
         CGPoint point=[touch locationInView:[touch view]];
         point.x *= m_zoom;
         point.y *= m_zoom;
+        
         if( [self OnSelTouchMove:point] ) return;
         if( [self OnAnnotTouchMove:point] ) return;
         if( [self OnNoteTouchMove:point] ) return;
@@ -1465,6 +1470,7 @@ extern NSString *g_author;
         if( [self OnRectTouchMove:point] ) return;
         if( [self OnEllipseTouchMove:point] ) return;
         if( [self OnImageTouchMove:point] ) return;
+        
         [self OnNoneTouchMove:point:touch.timestamp];
     }
 }
@@ -2142,7 +2148,7 @@ extern NSString *g_author;
         //popup dialog to show text and subject.
         //nuri is text content.
         //subj is subject string.
-    	if( m_delegate)
+        if(m_delegate && (![m_annot isAnnotReadOnly] || m_annot.type == 1))
     		[m_delegate OnAnnotPopup :m_annot: [m_annot getPopupSubject] :nuri];
 	    [self vAnnotEnd];
 	    return;
@@ -2158,6 +2164,9 @@ extern NSString *g_author;
         return;
     }
 	if( m_status != sta_annot ) return;
+    
+    if ([m_annot isAnnotLocked]) return;
+    
     [self setModified:YES force:NO];
     
     //Action Stack Manger
@@ -2190,7 +2199,7 @@ extern NSString *g_author;
 }
 
 -(void)onSingleTap:(float)x :(float)y
-{    
+{
     [self vGetTextFromPoint:CGPointMake(x, y)];
 
     [m_view vGetPos:&m_annot_pos :x * m_scale :y * m_scale];
@@ -2224,16 +2233,18 @@ extern NSString *g_author;
                 return;
             }
             
+            if ([m_annot isAnnotReadOnly] && !([self isReadOnlyAnnotEnabled:m_annot]))
+                return;
             
-        	self.scrollEnabled = false;
-        	m_status = sta_annot;
-        	[m_annot getRect:&m_annot_rect];
-        	m_annot_rect.left = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:m_annot_rect.left];
-        	m_annot_rect.right = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:m_annot_rect.right];
-        	float tmp = m_annot_rect.top;
-        	m_annot_rect.top = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:m_annot_rect.bottom];
-        	m_annot_rect.bottom = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:tmp];
-        	[self refresh];
+            self.scrollEnabled = false;
+            m_status = sta_annot;
+            [m_annot getRect:&m_annot_rect];
+            m_annot_rect.left = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:m_annot_rect.left];
+            m_annot_rect.right = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:m_annot_rect.right];
+            float tmp = m_annot_rect.top;
+            m_annot_rect.top = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:m_annot_rect.bottom];
+            m_annot_rect.bottom = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:tmp];
+            [self refresh];
             
             int nu = [m_annot getCheckStatus];
             if (nu != -1) {
@@ -2272,7 +2283,7 @@ extern NSString *g_author;
                 if (m_delegate){
                     [m_delegate OnAnnotCommboBox:arr selected:[m_annot getComboSel]];
                 }
-                return ;
+                return;
             }
             
             nu = [m_annot getListItemCount];
@@ -2302,7 +2313,7 @@ extern NSString *g_author;
                 if (m_delegate){
                     [m_delegate OnAnnotList:m_annot items:arr selectedIndexes:selected_items]; // Modified method
                 }
-                return ;
+                return;
             }
             
             NSString *nuri = [m_annot getEditText];
@@ -2315,10 +2326,12 @@ extern NSString *g_author;
                     annotRect.size.height = (m_annot_rect.bottom - m_annot_rect.top)/m_scale;
                     [m_delegate OnAnnotEditBox :annotRect : nuri :([m_annot getEditTextSize]/m_scale) * [m_view vGetScale:m_cur_page]];
                 }
-                return ;
+                return;
             }
             
-        	if( m_delegate ) [m_delegate OnAnnotClicked :page:m_annot:x:y];
+            if (m_delegate)
+                [m_delegate OnAnnotClicked :page:m_annot:x:y];
+            
         }
         else
         {
@@ -2329,6 +2342,30 @@ extern NSString *g_author;
             }
         }
     }
+}
+
+- (BOOL)isReadOnlyAnnotEnabled:(PDFAnnot *)annot
+{
+    int pageno = [m_annot getDest];
+    if( pageno >= 0 )       //is goto annot
+        return YES;
+    
+    NSString *nuri = [m_annot getURI];
+    if(nuri)                //is url annot
+        return YES;
+    
+    nuri = [m_annot getMovie];
+    if(nuri)                //is movie annot
+        return YES;
+        
+    nuri = [m_annot getSound];
+    if(nuri)                //is audio annot
+        return YES;
+    
+    if (m_annot.type == 1)  //is note annot
+        return YES;
+    
+    return NO;
 }
 
 - (void)selectListBoxItems:(NSArray *)items
@@ -3052,7 +3089,7 @@ extern NSString *g_author;
 
 - (BOOL)isCurlEnabled
 {
-    return NO;
+    return g_curl_enabled;
 }
 
 - (CGImageRef )vGetImageForPage:(int)pg withSize:(CGSize)size withBackground:(BOOL)hasBackground
@@ -3077,6 +3114,86 @@ extern NSString *g_author;
 
     [m_view vRenderSync:pos.pageno];
     [self refresh];
+}
+
+- (BOOL)mergePDFAtPath:(NSString *)savePath fromPaths: (NSMutableArray *)pdfFilePaths
+{
+    NSString *cacheFileTmpName = [NSString stringWithFormat:@"cache%lu.dat", (unsigned long)([[NSDate date] timeIntervalSince1970] * 1000)];
+    
+    NSString *cacheFileFullPath = [NSTemporaryDirectory() stringByAppendingPathComponent:cacheFileTmpName];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:cacheFileFullPath])
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:cacheFileFullPath error:nil];
+    }
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:savePath])
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:savePath error:nil];
+    }
+    else if ([[NSFileManager defaultManager] fileExistsAtPath:savePath])
+    {
+        return NO;
+    }
+    
+    PDF_ERR dst_err;
+    PDF_DOC doc_dst = Document_create([savePath UTF8String], &dst_err);
+    BOOL success = Document_setCache(doc_dst, [cacheFileFullPath UTF8String]);
+    
+    if (success)
+    {
+        for (NSString *filePath in pdfFilePaths)
+        {
+            NSString *tmpPath = nil;
+            
+            PDF_ERR src_err;
+            PDF_DOC doc_src = Document_open([filePath UTF8String], NULL, &src_err);
+            PDF_PAGE page = Document_getPage(doc_src, 0);
+            
+            if (success)
+            {
+                PDF_IMPORTCTX ctx = Document_importStart(doc_dst, doc_src);
+                int dstno = Document_getPageCount(doc_dst);
+                int srccount = Document_getPageCount(doc_src);
+                int srcno = 0;
+                while (srcno < srccount)
+                {
+                    success = success && Document_importPage(doc_dst, ctx, srcno, dstno);
+                    dstno++;
+                    srcno++;
+                }
+                Document_importEnd(doc_dst, ctx);
+            }
+            
+            Document_close(doc_src);
+            if (success)
+            {
+                success = Document_save(doc_dst);
+            }
+            
+            if (tmpPath && [[NSFileManager defaultManager] fileExistsAtPath:tmpPath])
+            {
+                [[NSFileManager defaultManager] removeItemAtPath:tmpPath error:nil];
+            }
+            
+        }
+    }
+    
+    //PDF_PAGE page0 = Document_getPage(doc_dst, 0);
+    //PDF_PAGE page1 = Document_getPage(doc_dst, 1);
+    
+    Document_close(doc_dst);
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:savePath] && !success)
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:savePath error:nil];
+    }
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:cacheFileFullPath])
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:cacheFileFullPath error:nil];
+    }
+    return YES;
 }
 
 @end

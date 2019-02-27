@@ -26,7 +26,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	NSString *title =[[NSString alloc]initWithFormat:NSLocalizedString(@"Text Annot", @"Localizable")];
+    NSString *title =[[NSString alloc]initWithFormat:NSLocalizedString(@"Text Annot", @"Localizable")];
     self.title = title;
     
     UIBarButtonItem *cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelTextAnnot)];
@@ -35,12 +35,12 @@
     
     self.navigationItem.leftBarButtonItem = cancelBtn;
     self.navigationItem.rightBarButtonItem = saveBtn;
-    self.view.backgroundColor = [UIColor lightGrayColor];
+    self.view.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    UILabel *subjectLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height + 15, 90, 50)];
+    UILabel *subjectLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height + self.navigationController.navigationBar.frame.size.height + 15, 90, 50)];
     subjectLabel.text = @"Subject:";
     subjectLabel.textAlignment = NSTextAlignmentCenter;
     
@@ -51,7 +51,7 @@
     textField = [[UITextField alloc] initWithFrame:CGRectMake(subjectLabel.frame.size.width, subjectLabel.frame.origin.y, self.view.bounds.size.width  - (subjectLabel.frame.size.width + 5) - 5, 44)];
     textField.backgroundColor = [UIColor whiteColor];
     
-    textView = [[UITextView alloc] initWithFrame:CGRectMake(contentLabel.frame.size.width, contentLabel.frame.origin.y, self.view.bounds.size.width - (contentLabel.frame.size.width + 5) - 5, self.view.bounds.size.height - contentLabel.frame.origin.y - 5)];
+    textView = [[UITextView alloc] initWithFrame:CGRectMake(contentLabel.frame.size.width, contentLabel.frame.origin.y, self.view.bounds.size.width - (contentLabel.frame.size.width + 5) - 5, self.view.bounds.size.height - contentLabel.frame.origin.y - 15)];
     
     [self.view addSubview:subjectLabel];
     [self.view addSubview:contentLabel];
@@ -60,6 +60,12 @@
     
     textField.text = _subject;
     textView.text = _text;
+    
+    if (self.readOnly)
+    {
+        textView.userInteractionEnabled = NO;
+        textField.userInteractionEnabled = NO;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -69,12 +75,12 @@
 }
 -(BOOL)cancelTextAnnot
 {
-    if(m_delegate)
+    if(m_delegate && !self.readOnly)
     {
         [m_delegate OnSaveTextAnnot:@"" subject:@""];
     }
     [self dismissViewControllerAnimated:YES completion:^{
-       
+        
     }];
     
     return NO;
@@ -82,7 +88,7 @@
 
 -(void)saveTextAnnot
 {
-    if(m_delegate)
+    if(m_delegate && !self.readOnly)
     {
         [m_delegate OnSaveTextAnnot:textView.text subject:textField.text];
     }
