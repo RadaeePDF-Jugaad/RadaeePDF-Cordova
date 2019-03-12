@@ -1277,6 +1277,7 @@ extern NSMutableString *pdfPath;
     PDFOutline *root = [m_doc rootOutline];
     if( root )
     {
+        rdToolBar.hidden = YES;
         outlineView = [[OutLineViewController alloc] init];
         //First parameter is root node
         [outlineView setList:m_doc :NULL :root];
