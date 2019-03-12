@@ -175,7 +175,7 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
         		m_asset_stream = new PDFAssetStream();
         		m_asset_stream.open(getAssets(), pdf_asset);
         		m_doc = new Document();
-        		int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
+        		int ret = m_doc.OpenStream(pdf_asset, m_asset_stream, pdf_pswd);
         		ProcessOpenResult(ret);
         	}
         	else if( pdf_path != null && pdf_path != "" )

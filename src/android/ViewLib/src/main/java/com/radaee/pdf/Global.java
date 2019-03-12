@@ -213,7 +213,7 @@ public class Global
 	 * @param hide
 	 *            true to hide, false to show.
 	 */
-	private static native void hideAnnots(boolean hide);
+	public static native void hideAnnots(boolean hide);
 
 	private static native void drawScroll(Bitmap bmp, long dib1, long dib2, int x, int y, int style, int back_side_clr);
 	/**
@@ -385,6 +385,10 @@ public class Global
 	public static String sSignPadDescr = "Sign Here";
 
 	public static boolean sExecuteAnnotJS = true;
+
+	public static boolean g_annot_lock = false;
+	public static boolean g_annot_readonly = false;
+
 	/**
 	 *Annot Rect params
 	 */

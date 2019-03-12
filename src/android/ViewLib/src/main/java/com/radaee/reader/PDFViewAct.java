@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,12 +26,16 @@ import android.widget.Toast;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
+import com.radaee.pdf.Matrix;
+import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.ILayoutView;
 import com.radaee.viewlib.R;
+
+import java.io.FileOutputStream;
 
 public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListener {
     private String mFindQuery = "";
@@ -198,7 +203,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
                 m_asset_stream = new PDFAssetStream();
                 m_asset_stream.open(getAssets(), pdf_asset);
                 m_doc = new Document();
-                int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
+                int ret = m_doc.OpenStream(pdf_asset, m_asset_stream, pdf_pswd);
 
                 ProcessOpenResult(ret);
             } else if (!TextUtils.isEmpty(pdf_path)) {
@@ -482,5 +487,42 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
         if (m_view != null)
             return m_view.PDFGetCurrPage();
         return -1;
+    }
+
+    public void imageFromPage(int index, float[] rect, float scale) {
+        // Hide the annotations before render method (it's necessary to avoid the annotation render)
+        Global.hideAnnots(true);
+
+        // Get the page
+        Page page = m_doc.GetPage(index);
+
+        // Set the rect size
+        float w = (rect[2] - rect[0]) * scale;
+        float h = (rect[3] - rect[1]) * scale;
+
+        // Draw the Bitmap
+        Bitmap bmp;
+        bmp = Bitmap.createBitmap((int)w, (int)h, Bitmap.Config.ARGB_8888);
+        Matrix mat = new Matrix(scale,-scale, -(rect[0] * scale), (rect[1] * scale) + h);
+        page.RenderPrepare(bmp);
+        page.RenderToBmp(bmp, mat);
+
+        // Clean
+        mat.Destroy();
+        page.Close();
+
+        // Show annotations
+        Global.hideAnnots(false);
+
+        // Write the image file
+        try {
+            FileOutputStream fo = new FileOutputStream("/sdcard/000_bitmap.jpg");
+            bmp.compress(Bitmap.CompressFormat.JPEG, 75, fo);
+            fo.close();
+            bmp.recycle();
+        }
+        catch (Exception e)
+        {
+        }
     }
 }

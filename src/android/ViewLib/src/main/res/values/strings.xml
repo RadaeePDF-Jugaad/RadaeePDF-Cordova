@@ -73,9 +73,12 @@
     <string name="pdf_print_not_available">PDF File is not available for print.</string>
     <string name="pdf_print_calculation_failed">Page count calculation failed.</string>
 
+    <string name="pdf_share_not_available">PDF File is not available for share.</string>
+
     <string name="copy_text">Text copied to clipboard: %1$s</string>
 
     <string name="print">Print</string>
+    <string name="share">Share</string>
     <string name="bookmark_label">Page: %1$d</string>
     <string name="bookmark_already_added">Bookmark already exists</string>
     <string name="bookmark_error">Error: Cannot add bookmark</string>

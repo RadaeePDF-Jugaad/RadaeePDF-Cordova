@@ -1,23 +1,39 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
-
+    signingConfigs {
+    }
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
     defaultConfig {
         minSdkVersion 14
+        renderscriptTargetApi 18
+        renderscriptSupportModeEnabled true
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
-    api 'com.android.support:support-v4:26.1.0'
-	api 'com.github.gcacace:signature-pad:1.2.1'
-    api files('libs/com.radaee.view.jar')
+    api 'com.android.support:support-v4:27.1.1'
+    api 'com.github.gcacace:signature-pad:1.2.1'
 }
+
+task deleteJar(type: Delete) {
+    delete 'libs/com.radaee.view.jar'
+}
+
+task CreateJar(type: Jar) {
+    archiveName = "com.radaee.view.jar"
+    from('build/intermediates/javac/debug/compileDebugJavaWithJavac/classes') {
+        include('com/radaee/view/**')
+    }
+}
+CreateJar.dependsOn(deleteJar, build)

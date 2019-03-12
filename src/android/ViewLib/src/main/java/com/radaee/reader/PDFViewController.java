@@ -15,6 +15,7 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,9 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.radaee.pdf.Global;
-import com.radaee.pdf.Document;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
+import com.radaee.pdf.adv.Ref;
 import com.radaee.util.BookmarkHandler;
 import com.radaee.util.CommonUtil;
 import com.radaee.util.PDFThumbView;
@@ -117,7 +118,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	private View	view_dual;
 	private boolean m_set = false;
 	private PDFThumbView mThumbView;
-	private boolean is_closing = false;
 
 	public PDFViewController(RelativeLayout parent, ILayoutView view)
 	{
@@ -323,6 +323,12 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	}
 	public void OnAnnotTapped(Annotation annot)
 	{
+		//m_view.PDFCancelAnnot();
+		if (m_bar_status == BAR_ACT) {
+			m_view.PDFCancelAnnot();
+			m_bar_status = BAR_NONE;
+		}
+
 		switch(m_bar_status)
 		{
 		case BAR_NONE:
@@ -504,7 +510,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 	}
 
 	public void onDestroy() {
-		is_closing = true;
 		if( mThumbView != null ) {
 			mThumbView.thumbClose();
 			mThumbView = null;
@@ -1107,6 +1112,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 					JSONArray mPages = new JSONArray();
 					for (int i = 0 ; i < m_view.PDFGetDoc().GetPageCount() ; i++) {
 						Page mPage = m_view.PDFGetDoc().GetPage(i);
+						mPage.ObjsStart();
 						JSONObject mResult = CommonUtil.constructPageJsonFormFields(mPage, i);
 						if(mResult != null)
 							mPages.put(mResult);
@@ -1196,54 +1202,26 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 
 		@Override
 		public boolean flatAnnotAtPage(int page) {
-			Document doc = new Document();
-			if (is_closing) {
-				doc.Open(m_view.PDFGetDoc().getDocPath(), m_view.PDFGetDoc().getDocPwd());
-			} else {
-				if(m_view.PDFGetDoc() == null) return false;
-				if (m_view.PDFGetDoc().IsOpened()) {
-					doc = m_view.PDFGetDoc();
-				}
-			}
-
-			boolean res = flatAnnotAtPage(page, doc);
-			doc.Save();
-            if (is_closing) doc.Close();
-			return res;
-		}
-
-		public boolean flatAnnotAtPage(int page, Document doc) {
-			if(page >= doc.GetPageCount()) return false;
-			Page ppage = doc.GetPage(page);
-			ppage.ObjsStart();
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+			if(page >= m_view.PDFGetDoc().GetPageCount()) return false;
+			Page ppage = m_view.PDFGetDoc().GetPage(page);
 			if (ppage != null) {
 				boolean res = ppage.FlatAnnots();
 				if (res && page == m_view.PDFGetCurrPage()){
 					m_view.PDFUpdateCurrPage();
+					return true;
 				}
-				return true;
 			}
 			return false;
 		}
 
 		@Override
 		public boolean flatAnnots() {
-			Document doc = new Document();
-			if (is_closing) {
-				doc.Open(m_view.PDFGetDoc().getDocPath(), m_view.PDFGetDoc().getDocPwd());
-			} else {
-				if(m_view.PDFGetDoc() == null) return false;
-				if (m_view.PDFGetDoc().IsOpened()) {
-					doc = m_view.PDFGetDoc();
-				}
-			}
-
-			for (int i = 0 ; i < doc.GetPageCount() ; i++) {
-				if (!this.flatAnnotAtPage(i, doc))
+			if(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+			for (int i = 0 ; i < m_view.PDFGetDoc().GetPageCount() ; i++) {
+				if (!this.flatAnnotAtPage(i))
 					return false;
 			}
-			doc.Save();
-			if (is_closing) doc.Close();
 			return true;
 		}
 

@@ -204,7 +204,11 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                 m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
                 m_status = STA_ANNOT;
                 int check = m_annot.GetCheckStatus();
-                if (m_doc.CanSave() && check >= 0) {
+                if(Global.g_annot_readonly && m_annot.IsReadOnly()) {
+                    Toast.makeText(getContext(), "Readonly annotation", Toast.LENGTH_SHORT).show();
+                    if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
+                }
+                else if (m_doc.CanSave() && check >= 0) {
                     switch (check) {
                         case 0:
                             m_annot.SetCheckValue(true);
@@ -863,7 +867,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     m_annot_rect0 = null;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (m_annot_rect0 != null) {
+                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly())) {
                     float x = event.getX();
                     float y = event.getY();
                     m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
@@ -874,7 +878,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (m_annot_rect0 != null) {
+                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly())) {
                     float x = event.getX();
                     float y = event.getY();
                     GLLayout.PDFPos pos = m_layout.vGetPos((int) x, (int) y);
@@ -1633,7 +1637,8 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
     }
 
     public void PDFRemoveAnnot() {
-        if (m_status != STA_ANNOT || !m_doc.CanSave()) return;
+        if (m_status != STA_ANNOT || !PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
+                || (Global.g_annot_lock && m_annot.IsLocked())) return;
         //add to redo/undo stack.
         Page page = m_doc.GetPage(m_annot_page.GetPageNo());
         page.ObjsStart();
@@ -1695,6 +1700,8 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
 
         subj.setText(m_annot.GetPopupSubject());
         content.setText(m_annot.GetPopupText());
+        subj.setEnabled(!(Global.g_annot_readonly && m_annot.IsReadOnly()));
+        content.setEnabled(!(Global.g_annot_readonly && m_annot.IsReadOnly()));
         AlertDialog dlg = builder.create();
         dlg.show();
     }

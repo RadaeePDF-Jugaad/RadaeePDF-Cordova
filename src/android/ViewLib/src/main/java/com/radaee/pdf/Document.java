@@ -1116,6 +1116,7 @@ public class Document
 	 */
 	public float GetPageHeight( int pageno )
 	{
+		if(pageno < 0 || pageno >= getPageCount(hand_val)) return 1;
 		float h = getPageHeight( hand_val, pageno );
 		if( h <= 0 ) return 1;
 		else return h;
