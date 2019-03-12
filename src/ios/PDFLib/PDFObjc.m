@@ -1334,7 +1334,7 @@ extern bool g_annot_readonly;
 
 - (BOOL)isAnnotLocked
 {
-    if (g_annot_lock && [self isLocked])
+    if ([self isLocked])
         return YES;
     
     return NO;
