@@ -8,24 +8,104 @@
 
 #import "PDFView.h"
 #import <QuartzCore/QuartzCore.h>
-
-extern int g_def_view;
-extern float g_Ink_Width;
-extern float g_line_Width;
-extern float g_rect_Width;
-extern uint g_ink_color;
-extern uint g_rect_color;
-extern uint g_line_color;
-extern uint g_oval_color;
-extern bool g_paging_enabled;
-extern bool g_double_page_enabled;
-extern bool g_curl_enabled;
-extern bool g_cover_page_enabled;
-extern bool g_execute_annot_JS;
-extern NSString *g_author;
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
+#import "PDFV.h"
+#import "ReaderHandler.h"
+#import "RDUtils.h"
+#import "ActionStackManager.h"
 
 #define TEMP_SIGNATURE @"radaee_signature_temp.png"
 #define TEMP_SIGNATURE_EMPTY @"radaee_empty_signature_temp.png"
+
+@interface PDFView ()<PDFVInnerDel, UIScrollViewDelegate, PDFJSDelegate>
+{
+#ifdef FTS_ENABLED
+    FTSOccurrence *currentOccurrence;
+#endif
+    UIView *aview;
+    ActionStackManager *actionManger;
+    
+    UIImageView *imgAnnot;
+    NSString *tmpImage;
+    double lastAngle;
+    
+    BOOL readOnlyEnabled;
+    BOOL autoSaveEnabled;
+    
+    BOOL coverPage;
+    
+    BOOL isResizing;
+    BOOL isRotating;
+    
+    int doubleTapZoomMode;
+    int readerBackgroundColor;
+    
+    PDFDoc *m_doc;
+    PDFV *m_view;
+    PDFInk *m_ink;
+    PDF_POINT *m_lines;
+    PDF_POINT *m_rects;
+    PDF_POINT *m_ellipse;
+    UIView *m_child;
+    
+    PDFAnnot *m_annot;
+    struct PDFV_POS m_annot_pos;
+    PDF_RECT m_annot_rect;
+    
+    int m_lines_cnt;
+    int m_lines_max;
+    bool m_lines_drawing;
+    
+    int m_rects_cnt;
+    int m_rects_max;
+    bool m_rects_drawing;
+    
+    int m_ellipse_cnt;
+    int m_ellipse_max;
+    bool m_ellipse_drawing;
+    
+    int m_type;
+    
+    NSTimer *m_timer;
+    bool m_modified;
+    int m_w;
+    int m_h;
+    int m_cur_page;
+    
+    CGPoint zoomPoint;
+    bool isDoubleTapping;
+    
+    BOOL pagingEnabled;
+    BOOL doublePage;
+    
+    enum STATUS
+    {
+        sta_none,
+        sta_zoom,
+        sta_sel,
+        sta_annot,
+        sta_note,
+        sta_ink,
+        sta_line,
+        sta_rect,
+        sta_ellipse,
+        sta_image,
+    };
+    enum STATUS m_status;
+    NSTimeInterval m_tstamp;
+    NSTimeInterval m_tstamp_tap;
+    float m_tx;
+    float m_ty;
+    float m_px;
+    float m_py;
+    float m_zoom;
+    struct PDFV_POS m_zoom_pos;
+    float m_scale;
+    id<PDFViewDelegate> m_delegate;
+}
+
+@end
 
 @implementation PDFView
 
@@ -88,7 +168,7 @@ extern NSString *g_author;
     [self vClose];
     
     // Load global var
-    doublePage = g_double_page_enabled;
+    doublePage = GLOBAL.g_double_page_enabled;
     
     // Zoom action on double tap
     // 1: default zoom
@@ -111,24 +191,24 @@ extern NSString *g_author;
         }
     }
     
-    switch(g_def_view)
+    switch(GLOBAL.g_def_view)
     {
             // Horizontal
         case 1:
-            g_paging_enabled = NO;
+            GLOBAL.g_paging_enabled = NO;
             m_view = [[PDFVHorz alloc] init:false];
             break;
             
             // Horizontal rtol
         case 2:
-            g_paging_enabled = NO;
+            GLOBAL.g_paging_enabled = NO;
             m_view = [[PDFVHorz alloc] init:true];
             break;
             
             // Single Page (paging enabled)
         case 3:
             doublePage = NO;
-            g_paging_enabled = YES;
+            GLOBAL.g_paging_enabled = YES;
             m_view = [[PDFVDual alloc] init:false :NULL :0 :verts :doc.pageCount];
             
             break;
@@ -136,7 +216,7 @@ extern NSString *g_author;
             // Double Page (paging enabled)
         case 4:
             doublePage = YES;
-            g_paging_enabled = YES;
+            GLOBAL.g_paging_enabled = YES;
             m_view = [[PDFVDual alloc] init:false :NULL :0 : NULL :doc.pageCount];
             
             break;
@@ -144,12 +224,12 @@ extern NSString *g_author;
             // Double Page first page single (paging enabled)
         case 6:
             doublePage = YES;
-            g_paging_enabled = YES;
+            GLOBAL.g_paging_enabled = YES;
             m_view = [[PDFVDual alloc] init:false :NULL :0 : horzs :doc.pageCount];
             
             break;
         default:
-            g_paging_enabled = NO;
+            GLOBAL.g_paging_enabled = NO;
             m_view = [[PDFVVert alloc] init];
             break;
     }
@@ -157,10 +237,10 @@ extern NSString *g_author;
     free( verts );
     NSLog(@"PDFView rect ：%f %f %f %f ",self.frame.origin.x, self.frame.origin.y,self.frame.size.width,self.frame.size.height);
     self.minimumZoomScale = 1;
-    self.maximumZoomScale = g_zoom_level;
+    self.maximumZoomScale = GLOBAL.g_zoom_level;
     m_delegate = delegate;
     self.delegate = self;
-    m_type = g_def_view;
+    m_type = GLOBAL.g_def_view;
     struct PDFVThreadBack tback;
     tback.OnPageRendered = @selector(OnPageRendered:);
     tback.OnFound = @selector(OnFound:);
@@ -202,7 +282,7 @@ extern NSString *g_author;
     
     self.pagingEnabled = NO;
     if ([self paginAvailable]) {
-        self.pagingEnabled = g_paging_enabled;
+        self.pagingEnabled = GLOBAL.g_paging_enabled;
     }
     
     if ([self isCurlEnabled]) {
@@ -282,13 +362,13 @@ extern NSString *g_author;
     }
     
     if (doublePage) {
-        if (g_paging_enabled && g_def_view == 4 && pageno > 0 && (pageno + 1) < m_doc.pageCount && (pageno % 2 == 0) && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
+        if (GLOBAL.g_paging_enabled && GLOBAL.g_def_view == 4 && pageno > 0 && (pageno + 1) < m_doc.pageCount && (pageno % 2 == 0) && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
             pageno++;
         }
         
         BOOL checkMod = (coverPage) ? (pageno % 2 == 0) : (pageno % 2 != 0);
         
-        if (g_paging_enabled && g_def_view == 4 && pageno > 0 && checkMod && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
+        if (GLOBAL.g_paging_enabled && GLOBAL.g_def_view == 4 && pageno > 0 && checkMod && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
             pageno--;
         }
     }
@@ -309,7 +389,7 @@ extern NSString *g_author;
     
     float gapY = (m_h - ([m_doc pageHeight:pageno]*[m_view vGetScaleMin:pageno])) / 2;
     
-    if (g_def_view > 1)
+    if (GLOBAL.g_def_view > 1)
         [m_view vSetPos:&pos :gapX :gapY];
     else
         [m_view vSetPos:&pos :0 :0];
@@ -484,7 +564,7 @@ extern NSString *g_author;
         point.x = m_w/m_scale - buffer;
     }
     
-    self.zoomScale = (scale > g_zoom_level) ? g_zoom_level : scale;
+    self.zoomScale = (scale > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : scale;
     
     m_zoom = scale;
     
@@ -554,7 +634,7 @@ extern NSString *g_author;
         [self centerPage];
         
         if (self.zoomScale <= 1 && [self paginAvailable]) {
-            self.pagingEnabled = g_paging_enabled;
+            self.pagingEnabled = GLOBAL.g_paging_enabled;
         }
     }
 }
@@ -563,14 +643,14 @@ extern NSString *g_author;
 {
     if( m_status == sta_ink && m_ink )
     {
-        NSLog(@"g_ink_color = %d",g_ink_color);
+        NSLog(@"g_ink_color = %d",GLOBAL.g_ink_color);
         int cnt = [m_ink nodesCount];
         int cur = 0;
-        CGContextSetLineWidth(context, g_Ink_Width);
-        float red = ((g_ink_color>>16)&0xFF)/255.0f;
-        float green = ((g_ink_color>>8)&0xFF)/255.0f;
-        float blue = (g_ink_color&0xFF)/255.0f;
-        float alpha = ((g_ink_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_Ink_Width);
+        float red = ((GLOBAL.g_ink_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_ink_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_ink_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_ink_color>>24)&0xFF)/255.0f;
         CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         CGContextBeginPath( context );
         while( cur < cnt )
@@ -621,11 +701,11 @@ extern NSString *g_author;
 {
     if( m_status == sta_line && (m_lines_cnt || m_lines_drawing) )
     {
-        CGContextSetLineWidth(context, g_line_Width);
-        float red = ((g_line_color>>16)&0xFF)/255.0f;
-        float green = ((g_line_color>>8)&0xFF)/255.0f;
-        float blue = (g_line_color&0xFF)/255.0f;
-        float alpha = ((g_line_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_line_Width);
+        float red = ((GLOBAL.g_line_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_line_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_line_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_line_color>>24)&0xFF)/255.0f;
         CGContextSetRGBFillColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_lines;
         PDF_POINT *pt_end = m_lines + (m_lines_cnt<<1);
@@ -645,11 +725,11 @@ extern NSString *g_author;
 {
     if( m_status == sta_rect && (m_rects_cnt || m_rects_drawing) )
     {
-        CGContextSetLineWidth(context, g_rect_Width);
-        float red = ((g_rect_color>>16)&0xFF)/255.0f;
-        float green = ((g_rect_color>>8)&0xFF)/255.0f;
-        float blue = (g_rect_color&0xFF)/255.0f;
-        float alpha = ((g_rect_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_rect_Width);
+        float red = ((GLOBAL.g_rect_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_rect_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_rect_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_rect_color>>24)&0xFF)/255.0f;
         CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_rects;
         PDF_POINT *pt_end = m_rects + (m_rects_cnt<<1);
@@ -690,11 +770,11 @@ extern NSString *g_author;
 {
     if( m_status == sta_ellipse && (m_ellipse_cnt || m_ellipse_drawing) )
     {
-        CGContextSetLineWidth(context, g_rect_Width);
-        float red = ((g_oval_color>>16)&0xFF)/255.0f;
-        float green = ((g_oval_color>>8)&0xFF)/255.0f;
-        float blue = (g_oval_color&0xFF)/255.0f;
-        float alpha = ((g_oval_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_rect_Width);
+        float red = ((GLOBAL.g_oval_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_oval_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_oval_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_oval_color>>24)&0xFF)/255.0f;
         CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_ellipse;
         PDF_POINT *pt_end = m_ellipse + (m_ellipse_cnt<<1);
@@ -1060,7 +1140,7 @@ extern NSString *g_author;
     {
         m_tx = point.x * m_scale;
         m_ty = point.y * m_scale;
-        m_ink = [[PDFInk alloc] init:g_Ink_Width * m_scale: g_ink_color];
+        m_ink = [[PDFInk alloc] init:GLOBAL.g_Ink_Width * m_scale: GLOBAL.g_ink_color];
     }
     [m_ink onDown:point.x * m_scale: point.y * m_scale];
 	return true;
@@ -1330,7 +1410,7 @@ extern NSString *g_author;
     
     if (doubleTapZoomMode > 0) {
         if (m_zoom > 1){
-            self.pagingEnabled = g_paging_enabled;
+            self.pagingEnabled = GLOBAL.g_paging_enabled;
             [self resetZoomLevel];
         }else {
             self.pagingEnabled = NO;
@@ -1361,7 +1441,7 @@ extern NSString *g_author;
                 
                 if (scale > 1) {
                     
-                    self.zoomScale = (scale > g_zoom_level) ? g_zoom_level : scale;
+                    self.zoomScale = (scale > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : scale;
                     m_zoom = scale;
                     
                     [m_view vSetScale:scale];
@@ -1784,7 +1864,7 @@ extern NSString *g_author;
                 PDFPage *page = [vpage GetPage];
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformRect:&rect];
-                [page addAnnotEllipse:&rect:g_rect_Width * m_scale / [vpage GetScale]:g_oval_color:0];
+                [page addAnnotEllipse:&rect:GLOBAL.g_rect_Width * m_scale / [vpage GetScale]:GLOBAL.g_oval_color:0];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -1888,7 +1968,7 @@ extern NSString *g_author;
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
-                [page addAnnotLine:pt_cur :&pt_cur[1] :g_rect_Width :0 :1 :g_rect_color :g_rect_color];
+                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_rect_Width :0 :1 :GLOBAL.g_rect_color :GLOBAL.g_rect_color];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -1993,7 +2073,7 @@ extern NSString *g_author;
                 PDFPage *page = [vpage GetPage];
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale :self.contentOffset.y * m_scale];
                 [mat transformRect:&rect];
-                [page addAnnotRect:&rect: g_rect_Width * m_scale / [vpage GetScale]: g_rect_color: 0];
+                [page addAnnotRect:&rect: GLOBAL.g_rect_Width * m_scale / [vpage GetScale]: GLOBAL.g_rect_color: 0];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -2329,6 +2409,17 @@ extern NSString *g_author;
                 return;
             }
             
+            nuri = [m_annot getURI];
+            if(nuri)//open url
+            {
+                if( m_delegate && GLOBAL.g_auto_launch_link)
+                {
+                    [m_delegate OnAnnotOpenURL:nuri];
+                    [self vAnnotEnd];
+                    return;
+                }
+            }
+            
             if (m_delegate)
                 [m_delegate OnAnnotClicked :page:m_annot:x:y];
             
@@ -2615,7 +2706,7 @@ extern NSString *g_author;
 
 - (BOOL)paginAvailable
 {
-    return (g_def_view == 3 || g_def_view == 4 || g_def_view == 6);
+    return (GLOBAL.g_def_view == 3 || GLOBAL.g_def_view == 4 || GLOBAL.g_def_view == 6);
 }
 
 - (BOOL)canSaveDocument
@@ -2678,7 +2769,7 @@ extern NSString *g_author;
 
 - (void)setAuthorForAnnot:(PDFAnnot *)annot
 {
-    [annot setPopupLabel:g_author];
+    [annot setPopupLabel:GLOBAL.g_author];
 }
 
 - (void)setModifyDateForAnnot:(PDFAnnot *)annot
@@ -2806,7 +2897,7 @@ extern NSString *g_author;
     CGDataProviderRelease(provider);
     
     // Save the image
-    NSString *filePath = [pdfPath stringByAppendingPathComponent:@"test.png"];
+    NSString *filePath = [GLOBAL.pdfPath stringByAppendingPathComponent:@"test.png"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     }
@@ -2817,7 +2908,7 @@ extern NSString *g_author;
 
 - (void)executeAnnotJS
 {
-    if (!m_annot || ! g_execute_annot_JS) {
+    if (!m_annot || ! GLOBAL.g_execute_annot_JS) {
         return;
     }
     
@@ -3089,7 +3180,7 @@ extern NSString *g_author;
 
 - (BOOL)isCurlEnabled
 {
-    return g_curl_enabled;
+    return GLOBAL.g_curl_enabled;
 }
 
 - (CGImageRef )vGetImageForPage:(int)pg withSize:(CGSize)size withBackground:(BOOL)hasBackground
@@ -3194,6 +3285,20 @@ extern NSString *g_author;
         [[NSFileManager defaultManager] removeItemAtPath:cacheFileFullPath error:nil];
     }
     return YES;
+}
+
+- (CGRect)convertRect:(PDF_RECT)rect inPage:(int)page {
+    PDFVPage *vpage = [m_view vGetPage:page];
+    rect.left = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:rect.left];
+    rect.right = [vpage GetX] - self.contentOffset.x * m_scale + [vpage ToDIBX:rect.right];
+    float tmp = rect.top;
+    rect.top = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:rect.bottom];
+    rect.bottom = [vpage GetY] - self.contentOffset.y * m_scale + [vpage ToDIBY:tmp];
+    
+    return CGRectMake(self.contentOffset.x + rect.left/m_scale,
+                              self.contentOffset.y + rect.top/m_scale,
+                              (rect.right - rect.left)/m_scale,
+                              (rect.bottom - rect.top)/m_scale);
 }
 
 @end

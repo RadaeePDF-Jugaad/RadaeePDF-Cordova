@@ -7,8 +7,6 @@
 //
 
 #import "PDFReflowView.h"
-extern NSMutableString *pdfName;
-extern NSMutableString *pdfPath;
 
 @implementation PDFReflowView
 @synthesize m_image;
@@ -28,7 +26,6 @@ extern NSMutableString *pdfPath;
         self.delegate = (id<UIScrollViewDelegate>)self;
         self.scrollEnabled = YES;
         self.backgroundColor = [UIColor clearColor];
-        
     }
     
     return self;
@@ -59,20 +56,22 @@ extern NSMutableString *pdfPath;
     dib = [[PDFDIB alloc] init:m_w :m_h];
     
     
-    [m_page reflow:dib :gap:gap];
+    BOOL b = [m_page reflow:dib :gap:gap];
     
     void *data = [dib data];
     CGDataProviderRef provider = CGDataProviderCreateWithData( NULL, data, m_w * m_h * 4, NULL );
     CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
     m_img = CGImageCreate( m_w, m_h, 8, 32, m_w<<2, cs, kCGBitmapByteOrder32Big|kCGImageAlphaNoneSkipLast, provider, NULL, FALSE, kCGRenderingIntentDefault );
-    CGColorSpaceRelease(cs);
-    CGDataProviderRelease( provider );
-    imageView.image = nil;
+    //CGColorSpaceRelease(cs);
+    //CGDataProviderRelease( provider );
+    //imageView.image = nil;
     
     m_image = [UIImage imageWithCGImage:m_img];
-    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *filePath = @"/Users/lujinrong/Downloads/image.png";
+    BOOL result =[UIImagePNGRepresentation(m_image)writeToFile:filePath   atomically:YES]; //
     [imageView setImage:m_image];
-    CGImageRelease(m_img);
+    //CGImageRelease(m_img);
     [self setNeedsDisplay];
 }
 -(void)vClose

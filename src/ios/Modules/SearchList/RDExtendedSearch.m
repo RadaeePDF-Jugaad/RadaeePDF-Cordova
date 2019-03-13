@@ -8,9 +8,6 @@
 
 #import "RDExtendedSearch.h"
 
-extern bool  g_CaseSensitive;
-extern bool g_MatchWholeWord;
-
 @implementation RDSearchResult
 
 + (RDSearchResult *)initWithString:(NSString *)stringToShow forPage:(int)page
@@ -53,7 +50,7 @@ extern bool g_MatchWholeWord;
             
             m_page = [m_doc page:i];
             [m_page objsStart];
-            m_finder = [m_page find:text :g_CaseSensitive :g_MatchWholeWord];
+            m_finder = [m_page find:text :GLOBAL.g_CaseSensitive :GLOBAL.g_MatchWholeWord];
             
             m_page = nil;
             
@@ -74,7 +71,7 @@ extern bool g_MatchWholeWord;
                 
                 m_page = [m_doc page:i];
                 [m_page objsStart];
-                m_finder = [m_page find:text :g_CaseSensitive :g_MatchWholeWord];
+                m_finder = [m_page find:text :GLOBAL.g_CaseSensitive :GLOBAL.g_MatchWholeWord];
                 
                 if (m_finder.count > 0) {
                     [self addPageSearchResults:m_finder forPage:i];

@@ -234,7 +234,7 @@
                 rect_draw.top = [page ToDIBY:rect_word.bottom] + [page GetY];
                 rect_draw.right = [page ToDIBX:rect_word.right] + [page GetX];
                 rect_draw.bottom = [page ToDIBY:rect_word.top] + [page GetY];
-                [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): g_sel_color];
+                [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color];
                 rect_word = rect;
             }
             ichar++;
@@ -243,7 +243,7 @@
         rect_draw.top = [page ToDIBY:rect_word.bottom] + [page GetY];
         rect_draw.right = [page ToDIBX:rect_word.right] + [page GetX];
         rect_draw.bottom = [page ToDIBY:rect_word.top] + [page GetY];
-        [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): g_sel_color];
+        [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color];
     }
 }
 - (void)find_draw_all:(PDFVCanvas *)canvas :(PDFVPage *)page

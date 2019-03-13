@@ -7,11 +7,7 @@
 //
 
 #import "PDFObjc.h"
-extern uint annotHighlightColor;
-extern uint annotUnderlineColor;
-extern uint annotStrikeoutColor;
-extern bool g_annot_lock;
-extern bool g_annot_readonly;
+#import "RDGlobal.h"
 
 @implementation PDFSign
 @synthesize handle = m_sign;
@@ -1342,7 +1338,7 @@ extern bool g_annot_readonly;
 
 - (BOOL)isAnnotReadOnly
 {
-    if (g_annot_readonly && [self isReadonly])
+    if (GLOBAL.g_annot_readonly && [self isReadonly])
         return YES;
     
     return NO;

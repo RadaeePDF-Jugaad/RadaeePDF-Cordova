@@ -7,6 +7,7 @@
 
 #import "SignatureViewController.h"
 #import "UviSignatureView.h"
+#import "RDGlobal.h"
 
 @interface SignatureViewController () {
     
@@ -15,8 +16,6 @@
 }
 
 @end
-
-extern bool g_fit_signature_to_field;
 
 @implementation SignatureViewController
 
@@ -54,7 +53,7 @@ extern bool g_fit_signature_to_field;
 - (void)getImage
 {
     // Save image to temp path
-    [sigView signatureImage:CGPointZero text:@"" fitSignature:g_fit_signature_to_field];
+    [sigView signatureImage:CGPointZero text:@"" fitSignature:GLOBAL.g_fit_signature_to_field];
     [_delegate didSign];
 }
 

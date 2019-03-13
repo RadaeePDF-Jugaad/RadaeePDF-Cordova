@@ -581,7 +581,7 @@
     
     m_scales_min[pcur] = scale1;
     
-    m_scales_max[pcur] = m_scales_min[pcur] * g_zoom_level;
+    m_scales_max[pcur] = m_scales_min[pcur] * GLOBAL.g_zoom_level;
     
     if( m_scales[pcur] < m_scales_min[pcur] ) m_scales[pcur] = m_scales_min[pcur];
     if( m_scales[pcur] > m_scales_max[pcur] ) m_scales[pcur] = m_scales_max[pcur];
@@ -606,7 +606,7 @@
         float w = [m_doc pageWidth:cur];
         float h = [m_doc pageHeight:cur];
         
-        if (g_static_scale) {
+        if (GLOBAL.g_static_scale) {
             [self vLoadPageLayout:cur width:sz.cx height:sz.cy vert:YES];
         } else {
             [self vLoadPageLayout:cur width:w height:h vert:YES];
@@ -684,7 +684,7 @@
         float w = [m_doc pageWidth:cur];
         float h = [m_doc pageHeight:cur];
         
-        if (g_static_scale) {
+        if (GLOBAL.g_static_scale) {
             [self vLoadPageLayout:cur width:sz.cx height:sz.cy];
         } else {
             [self vLoadPageLayout:cur width:w height:h];
@@ -852,7 +852,7 @@
     PDF_SIZE sz = [m_doc getPagesMaxSize];
     float max_w_dual = 0;
     
-    if (g_static_scale) {
+    if (GLOBAL.g_static_scale) {
         while( pcur < pcnt ) {
             float w = [m_doc pageWidth:pcur] + [m_doc pageWidth:pcur + 1];
             if( max_w_dual < w ) max_w_dual = w;
@@ -868,7 +868,7 @@
         {
             if( m_vert_dual != NULL && ccnt < m_vert_dual_cnt && m_vert_dual[ccnt] && pcur < pcnt - 1 )
             {
-                if (g_static_scale) {
+                if (GLOBAL.g_static_scale) {
                     [self vLoadPageLayout:pcur width:max_w_dual height:sz.cy];
                 } else {
                     float w = [m_doc pageWidth:pcur] + [m_doc pageWidth:pcur + 1];
@@ -883,7 +883,7 @@
             }
             else
             {
-                if (g_static_scale) {
+                if (GLOBAL.g_static_scale) {
                     [self vLoadPageLayout:pcur width:sz.cx height:sz.cy];
                 } else {
                     float w = [m_doc pageWidth:pcur];
@@ -948,7 +948,7 @@
         {
             if( (m_horz_dual == NULL || ccnt >= m_horz_dual_cnt || m_horz_dual[ccnt]) && pcur < pcnt - 1 )
             {
-                if (g_static_scale) {
+                if (GLOBAL.g_static_scale) {
                     [self vLoadPageLayout:pcur width:max_w_dual height:sz.cy];
                 } else {
                     float w = [m_doc pageWidth:pcur] + [m_doc pageWidth:pcur + 1];
@@ -963,7 +963,7 @@
             }
             else
             {
-                if (g_static_scale) {
+                if (GLOBAL.g_static_scale) {
                     [self vLoadPageLayout:pcur width:sz.cx height:sz.cy];
                 } else {
                     float w = [m_doc pageWidth:pcur];
@@ -1295,7 +1295,7 @@
     if( m_orientation == 0 )//horz
     {
         m_scale_min = ((float)(m_h - m_page_gap)) / sz.cy;
-        m_scale_max = m_scale_min * g_zoom_level;
+        m_scale_max = m_scale_min * GLOBAL.g_zoom_level;
         m_scale = m_scale_min;
         
         int left = m_w/2;
@@ -1332,7 +1332,7 @@
     else
     {
         m_scale_min = ((float)(m_w - m_page_gap)) / sz.cx;
-        m_scale_max = m_scale_min * g_zoom_level;
+        m_scale_max = m_scale_min * GLOBAL.g_zoom_level;
         m_scale = m_scale_min;
         
         int left = m_page_gap / 2;
@@ -1521,7 +1521,7 @@
     PDFVPage *vpage = m_pages[m_sel];
     int left = [vpage GetX];
     int top = [vpage GetY];
-    [canvas FillRect:CGRectMake(left, top, [vpage GetWidth], [vpage GetHeight]) :g_sel_color];
+    [canvas FillRect:CGRectMake(left, top, [vpage GetWidth], [vpage GetHeight]) :GLOBAL.g_sel_color];
 
     //NSTimeInterval time2 = [[NSDate date] timeIntervalSince1970] * 1000 - time1;
     //time2 = 0;
@@ -1595,7 +1595,7 @@
     PDF_SIZE sz = [m_doc getPagesMaxSize];
     
     m_scale_min = (((float)(m_element_height)) / sz.cy);
-    m_scale_max = m_scale_min * g_zoom_level;
+    m_scale_max = m_scale_min * GLOBAL.g_zoom_level;
     m_scale = m_scale_min;
     
     float elementWidth = (sz.cx * m_scale);

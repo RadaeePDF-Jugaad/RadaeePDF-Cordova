@@ -84,27 +84,6 @@
 }
 @end
 
-int g_def_view = 0;
-float g_zoom_level = 5;
-bool g_static_scale = false;
-bool g_paging_enabled = false;
-bool g_double_page_enabled = false;
-bool g_curl_enabled = false;
-bool g_cover_page_enabled = false;
-bool g_fit_signature_to_field = true;
-bool g_execute_annot_JS = true;
-bool g_dark_mode = false;
-bool g_annot_lock = false;
-bool g_annot_readonly = false;
-PDF_RENDER_MODE renderQuality = mode_normal;
-
-uint annotHighlightColor = 0xFFFFFF00;
-uint annotUnderlineColor = 0xFF0000FF;
-uint annotStrikeoutColor = 0xFFFF0000;
-uint annotSquigglyColor = 0xFF00FF00;
-
-NSString *g_author = @"";
-
 void APP_Init()
 {
     BOOL isActive = NO;
@@ -362,22 +341,7 @@ void APP_Init()
     Global_setDefaultFont("Korea1", "BousungEG-Light-GB", true);
     Global_setAnnotFont( "Arimo" );//Global_setAnnotFont( "BousungEG-Light-GB" );
     
+    Global_setAnnotTransparency(0x200040FF);
     
-	Global_setAnnotTransparency(0x200040FF);
-	g_def_view = 0;
-	renderQuality = mode_normal;
-	g_zoom_level = 5;
-    g_paging_enabled = false;
-    g_double_page_enabled = true;
-    g_curl_enabled = false;
-    g_cover_page_enabled = false;
-    
-    g_Ink_Width = 2;
-    g_rect_Width = 2;
-    g_line_Width = 2;
-    g_rect_color = 0xFFFF0000;
-    g_line_color = 0xFFFF0000;
-    g_ink_color = 0xFFFF0000;
-    g_sel_color = 0x400000C0;
-    g_oval_color = 0xFF0000FF;
+    [[RDGlobal sharedInstance] setup];
 }

@@ -8,11 +8,6 @@
 
 #import "PDFVPage.h"
 
-extern uint annotHighlightColor;
-extern uint annotUnderlineColor;
-extern uint annotStrikeoutColor;
-extern uint annotSquigglyColor;
-
 @implementation PDFVCache
 -(id)init:(PDFDoc *)doc :(int) pageno :(float)scale : (int)w : (int)h
 {
@@ -93,7 +88,7 @@ extern uint annotSquigglyColor;
         [m_page renderPrepare:m_dib];
 	if( m_status == 2 ) return;
     PDFMatrix *mat = [[PDFMatrix alloc] init:m_scale: -m_scale: 0: m_dibh];
-    [m_page render:m_dib :mat :renderQuality];
+    [m_page render:m_dib :mat :GLOBAL.renderQuality];
     [self RenderFinish];
 }
 
@@ -320,7 +315,7 @@ extern uint annotSquigglyColor;
             rect_draw.right = rect_word.right * scale;
             rect_draw.bottom = (page_height - rect_word.top) * scale;
             [canvas FillRect:CGRectMake((orgx + rect_draw.left), (orgy + rect_draw.top),
-                                        (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): g_sel_color ];
+                                        (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color ];
             rect_word = rect;
         }
         tmp++;
@@ -330,7 +325,7 @@ extern uint annotSquigglyColor;
     rect_draw.right = rect_word.right * scale;
     rect_draw.bottom = (page_height - rect_word.top) * scale;
     [canvas FillRect:CGRectMake((orgx + rect_draw.left), (orgy + rect_draw.top),
-                                (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): g_sel_color ];
+                                (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color ];
 }
 
 -(void)Reset

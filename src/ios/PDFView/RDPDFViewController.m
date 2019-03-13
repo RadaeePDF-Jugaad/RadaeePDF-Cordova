@@ -20,6 +20,7 @@
 #import "RDAnnotListViewController.h"
 #import "SignatureViewController.h"
 #import "ViewModeTableViewController.h"
+#import "RDFormManager.h"
 
 @interface RDPDFViewController () <UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,UIDocumentInteractionControllerDelegate,RDToolBarDelegate,DrawModeDelegate,RDMoreTableViewControllerDelegate, SignatureDelegate, ViewModeDelegate, BookmarkTableViewDelegate, RDAnnotListViewControllerDelegate, SearchResultViewControllerDelegate,saveTextAnnotDelegate>
 {
@@ -54,8 +55,6 @@
 @synthesize b_keyboard;
 
 bool b_outline;
-extern NSMutableString *pdfName;
-extern NSMutableString *pdfPath;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -290,10 +289,10 @@ extern NSMutableString *pdfPath;
 
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd atPage:(int)page readOnly:(BOOL)readOnlyEnabled autoSave:(BOOL)autoSaveEnabled author:(NSString *)author;
 {
-    g_author = author;
+    GLOBAL.g_author = author;
     autoSave = autoSaveEnabled;
-    pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
-    pdfName = [[path lastPathComponent] mutableCopy];
+    GLOBAL.pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
+    GLOBAL.pdfName = [[path lastPathComponent] mutableCopy];
     
     [self PDFClose];
     PDF_ERR err = 0;
@@ -737,20 +736,20 @@ extern NSMutableString *pdfPath;
     switch (mode) {
         case 2:
         {
-            g_def_view = 3;
+            GLOBAL.g_def_view = 3;
             break;
         }
         case 3:
         {
-            g_def_view = 4;
+            GLOBAL.g_def_view = 4;
             break;
         }
         default:
-            g_def_view = mode;
+            GLOBAL.g_def_view = mode;
             break;
     }
     
-    [[NSUserDefaults standardUserDefaults] setInteger:g_def_view forKey:@"ViewMode"];
+    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_def_view forKey:@"ViewMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     CGRect rect = [self screenRect];
     
@@ -770,7 +769,7 @@ extern NSMutableString *pdfPath;
 
 - (NSMutableArray *)loadBookmarkForPdf:(NSString *)pdfPath withPath:(BOOL)withPath
 {
-    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[pdfName stringByDeletingPathExtension] withPath:withPath];
+    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[GLOBAL.pdfName stringByDeletingPathExtension] withPath:withPath];
 }
 
 - (NSMutableArray *)addBookMarks:(NSString *)dpath :(NSString *)subdir :(NSFileManager* )fm pdfName:(NSString *)pdfName withPath:(BOOL)withPath
@@ -818,7 +817,7 @@ extern NSMutableString *pdfPath;
 - (void)bookmarkList
 {
     BookmarkTableViewController *b = [[BookmarkTableViewController alloc] init];
-    b.items = [self loadBookmarkForPdf:pdfPath withPath:YES];
+    b.items = [self loadBookmarkForPdf:GLOBAL.pdfPath withPath:YES];
     b.delegate = self;
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -1023,7 +1022,7 @@ extern NSMutableString *pdfPath;
 
 - (NSString *)composeFile
 {
-    NSString *pdfpath = [pdfPath stringByAppendingPathComponent:pdfName];
+    NSString *pdfpath = [GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName];
     struct PDFV_POS pos;
     [m_view vGetPos:&pos];
     int pageno = pos.pageno;
@@ -1290,7 +1289,7 @@ extern NSMutableString *pdfPath;
 
 - (void)printPdf
 {
-    NSString *path = [pdfPath stringByAppendingPathComponent:pdfName];
+    NSString *path = [GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName];
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         UIAlertView *alter = [[UIAlertView alloc]initWithTitle:@"Warning" message:@"PDF file not available"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
@@ -1307,7 +1306,7 @@ extern NSMutableString *pdfPath;
         
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
-        printInfo.jobName = [pdfPath lastPathComponent];
+        printInfo.jobName = [GLOBAL.pdfPath lastPathComponent];
         printInfo.duplex = UIPrintInfoDuplexLongEdge;
         pic.printInfo = printInfo;
         pic.showsPageRange = YES;
@@ -1330,7 +1329,7 @@ extern NSMutableString *pdfPath;
 
 -(void)sharePDF
 {
-    NSURL *url = [NSURL fileURLWithPath:[pdfPath stringByAppendingPathComponent:pdfName]];
+    NSURL *url = [NSURL fileURLWithPath:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName]];
     if(url)
     {
         UIActivityViewController *a = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
@@ -1599,7 +1598,7 @@ extern NSMutableString *pdfPath;
     if(!b_findStart)
     {
         findString =text;
-        [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
+        [m_view vFindStart:text :GLOBAL.g_CaseSensitive :GLOBAL.g_MatchWholeWord];
         b_findStart = YES;
         [m_view vFind:dir];
     }
@@ -1608,14 +1607,14 @@ extern NSMutableString *pdfPath;
         bool stringCmp =false;
         if( findString != NULL )
         {
-            if(g_CaseSensitive == true)
+            if(GLOBAL.g_CaseSensitive == true)
                 stringCmp=[text compare:findString] == NSOrderedSame;
             else
                 stringCmp=[text caseInsensitiveCompare:findString] == NSOrderedSame;
         }
         if( !stringCmp )
         {
-            [m_view vFindStart:text :g_CaseSensitive :g_MatchWholeWord];
+            [m_view vFindStart:text :GLOBAL.g_CaseSensitive :GLOBAL.g_MatchWholeWord];
             findString =text;
         }
         [m_view vFind:dir];
@@ -2108,7 +2107,7 @@ extern NSMutableString *pdfPath;
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         //2strikethrough
-        [m_view vSelMarkup:annotStrikeoutColor :2];
+        [m_view vSelMarkup:GLOBAL.annotStrikeoutColor :2];
         
         if(m_bSel)
         {
@@ -2125,7 +2124,7 @@ extern NSMutableString *pdfPath;
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         //0HighLight
-        [m_view vSelMarkup:annotHighlightColor :0];
+        [m_view vSelMarkup:GLOBAL.annotHighlightColor :0];
         
         if(m_bSel)
         {
@@ -2141,7 +2140,7 @@ extern NSMutableString *pdfPath;
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         //1UnderLine
-        [m_view vSelMarkup:annotUnderlineColor :1];
+        [m_view vSelMarkup:GLOBAL.annotUnderlineColor :1];
         
         if(m_bSel)
         {
@@ -2471,7 +2470,7 @@ extern NSMutableString *pdfPath;
 {
     if (doc == nil) {
         doc = [[PDFDoc alloc] init];
-        [doc open:[pdfPath stringByAppendingPathComponent:pdfName] :@""];
+        [doc open:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :@""];
     }
     
     if(page >= 0 && page < doc.pageCount)
@@ -2490,7 +2489,7 @@ extern NSMutableString *pdfPath;
 {
     PDFDoc *doc = [[PDFDoc alloc] init];
     if (m_doc == nil) {
-        [doc open:[pdfPath stringByAppendingPathComponent:pdfName] :@""];
+        [doc open:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :@""];
     } else {
         doc = m_doc;
     }

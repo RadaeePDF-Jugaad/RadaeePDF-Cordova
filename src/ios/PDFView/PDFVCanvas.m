@@ -8,8 +8,6 @@
 
 #import "PDFVCanvas.h"
 
-extern bool g_dark_mode;
-
 @implementation PDFVCanvas
 -(id)init:(CGContextRef)ctx :(float)scale
 {
@@ -17,7 +15,7 @@ extern bool g_dark_mode;
     {
         m_ctx = ctx;
         m_scale = scale;
-        darkMode = g_dark_mode;
+        darkMode = GLOBAL.g_dark_mode;
         CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
     }
     
