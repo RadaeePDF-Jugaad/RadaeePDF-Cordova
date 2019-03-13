@@ -50,7 +50,7 @@
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    GLOBAL.g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     if([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]){
         
@@ -97,10 +97,10 @@
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    GLOBAL.g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:url ofType:nil];
-
+    
     [self openPdf:filePath atPage:[[params objectForKey:@"gotoPage"] intValue] withPassword:[params objectForKey:@"password"] readOnly:[[params objectForKey:@"readOnlyMode"] boolValue] autoSave:[[params objectForKey:@"automaticSave"] boolValue]];
 }
 
@@ -109,7 +109,7 @@
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    GLOBAL.g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     NSString *filePath = url;
     
@@ -173,19 +173,19 @@
         
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@"fileStat"]) {
             case 0:
-            message = @"File has not been modified.";
-            break;
-            
+                message = @"File has not been modified.";
+                break;
+                
             case 1:
-            message = @"File has been modified but not saved.";
-            break;
-            
+                message = @"File has been modified but not saved.";
+                break;
+                
             case 2:
-            message = @"File has been modified and saved.";
-            break;
-            
+                message = @"File has been modified and saved.";
+                break;
+                
             default:
-            break;
+                break;
         }
         
         [self cdvOkWithMessage:message];
@@ -322,7 +322,7 @@
 - (void)setImmersive:(CDVInvokedUrlCommand *)command
 {
     self.cdv_command = command;
- 
+    
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
     isImmersive = [[params objectForKey:@"immersive"] boolValue];
@@ -611,12 +611,12 @@
 
 - (void)setPagingEnabled:(BOOL)enabled
 {
-    g_paging_enabled = enabled;
+    GLOBAL.g_paging_enabled = enabled;
 }
 
 - (void)setDoublePageEnabled:(BOOL)enabled
 {
-    g_double_page_enabled = enabled;
+    GLOBAL.g_double_page_enabled = enabled;
 }
 
 - (void)setReaderViewMode:(CDVInvokedUrlCommand *)command
@@ -702,17 +702,17 @@
     [[NSUserDefaults standardUserDefaults] setInteger:selColor forKey:@"SelColor"];
     [[NSUserDefaults standardUserDefaults] setInteger:arrowColor forKey:@"ArrowColor"];
     
-    g_def_view = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"DefView"];
-    g_MatchWholeWord = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"MatchWholeWord"];
+    GLOBAL.g_def_view = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"DefView"];
+    GLOBAL.g_MatchWholeWord = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"MatchWholeWord"];
     
-    g_rect_color = rectColor;
-    g_ink_color = inkColor;
-    g_sel_color = selColor;
-    g_oval_color = ovalColor;
-    g_line_color = arrowColor;
-    annotHighlightColor = highlightColor;
-    annotUnderlineColor = underlineColor;
-    annotStrikeoutColor = strikeoutColor;
+    GLOBAL.g_rect_color = rectColor;
+    GLOBAL.g_ink_color = inkColor;
+    GLOBAL.g_sel_color = selColor;
+    GLOBAL.g_oval_color = ovalColor;
+    GLOBAL.g_line_color = arrowColor;
+    GLOBAL.annotHighlightColor = highlightColor;
+    GLOBAL.annotUnderlineColor = underlineColor;
+    GLOBAL.annotStrikeoutColor = strikeoutColor;
     //annotSquigglyColor = 0xFF00FF00;
     
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1087,10 +1087,10 @@
 - (void)willShowReader
 {
     /*
-    if (_delegate) {
-        [_delegate willShowReader];
-    }
-    */
+     if (_delegate) {
+     [_delegate willShowReader];
+     }
+     */
     
     [self cdvSendCallback:@"" orCommand:self.cdv_willShowReader];
 }
@@ -1098,10 +1098,10 @@
 - (void)didShowReader
 {
     /*
-    if (_delegate) {
-        [_delegate didShowReader];
-    }
-    */
+     if (_delegate) {
+     [_delegate didShowReader];
+     }
+     */
     
     [self cdvSendCallback:@"" orCommand:self.cdv_didShowReader];
 }
@@ -1109,10 +1109,10 @@
 - (void)willCloseReader
 {
     /*
-    if (_delegate) {
-        [_delegate willCloseReader];
-    }
-    */
+     if (_delegate) {
+     [_delegate willCloseReader];
+     }
+     */
     
     [self cdvSendCallback:@"" orCommand:self.cdv_willCloseReader];
 }
@@ -1120,10 +1120,10 @@
 - (void)didCloseReader
 {
     /*
-    if (_delegate) {
-        [_delegate didCloseReader];
-    }
-    */
+     if (_delegate) {
+     [_delegate didCloseReader];
+     }
+     */
     
     [self cdvSendCallback:@"" orCommand:self.cdv_didCloseReader];
 }
@@ -1131,10 +1131,10 @@
 - (void)didChangePage:(int)page
 {
     /*
-    if (_delegate) {
-        [_delegate didChangePage:page];
-    }
-    */
+     if (_delegate) {
+     [_delegate didChangePage:page];
+     }
+     */
     
     [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didChangePage];
 }
@@ -1142,10 +1142,10 @@
 - (void)didSearchTerm:(NSString *)term found:(BOOL)found
 {
     /*
-    if (_delegate) {
-        [_delegate didSearchTerm:term found:found];
-    }
-    */
+     if (_delegate) {
+     [_delegate didSearchTerm:term found:found];
+     }
+     */
     
     [self cdvSendCallback:term orCommand:self.cdv_didSearchTerm];
 }
@@ -1153,10 +1153,10 @@
 - (void)didTapOnPage:(int)page atPoint:(CGPoint)point
 {
     /*
-    if (_delegate) {
-        [_delegate didTapOnPage:page atPoint:point];
-    }
-    */
+     if (_delegate) {
+     [_delegate didTapOnPage:page atPoint:point];
+     }
+     */
     
     [self cdvSendCallback:[NSString stringWithFormat:@"%i", page] orCommand:self.cdv_didTapOnPage];
 }
@@ -1174,10 +1174,10 @@
 - (void)didTapOnAnnotationOfType:(int)type atPage:(int)page atPoint:(CGPoint)point
 {
     /*
-    if (_delegate) {
-        [_delegate didTapOnAnnotationOfType:type atPage:page atPoint:point];
-    }
-    */
+     if (_delegate) {
+     [_delegate didTapOnAnnotationOfType:type atPage:page atPoint:point];
+     }
+     */
     [self cdvSendDictCallback:@{@"index": [NSNumber numberWithInt:page], @"type": [NSNumber numberWithInt:type]} orCommand:self.cdv_didTapOnAnnotationOfType];
 }
 
