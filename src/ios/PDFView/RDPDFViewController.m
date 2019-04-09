@@ -307,9 +307,18 @@ bool b_outline;
     {
         case err_ok:
             break;
-        case err_password:
+        case err_password: {
             return 2;
             break;
+        }
+        case err_encrypt: {
+            return 3;
+            break;
+        }
+        case err_bad_file: {
+            return 4;
+            break;
+        }
         default: return 0;
     }
     
