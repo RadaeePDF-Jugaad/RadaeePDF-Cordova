@@ -30,7 +30,7 @@ If you, as user and developer need new features or fixes you shall submit them h
 	
 2. Add the android/iOS platform.  
    `cd RadaeePDF-Cordova`    
-	`cordova platform add android@6 --save` and/or `cordova platform add ios --save`
+	`cordova platform add android@latest --save` and/or `cordova platform add ios --save`
 	
 3. Add the plugin.  
    `cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git --save`
@@ -42,7 +42,8 @@ After doing these steps, you will have a ready to use project.
 
 ## Compatibility
 
-We do not yet support cordova-android 7.0.0, latest supported version is 6.4.0
+For cordova-android latest supported version is 8.0.0, We do not support cordova-android 7.0.0.
+Make sure to update to latest plugin version (especially src/android/hooks/configure-android.js), and to use the command `cordova platform add android@latest` 
 
 ## The JavaScript Interfaces
 
@@ -130,7 +131,7 @@ RadaeePDFPlugin.getFileState(
 For more examples, check demo/js/index.js  
 
 RadaeePDF library version included:
-- Android: v3.15.1
+- Android: v3.50
 - iOS: v3.8.4
 
 Original development: 
