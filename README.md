@@ -42,7 +42,8 @@ After doing these steps, you will have a ready to use project.
 
 ## Compatibility
 
-We do not yet support cordova-android 7.0.0, latest supported version is 6.4.0
+We do not yet support cordova-android 7.0.0, latest supported version is 6.4.0.  
+To be able to try the latest changes and improvements, please check the beta version https://github.com/gearit/RadaeePDF-Cordova/tree/beta
 
 ## The JavaScript Interfaces
 
@@ -130,7 +131,7 @@ RadaeePDFPlugin.getFileState(
 For more examples, check demo/js/index.js  
 
 RadaeePDF library version included:
-- Android: v3.15.1
+- Android: v3.50
 - iOS: v3.8.4
 
 Original development: 
