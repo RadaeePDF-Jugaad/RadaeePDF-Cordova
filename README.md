@@ -43,7 +43,7 @@ After doing these steps, you will have a ready to use project.
 ## Compatibility
 
 For cordova-android, latest supported version is 8.0.0, We do not support cordova-android 7.0.0.  
-Make sure to update to latest plugin version (especially src/android/hooks/configure-android.js), and to use the command `cordova platform add android@latest` 
+Make sure to update to latest plugin version (especially **src/android/hooks/configure-android.js**), and to use the command `cordova platform add android@latest` 
 
 ## The JavaScript Interfaces
 
