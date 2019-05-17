@@ -1,0 +1,236 @@
+PDFViewer SDK for iOS - Release notes
+
+3.50beta2
+- ADD multiple scale for pages
+- ADD dark mode
+- ADD horizontal continuous RTOL
+- ADD thumbnail RTOL
+- FIX scroll effect on rotation
+- FIX thumbnail selection
+- FIX thumbnail positions (now start and end are on screen center)
+- ADD page label on thumbnails
+- ADD PageRendered callback to PDFLayoutView
+
+3.50beta1
+- ENHANCED tiled rendering
+- ADD main features from stable demo project
+
+3.6.9beta1
+- FIX cyrillic issue on case sensitive search
+- FIX vNoteEnd issue (annotations added with tap)
+- FIX vGetPos for bookmark insert
+- Now uses UITextView instead of UITextEdit for note annotations (allows multiline)
+
+3.6.8beta1
+- ADD rich media annotations getter/setter
+- ADD render mode with curl effect
+
+3.6.7beta1
+- ADD method: renderThumb
+- ADD method: setMeta
+- ADD feature: print
+- Changed icons and toolbar tint
+- Moved icons to imageSet
+
+3.6.5
+- ADD get/set rotation methods
+- FIX some issues
+
+3.6.5beta3
+- ADD setPageRotate method
+- FIX rich media annot recognition
+- Keep same with Android version
+
+3.6.5beta2:
+- FIX long text in edit box issue
+- FIX lib issues
+
+3.6.5beta1:
+- Bug Fix
+- ADD form editing features (such as combobox, editbox, radio button, checkbox)
+
+3.6.4beta3
+- FIX issue for truetype font
+
+3.6.4beta2
+- FIX some font issue
+
+3.6.4beta1
+- FIX some rendering issue
+- FIX search position issue (vertical mode)
+
+3.6.3beta1
+- FIX some bug
+- Skip annotation that not allow interact, when user click on page
+- ADD methods:
+  - Page_isAnnotReadonly
+  - Page_setReadonly
+  - setEditFont
+
+3.6.2beta1
+- FIX some bug
+- FIX issue for accent rendering.
+- FIX issue for "–" character rendering.
+- FIX crashed issue for a encrypted PDF file(chapter 4.pdf).
+- FIX all rendering issues.
+- FIX rendeing issue for "EPSON.pdf"
+- ADD PDFAnnot fieldName
+- ADD PDFAnnot fieldNameWithNO
+
+3.6.1beta2
+- FIX rendering issue for vertical lines.
+- FIX issue for vertical writting texts searching.
+- FIX issue for wrong position calculated while zooming for RDPDFReader.
+- FIX all rendering issues.
+- FIX an issue for vertical thumb view.
+- FIX some bugs for RDPDFReader cache.
+
+3.6.0
+- FIX some rendering issues.
+
+3.6.0beta1
+- FIX crashed issue.
+- FIX rendering issue.
+- FIX issue for draft image output.
+- Version number aligned to Android version
+
+3.3.9beta1:
+- iOS9 Support.
+
+3.3.8beta1
+- FIX encryptAs method.
+
+3.3.7beta1
+- FIX some rendering bug.
+
+3.3.6beta2
+- FIX scroll while editing
+- FIX RTOL string rendering
+- Updated default annot font
+
+3.3.6beta1
+- ADD Global_fontFileMapping method
+- Updated default annot font
+- ADD free a fonts
+- libRDPDFLib.a updated
+- Updated App_init() method
+
+3.3.5beta3
+- FIX lib issues
+
+3.3.5beta2
+- ADD [PDFAnnot getSignStatus] method
+
+3.3.5beta1
+- ADD popup methods: PopupOpen, SetPopup, addAnnotPopup.
+- FIX setEditText rotate bug.
+- FIX issue for a 1.85G PDF file, now it can open PDF file size to 2Gb PDF file.
+- FIX issue for invalid signed field after text field modified.
+
+3.3.3
+- FIX PDFIOS.h
+
+3.3.2
+- ADD methods: [PDFAnnot getPopupLabel] and [PDFAnnot setPopupLabel].
+- FIX iPad1 crash.
+- FIX zoom scroll issue in versions prior of iOS8.
+
+3.3.1beta2
+- FIX adding and removing annotation issues
+
+3.3.1beta1
+- ADD rootOutline creation method
+- FIX some rendering issues
+
+3.3.0beta6
+- ADD doubleTap zoom
+- ADD delegate method OnDoubleTapped
+
+3.3.0beta5
+- FIX zoom bug
+- FIX lib issues
+
+3.3.0beta4
+- FIX search crash when no result is found
+
+3.3.0beta3
+- FIX search crash
+- FIX page adjustment after rotation
+- FIX paging mode
+
+3.3.0beta2
+- FIX search crash
+- FIX delay when tap on searchBar for the first time
+
+3.3.0:
+- Updated libRDPDFLib.a
+- FIX search bug in some language.
+- FIX rotation bug
+- FIX search result: show the entire page
+- FIX zoom out bug
+- ADD g_paging_enabled bool to allow scroll page by page
+- ADD doublePage bool in PDFView class (vopen method) to manage double or single page mode
+
+3.2.1
+- FIX lib issues
+
+3.2.0
+- Keep same with Android version.
+- Updated libRDPDFLib.a in PDFLib document.
+- Updated 08 file in fdat document.
+
+3.1.1beta2
+- FIX lib issues
+
+3.1.1beta1
+- FIX lib issues
+
+3.1.0beta1
+- ADD Global_setCMYKProfile method
+
+3.0.9
+- FIX lib issues
+
+3.0.9beta1
+- FIX lib issues
+
+3.0.8beta1
+- FIX scroll issue
+
+3.0.7beta1
+- ADD method to merge two PDF in RDFileTableController.m: "selectRightAction" method
+
+3.0.6:
+- FIX text annot issue
+
+3.0.5beta1
+- FIX arm64 render bug
+- ADD encrypt method “encryptAs”
+
+3.0.4beta1
+- ADD getMarkupRects methods
+
+3.0.3
+- FIX method names that create warning
+- FIX help.pdf is now writable
+
+3.0.2beta1
+- FIX annot bug
+
+3.0.1beta1
+- FIX some memory problems
+- Improve som GC class
+
+3.0.0beta1
+- ADD 64-bit support
+- ADD iOS8 support
+
+2.9.7beta2
+- ADD methods:
+  - NSString *Page_getAnnotJS
+  - int Page_getAnnotEditTextColor
+  - bool Page_setAnnotEditTextColor
+
+2.9.7beta1
+- FIX the version number (before was wrong 3.x beta)
+- FIX of the outline method
