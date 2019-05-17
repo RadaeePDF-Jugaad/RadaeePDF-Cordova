@@ -386,8 +386,8 @@ public class Global
 
 	public static boolean sExecuteAnnotJS = true;
 
-	public static boolean g_annot_lock = false;
-	public static boolean g_annot_readonly = false;
+	public static boolean g_annot_lock = true;
+	public static boolean g_annot_readonly = true;
 
 	/**
 	 *Annot Rect params
@@ -412,6 +412,7 @@ public class Global
     public static int line_annot_color = 0x80FF0000;
     public static int line_annot_fill_color = 0x800000FF;
 
+    //true: calculate scale of each page, false: calculate scale based on the dimensions of the largest page
 	public static boolean fit_different_page_size = false;
 
 	static private void load_file(Resources res, int res_id, File save_file)

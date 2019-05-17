@@ -9,6 +9,7 @@
 #import "RadaeePDFPlugin.h"
 #import "RDPDFViewController.h"
 #import "PDFHttpStream.h"
+#import "RDFormManager.h"
 
 #pragma mark - Synthesize
 

@@ -533,13 +533,14 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                 if (m_layout != null) pos = m_layout.vGetPos(m_w >> 1, m_h >> 1);
                 switch (view_mode) {
                     case 1://horz
-                        layout = new GLLayoutHorz(getContext(), false);
+                        layout = new GLLayoutHorz(getContext(), false, Global.fit_different_page_size);
                         break;
                     case 2://surl
                         layout = new GLLayoutCurl(getContext());
                         break;
                     case 3://single
-                        layout = new GLLayoutDual(getContext(), GLLayoutDual.ALIGN_CENTER, GLLayoutDual.SCALE_SAME_HEIGHT, false, null, null);
+                        layout = new GLLayoutDual(getContext(), GLLayoutDual.ALIGN_CENTER, Global.fit_different_page_size ?
+                                GLLayoutDual.SCALE_SAME_HEIGHT : GLLayoutDual.SCALE_FIT, false, null, null);
                         break;
                     case 5:
                         layout = new GLLayoutReflow(getContext());
@@ -568,11 +569,12 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                             }
                             position++;
                         }
-                        layout = new GLLayoutDual(getContext(), GLLayoutDual.ALIGN_CENTER, GLLayoutDual.SCALE_FIT, false, bval, null);
+                        layout = new GLLayoutDual(getContext(), GLLayoutDual.ALIGN_CENTER, Global.fit_different_page_size ?
+                                GLLayoutDual.SCALE_FIT : GLLayoutDual.SCALE_SAME_HEIGHT, false, bval, null);
                     }
                     break;
                     default://vertical.
-                        layout = new GLLayoutVert(getContext(), GLLayoutVert.ALIGN_CENTER, false);
+                        layout = new GLLayoutVert(getContext(), GLLayoutVert.ALIGN_CENTER, Global.fit_different_page_size);
                         break;
                 }
                 layout.vOpen(m_doc, new GLLayout.GLListener() {
