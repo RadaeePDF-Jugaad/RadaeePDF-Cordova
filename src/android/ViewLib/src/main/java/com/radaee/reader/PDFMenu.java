@@ -4,6 +4,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
@@ -22,7 +23,7 @@ public class PDFMenu implements PopupWindow.OnDismissListener {
         m_popup.setBackgroundDrawable(new ColorDrawable(0));
         final float scale = parent.getContext().getResources().getDisplayMetrics().density;
         m_popup.setWidth((int) (width * scale));
-        m_popup.setHeight((int) (height * scale));
+        m_popup.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         m_parent = parent;
     }
 

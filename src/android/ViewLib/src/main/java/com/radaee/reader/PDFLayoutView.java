@@ -91,7 +91,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     private float m_rects[];
     private VPage m_note_pages[];
     private int m_note_indecs[];
-	private ILayoutView.PDFLayoutListener m_listener;
+    private ILayoutView.PDFLayoutListener m_listener;
     private VSel m_sel = null;
     private int m_edit_type = 0;
     private int m_combo_item = -1;
@@ -360,7 +360,10 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                         onListAnnot();
                     else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
                         handleSignatureField();
-                    else if (PDFCanSave() && m_listener != null)
+                    else if(PDFCanSave() && m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
+                        m_listener.OnPDFOpenURI(m_annot.GetURI());
+                        PDFEndAnnot();
+                    } else if (PDFCanSave() && m_listener != null)
                         m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                     invalidate();
                 }
@@ -1172,9 +1175,9 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 invalidate();
             } else if (pos != null) {
                 if(style == 3 || style == 4 || style == 6)
-					m_layout.vGotoPage(pos.pageno);
-				else
-				    m_layout.vSetPos(0, 0, pos);
+                    m_layout.vGotoPage(pos.pageno);
+                else
+                    m_layout.vSetPos(0, 0, pos);
                 m_layout.vMoveEnd();
             }
         }
@@ -1234,7 +1237,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     public void OnPageRendered(int pageno) {
         invalidate();
-        if (m_listener != null)
+        if (m_listener != null && m_layout != null)
             m_listener.OnPDFPageRendered(m_layout.vGetPage(pageno));
     }
 
@@ -1820,8 +1823,6 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     public final int PDFGetCurrPage() {
         return m_pageno;
     }
-
-
 
     public final PDFPos PDFGetPos(int x, int y) {
         if (m_layout != null)

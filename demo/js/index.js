@@ -186,7 +186,7 @@ var app = {
 
         RadaeePDFPlugin.open(
             {
-                url: "file:///mnt/sdcard/Download/pdf/Sign.pdf",
+                url: "file:///mnt/sdcard/test.pdf",
                 password: "" //password if needed
             },
             function(message) {

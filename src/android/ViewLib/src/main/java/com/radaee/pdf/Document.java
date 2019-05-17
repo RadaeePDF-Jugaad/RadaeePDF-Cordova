@@ -260,6 +260,9 @@ public class Document
     private static native String getEFName( long hand, int index );
 	private static native String getEFDesc( long hand, int index );
     private static native boolean getEFData( long hand, int index, String save_path );
+	private static native int getJSCount( long hand );
+	private static native String getJSName( long hand, int index );
+	private static native String getJS( long hand, int index );
     private static native int getPermission( long hand );
 	private static native int getPerm( long hand );
 	private static native String exportForm( long hand );
@@ -287,6 +290,7 @@ public class Document
 	private static native byte[] getID( long hand, int index);
 	private static native boolean setMeta( long hand, String tag, String value );
     private static native String getXMP(long hand);
+	private static native boolean setXMP(long hand, String xmp);
 	private static native boolean canSave( long hand );
 	private static native boolean save( long hand ) throws Exception;
 	private static native boolean saveAs( long hand, String dst, boolean rem_sec ) throws Exception;//remove security info and save to another file.
@@ -1006,6 +1010,35 @@ public class Document
         return getEFData(hand_val, index, save_path);
     }
 	/**
+	 * get java script count, for document level.<br/>
+	 * this method require premium license, it always return 0 if using other license type.
+	 * @return count
+	 */
+	public int GetJSCount()
+	{
+		return getJSCount(hand_val);
+	}
+
+	/**
+	 * get name of javascript.
+	 * @param index range in [0, GetJSCount())g
+	 * @return name of javascript
+	 */
+	public String GetJSName( int index )
+	{
+		return getJSName(hand_val, index);
+	}
+
+	/**
+	 * get javascript.
+	 * @param index range in [0, GetJSCount())
+	 * @return javascript string
+	 */
+	public String GetJS( int index )
+	{
+		return getJS(hand_val, index);
+	}
+	/**
 	 * get permission of PDF, this value defined in PDF reference 1.7<br/>
 	 * mostly, it means the permission from encryption.<br/>
 	 * this method require a professional or premium license.
@@ -1165,6 +1198,18 @@ public class Document
     {
         return getXMP( hand_val );
     }
+
+	/**
+	 * set XMP string from document.<br/>
+	 * this method require premium license.
+	 * @param xmp xmp string to set.
+	 * @return true or false.
+	 */
+	public boolean SetXMP(String xmp)
+	{
+		return setXMP(hand_val, xmp);
+	}
+
 	/**
 	 * get id of document.
 	 * @param index must 0 or 1, 0 means first 16 bytes, 1 means last 16 bytes.
@@ -1315,7 +1360,9 @@ public class Document
 	{
 		if( ctx == null ) return false;
         try {
-            return importPage(hand_val, ctx.hand, srcno, dstno);
+			boolean ret = importPage(hand_val, ctx.hand, srcno, dstno);
+			if(ret) page_count++;
+			return ret;
         }
         catch (Exception e)
         {

@@ -156,10 +156,10 @@
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinebi" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinei" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/rdf013" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinos" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinosb" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinosbi" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinosi" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgy.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgyb.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgybi.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgyi.otf" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/symbol" target-dir="res/raw" />
 		<source-file src="src/android/ViewLib/src/main/res/raw/umaps.dat" target-dir="res/raw" />
 
@@ -224,7 +224,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/ARIMO_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/COUSINE_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/FONT-LICENSE.txt" target-dir="res" />
-		<source-file src="src/android/ViewLib/src/main/res/TINOS_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/GUST e-foundry License.txt" target-dir="res" />
 
         <!-- Fonts -->
         <source-file src="fonts/Roboto-Black.ttf" target-dir="assets/fonts" />

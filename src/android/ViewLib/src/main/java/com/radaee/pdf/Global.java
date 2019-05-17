@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.50
+ * @version 3.52
  */
 public class Global
 {
@@ -389,6 +389,9 @@ public class Global
 	public static boolean g_annot_lock = true;
 	public static boolean g_annot_readonly = true;
 
+	/** if true the link action will be performed immediately otherwise the user must click on the play button*/
+	public static boolean g_auto_launch_link = true;
+
 	/**
 	 *Annot Rect params
 	 */
@@ -567,10 +570,10 @@ public class Global
         load_truetype_font( res, R.raw.arimob, new File(files, "arimob.ttf") );
         load_truetype_font( res, R.raw.arimoi, new File(files, "arimoi.ttf") );
         load_truetype_font( res, R.raw.arimobi, new File(files, "arimobi.ttf") );
-        load_truetype_font( res, R.raw.tinos, new File(files, "tinos.ttf") );
-        load_truetype_font( res, R.raw.tinosb, new File(files, "tinosb.ttf") );
-        load_truetype_font( res, R.raw.tinosi, new File(files, "tinosi.ttf") );
-        load_truetype_font( res, R.raw.tinosbi, new File(files, "tinosbi.ttf") );
+        load_truetype_font( res, R.raw.texgy, new File(files, "texgy.otf") );
+        load_truetype_font( res, R.raw.texgyb, new File(files, "texgyb.otf") );
+        load_truetype_font( res, R.raw.texgyi, new File(files, "texgyi.otf") );
+        load_truetype_font( res, R.raw.texgybi, new File(files, "texgybi.otf") );
         load_truetype_font( res, R.raw.cousine, new File(files, "cousine.ttf") );
         load_truetype_font( res, R.raw.cousineb, new File(files, "cousineb.ttf") );
         load_truetype_font( res, R.raw.cousinei, new File(files, "cousinei.ttf") );
@@ -611,49 +614,49 @@ public class Global
         fontfileMapping("Helvetica-Bold",          "Arimo Bold");
         fontfileMapping("Helvetica-BoldItalic",   "Arimo Bold Italic");
         fontfileMapping("Helvetica-Italic",        "Arimo Italic");
-        fontfileMapping("Garamond",                    "Tinos");
-        fontfileMapping("Garamond,Bold",              "Tinos Bold");
-        fontfileMapping("Garamond,BoldItalic",       "Tinos Bold Italic");
-        fontfileMapping("Garamond,Italic",            "Tinos Italic");
-        fontfileMapping("Garamond-Bold",              "Tinos Bold");
-        fontfileMapping("Garamond-BoldItalic",       "Tinos Bold Italic");
-        fontfileMapping("Garamond-Italic",            "Tinos Italic");
-        fontfileMapping("Times",                    "Tinos");
-        fontfileMapping("Times,Bold",              "Tinos Bold");
-        fontfileMapping("Times,BoldItalic",       "Tinos Bold Italic");
-        fontfileMapping("Times,Italic",            "Tinos Italic");
-        fontfileMapping("Times-Bold",              "Tinos Bold");
-        fontfileMapping("Times-BoldItalic",       "Tinos Bold Italic");
-        fontfileMapping("Times-Italic",            "Tinos Italic");
-        fontfileMapping("Times-Roman",             "Tinos");
-        fontfileMapping("Times New Roman",                "Tinos");
-        fontfileMapping("Times New Roman,Bold",          "Tinos Bold");
-        fontfileMapping("Times New Roman,BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("Times New Roman,Italic",        "Tinos Italic");
-        fontfileMapping("Times New Roman-Bold",          "Tinos Bold");
-        fontfileMapping("Times New Roman-BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("Times New Roman-Italic",        "Tinos Italic");
-        fontfileMapping("TimesNewRoman",                "Tinos");
-        fontfileMapping("TimesNewRoman,Bold",          "Tinos Bold");
-        fontfileMapping("TimesNewRoman,BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("TimesNewRoman,Italic",        "Tinos Italic");
-        fontfileMapping("TimesNewRoman-Bold",          "Tinos Bold");
-        fontfileMapping("TimesNewRoman-BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("TimesNewRoman-Italic",        "Tinos Italic");
-        fontfileMapping("TimesNewRomanPS",                "Tinos");
-        fontfileMapping("TimesNewRomanPS,Bold",          "Tinos Bold");
-        fontfileMapping("TimesNewRomanPS,BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("TimesNewRomanPS,Italic",        "Tinos Italic");
-        fontfileMapping("TimesNewRomanPS-Bold",          "Tinos Bold");
-        fontfileMapping("TimesNewRomanPS-BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("TimesNewRomanPS-Italic",        "Tinos Italic");
-        fontfileMapping("TimesNewRomanPSMT",                "Tinos");
-        fontfileMapping("TimesNewRomanPSMT,Bold",          "Tinos Bold");
-        fontfileMapping("TimesNewRomanPSMT,BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("TimesNewRomanPSMT,Italic",        "Tinos Italic");
-        fontfileMapping("TimesNewRomanPSMT-Bold",          "Tinos Bold");
-        fontfileMapping("TimesNewRomanPSMT-BoldItalic",   "Tinos Bold Italic");
-        fontfileMapping("TimesNewRomanPSMT-Italic",        "Tinos Italic");
+        fontfileMapping("Garamond",                    "TeXGyreTermes-Regular");
+        fontfileMapping("Garamond,Bold",              "TeXGyreTermes-Bold");
+        fontfileMapping("Garamond,BoldItalic",       "TeXGyreTermes-BoldItalic");
+        fontfileMapping("Garamond,Italic",            "TeXGyreTermes-Italic");
+        fontfileMapping("Garamond-Bold",              "TeXGyreTermes-Bold");
+        fontfileMapping("Garamond-BoldItalic",       "TeXGyreTermes-BoldItalic");
+        fontfileMapping("Garamond-Italic",            "TeXGyreTermes-Italic");
+        fontfileMapping("Times",                    "TeXGyreTermes-Regular");
+        fontfileMapping("Times,Bold",              "TeXGyreTermes-Bold");
+        fontfileMapping("Times,BoldItalic",       "TeXGyreTermes-BoldItalic");
+        fontfileMapping("Times,Italic",            "TeXGyreTermes-Italic");
+        fontfileMapping("Times-Bold",              "TeXGyreTermes-Bold");
+        fontfileMapping("Times-BoldItalic",       "TeXGyreTermes-BoldItalic");
+        fontfileMapping("Times-Italic",            "TeXGyreTermes-Italic");
+        fontfileMapping("Times-Roman",             "TeXGyreTermes-Regular");
+        fontfileMapping("Times New Roman",                "TeXGyreTermes-Regular");
+        fontfileMapping("Times New Roman,Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("Times New Roman,BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("Times New Roman,Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("Times New Roman-Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("Times New Roman-BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("Times New Roman-Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("TimesNewRoman",                "TeXGyreTermes-Regular");
+        fontfileMapping("TimesNewRoman,Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("TimesNewRoman,BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("TimesNewRoman,Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("TimesNewRoman-Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("TimesNewRoman-BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("TimesNewRoman-Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("TimesNewRomanPS",                "TeXGyreTermes-Regular");
+        fontfileMapping("TimesNewRomanPS,Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("TimesNewRomanPS,BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("TimesNewRomanPS,Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("TimesNewRomanPS-Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("TimesNewRomanPS-BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("TimesNewRomanPS-Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("TimesNewRomanPSMT",                "TeXGyreTermes-Regular");
+        fontfileMapping("TimesNewRomanPSMT,Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("TimesNewRomanPSMT,BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("TimesNewRomanPSMT,Italic",        "TeXGyreTermes-Italic");
+        fontfileMapping("TimesNewRomanPSMT-Bold",          "TeXGyreTermes-Bold");
+        fontfileMapping("TimesNewRomanPSMT-BoldItalic",   "TeXGyreTermes-BoldItalic");
+        fontfileMapping("TimesNewRomanPSMT-Italic",        "TeXGyreTermes-Italic");
         fontfileMapping("Courier",                        "Cousine");
         fontfileMapping("Courier Bold",                  "Cousine Bold");
         fontfileMapping("Courier BoldItalic",           "Cousine Bold Italic");

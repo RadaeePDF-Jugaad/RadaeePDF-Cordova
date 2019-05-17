@@ -19,6 +19,8 @@
 	modified on 05/10/17 -->  added double tap/long press js callbacks
 	
 	modified on 09/03/18 -->  added addAnnotAttachment, renderAnnotToFile
+
+	modified on 14/05/19 -->  added support to a parameter to switch between GPU and CPU based layouts.
 */
 package com.radaee.cordova;
 
@@ -81,6 +83,8 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         mPdfManager = new RadaeePDFManager(this);
+        mPdfManager.setDebugMode(false);
+        mPdfManager.setLayoutType(RadaeePDFManager.GPU_BASED_LAYOUT);
     }
     
     /**
@@ -138,8 +142,9 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 }
                 showPdfInProgress = true;
                 if (!TextUtils.isEmpty(targetPath)) {
-                    mPdfManager.show(mContext, targetPath, params.optString("password"), params.optBoolean("readOnlyMode"),
-                            params.optBoolean("automaticSave"), params.optInt("gotoPage"), params.optString("bmpFormat"), params.optString("author"));
+					mPdfManager.show(mContext, targetPath, params.optString("password"), params.optBoolean("readOnlyMode"),
+                            params.optBoolean("automaticSave"), params.optInt("gotoPage"), params.optString("bmpFormat"),
+                            params.optString("author"), params.optInt("engine"));
                     showPdfInProgress = false;
                     callbackContext.success("Pdf local opening success");
                 } else {
