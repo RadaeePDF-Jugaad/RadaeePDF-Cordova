@@ -1130,12 +1130,12 @@
         [horz setValue:[[UIImage imageNamed:@"btn_view_horz"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         UIAlertAction *singleP = [UIAlertAction actionWithTitle:NSLocalizedString(@"Single Page", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self setReaderViewMode:3];
+            [self setReaderViewMode:2];
         }];
         [singleP setValue:[[UIImage imageNamed:@"btn_view_single"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         UIAlertAction *doubleP = [UIAlertAction actionWithTitle:NSLocalizedString(@"Double Page", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self setReaderViewMode:4];
+            [self setReaderViewMode:3];
         }];
         [doubleP setValue:[[UIImage imageNamed:@"btn_view_dual"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
@@ -1541,6 +1541,7 @@
     m_searchBar.autocapitalizationType = UITextAutocapitalizationTypeNone;
     m_searchBar.placeholder = @"Search";
     m_searchBar.keyboardType = UIKeyboardTypeDefault;
+    m_searchBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     [self toolBarStyle];
     
