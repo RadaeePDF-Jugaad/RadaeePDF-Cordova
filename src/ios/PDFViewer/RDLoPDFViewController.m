@@ -43,7 +43,7 @@
     int pagecount;
     int pagenow;
     NSMutableArray *tempfiles;
-   
+    
     MPMoviePlayerViewController *mpvc;
     UIPickerView *pickerView;
     NSArray *pickViewArr;
@@ -71,6 +71,8 @@
     int gridMode;
     int doubleTapZoomMode;
     
+    int statusBarHeight;
+    
     UISlider *m_slider;
     
     UIColor *toolbarColor;
@@ -86,10 +88,12 @@
     
     [self initialPopupView];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshToolbarPosition) name:UIDeviceOrientationDidChangeNotification object:nil];
+    
     if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
-
+    
     isPrint = NO;
     m_bSel = false;
     float width = [UIScreen mainScreen].bounds.size.width;
@@ -133,7 +137,7 @@
     [self refreshToolbarPosition];
     
     [self.view addSubview:toolBar];
-
+    
     toolBar.hidden = NO;
     
     [self toolBarStyle];
@@ -328,8 +332,9 @@
 }
 
 - (void)refreshToolbarPosition {
-    CGRect statusRect = [[UIApplication sharedApplication] statusBarFrame];
-    [toolBar setFrame:CGRectMake(0, statusRect.size.height, [self screenRect].size.width, 44)];
+    [self refreshStatusBarHeight];
+    [toolBar setFrame:CGRectMake(0, statusBarHeight, [self screenRect].size.width, 44)];
+    [self refreshPageNumLabelPosition];
 }
 
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd {
@@ -416,71 +421,71 @@
     return [m_view PDFOpen:m_doc :4 :self];
 }
 /*
-#pragma mark - Grid View
-
-- (void)toggleGrid
-{
-    [self toggleGridView];
-}
-
-- (void)toggleGridView
-{
-    if (!m_Gridview) {
-        [self showGridView];
-        
-    } else {
-        [self hideGridView];
-    }
-}
-
-- (void)showGridView
-{
-    if (!m_Gridview) {
-        m_Gridview = [[PDFGridView alloc] initWithFrame:CGRectMake(100, 100, 500, 500)];
-        [m_Gridview PDFOpen:m_doc :4 :(id<PDFThumbViewDelegate>)self];
-        
-        if (gridBackgroundColor != 0) {
-            [m_Gridview setThumbBackgroundColor:gridBackgroundColor];
-        }
-        
-        [self.view addSubview:m_Gridview];
-    }
-}
-
-- (void)hideGridView
-{
-    if(m_Gridview) {
-        [m_Gridview removeFromSuperview];
-        [m_Gridview PDFClose];
-        m_Gridview = nil;
-    }
-}
-
-#pragma mark - Slider
-
-- (void)sliderInit:(int)pageno
-{
-    CGRect boundsc = [self screenRect];
-    
-    int cwidth = boundsc.size.width;
-    int cheight = boundsc.size.height;
-    
-    m_slider = [[UISlider alloc] initWithFrame:CGRectMake(0, cheight-50, cwidth, 50)];
-    
-    m_slider.minimumValue = 1;
-    m_slider.maximumValue = pagecount;
-    m_slider.continuous = NO;
-    m_slider.value = pageno;
-    
-    [m_slider addTarget:self action:@selector(OnSliderValueChange:) forControlEvents:UIControlEventValueChanged];
-    
-    [m_slider setBackgroundColor:[UIColor blackColor]];
-    
-    [self.view addSubview:m_slider];
-    
-    [self pageNumLabelInit:pageno];
-}
-*/
+ #pragma mark - Grid View
+ 
+ - (void)toggleGrid
+ {
+ [self toggleGridView];
+ }
+ 
+ - (void)toggleGridView
+ {
+ if (!m_Gridview) {
+ [self showGridView];
+ 
+ } else {
+ [self hideGridView];
+ }
+ }
+ 
+ - (void)showGridView
+ {
+ if (!m_Gridview) {
+ m_Gridview = [[PDFGridView alloc] initWithFrame:CGRectMake(100, 100, 500, 500)];
+ [m_Gridview PDFOpen:m_doc :4 :(id<PDFThumbViewDelegate>)self];
+ 
+ if (gridBackgroundColor != 0) {
+ [m_Gridview setThumbBackgroundColor:gridBackgroundColor];
+ }
+ 
+ [self.view addSubview:m_Gridview];
+ }
+ }
+ 
+ - (void)hideGridView
+ {
+ if(m_Gridview) {
+ [m_Gridview removeFromSuperview];
+ [m_Gridview PDFClose];
+ m_Gridview = nil;
+ }
+ }
+ 
+ #pragma mark - Slider
+ 
+ - (void)sliderInit:(int)pageno
+ {
+ CGRect boundsc = [self screenRect];
+ 
+ int cwidth = boundsc.size.width;
+ int cheight = boundsc.size.height;
+ 
+ m_slider = [[UISlider alloc] initWithFrame:CGRectMake(0, cheight-50, cwidth, 50)];
+ 
+ m_slider.minimumValue = 1;
+ m_slider.maximumValue = pagecount;
+ m_slider.continuous = NO;
+ m_slider.value = pageno;
+ 
+ [m_slider addTarget:self action:@selector(OnSliderValueChange:) forControlEvents:UIControlEventValueChanged];
+ 
+ [m_slider setBackgroundColor:[UIColor blackColor]];
+ 
+ [self.view addSubview:m_slider];
+ 
+ [self pageNumLabelInit:pageno];
+ }
+ */
 #pragma mark - Thumbnail
 
 - (void)thumbInit:(int)pageno {
@@ -583,7 +588,7 @@
     {
         [self hideBars];
     }
-
+    
     b_outline = false;
     m_bSel = false;
     [m_view vSelEnd];
@@ -611,44 +616,44 @@
     }
 }
 /*
--(void)selectText:(id)sender
-{
-    selectToolBar = [UIToolbar new];
-    [selectToolBar sizeToFit];
-    selectToolBar.barStyle = UIBarStyleBlackOpaque;
-    UIBarButtonItem *selectDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(selectDone)];
-    selectDoneBtn.width =30;
-    UIBarButtonItem *selectCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(selectCancel)];
-    selectCancelBtn.width =30;
-    UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
-                               initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
-                               target:nil
-                               action:nil];
-    
-    NSArray *toolbarItem = [[NSArray alloc]initWithObjects:selectDoneBtn,spacer,selectCancelBtn,nil];
-    [selectToolBar setItems:toolbarItem animated:NO];
-    self.navigationItem.titleView = selectToolBar;
-    [m_view vSelStart];
-    [m_view vNoteStart];
-}
-
--(void)selectDone
-{
-    m_bSel = false;
-    [drawLineToolBar removeFromSuperview];
-    self.navigationItem.titleView =toolBar;
-    [m_view vSelEnd];
-    [m_view vNoteEnd];
-}
-
--(void)selectCancel
-{
-    [drawLineToolBar removeFromSuperview];
-    self.navigationItem.titleView =toolBar;
-    [m_view vSelEnd];
-    [m_view vNoteEnd];
-}
-*/
+ -(void)selectText:(id)sender
+ {
+ selectToolBar = [UIToolbar new];
+ [selectToolBar sizeToFit];
+ selectToolBar.barStyle = UIBarStyleBlackOpaque;
+ UIBarButtonItem *selectDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(selectDone)];
+ selectDoneBtn.width =30;
+ UIBarButtonItem *selectCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(selectCancel)];
+ selectCancelBtn.width =30;
+ UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
+ initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
+ target:nil
+ action:nil];
+ 
+ NSArray *toolbarItem = [[NSArray alloc]initWithObjects:selectDoneBtn,spacer,selectCancelBtn,nil];
+ [selectToolBar setItems:toolbarItem animated:NO];
+ self.navigationItem.titleView = selectToolBar;
+ [m_view vSelStart];
+ [m_view vNoteStart];
+ }
+ 
+ -(void)selectDone
+ {
+ m_bSel = false;
+ [drawLineToolBar removeFromSuperview];
+ self.navigationItem.titleView =toolBar;
+ [m_view vSelEnd];
+ [m_view vNoteEnd];
+ }
+ 
+ -(void)selectCancel
+ {
+ [drawLineToolBar removeFromSuperview];
+ self.navigationItem.titleView =toolBar;
+ [m_view vSelEnd];
+ [m_view vNoteEnd];
+ }
+ */
 - (void)OnSelStart:(float)x :(float)y
 {
     if(m_bSel)
@@ -698,7 +703,7 @@
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotGoto:(int)pageno
 {
-     [self PDFGoto:pageno];
+    [self PDFGoto:pageno];
 }
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotPopup:(PDFAnnot *)annot
@@ -1406,7 +1411,7 @@
         UIAlertAction *sign = [UIAlertAction actionWithTitle:NSLocalizedString(@"Signature", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self didSelectDrawMode:6];
         }];
-
+        
         [sign setValue:[(_signatureImage) ? _signatureImage : [UIImage imageNamed:@"btn_annot_ink"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
 #endif
         UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
@@ -1516,7 +1521,7 @@
 }
 
 -(void)searchView
-{    
+{
     [toolBar changeToSearchToolBar];
     
     CGRect frame = toolBar.frame;
@@ -1950,7 +1955,7 @@
     [m_SearchBar resignFirstResponder];
     if (m_SearchBar.text.length > 40)
         return;
-
+    
     if (SEARCH_LIST == 1) {
         [self showSearchList];
     } else {
@@ -2136,14 +2141,21 @@
     }
 }
 
+- (void)refreshStatusBarHeight {
+    if (@available(iOS 11.0, *)) {
+        UIWindow *window = UIApplication.sharedApplication.keyWindow;
+        statusBarHeight = window.safeAreaInsets.top;
+    } else {
+        statusBarHeight = 20;
+    }
+}
+
 -(void)refreshStatusBar{
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
 -(BOOL)prefersStatusBarHidden
 {
-    [self refreshToolbarPosition];
-    [self refreshPageNumLabelPosition];
     return statusBarHidden;
 }
 
@@ -2398,10 +2410,7 @@
 
 - (float)barHeightDistance
 {
-    float hi = toolBar.frame.size.height;
-    CGRect rect = [[UIApplication sharedApplication] statusBarFrame];
-    
-    return hi + rect.size.height;
+    return toolBar.frame.size.height + statusBarHeight;
 }
 
 - (CGRect)screenRect
@@ -2428,7 +2437,7 @@
 
 - (UIColor *)getBarColor {
     UIColor *barColor = (self.navigationController.navigationBar.barTintColor) ? self.navigationController.navigationBar.barTintColor : [UIColor blackColor];
-   
+    
     if (toolbarColor) {
         barColor = toolbarColor;
     }
@@ -2438,7 +2447,7 @@
 
 - (UIColor *)getTintColor {
     UIColor *tintColor = (self.navigationController.navigationBar.tintColor) ? self.navigationController.navigationBar.tintColor : [UIColor orangeColor];
-
+    
     if (toolbarTintColor) {
         tintColor = toolbarTintColor;
     }
@@ -2473,6 +2482,7 @@
     [self.view bringSubviewToFront:toolBar];
     [self.view bringSubviewToFront:m_Thumbview];
     [self refreshStatusBar];
+    [self refreshToolbarPosition];
 }
 
 - (void)hideBars
