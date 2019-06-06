@@ -361,4 +361,8 @@
     _g_author = @"";
 }
 
+- (void)setG_annot_transparency:(uint)g_annot_transparency {
+    Global_setAnnotTransparency(g_annot_transparency);
+}
+
 @end

@@ -73,6 +73,10 @@
 "Double Page" = "Double Page";
 "Notice" = "Notice";
 "Document saved" = "Document saved";
+"Reached first occurrence" = "Reached first occurrence";
+"Reached last occurrence" = "Reached last occurrence";
+"Searching... (%i)" = "Searching... (%i)";
+"%i occurrences" = "%i occurrences";
 /*
  
  

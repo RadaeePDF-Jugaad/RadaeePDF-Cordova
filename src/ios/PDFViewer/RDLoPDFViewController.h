@@ -47,8 +47,6 @@
     OutLineViewController *outlineView;
 }
 
-@property(nonatomic,strong) NSString *pdfName;
-@property(nonatomic,strong) NSString *pdfPath;
 @property(nonatomic,strong) UILabel *pageNumLabel;
 
 #pragma mark - lib properties

@@ -77,6 +77,8 @@
 @property (nonatomic) uint g_annot_strikeout_clr;
 @property (nonatomic) uint g_annot_squiggly_clr;
 
+@property (nonatomic) uint g_annot_transparency;
+
 + (RDVGlobal *)sharedInstance;
 + (void)Init;
 

@@ -1,6 +1,10 @@
 PDFViewer SDK for iOS - Release notes
 
-3.50beta2
+3.51
+
+- FIX a rendering issue while decoding very large images.
+- FIX slow rendering of a certain pdf file.
+- FIX a rendering issue for tiling pattern.
 - ADD multiple scale for pages
 - ADD dark mode
 - ADD horizontal continuous RTOL
@@ -10,10 +14,9 @@ PDFViewer SDK for iOS - Release notes
 - FIX thumbnail positions (now start and end are on screen center)
 - ADD page label on thumbnails
 - ADD PageRendered callback to PDFLayoutView
-
-3.50beta1
 - ENHANCED tiled rendering
 - ADD main features from stable demo project
+
 
 3.6.9beta1
 - FIX cyrillic issue on case sensitive search

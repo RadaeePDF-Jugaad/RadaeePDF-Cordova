@@ -402,8 +402,7 @@ NSString *pdfFullPath;
         
         //Open PDF file
         int result = [m_pdf PDFOpen:pdfFullPath :pwd];
-        m_pdf.pdfName = pdfName;
-        m_pdf.pdfPath = pdfPath;
+
         if(result == 1)
         {
             m_pdf.hidesBottomBarWhenPushed = YES;
@@ -437,8 +436,7 @@ NSString *pdfFullPath;
     if(buttonIndex == 0)
     {
         result = [m_pdf PDFOpen:pdfFullPath :pwd];
-        m_pdf.pdfName = pdfName;
-        m_pdf.pdfPath = pdfPath;
+
         if(result == 1)
         {
             UINavigationController *nav = self.navigationController;

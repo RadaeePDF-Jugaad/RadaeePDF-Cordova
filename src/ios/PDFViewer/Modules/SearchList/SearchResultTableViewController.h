@@ -9,13 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "RDExtendedSearch.h"
 
-@interface SearchResultTableViewCell : UITableViewCell
-
-@property (strong, nonatomic) IBOutlet UILabel *descLabel;
-@property (strong, nonatomic) IBOutlet UILabel *pageLabel;
-
-@end
-
 @protocol SearchResultViewControllerDelegate <NSObject>
 
 - (void)didSelectSelectSearchResult:(int)index;
@@ -24,10 +17,13 @@
 
 @interface SearchResultTableViewController : UITableViewController
 {
+    UILabel *footerLabel;
     UINib *cellLoader;
     NSMutableArray *items;
 }
 
+@property (strong, nonatomic) NSString *searchedString;
+@property (strong, nonatomic) PDFDoc *doc;
 @property (nonatomic, weak) id <SearchResultViewControllerDelegate> delegate;
 
 @end

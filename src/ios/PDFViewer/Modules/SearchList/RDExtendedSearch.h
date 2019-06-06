@@ -28,23 +28,24 @@
     PDFPage *m_page;
     PDFDoc *m_doc;
     PDFFinder *m_finder;
+    void(^finishBlock)(void);
 }
 
 @property (nonatomic) BOOL searching;
+@property (nonatomic) BOOL stop;
 @property (strong, nonatomic) NSString *searchTxt;
 @property (strong, nonatomic) NSMutableArray *searchResults;
 
 + (RDExtendedSearch *)sharedInstance;
 
 - (BOOL)searchInit:(PDFDoc *)doc;
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc;
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc success:(void (^)(NSMutableArray *occurrences))success;
-
-- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page;
+- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *occurrences))progress finish:(void (^)())finish;
+- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *occurrences))progress;
 - (BOOL)pageIsInSearchResults:(int)page;
 - (int)getNextPageFromCurrentPage:(int)page;
 - (int)getPrevPageFromCurrentPage:(int)page;
 - (void)clearSearch;
+- (void)clearSearch:(void (^)())finish;
 
 - (BOOL)occurrenceAlreadyExist:(RDSearchResult *)searchResult;
 

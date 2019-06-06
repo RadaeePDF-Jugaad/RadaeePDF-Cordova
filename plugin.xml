@@ -446,7 +446,6 @@
         <resource-file src="src/ios/PDFViewer/RDMoreTableViewController.xib" />
         <source-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.m" />
         <header-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.h" />
-        <resource-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.xib" />
         <source-file src="src/ios/PDFViewer/Modules/DrawMode/DrawModeTableViewController.m" />
         <header-file src="src/ios/PDFViewer/Modules/DrawMode/DrawModeTableViewController.h" />
 
@@ -459,8 +458,6 @@
         <header-file src="src/ios/PDFViewer/Modules/SearchList/RDExtendedSearch.h" />
         <source-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.m" />
         <header-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.h" />
-        <resource-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.xib" />
-        <resource-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewCell.xib" />
         
         <source-file src="src/ios/PDFViewer/Modules/FormManager/RDFormManager.m" />
         <header-file src="src/ios/PDFViewer/Modules/FormManager/RDFormManager.h" />

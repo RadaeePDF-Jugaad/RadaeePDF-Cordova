@@ -15,6 +15,7 @@
 #import "RDVSel.h"
 #import "RDUtils.h"
 
+/*#import "FTSManager.h"*/
 #import "ReaderHandler.h"
 
 #define TEMP_SIGNATURE @"radaee_signature_temp.png"
@@ -1088,7 +1089,7 @@
         if( m_annot )
         {
             m_annot_idx = [m_annot getIndex];
-            NSLog(@"--- ANNOT INDEX %i ---", m_annot_idx);
+            
             if(m_del && [m_del respondsToSelector:@selector(didTapAnnot:atPage:atPoint:)])
             {
                 [m_del didTapAnnot:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
@@ -1933,7 +1934,10 @@
         [self ProUpdatePage:m_cur_page + 1];
     }
     
-    [self ProUpdatePage:m_cur_page];
+    if (m_cur_page >= 0 && m_cur_page < [m_doc pageCount]) {
+        [self ProUpdatePage:m_cur_page];
+    }
+    
     [self setNeedsDisplay];
     [m_child setNeedsDisplay];
 }
@@ -2356,7 +2360,7 @@
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
-                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_rect_width :0 :1 :GLOBAL.g_rect_color :GLOBAL.g_rect_color];
+                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_line_width :0 :1 :GLOBAL.g_line_color :GLOBAL.g_line_color];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];

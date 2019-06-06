@@ -134,7 +134,7 @@
     
     if( otl.child)
     {
-        outlineView = [[OutLineViewController alloc] initWithNibName:@"OutLineViewController" bundle:nil];
+        outlineView = [[OutLineViewController alloc] init];
         //First para is parent node
         [outlineView setList:m_doc :NULL :otl.child];
         UINavigationController *nav = m_jump.navigationController;

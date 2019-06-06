@@ -8,62 +8,73 @@
 
 #import "SearchResultTableViewController.h"
 
-@implementation SearchResultTableViewCell
-
-- (void)awakeFromNib
-{
-    // Initialization code
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
-    [super setSelected:selected animated:animated];
-    
-    // Configure the view for the selected state
-}
-
-@end
-
-@interface SearchResultTableViewController ()
-{
-    NSString *searchedString;
-}
-
-@end
-
 @implementation SearchResultTableViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    cellLoader = [UINib nibWithNibName:@"SearchResultTableViewCell" bundle:[NSBundle mainBundle]];
-    
-    self.preferredContentSize = CGSizeMake(self.tableView.bounds.size.width, self.tableView.bounds.size.height);
-    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    items = [NSMutableArray array];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 
-    // PDF Search
-    
-    items = [[RDExtendedSearch sharedInstance] searchResults];
-    searchedString = [[RDExtendedSearch sharedInstance] searchTxt];
-
-    [self.tableView reloadData];
+    if ([[RDExtendedSearch sharedInstance] searchResults].count == 0 || ![[[RDExtendedSearch sharedInstance] searchTxt] isEqualToString:_searchedString]) {
+        [[RDExtendedSearch sharedInstance] clearSearch:^{
+            // ricerca sincrona
+            NSLog(@"--- SEARCH START ---");
+            [[RDExtendedSearch sharedInstance] searchText:_searchedString inDoc:_doc progress:^(NSMutableArray *occurrences) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (occurrences.count > 0) {
+                        NSLog(@"--- SEARCHED PAGE: %i ---", [(RDSearchResult *)[occurrences objectAtIndex:0] page]);
+                        [self.tableView beginUpdates];
+                        [items addObjectsFromArray:occurrences];
+                        NSMutableArray *indexPaths = [NSMutableArray array];
+                        for (int i = 0; i < occurrences.count; i++) {
+                            [indexPaths addObject:[NSIndexPath indexPathForRow:(items.count - occurrences.count) + i inSection:0]];
+                        }
+                        [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+                        [self updateFooterText];
+                        
+                        [self.tableView endUpdates];
+                    }
+                });
+            } finish:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSLog(@"--- SEARCH FINISHED ---");
+                    [self updateFooterText];
+                    // ricerca sincrona
+                    /*dispatch_async(dispatch_get_main_queue(), ^{
+                     if ([[RDExtendedSearch sharedInstance] searchResults].count > 0) {
+                     items = [[RDExtendedSearch sharedInstance] searchResults];
+                     [self.tableView reloadData];
+                     }
+                     });*/
+                });
+            }];
+        }];
+    } else {
+        items = [[RDExtendedSearch sharedInstance] searchResults];
+        [self.tableView reloadData];
+    }
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)updateFooterText {
+    footerLabel.text = ([[RDExtendedSearch sharedInstance] searching]) ? [NSString stringWithFormat:NSLocalizedString(@"Searching... (%i)", nil), (int)items.count] : [NSString stringWithFormat:NSLocalizedString(@"%i occurrences", nil), (int)items.count];
+    footerLabel.textColor = ([[RDExtendedSearch sharedInstance] searching]) ? [UIColor lightGrayColor] : [UIColor blackColor];
 }
 
 #pragma mark - Table view data source
@@ -85,20 +96,41 @@
     return 70;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return 50;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    footerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 50)];
+    footerLabel.textAlignment = NSTextAlignmentCenter;
+    footerLabel.font = [UIFont boldSystemFontOfSize:14];
+    footerLabel.backgroundColor = [UIColor groupTableViewBackgroundColor];
+    
+    [self updateFooterText];
+    
+    return footerLabel;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"SearchResultTableViewCell";
-    SearchResultTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    static NSString *CellIdentifier = @"Cell";
     
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        NSArray *topLevelItems = [cellLoader instantiateWithOwner:self options:nil];
-        cell = [topLevelItems objectAtIndex:0];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell.textLabel.font = [UIFont systemFontOfSize:14];
     }
 
     // PDF Search
+    UILabel *pageLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+    pageLabel.text = [NSString stringWithFormat:@"%i", [(RDSearchResult *)[items objectAtIndex:indexPath.row] page]];
+    pageLabel.font = [UIFont boldSystemFontOfSize:17];
+    pageLabel.textAlignment = NSTextAlignmentRight;
     
-    cell.descLabel.attributedText = [self boldSearchedString:[(RDSearchResult *)[items objectAtIndex:indexPath.row] stringResult]];
-    cell.pageLabel.text = [NSString stringWithFormat:@"%i", [(RDSearchResult *)[items objectAtIndex:indexPath.row] page]];
+    cell.textLabel.attributedText = [self boldSearchedString:[(RDSearchResult *)[items objectAtIndex:indexPath.row] stringResult]];
+    cell.textLabel.numberOfLines = 0;
+    
+    cell.accessoryView = pageLabel;
     
     return cell;
 }
@@ -107,11 +139,11 @@
 {
     // PDF Search
     
-    NSRange range = [string rangeOfString:searchedString options:NSCaseInsensitiveSearch];
+    NSRange range = [string rangeOfString:_searchedString options:NSCaseInsensitiveSearch];
     
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:string];
     
-    [attrString addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Helvetica-Bold" size:14] range:range];
+    [attrString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:14] range:range];
     
     return attrString;
 }

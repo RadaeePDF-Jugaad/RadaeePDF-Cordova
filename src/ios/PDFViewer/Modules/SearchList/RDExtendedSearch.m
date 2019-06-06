@@ -42,52 +42,48 @@
     return YES;
 }
 
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc
-{
-    if ([self searchInit:doc]) {
-        
-        for (int i = 0; i < m_doc.pageCount; i++) {
-            
-            m_page = [m_doc page:i];
-            [m_page objsStart];
-            m_finder = [m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
-            
-            m_page = nil;
-            
-            NSLog(@"%i", m_finder.count);
-        }
-    }
-}
-
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc success:(void (^)(NSMutableArray *))success
+- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *))progress finish:(void (^)())finish
 {
     _searching = YES;
     self.searchResults =  [[NSMutableArray alloc] init];
     self.searchTxt = text;
+    [self searchInit:doc];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        if ([self searchInit:doc]) {
-            
-            for (int i = 0; i < m_doc.pageCount; i++) {
-                
+        for (int i = 0; i < m_doc.pageCount; i++) {
+            if (_stop) {
+                _searching = NO;
+                [self clearSearch:finishBlock];
+                return;
+            }
+            if (m_doc) {
                 m_page = [m_doc page:i];
-                [m_page objsStart];
-                m_finder = [m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
-                
-                if (m_finder.count > 0) {
-                    [self addPageSearchResults:m_finder forPage:i];
+                if (m_page) {
+                    [m_page objsStart];
+                    m_finder = [m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
+                    
+                    if (m_finder.count > 0) {
+                        [self addPageSearchResults:m_finder forPage:i progress:progress];
+                    }
+                    
+                    m_page = nil;
+                } else {
+                    break;
                 }
-                
-                m_page = nil;
+            } else {
+                break;
             }
         }
         _searching = NO;
-        success(self.searchResults);
+        if (finish) {
+            finish();
+        }
     });
 }
 
-- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page;
+- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *))progress
 {
+    NSMutableArray *progressResult = [NSMutableArray array];
     for (int i = 0; i < finder.count; i++) {
         
         int firstChar = [finder objsIndex:i];
@@ -100,8 +96,14 @@
         
         RDSearchResult *searchResult = [RDSearchResult initWithString:[[[m_page objsString:ichar :ichar_end] stringByReplacingOccurrencesOfString:@"\n" withString:@" "] stringByReplacingOccurrencesOfString:@"\r" withString:@" "] forPage:page + 1];
         
-        if (![self occurrenceAlreadyExist:searchResult])
+        if (![self occurrenceAlreadyExist:searchResult]) {
             [self.searchResults addObject:searchResult];
+            [progressResult addObject:searchResult];
+        }
+    }
+    
+    if (progress) {
+        progress(progressResult);
     }
 }
 
@@ -173,12 +175,29 @@
     return NO;
 }
 
-- (void)clearSearch
+- (void)clearSearch {
+    [self clearSearch:nil];
+}
+
+- (void)clearSearch:(void (^)())finish
 {
-    m_page = NULL;
-    m_doc = NULL;
-    m_finder = NULL;
-    [self.searchResults removeAllObjects];
+    finishBlock = finish;
+    
+    // controllo se la ricerca è in corso e setto lo stop a true
+    // in questo modo posso interrompere la ricerca in esecuzione senza crash
+    if (_searching) {
+        _stop = YES;
+    } else {
+        _stop = NO;
+        m_page = NULL;
+        m_doc = NULL;
+        m_finder = NULL;
+        [self.searchResults removeAllObjects];
+        
+        if (finishBlock) {
+            finishBlock();
+        }
+    }
 }
 
 @end

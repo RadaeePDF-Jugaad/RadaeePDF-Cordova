@@ -44,6 +44,10 @@
 "View Mode" = "View Mode";
 "Save" = "Save";
 "Print" = "Print";
+"Reached first occurrence" = "Reached first occurrence";
+"Reached last occurrence" = "Reached last occurrence";
+"Searching... (%i)" = "Searching... (%i)";
+"%i occurrences" = "%i occurrences";
 /*
  
  

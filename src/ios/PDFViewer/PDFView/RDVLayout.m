@@ -14,6 +14,7 @@
 #import "RDVCanvas.h"
 #import "RDVPage.h"
 #import "RDVFinder.h"
+#import "PDFThumbView.h"
 
 @implementation RDVLayout
 @synthesize docx = m_docx;
@@ -77,7 +78,9 @@
 -(void)ProOnRenderFinished :(RDVCache *)cache
 {
     if (m_del && [m_del respondsToSelector:@selector(RDVOnPageRendered:)]) {
-        [m_del RDVOnPageRendered:cache.pageno];
+        if (![m_del isKindOfClass:[PDFThumbView class]]) {
+            [m_del RDVOnPageRendered:cache.pageno];
+        }
     }
 }
 
@@ -992,8 +995,6 @@
             }
             ccnt++;
         }
-        
-        NSLog(@"--- PAGE: %i --- SCALE: %f ---", pageno, m_scale);
         
         m_doch = m_h * m_scale;
         

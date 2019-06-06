@@ -73,6 +73,10 @@
 "Double Page" = "Pagina Doppia";
 "Notice" = "Avviso";
 "Document saved" = "Documento salvato";
+"Reached first occurrence" = "Prima occorrenze";
+"Reached last occurrence" = "Ultima occorrenza";
+"Searching... (%i)" = "Ricerca in corso... (%i)";
+"%i occurrences" = "%i occorrenze";
 /*
  
  

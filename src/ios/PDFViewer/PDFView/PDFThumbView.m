@@ -54,6 +54,8 @@
     [m_layout vSetPos:(xpos - vp.w) / 2 :0 :&pos];
     m_sel_pno = pageno;
     
+    [self bringSubviewToFront:m_child];
+    
     CGPoint pt;
     pt.x = m_layout.docx / m_scale_pix;
     pt.y = m_layout.docy / m_scale_pix;

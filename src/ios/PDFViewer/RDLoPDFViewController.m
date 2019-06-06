@@ -26,7 +26,7 @@
 #define SYS_VERSION [[[UIDevice currentDevice]systemVersion] floatValue]
 #define THUMB_HEIGHT 99
 
-@interface RDLoPDFViewController ()<UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,UIDocumentInteractionControllerDelegate,RDToolBarDelegate,DrawModeDelegate,RDMoreTableViewControllerDelegate, SignatureDelegate, ViewModeDelegate, BookmarkTableViewDelegate, RDAnnotListViewControllerDelegate, SearchResultViewControllerDelegate, saveTextAnnotDelegate>
+@interface RDLoPDFViewController ()<UIPickerViewDataSource,UIPickerViewDelegate,UITextFieldDelegate,UIDocumentInteractionControllerDelegate,RDToolBarDelegate,DrawModeDelegate,RDMoreTableViewControllerDelegate, SignatureDelegate/*, ADVSignatureDelegate*/, ViewModeDelegate, BookmarkTableViewDelegate, RDAnnotListViewControllerDelegate, SearchResultViewControllerDelegate, saveTextAnnotDelegate>
 {
     NSString *findString;
     RDToolBar *toolBar;
@@ -43,7 +43,7 @@
     int pagecount;
     int pagenow;
     NSMutableArray *tempfiles;
-    
+   
     MPMoviePlayerViewController *mpvc;
     UIPickerView *pickerView;
     NSArray *pickViewArr;
@@ -93,7 +93,7 @@
     if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
-    
+
     isPrint = NO;
     m_bSel = false;
     float width = [UIScreen mainScreen].bounds.size.width;
@@ -336,6 +336,8 @@
     [toolBar setFrame:CGRectMake(0, statusBarHeight, [self screenRect].size.width, 44)];
     [self refreshPageNumLabelPosition];
 }
+
+
 
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd {
     return [self PDFOpen:path :pwd atPage:0 readOnly:NO autoSave:NO author:@""];
@@ -1742,10 +1744,10 @@
     float y = pos.pdfy;
     NSString *tempFile;
     NSString *tempName;
-    tempName = [_pdfName substringToIndex:_pdfName.length-4];
+    tempName = [GLOBAL.pdfName substringToIndex:GLOBAL.pdfName.length-4];
     tempFile = [tempName stringByAppendingFormat:@"%d%@",pageno,@".bookmark"];
     NSString *tempPath;
-    tempPath = [_pdfPath stringByAppendingFormat:@"%@",_pdfName];
+    tempPath = [GLOBAL.pdfPath stringByAppendingFormat:@"%@",GLOBAL.pdfName];
     NSString *fileContent = [NSString stringWithFormat:@"%@,%@,%d,%f,%f",tempPath,tempName,pageno,x,y];
     NSString *BookMarkDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)objectAtIndex:0];
     
@@ -1775,7 +1777,7 @@
 
 -(void)printPdf
 {
-    NSString *path = [_pdfPath stringByAppendingString:_pdfName];
+    NSString *path = [GLOBAL.pdfPath stringByAppendingString:GLOBAL.pdfName];
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         UIAlertView *alter = [[UIAlertView alloc]initWithTitle:@"Warning" message:@"PDF file not available"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
         [alter show];
@@ -1791,7 +1793,7 @@
         
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
-        printInfo.jobName = [_pdfPath lastPathComponent];
+        printInfo.jobName = [GLOBAL.pdfPath lastPathComponent];
         printInfo.duplex = UIPrintInfoDuplexLongEdge;
         pic.printInfo = printInfo;
         pic.showsPageRange = YES;
@@ -1870,6 +1872,17 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self startSearch:text dir:-1 reset:YES];
             });
+        } else {
+            UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable")
+                                                                           message:NSLocalizedString(@"Reached first occurrence", @"Localizable")
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction* ok = [UIAlertAction
+                                 actionWithTitle:NSLocalizedString(@"OK", nil)
+                                 style:UIAlertActionStyleDefault
+                                 handler:nil];
+            [alert addAction:ok];
+            [self presentViewController:alert animated:YES completion:nil];
         }
     } else {
         [self startSearch:text dir:-1 reset:NO];
@@ -1892,6 +1905,17 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self startSearch:text dir:1 reset:YES];
             });
+        } else {
+            UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable")
+                                                                           message:NSLocalizedString(@"Reached last occurrence", @"Localizable")
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction* ok = [UIAlertAction
+                                 actionWithTitle:NSLocalizedString(@"OK", nil)
+                                 style:UIAlertActionStyleDefault
+                                 handler:nil];
+            [alert addAction:ok];
+            [self presentViewController:alert animated:YES completion:nil];
         }
     } else {
         NSString *text = m_searchBar.text;
@@ -1968,37 +1992,30 @@
 - (void)showSearchList
 {
     if (SEARCH_LIST == 1) {
-        if ([[RDExtendedSearch sharedInstance] searching]) {
-            return;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            toolBar.hidden = YES;
         }
-        [[RDExtendedSearch sharedInstance] searchText:m_searchBar.text inDoc:m_doc success:^(NSMutableArray *occurrences) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if ([[[RDExtendedSearch sharedInstance] searchResults] count] > 0) {
-                    
-                    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-                        toolBar.hidden = YES;
-                    }
-                    
-                    SearchResultTableViewController *viewController = [[SearchResultTableViewController alloc] init];
-                    viewController.delegate = self;
-                    
-                    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-                        
-                        viewController.modalPresentationStyle = UIModalPresentationPopover;
-                        UIPopoverPresentationController *popover = viewController.popoverPresentationController;
-                        popover.barButtonItem = (UIBarButtonItem *)[toolBar.items objectAtIndex:0]; // search bar button item
-                        
-                        [self presentViewController:viewController animated:YES completion:nil];
-                    }
-                    else
-                    {
-                        b_outline = YES;
-                        self.navigationController.navigationBarHidden = NO;
-                        [self.navigationController pushViewController:viewController animated:YES];
-                    }
-                }
-            });
-        }];
+        
+        SearchResultTableViewController *viewController = [[SearchResultTableViewController alloc] init];
+        viewController.delegate = self;
+        viewController.searchedString = m_searchBar.text;
+        viewController.doc = m_doc;
+        
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            
+            viewController.modalPresentationStyle = UIModalPresentationPopover;
+            [viewController setPreferredContentSize:CGSizeMake(400, 600)];
+            UIPopoverPresentationController *popover = viewController.popoverPresentationController;
+            popover.barButtonItem = (UIBarButtonItem *)[toolBar.items objectAtIndex:0]; // search bar button item
+            
+            [self presentViewController:viewController animated:YES completion:nil];
+        }
+        else
+        {
+            b_outline = YES;
+            self.navigationController.navigationBarHidden = NO;
+            [self.navigationController pushViewController:viewController animated:YES];
+        }
     }
 }
 
