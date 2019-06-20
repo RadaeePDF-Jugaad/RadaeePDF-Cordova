@@ -313,10 +313,12 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 	@Override
 	public void OnPDFAnnotTapped(int pageno, Annotation annot)
 	{
-		if(m_controller != null)
-			m_controller.OnAnnotTapped(annot);
-		if (annot != null)
-			RadaeePluginCallback.getInstance().onAnnotTapped(annot);
+        if (annot != null)
+        RadaeePluginCallback.getInstance().onAnnotTapped(annot);
+        if (!m_view.PDFCanSave())
+            return;
+        if (m_controller != null)
+            m_controller.OnAnnotTapped(annot);
 	}
 	@Override
 	public void OnPDFBlankTapped()

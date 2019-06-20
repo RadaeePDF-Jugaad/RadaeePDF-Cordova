@@ -363,7 +363,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                     else if(PDFCanSave() && m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
                         m_listener.OnPDFOpenURI(m_annot.GetURI());
                         PDFEndAnnot();
-                    } else if (PDFCanSave() && m_listener != null)
+                    } else if (m_listener != null)
                         m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                     invalidate();
                 }
@@ -1665,8 +1665,8 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             if (m_pEdit != null && m_pEdit.isShowing()) m_pEdit.dismiss();
             if (m_pCombo != null && m_pCombo.isShowing()) m_pCombo.dismiss();
         } catch (Exception e) { e.getMessage(); }
-        if (m_listener != null)
-            m_listener.OnPDFAnnotTapped(-1, null);
+        //if (m_listener != null)
+            //m_listener.OnPDFAnnotTapped(-1, null);
     }
 
     public void PDFEditAnnot() {
