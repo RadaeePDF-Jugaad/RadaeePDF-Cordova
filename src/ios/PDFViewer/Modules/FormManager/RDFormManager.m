@@ -64,11 +64,15 @@
         if ([page objectForKey:@"Annots"]) {
             NSArray *annots = [page objectForKey:@"Annots"];
             
-            PDFPage *pdfPage = [currentDoc page:index];
-            [pdfPage objsStart];
-            
-            for (NSDictionary *annot in annots) {
-                [self parseAnnot:annot atPage:pdfPage error:error];
+            if (index >= 0 && index < currentDoc.pageCount) {
+                PDFPage *pdfPage = [currentDoc page:index];
+                [pdfPage objsStart];
+                
+                for (NSDictionary *annot in annots) {
+                    [self parseAnnot:annot atPage:pdfPage error:error];
+                }
+            } else {
+                *error = [NSError errorWithDomain:[[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@".ErrorDomain"] code:104 userInfo:@{@"page-attribute": [NSString stringWithFormat:@"\"Page\" index %i is not correct", index]}];
             }
         } else {
             *error = [NSError errorWithDomain:[[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@".ErrorDomain"] code:104 userInfo:@{@"annots-attribute": @"\"Annots\" attribute is missing"}];

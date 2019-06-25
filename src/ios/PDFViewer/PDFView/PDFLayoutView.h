@@ -238,6 +238,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (BOOL)isCurlEnabled;
 
 - (void)refreshCurrentPage;
+- (void)refreshCachedPages;
 
 - (BOOL)isModified;
 - (void)setModified:(BOOL)modified force:(BOOL)force;
@@ -258,6 +259,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 #ifdef FTS_ENABLED
 - (void)applyFTSOccurrence:(FTSOccurrence *)occurrence;
 #endif
+
+- (BOOL)pagingAvailable;
 
 @end
 

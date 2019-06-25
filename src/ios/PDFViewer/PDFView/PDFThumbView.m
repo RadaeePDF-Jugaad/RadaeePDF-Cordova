@@ -19,6 +19,7 @@
         m_child.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
         self.maximumZoomScale = 1;
         self.minimumZoomScale = 1;
+        self.pagingEnabled = NO;
     }
     return self;
 }
@@ -43,6 +44,11 @@
     [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
     return TRUE;
 }
+
+- (BOOL)pagingAvailable {
+    return NO;
+}
+
 -(void)vGoto:(int)pageno
 {
     RDVPos pos;

@@ -34,8 +34,8 @@
     closeButton.width = ICON_WIDTH;
     
     UIImage *searchImg = (_searchImage) ? _searchImage : [UIImage imageNamed:@"btn_search"];
-    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc]initWithImage:searchImg style:UIBarStyleBlackOpaque target:self action:@selector(searchClick)];
-    searchButton.width = ICON_WIDTH;
+    _searchButton = [[UIBarButtonItem alloc]initWithImage:searchImg style:UIBarStyleBlackOpaque target:self action:@selector(searchClick)];
+    _searchButton.width = ICON_WIDTH;
     
     UIImage *drawImg = (_drawImage) ? _drawImage : [UIImage imageNamed:@"btn_ink"];
     UIBarButtonItem *drawButton = [[UIBarButtonItem alloc]initWithImage:drawImg style:UIBarButtonItemStylePlain target:self action:@selector(drawModeClick)];
@@ -59,7 +59,7 @@
     
     UIImage *moreImg = (_moreImage) ? _moreImage : [UIImage imageNamed:@"btn_more"];
     _moreButton = [[UIBarButtonItem alloc] initWithImage:moreImg style:UIBarButtonItemStylePlain target:self action:@selector(moreClick)];
-    normalToolBarArray = [[NSMutableArray alloc] initWithObjects:searchButton,drawButton,selectText,undoButton,redoButton,gridButton, [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil], _moreButton,nil];
+    normalToolBarArray = [[NSMutableArray alloc] initWithObjects:_searchButton,drawButton,selectText,undoButton,redoButton,gridButton, [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil], _moreButton,nil];
     
     UIImage *rightImg = (_nextImage) ? _nextImage : [UIImage imageNamed:@"btn_right"];
     UIBarButtonItem *nextbutton=[[UIBarButtonItem alloc]initWithImage:rightImg style:UIBarStyleBlackOpaque target:self action:@selector(nextword)];
@@ -72,7 +72,7 @@
     UIImage *removeImg = (_removeImage) ? _removeImage : [UIImage imageNamed:@"btn_annot_remove"];
     UIBarButtonItem *searchCancelbtn=[[UIBarButtonItem alloc]initWithImage:removeImg style:UIBarStyleBlackOpaque target:self action:@selector(searchCancel)];
     searchCancelbtn.width = ICON_WIDTH;
-    searchToolBarArray = [[NSArray alloc]initWithObjects:searchButton,prevbutton,nextbutton,searchCancelbtn,nil];
+    searchToolBarArray = [[NSArray alloc]initWithObjects:_searchButton,prevbutton,nextbutton,searchCancelbtn,nil];
     
     UIImage *performImg = (_performImage) ? _performImage : [UIImage imageNamed:@"btn_perform"];
     UIBarButtonItem *playbutton=[[UIBarButtonItem alloc]initWithImage:performImg style:UIBarStyleBlackOpaque target:self action:@selector(performAnnot)];
@@ -115,6 +115,7 @@
 
 - (void)changeToNormalToolBar
 {
+    _searchButton.enabled = YES;
     [self setItems:normalToolBarArray];
 }
 #pragma mark - Delegate

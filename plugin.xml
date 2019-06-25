@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.5.0">
+        id="com.radaee.cordova" version="1.5.1">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -350,45 +350,6 @@
 
         <!-- Plugin sources and resources -->
         <resource-file src="src/ios/PDFViewer/Images.xcassets" />
-        <!--
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_add.imageset/btn_add.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_annot_ellipse.imageset/btn_annot_ellipse.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_annot_ink.imageset/btn_annot_ink.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_annot_line.imageset/btn_annot_line.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_annot_note.imageset/btn_annot_note.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_annot_rect.imageset/btn_annot_rect.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_annot_remove.imageset/annot_remove.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_back.imageset/btn_back.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_done.imageset/btn_done.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_grid.imageset/btn_grid.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_ink.imageset/btn_ink.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_left.imageset/btn_left.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_more.imageset/btn_more.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_outline.imageset/btn_outline.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_perform.imageset/btn_perform.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_print.imageset/btn_print.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_redo.imageset/btn_redo.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_remove.imageset/btn_remove.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_right.imageset/btn_right.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_save.imageset/btn_save.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_search.imageset/btn_search.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_select.imageset/btn_select.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_share.imageset/btn_share.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_show.imageset/btn_show.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_undo.imageset/btn_undo.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_view_horz.imageset/btn_view_hor.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_view_single.imageset/btn_view_single.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_view_vert.imageset/btn_view_vert.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/btn_view.imageset/btn_view.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/encrypt.imageset/encrypt.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/export_annot.imageset/export_annot.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/fontBig.imageset/fontBig.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/fontSmall.imageset/fontSmall.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/manage_mark.imageset/manage_mark-1.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/pdf_custom_stamp.imageset/pdf_custom_stamp.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/view_about.imageset/view_about.png" target-dir="Resources/Images"/>
-        <resource-file src="src/ios/PDFViewer/Images.xcassets/view_settings_page.imageset/view_settings_page.png" target-dir="Resources/Images"/>
-        -->
 
         <!-- Radaee sources -->
         <source-file src="src/ios/RadaeePDFPlugin.m" />

@@ -34,6 +34,7 @@
 {
     PDFLayoutView *m_view;
     PDFThumbView *m_Thumbview;
+    UISlider *m_slider;
     //PDFGridView *m_Gridview;
     PDFDoc *m_doc;
     

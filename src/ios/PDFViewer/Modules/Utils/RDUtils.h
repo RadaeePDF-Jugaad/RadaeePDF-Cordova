@@ -28,5 +28,6 @@
 + (NSString *)getPDFIDForDoc:(PDFDoc *)m_doc;
 + (NSDate *)dateFromPdfDate:(NSString *)dateString;
 + (NSString *)pdfDateFromDate:(NSDate *)date;
++ (UIColor *)invertColor:(UIColor *)color;
 
 @end

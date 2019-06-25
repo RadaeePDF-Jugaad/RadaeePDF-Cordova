@@ -43,7 +43,7 @@
 {
     if(m_layer) return;
     m_layer = [[CAShapeLayer alloc] init];
-    m_layer.backgroundColor = [UIColor whiteColor].CGColor;
+    m_layer.backgroundColor = (GLOBAL.g_dark_mode) ? [UIColor blackColor].CGColor : [UIColor whiteColor].CGColor;
     [m_layer removeAllAnimations];
     float pscale = 1.0f / [[UIScreen mainScreen] scale];
     m_layer.frame = CGRectMake(m_x * pscale, m_y * pscale, m_w * pscale, m_h * pscale);

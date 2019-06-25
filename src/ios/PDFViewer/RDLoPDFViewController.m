@@ -73,10 +73,11 @@
     
     int statusBarHeight;
     
-    UISlider *m_slider;
-    
     UIColor *toolbarColor;
     UIColor *toolbarTintColor;
+    
+    UILabel *sliderLabel;
+    BOOL showThumb;
 }
 @end
 
@@ -226,8 +227,19 @@
 
 -(void)PDFGoto:(int)pageno
 {
+    if (pageno < 0) {
+        [self PDFGoto:0];
+        return;
+    }
+    
+    if (pageno > m_doc.pageCount - 1) {
+        [self PDFGoto:m_doc.pageCount - 1];
+        return;
+    }
+    
     [m_view resetZoomLevel];
     [m_view vGoto:pageno];
+    [m_Thumbview vGoto:pageno];
     [self updatePageNumLabel:(pageno + 1)];
 }
 
@@ -240,8 +252,12 @@
     [m_view setFrame:CGRectMake(0, 0, size.width, size.height)];
     [m_view sizeThatFits:size];
     m_Thumbview.frame = CGRectMake(0, size.height - thumbViewHeight, size.width, thumbViewHeight);
+    m_slider.frame = CGRectMake(0, size.height - thumbViewHeight, size.width, thumbViewHeight);
     [m_Thumbview sizeThatFits:m_Thumbview.frame.size];
+    [m_slider sizeThatFits:m_slider.frame.size];
     [m_Thumbview vGoto:pagenow];
+    m_slider.value = pagenow +1;
+    [self setSliderText:(int)m_slider.value];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -349,6 +365,8 @@
     GLOBAL.pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
     GLOBAL.pdfName = [[path lastPathComponent] mutableCopy];
     GLOBAL.g_save_doc = autoSave;
+    
+    showThumb = YES;
     
     CGRect rect = [self screenRect];
     m_doc = [[PDFDoc alloc] init];
@@ -498,13 +516,72 @@
     }
     
     if (m_Thumbview) {
+        [m_Thumbview PDFClose];
         [m_Thumbview removeFromSuperview];
+        m_Thumbview = NULL;
+    }
+    
+    if (m_slider) {
+        [m_slider removeFromSuperview];
+        m_slider = nil;
     }
     
     m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, rect.size.height - thumbViewHeight, rect.size.width, thumbViewHeight)];
     [m_Thumbview PDFOpen:m_doc :4 :self];
     [m_Thumbview vGoto:pageno];//page 0 for default selected page.
     [self.view addSubview:m_Thumbview];
+    m_Thumbview.hidden = !showThumb;
+    
+    sliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, thumbViewHeight / 3)];
+    sliderLabel.textColor = [UIColor whiteColor];
+    sliderLabel.textAlignment = NSTextAlignmentCenter;
+    sliderLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self setSliderText:pageno + 1];
+    
+    m_slider = [[UISlider alloc] initWithFrame:CGRectMake(0, rect.size.height - thumbViewHeight, rect.size.width, thumbViewHeight)];
+    m_slider.minimumValue = 1;
+    m_slider.maximumValue = m_doc.pageCount;
+    //m_slider.continuous = NO;
+    m_slider.value = pageno + 1;
+    [m_slider addTarget:self action:@selector(OnSliderValueChange:) forControlEvents:UIControlEventValueChanged];
+    [m_slider addTarget:self action:@selector(OnSliderTouchUp:) forControlEvents:UIControlEventTouchUpInside];
+    m_slider.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
+    [m_slider addSubview:sliderLabel];
+    m_slider.hidden = showThumb;
+    [self.view addSubview:m_slider];
+}
+
+#pragma mark - Slider
+
+- (void)setSliderText:(int)value {
+    sliderLabel.text = [NSString stringWithFormat:@"%i/%i", value, m_doc.pageCount];
+}
+
+-(void)OnSliderValueChange:(UISlider *)slider
+{
+    [self updateSlider:slider.value goto:NO];
+}
+
+
+-(void)OnSliderTouchUp:(UISlider *)slider
+{
+    [self updateSlider:slider.value goto:YES];
+}
+
+- (void)updateSlider:(int)value goto:(BOOL)haveToGoTo {
+    int page = value;
+    if (page <= 0) {
+        page = 1;
+    }
+    if (page >= m_doc.pageCount) {
+        page = m_doc.pageCount;
+    }
+    
+    if (haveToGoTo) {
+        [self OnPageClicked:page - 1];
+    } else {
+        [self setSliderText:page];
+    }
 }
 
 -(void)OnPageClicked:(int)pageno
@@ -546,6 +623,8 @@
     }
     
     [m_Thumbview vGoto:pageno];
+    m_slider.value = pageno +1;
+    [self setSliderText:(int)m_slider.value];
     [self updatePageNumLabel:(pageno + 1)];
 }
 
@@ -965,6 +1044,13 @@
         [m_view removeFromSuperview];
         m_view = NULL;
     }
+    
+    if (m_Thumbview != nil) {
+        [m_Thumbview PDFClose];
+        [m_Thumbview removeFromSuperview];
+        m_Thumbview = NULL;
+    }
+    
     m_doc = NULL;
     [toolBar removeFromSuperview];
 }
@@ -1547,7 +1633,14 @@
     
     [self toolBarStyle];
     
+    toolBar.searchButton.enabled = (m_searchBar.text.length > 0);
+    
     [self.view addSubview:m_searchBar];
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    toolBar.searchButton.enabled = (searchText.length > 0);
 }
 
 - (void)showDocReadonlyAlert
@@ -1959,6 +2052,10 @@
 
 -(void)searchCancel
 {
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && [self presentedViewController]) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    
     if (SEARCH_LIST == 1) {
         [[RDExtendedSearch sharedInstance] clearSearch];
     }
@@ -2490,7 +2587,8 @@
 
 - (void)showBars
 {
-    m_Thumbview.hidden = NO;
+    m_Thumbview.hidden = !showThumb;
+    m_slider.hidden = showThumb;
     [pageNumLabel setHidden:false];
     toolBar.hidden = NO;
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
@@ -2505,7 +2603,8 @@
 
 - (void)hideBars
 {
-    m_Thumbview.hidden =YES;
+    m_Thumbview.hidden = YES;
+    m_slider.hidden = YES;
     [pageNumLabel setHidden:true];
     toolBar.hidden = YES;
     [m_searchBar resignFirstResponder];

@@ -329,11 +329,11 @@
     _g_swipe_distance= 1.0f;
     _g_render_quality = 1;
     
-    _g_rect_color = 0xFFFF0000;
-    _g_line_color = 0xFFFF0000;
-    _g_ink_color = 0xFFFF0000;
+    _g_rect_color = 0xFF000000;
+    _g_line_color = 0xFF000000;
+    _g_ink_color = 0xFF000000;
     _g_sel_color = 0x400000C0;
-    _g_oval_color = 0xFF0000FF;
+    _g_oval_color = 0xFF000000;
     _g_annot_highlight_clr = 0xFFFFFF00;
     _g_annot_underline_clr = 0xFF0000FF;
     _g_annot_strikeout_clr = 0xFFFF0000;

@@ -7,6 +7,7 @@
 //
 
 #import "SearchResultTableViewController.h"
+#import "RDUtils.h"
 
 @implementation SearchResultTableViewController
 
@@ -20,49 +21,73 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     items = [NSMutableArray array];
+    self.view.backgroundColor = [UIColor whiteColor];
+    self.tableView.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    void(^progressBlock)(NSMutableArray *, NSMutableArray *) = ^(NSMutableArray *occurrences, NSMutableArray *total){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            if (items.count != (total.count - occurrences.count)) {
+                for (id occ in occurrences) {
+                    [total removeObject:occ];
+                }
+                items = total;
+                [self.tableView reloadData];
+            }
+            
+            if (occurrences.count > 0) {
+                NSLog(@"--- SEARCHED PAGE: %i ---", [(RDSearchResult *)[occurrences objectAtIndex:0] page]);
+                [self.tableView beginUpdates];
+                [items addObjectsFromArray:occurrences];
+                NSMutableArray *indexPaths = [NSMutableArray array];
+                for (int i = 0; i < occurrences.count; i++) {
+                    [indexPaths addObject:[NSIndexPath indexPathForRow:(items.count - occurrences.count) + i inSection:0]];
+                }
+                [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+                [self updateFooterText];
+                
+                [self.tableView endUpdates];
+            }
+        });
+    };
+    
+    void(^finishBlock)() = ^(){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"--- SEARCH FINISHED ---");
+            [self updateFooterText];
+            // ricerca sincrona
+            /*dispatch_async(dispatch_get_main_queue(), ^{
+             if ([[RDExtendedSearch sharedInstance] searchResults].count > 0) {
+             items = [[RDExtendedSearch sharedInstance] searchResults];
+             [self.tableView reloadData];
+             }
+             });*/
+        });
+    };
 
     if ([[RDExtendedSearch sharedInstance] searchResults].count == 0 || ![[[RDExtendedSearch sharedInstance] searchTxt] isEqualToString:_searchedString]) {
         [[RDExtendedSearch sharedInstance] clearSearch:^{
-            // ricerca sincrona
+            // ricerca asincrona
             NSLog(@"--- SEARCH START ---");
-            [[RDExtendedSearch sharedInstance] searchText:_searchedString inDoc:_doc progress:^(NSMutableArray *occurrences) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (occurrences.count > 0) {
-                        NSLog(@"--- SEARCHED PAGE: %i ---", [(RDSearchResult *)[occurrences objectAtIndex:0] page]);
-                        [self.tableView beginUpdates];
-                        [items addObjectsFromArray:occurrences];
-                        NSMutableArray *indexPaths = [NSMutableArray array];
-                        for (int i = 0; i < occurrences.count; i++) {
-                            [indexPaths addObject:[NSIndexPath indexPathForRow:(items.count - occurrences.count) + i inSection:0]];
-                        }
-                        [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
-                        [self updateFooterText];
-                        
-                        [self.tableView endUpdates];
-                    }
-                });
+            [[RDExtendedSearch sharedInstance] searchText:_searchedString inDoc:_doc progress:^(NSMutableArray *occurrences, NSMutableArray *total) {
+                progressBlock(occurrences, total);
             } finish:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSLog(@"--- SEARCH FINISHED ---");
-                    [self updateFooterText];
-                    // ricerca sincrona
-                    /*dispatch_async(dispatch_get_main_queue(), ^{
-                     if ([[RDExtendedSearch sharedInstance] searchResults].count > 0) {
-                     items = [[RDExtendedSearch sharedInstance] searchResults];
-                     [self.tableView reloadData];
-                     }
-                     });*/
-                });
+                finishBlock();
             }];
         }];
     } else {
-        items = [[RDExtendedSearch sharedInstance] searchResults];
-        [self.tableView reloadData];
+        [[RDExtendedSearch sharedInstance] restoreProgress:^(NSMutableArray *occurrences, NSMutableArray *total) {
+            progressBlock(occurrences, total);
+        }];
+        
+        [[RDExtendedSearch sharedInstance] restoreFinish:^{
+            finishBlock();
+        }];
     }
 }
 
@@ -119,6 +144,8 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         cell.textLabel.font = [UIFont systemFontOfSize:14];
+        cell.textLabel.textColor = [UIColor blackColor];
+        cell.backgroundColor = [UIColor whiteColor];
     }
 
     // PDF Search
@@ -126,6 +153,7 @@
     pageLabel.text = [NSString stringWithFormat:@"%i", [(RDSearchResult *)[items objectAtIndex:indexPath.row] page]];
     pageLabel.font = [UIFont boldSystemFontOfSize:17];
     pageLabel.textAlignment = NSTextAlignmentRight;
+    pageLabel.textColor = [UIColor blackColor];
     
     cell.textLabel.attributedText = [self boldSearchedString:[(RDSearchResult *)[items objectAtIndex:indexPath.row] stringResult]];
     cell.textLabel.numberOfLines = 0;

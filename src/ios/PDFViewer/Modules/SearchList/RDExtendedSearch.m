@@ -42,12 +42,14 @@
     return YES;
 }
 
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *))progress finish:(void (^)())finish
+- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *, NSMutableArray *))progress finish:(void (^)())finish
 {
     _searching = YES;
     self.searchResults =  [[NSMutableArray alloc] init];
     self.searchTxt = text;
     [self searchInit:doc];
+    progressBlock = progress;
+    finishBlock = finish;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (int i = 0; i < m_doc.pageCount; i++) {
@@ -63,7 +65,7 @@
                     m_finder = [m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
                     
                     if (m_finder.count > 0) {
-                        [self addPageSearchResults:m_finder forPage:i progress:progress];
+                        [self addPageSearchResults:m_finder forPage:i progress:progressBlock];
                     }
                     
                     m_page = nil;
@@ -75,13 +77,13 @@
             }
         }
         _searching = NO;
-        if (finish) {
-            finish();
+        if (finishBlock) {
+            finishBlock();
         }
     });
 }
 
-- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *))progress
+- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *, NSMutableArray *))progress
 {
     NSMutableArray *progressResult = [NSMutableArray array];
     for (int i = 0; i < finder.count; i++) {
@@ -103,7 +105,7 @@
     }
     
     if (progress) {
-        progress(progressResult);
+        progress(progressResult, [NSMutableArray arrayWithArray:self.searchResults]);
     }
 }
 
@@ -198,6 +200,14 @@
             finishBlock();
         }
     }
+}
+
+- (void)restoreProgress:(void (^)(NSMutableArray *, NSMutableArray *))progress {
+    progressBlock = progress;
+}
+
+- (void)restoreFinish:(void (^)())finish {
+    finishBlock = finish;
 }
 
 @end

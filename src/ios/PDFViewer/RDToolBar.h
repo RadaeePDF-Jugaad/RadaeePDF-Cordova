@@ -34,6 +34,7 @@
 @interface RDToolBar : UIToolbar
 
 @property (nonatomic, strong) UIBarButtonItem *moreButton;
+@property (nonatomic, strong) UIBarButtonItem *searchButton;
 @property (nonatomic,weak) id<RDToolBarDelegate> m_delegate;
 
 @property (strong, nonatomic) UIImage *closeImage;

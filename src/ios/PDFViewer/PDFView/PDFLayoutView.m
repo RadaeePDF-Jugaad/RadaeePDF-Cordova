@@ -138,7 +138,9 @@
             break;
     }
     free( horzs );
-    self.pagingEnabled = GLOBAL.g_paging_enabled;
+    if ([self pagingAvailable]) {
+        self.pagingEnabled = GLOBAL.g_paging_enabled;
+    }
     [m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer];
     [self bringSubviewToFront:m_child];
     m_status = sta_none;
@@ -438,7 +440,7 @@
     CGRect rect = CGRectMake( self.contentOffset.x, self.contentOffset.y, self.frame.size.width, self.frame.size.height );
     m_child.frame = rect;
     
-    if (self.zoomScale <= 1 && [self paginAvailable]) {
+    if (self.zoomScale <= 1 && [self pagingAvailable]) {
         self.pagingEnabled = GLOBAL.g_paging_enabled;
     }
     
@@ -875,7 +877,7 @@
     {
         [self vGoto:m_cur_page];
      
-        if (self.zoomScale <= 1 && [self paginAvailable]) {
+        if (self.zoomScale <= 1 && [self pagingAvailable]) {
             self.pagingEnabled = GLOBAL.g_paging_enabled;
         }
     }
@@ -978,7 +980,9 @@
     
     if (doubleTapZoomMode > 0) {
         if (m_zoom > 1){
-            self.pagingEnabled = GLOBAL.g_paging_enabled;
+            if ([self pagingAvailable]) {
+                self.pagingEnabled = GLOBAL.g_paging_enabled;
+            }
             [self resetZoomLevel];
         }else {
             self.pagingEnabled = NO;
@@ -1942,7 +1946,17 @@
     [m_child setNeedsDisplay];
 }
 
-- (BOOL)paginAvailable
+- (void)refreshCachedPages {
+    int start = m_layout.cur_pg1;
+    int end = m_layout.cur_pg2;
+    
+    while (start < end) {
+        [self ProUpdatePage:start];
+        start++;
+    }
+}
+
+- (BOOL)pagingAvailable
 {
     return (GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 4 || GLOBAL.g_render_mode == 6);
 }
