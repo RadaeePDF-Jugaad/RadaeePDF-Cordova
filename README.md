@@ -43,7 +43,7 @@ After doing these steps, you will have a ready to use project.
 ## Compatibility
 
 We now support Cordova 6,7,8 and 9 for both Android and iOS platforms.  
-For cordova-android, latest supported version is 8.0.0, We do not support cordova-android 7.0.0.  
+For cordova-android, latest supported version is 8.0.0, We support cordova-android@7 from version 7.1.4 onwards.  
 Make sure to update to latest plugin version and to use the command `cordova platform add android@latest`
 
 ## The JavaScript Interfaces
