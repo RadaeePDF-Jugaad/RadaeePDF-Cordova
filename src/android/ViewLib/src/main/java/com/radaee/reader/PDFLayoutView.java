@@ -50,7 +50,7 @@ import com.radaee.view.PDFLayoutHorz;
 import com.radaee.view.PDFLayoutVert;
 import com.radaee.view.VPage;
 import com.radaee.view.VSel;
-import com.radaee.viewlib.R;
+import com.radaee.reader.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -362,6 +362,10 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                         handleSignatureField();
                     else if(PDFCanSave() && m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
                         m_listener.OnPDFOpenURI(m_annot.GetURI());
+                        PDFEndAnnot();
+                    } else if (m_annot.GetDest() >= 0) {
+                        int dest = m_annot.GetDest();
+                        m_layout.vGotoPage(dest);
                         PDFEndAnnot();
                     } else if (m_listener != null)
                         m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
