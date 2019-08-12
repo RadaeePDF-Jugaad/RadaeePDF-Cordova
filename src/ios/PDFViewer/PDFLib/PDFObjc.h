@@ -243,6 +243,7 @@
  *
  */
 -(int)objsIndex:(int)find_index;
+-(int)objsEnd:(int)find_index;
 @end
 
 @interface PDFPath : NSObject
@@ -901,7 +902,7 @@
 -(bool)getRichMediaItemSourceData:(int) idx :(NSString *)save_path;
 -(bool)getRichMediaData :(NSString *)asset :(NSString *)save_path;
 
-
+-(NSString*)getFileLink;
 -(PDFAnnot *)getPopup;
 -(bool)getPopupOpen;
 /**
@@ -1188,6 +1189,7 @@
  * @return handle of find session, or 0 if no found.
  */
 -(PDFFinder *)find:(NSString *)key :(bool)match_case :(bool)whole_word;
+-(PDFFinder *)find2:(NSString *)key :(bool)match_case :(bool)whole_word :(bool)skip_blanks;
 /**
  * @brief get annotations count in this page.
  * this can be invoked after ObjsStart or Render or RenderToBmp.

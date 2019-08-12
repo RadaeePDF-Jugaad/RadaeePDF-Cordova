@@ -882,6 +882,7 @@ int Page_objsAlignWord( PDF_PAGE page, int from, int dir );
  *	@return	finder object ot NULL if not found.
  */
 PDF_FINDER Page_findOpen( PDF_PAGE page, const char *str, bool match_case, bool whole_word );
+PDF_FINDER Page_findOpen2(PDF_PAGE page, const char* str, bool match_case, bool whole_word, bool skip_blanks);
 /**
  *	@brief	how many found?
             to invoke this function, developers should call Page_objsStart before.
@@ -900,6 +901,7 @@ int Page_findGetCount( PDF_FINDER finder );
  *	@return	char index in page, range: [0, Page_objsGetCharCount() - 1].
  */
 int Page_findGetFirstChar( PDF_FINDER finder, int index );
+int Page_findGetEndChar(PDF_FINDER finder, int index);
 /**
  *	@brief	close finder
             to invoke this function, developers should call Page_objsStart before.
@@ -1405,6 +1407,7 @@ bool Page_getAnnotRichMediaItemSourceData(PDF_PAGE page, PDF_ANNOT annot, int id
 bool Page_getAnnotRichMediaData(PDF_PAGE page, PDF_ANNOT annot, NSString *asset, NSString *save_path);
 
 
+NSString* Page_getAnnotFileLink(PDF_PAGE page, PDF_ANNOT annot);
 PDF_ANNOT Page_getAnnotPopup(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_getAnnotPopupOpen(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_setAnnotPopupOpen(PDF_PAGE page, PDF_ANNOT annot, bool open);

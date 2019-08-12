@@ -93,7 +93,6 @@
     //Global_activeStandard("com.radaee.pdf.PDFViewer", "Radaee", "radaee_com@yahoo.cn", "3BQIA5-IW8GQM-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO");
     //Global_activeProfession("com.radaee.pdf.PDFViewer", "Radaee", "radaee_com@yahoo.cn", "MP8SG1-7SPIWP-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO");
     //Global_activePremium("com.radaee.pdf.PDFViewer", "Radaee", "radaee_com@yahoo.cn", "89WG9I-HCL62K-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO");
-    
     /*
     [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
     [[NSUserDefaults standardUserDefaults] setObject:@"Radaee" forKey:@"actCompany"];
@@ -103,7 +102,6 @@
     
     [[NSUserDefaults standardUserDefaults] synchronize];
     */
-    
     BOOL isActive = NO;
     int licenseType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"actActivationType"] intValue];
     NSLog(@"LICENSE: %i", licenseType);

@@ -19,6 +19,14 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"Radaee" forKey:@"actCompany"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"radaee_com@yahoo.cn" forKey:@"actEmail"];
+    [[NSUserDefaults standardUserDefaults] setObject:@"89WG9I-HCL62K-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO" forKey:@"actSerial"];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"actActivationType"];
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     [RDVGlobal Init];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

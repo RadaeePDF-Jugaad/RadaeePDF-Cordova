@@ -73,6 +73,10 @@
 		A801AD46227C796A002DA8B3 /* RDAnnotListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD12227C7969002DA8B3 /* RDAnnotListViewController.m */; };
 		A801AD47227C796A002DA8B3 /* RDAnnotListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A801AD13227C7969002DA8B3 /* RDAnnotListViewController.xib */; };
 		A801AD48227C796A002DA8B3 /* ReaderHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD16227C7969002DA8B3 /* ReaderHandler.m */; };
+		A801AD4D227C796A002DA8B3 /* AdvSignatureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD20227C7969002DA8B3 /* AdvSignatureViewController.m */; };
+		A801AD4E227C796A002DA8B3 /* FXBlurView.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD24227C7969002DA8B3 /* FXBlurView.m */; };
+		A801AD4F227C796A002DA8B3 /* ImageCropView.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD26227C7969002DA8B3 /* ImageCropView.m */; };
+		A801AD50227C796A002DA8B3 /* SignatureView.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD28227C7969002DA8B3 /* SignatureView.m */; };
 		A801AD51227C796A002DA8B3 /* SignatureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD2A227C7969002DA8B3 /* SignatureViewController.m */; };
 		A801AD52227C796A002DA8B3 /* UviSignatureView.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD2C227C7969002DA8B3 /* UviSignatureView.m */; };
 		A801AD53227C796A002DA8B3 /* RDCOExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD2F227C7969002DA8B3 /* RDCOExtractor.m */; };
@@ -107,7 +111,10 @@
 		A8549AF22282C90A0035A2EF /* StrikeoutColorList.plist in Resources */ = {isa = PBXBuildFile; fileRef = A8549AF42282C90A0035A2EF /* StrikeoutColorList.plist */; };
 		A8549AF52282C90E0035A2EF /* UnderlineColorList.plist in Resources */ = {isa = PBXBuildFile; fileRef = A8549AF72282C90E0035A2EF /* UnderlineColorList.plist */; };
 		A8549AF82282C9110035A2EF /* ViewModeList.plist in Resources */ = {isa = PBXBuildFile; fileRef = A8549AFA2282C9110035A2EF /* ViewModeList.plist */; };
+		A8AF4822229D652A00D62AB0 /* RadaeePDFPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */; };
 		A8AF482C229D762F00D62AB0 /* RadaeeLib.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A8AF4829229D762F00D62AB0 /* RadaeeLib.h */; };
+		A8AF4831229D772000D62AB0 /* RadaeePDFPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */; };
+		A8AF4832229D774000D62AB0 /* RadaeePDFPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = A8AF4820229D652900D62AB0 /* RadaeePDFPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A8AF4835229D776D00D62AB0 /* ViewModeTableViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A801AD66227C7D4A002DA8B3 /* ViewModeTableViewController.h */; };
 		A8AF4836229D776D00D62AB0 /* ViewModeTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A801AD67227C7D4A002DA8B3 /* ViewModeTableViewController.m */; };
 		A8AF4837229D778D00D62AB0 /* TextAnnotViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A801AD58227C7CAC002DA8B3 /* TextAnnotViewController.h */; };
@@ -184,6 +191,7 @@
 		A8AF4882229D7ACF00D62AB0 /* libRDPDFLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC02B0916401E3D003D8D3B /* libRDPDFLib.a */; };
 		A8AF4883229D808700D62AB0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC4FD0B163EB31700CCBF0B /* UIKit.framework */; };
 		A8AF4884229D8A1300D62AB0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC4FD0D163EB31700CCBF0B /* Foundation.framework */; };
+		A8D4D94722AA506F00B8D806 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A8D4D94622AA506F00B8D806 /* Launch Screen.storyboard */; };
 		A8D87CB4228D5DF4003381A0 /* PDFGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8D87CB2228D5DF3003381A0 /* PDFGridView.m */; };
 		B603997716EB191900842206 /* InkColorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B603997516EB191900842206 /* InkColorViewController.m */; };
 		B603997816EB191900842206 /* InkColorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B603997616EB191900842206 /* InkColorViewController.xib */; };
@@ -331,6 +339,14 @@
 		A801AD13227C7969002DA8B3 /* RDAnnotListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RDAnnotListViewController.xib; sourceTree = "<group>"; };
 		A801AD15227C7969002DA8B3 /* ReaderHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReaderHandler.h; sourceTree = "<group>"; };
 		A801AD16227C7969002DA8B3 /* ReaderHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReaderHandler.m; sourceTree = "<group>"; };
+		A801AD1F227C7969002DA8B3 /* AdvSignatureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvSignatureViewController.h; sourceTree = "<group>"; };
+		A801AD20227C7969002DA8B3 /* AdvSignatureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvSignatureViewController.m; sourceTree = "<group>"; };
+		A801AD23227C7969002DA8B3 /* FXBlurView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FXBlurView.h; sourceTree = "<group>"; };
+		A801AD24227C7969002DA8B3 /* FXBlurView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FXBlurView.m; sourceTree = "<group>"; };
+		A801AD25227C7969002DA8B3 /* ImageCropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCropView.h; sourceTree = "<group>"; };
+		A801AD26227C7969002DA8B3 /* ImageCropView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCropView.m; sourceTree = "<group>"; };
+		A801AD27227C7969002DA8B3 /* SignatureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignatureView.h; sourceTree = "<group>"; };
+		A801AD28227C7969002DA8B3 /* SignatureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignatureView.m; sourceTree = "<group>"; };
 		A801AD29227C7969002DA8B3 /* SignatureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignatureViewController.h; sourceTree = "<group>"; };
 		A801AD2A227C7969002DA8B3 /* SignatureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignatureViewController.m; sourceTree = "<group>"; };
 		A801AD2B227C7969002DA8B3 /* UviSignatureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UviSignatureView.h; sourceTree = "<group>"; };
@@ -401,8 +417,11 @@
 		A8549AF92282C9110035A2EF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Base; path = Base.lproj/ViewModeList.plist; sourceTree = "<group>"; };
 		A8549AFB2282C9940035A2EF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = it; path = it.lproj/SettingList.plist; sourceTree = "<group>"; };
 		A8549AFC2282CA0D0035A2EF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = it; path = it.lproj/RenderList.plist; sourceTree = "<group>"; };
+		A8AF4820229D652900D62AB0 /* RadaeePDFPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RadaeePDFPlugin.h; sourceTree = SOURCE_ROOT; };
+		A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RadaeePDFPlugin.m; sourceTree = SOURCE_ROOT; };
 		A8AF4827229D762F00D62AB0 /* libRadaeeLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRadaeeLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AF4829229D762F00D62AB0 /* RadaeeLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RadaeeLib.h; sourceTree = "<group>"; };
+		A8D4D94622AA506F00B8D806 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		A8D87CB2228D5DF3003381A0 /* PDFGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PDFGridView.m; path = PDFView/PDFGridView.m; sourceTree = "<group>"; };
 		A8D87CB3228D5DF4003381A0 /* PDFGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PDFGridView.h; path = PDFView/PDFGridView.h; sourceTree = "<group>"; };
 		B603997416EB191900842206 /* InkColorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InkColorViewController.h; sourceTree = "<group>"; };
@@ -516,6 +535,8 @@
 		6CC4FD11163EB31700CCBF0B /* PDFViewer */ = {
 			isa = PBXGroup;
 			children = (
+				A8AF4820229D652900D62AB0 /* RadaeePDFPlugin.h */,
+				A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */,
 				A801AD65227C7D3F002DA8B3 /* VIewMode */,
 				A801AD5C227C7CE0002DA8B3 /* TextAnnot */,
 				A801AD5B227C7CDB002DA8B3 /* More */,
@@ -535,6 +556,7 @@
 				B603997F16EB1A8700842206 /* More */,
 				B6CC4D4516E646E300B82BD3 /* UINavigationController+autoRotate.h */,
 				B6CC4D4616E646E300B82BD3 /* UINavigationController+autoRotate.m */,
+				A8D4D94622AA506F00B8D806 /* Launch Screen.storyboard */,
 				A835BDA91D2BA110004B3DE1 /* Images.xcassets */,
 			);
 			path = PDFViewer;
@@ -769,12 +791,36 @@
 		A801AD1E227C7969002DA8B3 /* Signature */ = {
 			isa = PBXGroup;
 			children = (
+				A801AD1F227C7969002DA8B3 /* AdvSignatureViewController.h */,
+				A801AD20227C7969002DA8B3 /* AdvSignatureViewController.m */,
+				A801AD21227C7969002DA8B3 /* ImageCropView */,
+				A801AD27227C7969002DA8B3 /* SignatureView.h */,
+				A801AD28227C7969002DA8B3 /* SignatureView.m */,
 				A801AD29227C7969002DA8B3 /* SignatureViewController.h */,
 				A801AD2A227C7969002DA8B3 /* SignatureViewController.m */,
 				A801AD2B227C7969002DA8B3 /* UviSignatureView.h */,
 				A801AD2C227C7969002DA8B3 /* UviSignatureView.m */,
 			);
 			path = Signature;
+			sourceTree = "<group>";
+		};
+		A801AD21227C7969002DA8B3 /* ImageCropView */ = {
+			isa = PBXGroup;
+			children = (
+				A801AD22227C7969002DA8B3 /* FXBlurView */,
+				A801AD25227C7969002DA8B3 /* ImageCropView.h */,
+				A801AD26227C7969002DA8B3 /* ImageCropView.m */,
+			);
+			path = ImageCropView;
+			sourceTree = "<group>";
+		};
+		A801AD22227C7969002DA8B3 /* FXBlurView */ = {
+			isa = PBXGroup;
+			children = (
+				A801AD23227C7969002DA8B3 /* FXBlurView.h */,
+				A801AD24227C7969002DA8B3 /* FXBlurView.m */,
+			);
+			path = FXBlurView;
 			sourceTree = "<group>";
 		};
 		A801AD2D227C7969002DA8B3 /* Test */ = {
@@ -980,6 +1026,7 @@
 				A8AF4873229D794800D62AB0 /* RDVThread.h in Headers */,
 				A8AF4845229D785800D62AB0 /* RDAnnotListViewController.h in Headers */,
 				A8AF4865229D794800D62AB0 /* RDVCache.h in Headers */,
+				A8AF4832229D774000D62AB0 /* RadaeePDFPlugin.h in Headers */,
 				A8AF4837229D778D00D62AB0 /* TextAnnotViewController.h in Headers */,
 				A8AF487F229D7ACB00D62AB0 /* PDFObjc.h in Headers */,
 				A8AF4841229D783100D62AB0 /* DrawModeTableViewController.h in Headers */,
@@ -1099,6 +1146,7 @@
 				6CBD47FF16A5A75900BF6A5D /* RectColorViewController.xib in Resources */,
 				A8549ADD2282C8F60035A2EF /* LineMarkWidth.plist in Resources */,
 				A8549AF82282C9110035A2EF /* ViewModeList.plist in Resources */,
+				A8D4D94722AA506F00B8D806 /* Launch Screen.storyboard in Resources */,
 				A8549AE92282C9010035A2EF /* RenderList.plist in Resources */,
 				A801AD42227C796A002DA8B3 /* FTSSearchTableViewCell.xib in Resources */,
 				6C6843AB16AC238C000DE767 /* OutLineViewController.xib in Resources */,
@@ -1141,6 +1189,7 @@
 				A801AD3B227C796A002DA8B3 /* FMDatabaseAdditions.m in Sources */,
 				6C1F8B6C16742F99002D2778 /* BookMarkViewController.m in Sources */,
 				A801AD3D227C796A002DA8B3 /* FMDatabaseQueue.m in Sources */,
+				A801AD4D227C796A002DA8B3 /* AdvSignatureViewController.m in Sources */,
 				A801AD45227C796A002DA8B3 /* TextExtractor.m in Sources */,
 				A825B9A7228324F9009BD8EB /* PDFReflowView.m in Sources */,
 				6C1F8B7216742FC9002D2778 /* SettingViewController.m in Sources */,
@@ -1162,6 +1211,8 @@
 				8E6C05FD1DEFCD6E00F278B9 /* RDVLayout.m in Sources */,
 				6CEA178516A1557E009FFE80 /* ViewModeViewController.m in Sources */,
 				A801AD3F227C796A002DA8B3 /* FTSManager.m in Sources */,
+				A801AD50227C796A002DA8B3 /* SignatureView.m in Sources */,
+				A8AF4822229D652A00D62AB0 /* RadaeePDFPlugin.m in Sources */,
 				8E6C05FB1DEFCD6E00F278B9 /* RDVFinder.m in Sources */,
 				8E6C06091DF005D200F278B9 /* RDLoPDFViewController.m in Sources */,
 				7A2D86E12285CB390017E40D /* PDFHttpStream.m in Sources */,
@@ -1169,6 +1220,7 @@
 				6C6843AA16AC238C000DE767 /* OutLineViewController.m in Sources */,
 				8E6C05FC1DEFCD6E00F278B9 /* RDVGlobal.m in Sources */,
 				6CBD243A16AC372D00D29A9C /* OUTLINE_ITEM.m in Sources */,
+				A801AD4E227C796A002DA8B3 /* FXBlurView.m in Sources */,
 				B6B888D91DFDA6D500EF184F /* PDFThumbView.m in Sources */,
 				B6CC4D4716E646E300B82BD3 /* UINavigationController+autoRotate.m in Sources */,
 				B603997716EB191900842206 /* InkColorViewController.m in Sources */,
@@ -1182,6 +1234,7 @@
 				8E6C05FE1DEFCD6E00F278B9 /* RDVPage.m in Sources */,
 				A801AD48227C796A002DA8B3 /* ReaderHandler.m in Sources */,
 				B626624D1792BF80008A2593 /* OvalColorViewController.m in Sources */,
+				A801AD4F227C796A002DA8B3 /* ImageCropView.m in Sources */,
 				A825B9A32283241C009BD8EB /* RDPDFReflowViewController.m in Sources */,
 				6CC851F4183A37F800F57C53 /* PDFObjc.m in Sources */,
 				A801AD46227C796A002DA8B3 /* RDAnnotListViewController.m in Sources */,
@@ -1214,6 +1267,7 @@
 				A8AF4864229D794800D62AB0 /* PDFLayoutView.m in Sources */,
 				A8AF484A229D787200D62AB0 /* RDExtendedSearch.m in Sources */,
 				A8AF4866229D794800D62AB0 /* RDVCache.m in Sources */,
+				A8AF4831229D772000D62AB0 /* RadaeePDFPlugin.m in Sources */,
 				A8AF4878229D794800D62AB0 /* PDFGridView.m in Sources */,
 				A8AF4836229D776D00D62AB0 /* ViewModeTableViewController.m in Sources */,
 				A8AF487C229D797900D62AB0 /* OutLineViewController.m in Sources */,

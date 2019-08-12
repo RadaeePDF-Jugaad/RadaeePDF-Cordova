@@ -88,6 +88,13 @@
         [[RDExtendedSearch sharedInstance] restoreFinish:^{
             finishBlock();
         }];
+        
+        if (![[RDExtendedSearch sharedInstance] searching]) {
+            NSLog(@"--- NOT SEARCHING ---");
+            items = [[RDExtendedSearch sharedInstance] searchResults];
+            [self updateFooterText];
+            [self.tableView reloadData];
+        }
     }
 }
 
