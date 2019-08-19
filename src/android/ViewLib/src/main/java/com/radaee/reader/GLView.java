@@ -13,6 +13,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Looper;
@@ -28,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.PopupWindow;
@@ -52,7 +54,7 @@ import com.radaee.view.GLLayoutVert;
 import com.radaee.view.GLPage;
 import com.radaee.view.ILayoutView;
 import com.radaee.view.VSel;
-import com.radaee.reader.R;
+import com.radaee.viewlib.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -299,6 +301,34 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                         }
                     });
                     m_pEdit.showAtLocation(GLView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int)(m_annot_rect[1] + location[1]));
+                    //show the keyboard
+                    //InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    //imm.showSoftInput(edit, InputMethodManager.SHOW_IMPLICIT);
+                    /*
+                    Intent intent = new Intent(getContext(), PopupEditAct.class);
+                    intent.putExtra("txt", m_annot.GetEditText());
+                    intent.putExtra("x", m_annot_rect[0] + location[0]);
+                    intent.putExtra("y", m_annot_rect[1] + location[1]);
+                    intent.putExtra("w", m_annot_rect[2] - m_annot_rect[0]);
+                    intent.putExtra("h", m_annot_rect[3] - m_annot_rect[1]);
+                    intent.putExtra("type", m_annot.GetEditType());
+                    intent.putExtra("max", m_annot.GetEditMaxlen());
+                    intent.putExtra("size", m_annot.GetEditTextSize() * m_annot_page.GetScale());
+                    PopupEditAct.ms_listener = new PopupEditAct.ActRetListener() {
+                        @Override
+                        public void OnEditValue(String val) {
+                            if (m_annot != null) {
+                                m_annot.SetEditText(val);
+                                m_layout.gl_render(m_annot_page);
+                                if (m_listener != null)
+                                    m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                                PDFEndAnnot();
+                                m_edit_type = 0;
+                            }
+                        }
+                    };
+                    getContext().startActivity(intent);
+                    */
                 } else if (m_doc.CanSave() && m_annot.GetComboItemCount() >= 0)//if form choice
                 {
                     try {
@@ -360,10 +390,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     handleSignatureField();
                 else if(PDFCanSave() && m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
                     m_listener.OnPDFOpenURI(m_annot.GetURI());
-                    PDFEndAnnot();
-                } else if (m_annot.GetDest() >= 0) {
-                    int dest = m_annot.GetDest();
-                    m_layout.vGotoPage(dest);
                     PDFEndAnnot();
                 } else if (m_listener != null)
                     m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
@@ -541,13 +567,17 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                 }
                 gl10.glClearColor(((m_back_color >> 16) & 0xff) / 255.0f, ((m_back_color >> 8) & 0xff) / 255.0f, (m_back_color & 0xff) / 255.0f, ((m_back_color >> 24) & 0xff) / 255.0f);
                 gl10.glClear(GL10.GL_COLOR_BUFFER_BIT);
+                gl10.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+                gl10.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
                 m_layout.gl_draw(gl10);
                 if (Global.dark_mode) {
                     gl10.glEnable(GL10.GL_COLOR_LOGIC_OP);
                     gl10.glLogicOp(GL10.GL_XOR);
-                    GLBlock.drawQuadColor(gl10, 0, 0, m_w << 16, 0, 0, m_h << 16, m_w << 16, m_h << 16, 1, 1, 1);
+                    m_layout.gl_fill_color(gl10, 0, 0, m_w, m_h, 1, 1, 1);
                     gl10.glDisable(GL10.GL_COLOR_LOGIC_OP);
                 }
+                gl10.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+                gl10.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
                 final int pgno = m_layout.vGetPage(m_w >> 2, m_h >> 2);
                 if (pgno != m_cur_pageno && m_listener != null) {
                     m_cur_pageno = pgno;
