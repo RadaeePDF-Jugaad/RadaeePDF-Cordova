@@ -1,5 +1,9 @@
 PDFViewer SDK for iOS - Release notes
 
+3.54 beta1
+- ADD getListItemVal method (returns export value)
+- ADD getComboItemVal method (returns export value)
+
 3.53
  
 - UPDATE native libs

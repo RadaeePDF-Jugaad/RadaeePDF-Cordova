@@ -2847,6 +2847,12 @@
     if (js) {
         [self runJS:js];
     }
+    
+    js = [annot getFieldJS:3];
+    
+    if (js) {
+        [self runJS:js];
+    }
 }
 
 - (void)runJS:(NSString *)js

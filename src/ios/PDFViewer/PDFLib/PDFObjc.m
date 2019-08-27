@@ -1239,6 +1239,13 @@
 		return NULL;
 	return [NSString stringWithUTF8String:buf];
 }
+-(NSString *)getComboItemVal:(int)index
+{
+    char buf[1024];
+    if( !Page_getAnnotComboItemVal( m_page, m_handle, index, buf, 1023 ) )
+        return NULL;
+    return [NSString stringWithUTF8String:buf];
+}
 -(int)getComboSel
 {
 	return Page_getAnnotComboItemSel( m_page, m_handle );
@@ -1261,6 +1268,13 @@
 	if( !Page_getAnnotListItem( m_page, m_handle, index, buf, 1023 ) )
 		return NULL;
 	return [NSString stringWithUTF8String:buf];
+}
+-(NSString *)getListItemVal:(int)index
+{
+    char buf[1024];
+    if( !Page_getAnnotListItemVal( m_page, m_handle, index, buf, 1023 ) )
+        return NULL;
+    return [NSString stringWithUTF8String:buf];
 }
 -(int)getListSels:(int *)sels :(int)sels_max
 {

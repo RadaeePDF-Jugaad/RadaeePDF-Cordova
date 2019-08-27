@@ -990,6 +990,7 @@
  * @return null if this is not combo-box, "" if no item selected, otherwise the item selected.
  */
 -(NSString *)getComboItem :(int)index;
+-(NSString *)getComboItemVal :(int)index;
 /**
  * @brief get current selected item index of combo-box.
  * this method valid in premium version
@@ -1018,6 +1019,7 @@
  * @return null if this is not list-box, "" if no item selected, otherwise the item selected.
  */
 -(NSString *)getListItem:(int)index;
+-(NSString *)getListItemVal:(int)index;
 /**
  * @brief get selected indexes of list-box.
  * this method valid in premium version

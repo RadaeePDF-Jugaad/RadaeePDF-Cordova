@@ -1619,6 +1619,7 @@ int Page_getAnnotComboItemCount( PDF_PAGE page, PDF_ANNOT annot );
  *	@return	true or false
  */
 bool Page_getAnnotComboItem( PDF_PAGE page, PDF_ANNOT annot, int item, char *val, int len );
+bool Page_getAnnotComboItemVal(PDF_PAGE page, PDF_ANNOT annot, int item, char* val, int len);
 /**
  *	@brief	get index of selected item.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1671,6 +1672,7 @@ bool Page_isAnnotListMultiSel(PDF_PAGE page, PDF_ANNOT annot);
  *	@return	true or false
  */
 bool Page_getAnnotListItem( PDF_PAGE page, PDF_ANNOT annot, int item, char *buf, int buf_len );
+bool Page_getAnnotListItemVal(PDF_PAGE page, PDF_ANNOT annot, int item, char* buf, int buf_len);
 /**
  *	@brief	get selected items of list-box.
             to invoke this function, developers should call Page_objsStart or Page_render before.
