@@ -462,8 +462,9 @@
 		</config-file>
 
         <!-- hooks -->
+        <!--
         <hook type="before_compile" src="hooks/configure-ios.js"/>
-
+        -->
     </platform>
 
 </plugin>
