@@ -431,6 +431,8 @@ int Document_getOutlineDest( PDF_DOC doc, PDF_OUTLINE outlinenode );
  *	@return	Root Outline item if outlinenode == NULL.
             return NULL if no children.
  */
+NSString* Document_getOutlineURI(PDF_DOC doc, PDF_OUTLINE outlinenode);
+NSString* Document_getOutlineFileLink(PDF_DOC doc, PDF_OUTLINE outlinenode);
 PDF_OUTLINE Document_getOutlineChild(PDF_DOC doc, PDF_OUTLINE outlinenode);
 /**
  *	@brief	get next Outline item.

@@ -136,6 +136,8 @@
  *	@return	title string.
  */
 -(NSString *)label;
+-(NSString *)fileLink;
+-(NSString *)url;
 /**
  *	@brief	remove this outline from PDF Document.
  */
