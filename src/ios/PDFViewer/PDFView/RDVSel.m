@@ -150,4 +150,14 @@
     m_index1 = -1;
     m_index2 = -1;
 }
+
+- (int)startIdx
+{
+    return m_index1;
+}
+- (int)endIdx
+{
+    return m_index2;
+}
+
 @end

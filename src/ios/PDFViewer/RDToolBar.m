@@ -21,14 +21,20 @@
 {
     self = [super init];
     if (self) {
-        self.barStyle = UIBarStyleBlackOpaque;
-        [self sizeToFit];
+        self.bar = [[UIToolbar alloc] init];
+        self.bar.barStyle = UIBarStyleBlackOpaque;
+        [self.bar sizeToFit];
     }
     return self;
 }
 
 - (void)setupToolBarArray
 {
+    self.bar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    _barHeight = self.bar.frame.size.height;
+    
+    self.bar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    
     UIImage *closeImg = (_closeImage) ? _closeImage : [UIImage imageNamed:@"btn_back"];
     UIBarButtonItem *closeButton = [[UIBarButtonItem alloc] initWithImage:closeImg style:UIBarButtonItemStylePlain target:self action:@selector(closeClick)];
     closeButton.width = ICON_WIDTH;
@@ -100,23 +106,25 @@
     [normalToolBarArray removeObjectsInArray:objectsToRemove];
     [normalToolBarArray insertObject:closeButton atIndex:0];
     
+    [self addSubview:self.bar];
+    
     [self changeToNormalToolBar];
 }
 
 - (void)changeToPerformToolBar
 {
-    [self setItems:performToolBarArray];
+    [self.bar setItems:performToolBarArray];
 }
 
 - (void)changeToSearchToolBar
 {
-    [self setItems:searchToolBarArray];
+    [self.bar setItems:searchToolBarArray];
 }
 
 - (void)changeToNormalToolBar
 {
     _searchButton.enabled = YES;
-    [self setItems:normalToolBarArray];
+    [self.bar setItems:normalToolBarArray];
 }
 #pragma mark - Delegate
 // normalbar delegate

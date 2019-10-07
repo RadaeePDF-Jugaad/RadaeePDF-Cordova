@@ -31,8 +31,9 @@
 
 @end
 
-@interface RDToolBar : UIToolbar
+@interface RDToolBar : UIView
 
+@property (nonatomic, strong) UIToolbar *bar;
 @property (nonatomic, strong) UIBarButtonItem *moreButton;
 @property (nonatomic, strong) UIBarButtonItem *searchButton;
 @property (nonatomic,weak) id<RDToolBarDelegate> m_delegate;
@@ -59,6 +60,8 @@
 @property (nonatomic) BOOL hideRedoImage;
 @property (nonatomic) BOOL hideMoreImage;
 @property (nonatomic) BOOL hideGridImage;
+
+@property (nonatomic) int barHeight;
 
 - (void)setupToolBarArray;
 - (void)changeToPerformToolBar;

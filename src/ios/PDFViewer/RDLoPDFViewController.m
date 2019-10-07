@@ -349,11 +349,17 @@
 
 - (void)refreshToolbarPosition {
     [self refreshStatusBarHeight];
-    [toolBar setFrame:CGRectMake(0, statusBarHeight, [self screenRect].size.width, 44)];
+    
+    if (@available(iOS 13.0, *)) {
+        [toolBar setFrame:CGRectMake(0, 0, [self screenRect].size.width, toolBar.barHeight + statusBarHeight)];
+        [toolBar.bar setFrame:CGRectMake(0, toolBar.frame.size.height - toolBar.barHeight, [self screenRect].size.width, toolBar.barHeight)];
+    } else {
+        [toolBar setFrame:CGRectMake(0, statusBarHeight, [self screenRect].size.width, toolBar.barHeight)];
+        [toolBar.bar setFrame:CGRectMake(0, 0, toolBar.frame.size.width, toolBar.frame.size.height)];
+    }
+    
     [self refreshPageNumLabelPosition];
 }
-
-
 
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd {
     return [self PDFOpen:path :pwd atPage:0 readOnly:NO autoSave:NO author:@""];
@@ -1191,7 +1197,6 @@
         vm.modalPresentationStyle = UIModalPresentationPopover;
         vm.delegate = self;
         vm.preferredContentSize = CGSizeMake(320, (44 * 4) + 10);
-        vm.tableView.scrollEnabled = NO;
         
         UIPopoverPresentationController *pop = vm.popoverPresentationController;
         pop.permittedArrowDirections = UIPopoverArrowDirectionUp;
@@ -1204,7 +1209,10 @@
         UIAlertController *action = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Select View Mode", nil) message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
         
         UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            [self dismissViewControllerAnimated:YES completion:nil];
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+            {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
         }];
         
         UIAlertAction *vert = [UIAlertAction actionWithTitle:NSLocalizedString(@"Vertical", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -1450,14 +1458,13 @@
 #else
         vm.preferredContentSize = CGSizeMake(200, (44 * 6) + 10);
 #endif
-        vm.tableView.scrollEnabled = NO;
         
         UIPopoverPresentationController *pop = vm.popoverPresentationController;
         pop.permittedArrowDirections = UIPopoverArrowDirectionUp;
         if (_hideSearchImage) {
-            pop.barButtonItem = [toolBar.items objectAtIndex:1];
+            pop.barButtonItem = [toolBar.bar.items objectAtIndex:1];
         } else {
-            pop.barButtonItem = [toolBar.items objectAtIndex:2];
+            pop.barButtonItem = [toolBar.bar.items objectAtIndex:2];
         }
         
         [self presentViewController:vm animated:YES completion:nil];
@@ -1503,7 +1510,10 @@
         [sign setValue:[(_signatureImage) ? _signatureImage : [UIImage imageNamed:@"btn_annot_ink"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
 #endif
         UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            [self dismissViewControllerAnimated:YES completion:nil];
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+            {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
         }];
         
         [action addAction:ink];
@@ -2103,7 +2113,7 @@
             viewController.modalPresentationStyle = UIModalPresentationPopover;
             [viewController setPreferredContentSize:CGSizeMake(400, 600)];
             UIPopoverPresentationController *popover = viewController.popoverPresentationController;
-            popover.barButtonItem = (UIBarButtonItem *)[toolBar.items objectAtIndex:0]; // search bar button item
+            popover.barButtonItem = (UIBarButtonItem *)[toolBar.bar.items objectAtIndex:0]; // search bar button item
             
             [self presentViewController:viewController animated:YES completion:nil];
         }
@@ -2142,11 +2152,11 @@
 #pragma mark - Popup Menu Method
 -(void)selectIsStarting
 {
-    UIBarButtonItem *item = [toolBar.items objectAtIndex:3]; // Selection button
+    UIBarButtonItem *item = [toolBar.bar.items objectAtIndex:3]; // Selection button
     
     if (alreadySelected)
     {
-        [item setTintColor:toolBar.tintColor];
+        [item setTintColor:toolBar.bar.tintColor];
         
         [m_view vSelEnd];
         alreadySelected = false;
@@ -2525,7 +2535,7 @@
 
 - (float)barHeightDistance
 {
-    return toolBar.frame.size.height + statusBarHeight;
+    return toolBar.bar.frame.size.height + statusBarHeight;
 }
 
 - (CGRect)screenRect
@@ -2572,16 +2582,20 @@
 
 - (void)toolBarStyle
 {
-    toolBar.translucent = NO;
+    toolBar.bar.translucent = NO;
     
     //set tint
-    toolBar.tintColor = m_searchBar.tintColor = drawToolbar.tintColor = m_slider.tintColor = [self getTintColor];
-    toolBar.barTintColor = m_searchBar.barTintColor = drawToolbar.barTintColor = [self getBarColor];
+    toolBar.bar.tintColor = m_searchBar.tintColor = drawToolbar.tintColor = m_slider.tintColor = [self getTintColor];
+    toolBar.backgroundColor = toolBar.bar.barTintColor = m_searchBar.barTintColor = drawToolbar.barTintColor = [self getBarColor];
     
-    UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
-    
-    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
-        statusBar.backgroundColor = [self getBarColor];
+    if (@available(iOS 13.0, *)) {
+        
+    } else {
+        UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
+        
+        if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
+            statusBar.backgroundColor = [self getBarColor];
+        }
     }
 }
 
