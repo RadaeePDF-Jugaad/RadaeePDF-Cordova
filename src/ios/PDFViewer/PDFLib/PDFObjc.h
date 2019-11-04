@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "PDFIOS.h"
-#import "../PDFView/RDVGlobal.h"
+#import "RDVGlobal.h"
 #pragma once
 
 @interface PDFSign : NSObject
