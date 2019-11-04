@@ -262,5 +262,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (BOOL)pagingAvailable;
 
+- (NSString *)getImageFromRect:(int)top :(int)right :(int)left :(int)bottom :(int)pageNum;
+- (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect;
+
 @end
 

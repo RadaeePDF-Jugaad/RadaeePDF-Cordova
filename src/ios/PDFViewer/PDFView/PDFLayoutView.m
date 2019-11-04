@@ -1261,6 +1261,38 @@
     return true;
 }
 
+- (NSString *)getImageFromRect:(int)top :(int)right :(int)left :(int)bottom :(int) pageNum
+{
+    if (!m_doc)
+        return nil;
+    
+    // set dib size with the draw_rect
+    int width = right - left;
+    int height = bottom - top;
+    
+    // get the selected page
+    PDFPage *page = [m_doc page:pageNum];
+    [page objsStart];
+    PDFDIB *dib = [[PDFDIB alloc] init :width :height];
+    
+    // set the matrix with the draw_rect (we need only a portion of the page)
+    PDFMatrix *mat = [[PDFMatrix alloc] init :1 :-1 :-left :bottom];
+    [page renderPrepare :dib];
+    [page render :dib :mat :2];//always render best.
+    mat = NULL;
+    
+    // get the UIImage
+    UIImage *img = [UIImage imageWithCGImage:[dib image]];
+    
+    //save image in PNG
+    NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.png"];
+    [UIImagePNGRepresentation(img) writeToFile:tempDir atomically:YES];
+    
+    NSString *imageBase64 = [UIImagePNGRepresentation(img) base64EncodedStringWithOptions:(NSDataBase64Encoding64CharacterLineLength)];
+    
+    return imageBase64;
+}
+
 -(bool)OnAnnotTouchBegin:(CGPoint)point
 {
     if (m_status != sta_annot) return false;
@@ -2882,7 +2914,27 @@
     return tp;
 }
 
--(void)OnUncaughtException:(int)code : (NSString *)para
+-(void)OnUncaughtException:(int)code :(NSString *)para
 {}
+
+#pragma mark - Screen/PDF coordinates convertion
+
+- (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect
+{
+    RDVPos pos1;
+    RDVPos pos2;
+    
+    [m_layout vGetPos:(screenRect.origin.x - self.contentOffset.x) * m_scale_pix * m_zoom :(screenRect.origin.y - self.contentOffset.y) * m_scale_pix * m_zoom: &pos1];
+    [m_layout vGetPos:(screenRect.origin.x - self.contentOffset.x + screenRect.size.width) * m_scale_pix * m_zoom :(screenRect.origin.y - self.contentOffset.y + screenRect.size.height) * m_scale_pix * m_zoom :&pos2];
+    
+    PDF_RECT pdfRect;
+    
+    pdfRect.left = pos1.pdfx;
+    pdfRect.right = pos2.pdfx;
+    pdfRect.top = pos2.pdfy;
+    pdfRect.bottom = pos1.pdfy;
+    
+    return pdfRect;
+}
 
 @end

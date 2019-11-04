@@ -12,6 +12,7 @@
 
 @interface OUTLINE_ITEM : NSObject
 @property(nonatomic,strong)NSString *label;
+@property(nonatomic,strong)NSString *link;
 @property(nonatomic,assign)int dest;
 @property(nonatomic,strong,readwrite)PDFOutline *child;
 @end

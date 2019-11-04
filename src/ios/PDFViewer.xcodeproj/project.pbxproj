@@ -42,6 +42,7 @@
 		6CEA178516A1557E009FFE80 /* ViewModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CEA178316A1557E009FFE80 /* ViewModeViewController.m */; };
 		6CEA178616A1557E009FFE80 /* ViewModeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6CEA178416A1557E009FFE80 /* ViewModeViewController.xib */; };
 		7A2D86E12285CB390017E40D /* PDFHttpStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A2D86E02285CB390017E40D /* PDFHttpStream.m */; };
+		7AE34E3823279BE100B0DE91 /* RDUPassWord.m in Sources */ = {isa = PBXBuildFile; fileRef = B603997A16EB199100842206 /* RDUPassWord.m */; };
 		8E6C05F81DEFCD6E00F278B9 /* PDFLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6C05E71DEFCD6E00F278B9 /* PDFLayoutView.m */; };
 		8E6C05F91DEFCD6E00F278B9 /* RDVCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6C05E91DEFCD6E00F278B9 /* RDVCache.m */; };
 		8E6C05FA1DEFCD6E00F278B9 /* RDVCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6C05EB1DEFCD6E00F278B9 /* RDVCanvas.m */; };
@@ -1275,6 +1276,7 @@
 				A8AF483A229D779200D62AB0 /* RDMoreTableViewController.m in Sources */,
 				A8AF4838229D778D00D62AB0 /* TextAnnotViewController.m in Sources */,
 				A8AF4870229D794800D62AB0 /* RDVPage.m in Sources */,
+				7AE34E3823279BE100B0DE91 /* RDUPassWord.m in Sources */,
 				A8AF4874229D794800D62AB0 /* RDVThread.m in Sources */,
 				A8AF4876229D794800D62AB0 /* PDFThumbView.m in Sources */,
 				A8AF4844229D783E00D62AB0 /* RDFormManager.m in Sources */,
@@ -1693,7 +1695,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

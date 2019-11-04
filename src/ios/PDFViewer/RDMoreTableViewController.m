@@ -29,7 +29,6 @@
     
     actionTitle = [NSArray arrayWithObjects:NSLocalizedString(@"View Mode", nil),NSLocalizedString(@"Add Bookmark", nil), NSLocalizedString(@"Bookmark List", nil), NSLocalizedString(@"View Menu", nil), NSLocalizedString(@"Save", nil), NSLocalizedString(@"Print", nil), NSLocalizedString(@"Share", nil), nil];
     actionImage = [NSArray arrayWithObjects:viewMode, addBookMark, bookMarkList, viewMenu, savePDF, printPDF, share, nil];
-    self.tableView.scrollEnabled = NO;
 }
 
 - (void)didReceiveMemoryWarning {

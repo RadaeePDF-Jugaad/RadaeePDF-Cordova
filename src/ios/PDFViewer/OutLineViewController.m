@@ -72,6 +72,7 @@
         outline_item = [[OUTLINE_ITEM alloc]init];
         outline_item.label = [first label];
         outline_item.dest = [first dest];
+        outline_item.link = [first fileLink];
         outline_item.child = [first child];
         first = [first next];
         [self.arForTable addObject:outline_item];

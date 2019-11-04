@@ -22,4 +22,6 @@
 -(NSString *)GetSelString;
 -(void)DrawSel:(RDVCanvas *)canvas :(RDVPage *)page;
 -(void)drawOffScreen :(RDVCanvas *)canvas :(RDVPage *)page :(int)docx :(int)docy;
+-(int)startIdx;
+-(int)endIdx;
 @end

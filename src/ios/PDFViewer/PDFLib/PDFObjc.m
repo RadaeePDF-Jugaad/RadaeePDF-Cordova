@@ -359,6 +359,15 @@
     Document_getOutlineLabel(m_doc, m_handle, label, 511);
     return [NSString stringWithUTF8String:label];
 }
+-(NSString *)fileLink
+{
+    return Document_getOutlineFileLink(m_doc, m_handle);
+}
+
+-(NSString *)url
+{
+    return Document_getOutlineURI(m_doc, m_handle);
+}
 -(bool)removeFromDoc
 {
 	return Document_removeOutline( m_doc, m_handle );

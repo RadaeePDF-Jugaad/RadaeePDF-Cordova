@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "PDFIOS.h"
-#import "RDVGlobal.h"
+#import "../PDFView/RDVGlobal.h"
 #pragma once
 
 @interface PDFSign : NSObject
@@ -136,6 +136,8 @@
  *	@return	title string.
  */
 -(NSString *)label;
+-(NSString *)fileLink;
+-(NSString *)url;
 /**
  *	@brief	remove this outline from PDF Document.
  */
