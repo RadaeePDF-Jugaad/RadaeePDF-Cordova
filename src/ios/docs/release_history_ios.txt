@@ -1,4 +1,11 @@
 PDFViewer SDK for iOS - Release notes
+3.56
+- FIX marked content issue
+- FIX rendering issues
+- FIX memory leak issues
+- FIX markup annotation issue
+- FIX memory usage issue for a special PDF file
+
 3.55
 - iOS 13 support
 - FIX rendering issue
