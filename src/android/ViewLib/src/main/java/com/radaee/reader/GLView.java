@@ -588,7 +588,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                         }
                     });
                 }
-                if (Global.debug_mode && m_canvas != null)
+                if ((Global.debug_mode || m_layout.vHasFind()) && m_canvas != null)
                     m_canvas.postInvalidate();
             }
         });
@@ -2005,11 +2005,30 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
 
     public void PDFGotoPage(int pageno) {
         if (m_layout == null) return;
+        if (m_w <= 0 || m_h <= 0) {
         GLLayout.PDFPos pos = m_layout.new PDFPos();
         pos.pageno = pageno;
         pos.x = 0;
         pos.y = m_doc.GetPageHeight(pageno) + 1;
         m_goto_pos = pos;
+    }
+        else
+            m_layout.vGotoPage(pageno);
+        m_canvas.postInvalidate();
+    }
+
+    public void PDFScrolltoPage(int pageno) {
+        if (m_layout == null) return;
+        if (m_w <= 0 || m_h <= 0) {
+            GLLayout.PDFPos pos = m_layout.new PDFPos();
+            pos.pageno = pageno;
+            pos.x = 0;
+            pos.y = m_doc.GetPageHeight(pageno) + 1;
+            m_goto_pos = pos;
+        }
+        else
+            m_layout.vScrolltoPage(pageno);
+        m_canvas.postInvalidate();
     }
 
     public void PDFUndo() {
