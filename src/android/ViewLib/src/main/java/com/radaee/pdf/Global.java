@@ -17,7 +17,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.52.4
+ * @version 3.52.6
  */
 public class Global
 {
@@ -407,7 +407,7 @@ public class Global
     public static int ellipse_annot_fill_color = 0x800000FF;
 
     /**
-     *Annot Line params
+     * Annot Line params
      */
     public static float line_annot_width = 3;
     public static int line_annot_style1 = 1;

@@ -127,6 +127,9 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public void PDFGotoPage(int pageno) {
         m_view.PDFGotoPage(pageno);
     }
+    public void PDFScrolltoPage(int pageno) {
+        m_view.PDFScrolltoPage(pageno);
+    }
 
     public void PDFUndo() {
         m_view.PDFUndo();

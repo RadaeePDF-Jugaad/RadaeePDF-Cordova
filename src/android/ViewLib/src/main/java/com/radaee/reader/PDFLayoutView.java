@@ -1212,6 +1212,19 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             invalidate();
         }
     }
+    public void PDFScrolltoPage(int pageno)
+    {
+        if (m_layout == null) return;
+        if (m_layout.vGetHeight() <= 0 || m_layout.vGetWidth() <= 0) {
+            m_goto_pos = m_layout.new PDFPos();
+            m_goto_pos.pageno = pageno;
+            m_goto_pos.x = 0;
+            m_goto_pos.y = m_doc.GetPageHeight(pageno) + 1;
+        } else {
+            m_layout.vScrolltoPage(pageno);
+            invalidate();
+        }
+    }
 
     public void PDFClose() {
         if (m_layout != null) {

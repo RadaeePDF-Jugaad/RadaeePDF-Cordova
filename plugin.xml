@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.5.2">
+        id="com.radaee.cordova" version="1.5.3">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -41,7 +41,6 @@
 
         <!-- Plugin source -->
         <source-file src="src/android/RadaeePDFPlugin.java" target-dir="src/com/radaee/cordova" />
-        <source-file src="src/android/ViewLib/libs/com.radaee.view.jar" target-dir="libs" />
 
         <!-- Radaee source - java.com.radaee.pdf -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/adv/Obj.java" target-dir="src/com/radaee/pdf/adv" />
@@ -104,7 +103,41 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
-        
+		
+		<!-- Radaee source - java.com.radaee.view -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayout.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutCurl.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutReflow.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/ILayoutView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayout.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFPageView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVCache.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVFinder.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewCurl.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewPager.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewReflow.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewThumb.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVSel.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VFinder.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VSel.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VThread.java" target-dir="src/com/radaee/view"/>
+
         <!-- Radaee source - java.com.radaee.util -->
 
         <source-file src="src/android/ViewLib/src/main/jniLibs/arm64-v8a/librdpdf.so" target-dir="libs/arm64-v8a" />
