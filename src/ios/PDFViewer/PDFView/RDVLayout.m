@@ -56,7 +56,12 @@
         m_cellh = srect.size.height * sscale;
         if(m_cellh > m_cellw) m_cellh = m_cellw;
         else m_cellw = m_cellh;
-        if(m_cellw >= 1024)
+        if(m_cellw >= 2048)
+        {
+            m_cellw = 2048;
+            m_cellh = 2048;
+        }
+        else if(m_cellw >= 1024)
         {
             m_cellw = 1024;
             m_cellh = 1024;
@@ -128,6 +133,7 @@
             {
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pgno1];
                 [vp vEndPage:m_thread];
+                [vp vLayerDel];
                 pgno1++;
             }
             pgno1 = (m_disp_pg1 > pg2)?m_disp_pg1:pg2;
@@ -136,6 +142,7 @@
             {
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pgno1];
                 [vp vEndPage:m_thread];
+                [vp vLayerDel];
                 pgno1++;
             }
         }
@@ -289,10 +296,10 @@
         [self ProRefreshDispRange];
 	    int pg1 = m_disp_pg1;
 	    int pg2 = m_disp_pg2;
-	    int docx = m_docx - m_w;
-	    int docy = m_docy - m_h;
-	    int lw = m_w * 3;
-	    int lh = m_h * 3;
+	    int docx = m_docx - (m_w >> 1);
+	    int docy = m_docy - (m_h >> 1);
+	    int lw = m_w * 2;
+	    int lh = m_h * 2;
         while(pg1 < pg2)
         {
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
@@ -337,7 +344,7 @@
     [CATransaction begin];
     [CATransaction setDisableActions :YES];
     [self ProLayout];
-    //[self vSetPos :m_w>>1 :m_h>>1 :&m_zoom_pos];
+    //[self vSetPos :m_w>>1 :m_h>>1 :&m_zoom_pos]; // commented to allow zoom in dynamic position (not only center)
     [CATransaction commit];
 }
 
@@ -346,7 +353,7 @@
     if(!m_zooming) return;
     m_zooming = false;
     [self ProLayout];
-    //[self vSetPos :m_w>>1 :m_h>>1 :&m_zoom_pos];
+    //[self vSetPos :m_w>>1 :m_h>>1 :&m_zoom_pos]; // commented to allow zoom in dynamic position (not only center)
     int pg1 = m_zoom_pg1;
     int pg2 = m_disp_pg1;
     while(pg1 < pg2)
@@ -731,6 +738,7 @@
             {
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pgno1];
                 [vp vEndPage:m_thread];
+                [vp vLayerDel];
                 pgno1++;
             }
             pgno1 = (m_disp_pg1 > pg2)?m_disp_pg1:pg2;
@@ -739,6 +747,7 @@
             {
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pgno1];
                 [vp vEndPage:m_thread];
+                [vp vLayerDel];
                 pgno1++;
             }
         }

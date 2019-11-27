@@ -42,7 +42,6 @@
 		6CEA178516A1557E009FFE80 /* ViewModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CEA178316A1557E009FFE80 /* ViewModeViewController.m */; };
 		6CEA178616A1557E009FFE80 /* ViewModeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6CEA178416A1557E009FFE80 /* ViewModeViewController.xib */; };
 		7A2D86E12285CB390017E40D /* PDFHttpStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A2D86E02285CB390017E40D /* PDFHttpStream.m */; };
-		7A378178237D5FD400E5EDEB /* RadaeePDFPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */; };
 		7AE34E3823279BE100B0DE91 /* RDUPassWord.m in Sources */ = {isa = PBXBuildFile; fileRef = B603997A16EB199100842206 /* RDUPassWord.m */; };
 		8E6C05F81DEFCD6E00F278B9 /* PDFLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6C05E71DEFCD6E00F278B9 /* PDFLayoutView.m */; };
 		8E6C05F91DEFCD6E00F278B9 /* RDVCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6C05E91DEFCD6E00F278B9 /* RDVCache.m */; };
@@ -113,6 +112,7 @@
 		A8549AF22282C90A0035A2EF /* StrikeoutColorList.plist in Resources */ = {isa = PBXBuildFile; fileRef = A8549AF42282C90A0035A2EF /* StrikeoutColorList.plist */; };
 		A8549AF52282C90E0035A2EF /* UnderlineColorList.plist in Resources */ = {isa = PBXBuildFile; fileRef = A8549AF72282C90E0035A2EF /* UnderlineColorList.plist */; };
 		A8549AF82282C9110035A2EF /* ViewModeList.plist in Resources */ = {isa = PBXBuildFile; fileRef = A8549AFA2282C9110035A2EF /* ViewModeList.plist */; };
+		A8AF4822229D652A00D62AB0 /* RadaeePDFPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */; };
 		A8AF482C229D762F00D62AB0 /* RadaeeLib.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A8AF4829229D762F00D62AB0 /* RadaeeLib.h */; };
 		A8AF4831229D772000D62AB0 /* RadaeePDFPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = A8AF4821229D652900D62AB0 /* RadaeePDFPlugin.m */; };
 		A8AF4832229D774000D62AB0 /* RadaeePDFPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = A8AF4820229D652900D62AB0 /* RadaeePDFPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1213,7 +1213,7 @@
 				6CEA178516A1557E009FFE80 /* ViewModeViewController.m in Sources */,
 				A801AD3F227C796A002DA8B3 /* FTSManager.m in Sources */,
 				A801AD50227C796A002DA8B3 /* SignatureView.m in Sources */,
-				7A378178237D5FD400E5EDEB /* RadaeePDFPlugin.m in Sources */,
+				A8AF4822229D652A00D62AB0 /* RadaeePDFPlugin.m in Sources */,
 				8E6C05FB1DEFCD6E00F278B9 /* RDVFinder.m in Sources */,
 				8E6C06091DF005D200F278B9 /* RDLoPDFViewController.m in Sources */,
 				7A2D86E12285CB390017E40D /* PDFHttpStream.m in Sources */,
