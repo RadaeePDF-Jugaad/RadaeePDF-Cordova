@@ -118,13 +118,13 @@
     textFd.delegate = self;
     [self.view addSubview:textFd];
     textFd.hidden = YES;
-    [self createToolbarItems];
 }
 -(void)viewWillAppear:(BOOL)animated
 {
     if (_delegate && [_delegate respondsToSelector:@selector(willShowReader)]) {
         [_delegate willShowReader];
     }
+    
     
     [toolBar sizeToFit];
     b_findStart = NO;
