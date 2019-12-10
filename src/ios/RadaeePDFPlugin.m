@@ -142,6 +142,12 @@
     [self showReader];
 }
 
+- (void)closeReader:(CDVInvokedUrlCommand *)command
+{
+    if (m_pdf != nil) {
+        [m_pdf closeView];
+    }
+}
 
 - (void)activateLicense:(CDVInvokedUrlCommand *)command
 {

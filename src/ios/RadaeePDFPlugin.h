@@ -94,6 +94,7 @@
 - (void)activateLicense:(CDVInvokedUrlCommand*)command;
 - (void)openFromAssets:(CDVInvokedUrlCommand*)command;
 - (void)openFromPath:(CDVInvokedUrlCommand*)command;
+- (void)closeReader:(CDVInvokedUrlCommand *)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
 - (void)getPageNumber:(CDVInvokedUrlCommand*)command;
 - (void)getPageCount:(CDVInvokedUrlCommand*)command;
