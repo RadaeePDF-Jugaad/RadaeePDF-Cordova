@@ -125,7 +125,7 @@
         [_delegate willShowReader];
     }
     
-    
+    [self createToolbarItems];
     [toolBar sizeToFit];
     b_findStart = NO;
     isPrint = NO;
