@@ -69,8 +69,6 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 			case 0://succeeded, and continue
 				OpenTask task = new OpenTask(false);
 				task.execute();
-				//m_view.PDFOpen(m_doc, this);
-				//m_controller = new PDFViewController(m_layout, m_view);
 				break;
 			default://unknown error
 				onFail("Open Failed: Unknown Error");
@@ -110,6 +108,7 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		protected void onPostExecute(Integer integer)
 		{
 			m_view.PDFOpen(m_doc, PDFGLViewAct.this);
+			m_view.setReadOnly(getIntent().getBooleanExtra("READ_ONLY", false));
 			m_controller = new PDFViewController(m_layout, m_view);
 			need_save_doc = need_save;
 			if(dlg != null)
@@ -141,11 +140,6 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 			//m_tmp_index++;
 			OpenTask task = new OpenTask(true);
 			task.execute();
-            /*
-        	m_view.PDFOpen(m_doc, this);
-    		m_controller = new PDFViewController(m_layout, m_view);
-    		need_save_doc = true;
-    		*/
 		}
 		else
 		{
@@ -313,10 +307,13 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 	@Override
 	public void OnPDFAnnotTapped(int pageno, Annotation annot)
 	{
-		if(m_controller != null)
-			m_controller.OnAnnotTapped(annot);
-		if (annot != null)
+		if (annot != null) {
 			RadaeePluginCallback.getInstance().onAnnotTapped(annot);
+			if (!m_view.PDFCanSave() && annot.GetType() != 2)
+				return;
+		}
+		if (m_controller != null)
+			m_controller.OnAnnotTapped(annot);
 	}
 	@Override
 	public void OnPDFBlankTapped()
@@ -333,49 +330,41 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		final String sel_text = text;
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
 		{
 			@SuppressLint("NewApi")
 			public void onClick(DialogInterface dialog, int which)
 			{
-				if( rad_group.getCheckedRadioButtonId() == R.id.rad_copy )
-				{
-					Toast.makeText(PDFGLViewAct.this, "todo copy text:" + sel_text, Toast.LENGTH_SHORT).show();
-				}
-				else if( m_doc.CanSave() )
-				{
+				if (rad_group.getCheckedRadioButtonId() == R.id.rad_copy) {
+					android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+					android.content.ClipData clip = android.content.ClipData.newPlainText("Radaee", sel_text);
+					clipboard.setPrimaryClip(clip);
+					Toast.makeText(PDFGLViewAct.this, getString(R.string.copy_text, sel_text), Toast.LENGTH_SHORT).show();
+				} else if (m_view.PDFCanSave()) {
 					boolean ret = false;
-					if( rad_group.getCheckedRadioButtonId() == R.id.rad_copy )
-					{
-						Toast.makeText(PDFGLViewAct.this, "todo copy text:" + sel_text, Toast.LENGTH_SHORT).show();
-						android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-						android.content.ClipData clip = android.content.ClipData.newPlainText("Radaee", sel_text);
-						clipboard.setPrimaryClip(clip);
-					}
-					else if( rad_group.getCheckedRadioButtonId() == R.id.rad_highlight )
+					if (rad_group.getCheckedRadioButtonId() == R.id.rad_highlight)
 						ret = m_view.PDFSetSelMarkup(0);
-					else if( rad_group.getCheckedRadioButtonId() == R.id.rad_underline )
+					else if (rad_group.getCheckedRadioButtonId() == R.id.rad_underline)
 						ret = m_view.PDFSetSelMarkup(1);
-					else if( rad_group.getCheckedRadioButtonId() == R.id.rad_strikeout )
+					else if (rad_group.getCheckedRadioButtonId() == R.id.rad_strikeout)
 						ret = m_view.PDFSetSelMarkup(2);
-					else if( rad_group.getCheckedRadioButtonId() == R.id.rad_squiggly )
+					else if (rad_group.getCheckedRadioButtonId() == R.id.rad_squiggly)
 						ret = m_view.PDFSetSelMarkup(4);
-					if( !ret )
-						Toast.makeText(PDFGLViewAct.this, "add annotation failed!", Toast.LENGTH_SHORT).show();
-				}
-				else
-					Toast.makeText(PDFGLViewAct.this, "can't write or encrypted!", Toast.LENGTH_SHORT).show();
+					if (!ret)
+						Toast.makeText(PDFGLViewAct.this, R.string.annotation_failed, Toast.LENGTH_SHORT).show();
+				} else
+					Toast.makeText(PDFGLViewAct.this, R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
 				dialog.dismiss();
-				if(m_controller != null)
+				if (m_controller != null)
 					m_controller.OnSelectEnd();
 			}});
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
 		{
 			public void onClick(DialogInterface dialog, int which)
 			{
 				dialog.dismiss();
 			}});
-		builder.setTitle("Process selected text");
+		builder.setTitle(R.string.process_selected_text);
 		builder.setCancelable(false);
 		builder.setView(layout);
 		AlertDialog dlg = builder.create();

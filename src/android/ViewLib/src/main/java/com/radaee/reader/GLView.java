@@ -87,6 +87,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
     private int m_w;
     private int m_h;
     private int m_back_color = 0xFFC0C0C0;
+    private boolean mReadOnly = false;
 
     class PDFGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
@@ -215,7 +216,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     Toast.makeText(getContext(), "Readonly annotation", Toast.LENGTH_SHORT).show();
                     if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                 }
-                else if (m_doc.CanSave() && check >= 0) {
+                else if (PDFCanSave() && check >= 0) {
                     switch (check) {
                         case 0:
                             m_annot.SetCheckValue(true);
@@ -237,7 +238,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     if (m_listener != null)
                         m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
                     PDFEndAnnot();
-                } else if (m_doc.CanSave() && m_annot.GetEditType() > 0)//if form edit-box.
+                } else if (PDFCanSave() && m_annot.GetEditType() > 0)//if form edit-box.
                 {
                     int[] location = new int[2];
                     getLocationOnScreen(location);
@@ -301,35 +302,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                         }
                     });
                     m_pEdit.showAtLocation(GLView.this, Gravity.NO_GRAVITY, (int) m_annot_rect[0] + location[0], (int)(m_annot_rect[1] + location[1]));
-                    //show the keyboard
-                    //InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    //imm.showSoftInput(edit, InputMethodManager.SHOW_IMPLICIT);
-                    /*
-                    Intent intent = new Intent(getContext(), PopupEditAct.class);
-                    intent.putExtra("txt", m_annot.GetEditText());
-                    intent.putExtra("x", m_annot_rect[0] + location[0]);
-                    intent.putExtra("y", m_annot_rect[1] + location[1]);
-                    intent.putExtra("w", m_annot_rect[2] - m_annot_rect[0]);
-                    intent.putExtra("h", m_annot_rect[3] - m_annot_rect[1]);
-                    intent.putExtra("type", m_annot.GetEditType());
-                    intent.putExtra("max", m_annot.GetEditMaxlen());
-                    intent.putExtra("size", m_annot.GetEditTextSize() * m_annot_page.GetScale());
-                    PopupEditAct.ms_listener = new PopupEditAct.ActRetListener() {
-                        @Override
-                        public void OnEditValue(String val) {
-                            if (m_annot != null) {
-                                m_annot.SetEditText(val);
-                                m_layout.gl_render(m_annot_page);
-                                if (m_listener != null)
-                                    m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                                PDFEndAnnot();
-                                m_edit_type = 0;
-                            }
-                        }
-                    };
-                    getContext().startActivity(intent);
-                    */
-                } else if (m_doc.CanSave() && m_annot.GetComboItemCount() >= 0)//if form choice
+                } else if (PDFCanSave() && m_annot.GetComboItemCount() >= 0)//if form choice
                 {
                     try {
                         int[] location = new int[2];
@@ -388,7 +361,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     onListAnnot();
                 else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
                     handleSignatureField();
-                else if(PDFCanSave() && m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
+                else if(m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
                     m_listener.OnPDFOpenURI(m_annot.GetURI());
                     PDFEndAnnot();
                 } else if (m_listener != null)
@@ -832,7 +805,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
         if (m_status != STA_ZOOM) return false;
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE:
-                if (m_status == STA_ZOOM && event.getPointerCount() >= 2) {
+                if (m_status == STA_ZOOM && event.getPointerCount() >= 2 && Global.def_view != 5) {
                     float dx = event.getX(0) - event.getX(1);
                     float dy = event.getY(0) - event.getY(1);
                     final float dis1 = Global.sqrtf(dx * dx + dy * dy);
@@ -849,6 +822,18 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL:
                 if (m_status == STA_ZOOM && event.getPointerCount() == 2) {
+                    if(Global.def_view == 5) {
+                        float dx = event.getX(0) - event.getX(1);
+                        float dy = event.getY(0) - event.getY(1);
+                        final float dis1 = Global.sqrtf(dx * dx + dy * dy);
+                        queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                m_layout.gl_zoom_set(m_zoom_scale * dis1 / m_zoom_dis0);
+                                m_layout.vSetPos((int) m_hold_x, (int) m_hold_y, m_zoom_pos);
+                            }
+                        });
+                    }
                     m_status = STA_NONE;
                     m_hold = false;
                     queueEvent(new Runnable() {
@@ -1004,7 +989,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     m_annot_rect0 = null;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly())) {
+                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly()) && PDFCanSave()) {
                     float x = event.getX();
                     float y = event.getY();
                     m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
@@ -1015,7 +1000,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly())) {
+                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly()) && PDFCanSave()) {
                     float x = event.getX();
                     float y = event.getY();
                     GLLayout.PDFPos pos = m_layout.vGetPos((int) x, (int) y);
@@ -1790,8 +1775,13 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
     }
 
     public void PDFRemoveAnnot() {
-        if (m_status != STA_ANNOT || !PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
-                || (Global.g_annot_lock && m_annot.IsLocked())) return;
+        if (m_status != STA_ANNOT) return;
+        if(!PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
+                || (Global.g_annot_lock && m_annot.IsLocked())) {
+            Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
+            PDFEndAnnot();
+            return;
+        }
         //add to redo/undo stack.
         Page page = m_doc.GetPage(m_annot_page.GetPageNo());
         page.ObjsStart();
@@ -1825,6 +1815,11 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
 
     public void PDFEditAnnot() {
         if (m_status != STA_ANNOT) return;
+        if(!PDFCanSave()) {
+            Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
+            PDFEndAnnot();
+            return;
+        }
         RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dlg_note, null);
         final EditText subj = (EditText) layout.findViewById(R.id.txt_subj);
         final EditText content = (EditText) layout.findViewById(R.id.txt_content);
@@ -1926,7 +1921,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
         }
 
         boolean reset = m_annot.GetReset();
-        if (reset && m_doc.CanSave()) {
+        if (reset && PDFCanSave()) {
             m_annot.SetReset();
             m_layout.gl_render(m_annot_page);
             if (m_listener != null)
@@ -2053,9 +2048,16 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
             Toast.makeText(getContext(), "No more redo.", Toast.LENGTH_SHORT).show();
     }
 
+    public void setReadOnly(boolean readonly) {
+        mReadOnly = readonly;
+    }
+
     public boolean PDFCanSave() {
-        if (m_layout != null) return m_layout.vCanSave();
-        return false;
+        return !mReadOnly && m_layout != null && m_layout.vCanSave();
+    }
+
+    public boolean PDFSave() {
+        return m_doc.Save();
     }
 
     public void PDFSetBGColor(int color) {
@@ -2096,6 +2098,15 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
         // reload the page
         m_layout.gl_render(vpage);
     }
+
+    public float[] toPDFRect(float[] viewRect) {
+    if(m_layout != null) {
+        GLPage vpage = m_layout.vGetPage(PDFGetCurrPage());
+        Matrix mat = vpage.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
+        mat.TransformRect(viewRect);
+    }
+    return viewRect;
+}
 
     private static int tmp_idx = 0;
 

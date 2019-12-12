@@ -320,10 +320,11 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
     @Override
     public void OnPDFAnnotTapped(int pageno, Annotation annot) {
-        if (annot != null)
+        if (annot != null) {
             RadaeePluginCallback.getInstance().onAnnotTapped(annot);
-        if (!m_view.PDFCanSave())
-            return;
+            if (!m_view.PDFCanSave() && annot.GetType() != 2)
+                return;
+        }
         if (m_controller != null)
             m_controller.OnAnnotTapped(annot);
 
@@ -344,7 +345,6 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @SuppressLint("NewApi")
             public void onClick(DialogInterface dialog, int which) {
                 if (rad_group.getCheckedRadioButtonId() == R.id.rad_copy) {
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);

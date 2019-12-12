@@ -144,6 +144,11 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     }
 
     @Override
+    public boolean PDFSave() {
+        return m_view.PDFSave();
+    }
+
+    @Override
     public void PDFUpdateCurrPage()
     {
         m_view.PDFUpdateCurrPage();
@@ -162,5 +167,13 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public void PDFAddAnnotRect(float x, float y, float width, float height, int p)
     {
         m_view.PDFAddAnnotRect(x, y, width, height, p);
+    }
+
+    public float[] toPDFRect(float[] viewRect) {
+        return m_view.toPDFRect(viewRect);
+    }
+
+    public void setReadOnly(boolean readonly) {
+        m_view.setReadOnly(readonly);
     }
 }
