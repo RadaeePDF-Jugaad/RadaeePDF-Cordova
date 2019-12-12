@@ -190,6 +190,7 @@ public interface ILayoutView {
     void PDFUndo();
     void PDFRedo();
     boolean PDFCanSave();
+    boolean PDFSave();
     void PDFUpdateCurrPage();
     int PDFGetCurrPage();
     void PDFAddAnnotRect(float x, float y, float width, float height, int p);
