@@ -614,7 +614,7 @@ public class PDFLayoutDual extends PDFLayout
     @Override
     public void vGotoPage( int pageno )
     {
-        if( m_pages == null || m_doc == null || m_w <= 0 || m_h <= 0 || pageno < 0 || pageno >= m_cells.length ) return;
+        if( m_pages == null || m_doc == null || m_w <= 0 || m_h <= 0 || pageno < 0 || pageno >= m_pages.length ) return;
         
         vScrollAbort();
         int ccur = 0;
@@ -635,7 +635,7 @@ public class PDFLayoutDual extends PDFLayout
     @Override
     public void vScrolltoPage( int pageno )
     {
-        if( m_pages == null || m_doc == null || m_w <= 0 || m_h <= 0 || pageno < 0 || pageno >= m_cells.length ) return;
+        if( m_pages == null || m_doc == null || m_w <= 0 || m_h <= 0 || pageno < 0 || pageno >= m_pages.length ) return;
         vScrollAbort();
         int ccur = 0;
         while( ccur < m_cells.length )

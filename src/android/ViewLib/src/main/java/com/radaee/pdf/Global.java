@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.os.Environment;
 
 import com.radaee.viewlib.R;
 
@@ -17,7 +16,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.52.6
+ * @version 3.53.1
  */
 public class Global
 {

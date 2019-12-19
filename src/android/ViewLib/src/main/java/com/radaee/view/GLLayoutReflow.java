@@ -3,14 +3,10 @@ package com.radaee.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import com.radaee.pdf.BMP;
-import com.radaee.pdf.Document;
-import com.radaee.pdf.Global;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
+import com.radaee.pdf.Page;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -33,7 +29,19 @@ public class GLLayoutReflow extends GLLayout
     public void gl_layout(float scale, boolean zoom) {
         if( m_doc == null || m_vw <= m_page_gap || m_vh <= m_page_gap ) return;
         m_scale_min = ((m_vw - m_page_gap) << 1) / m_doc.GetPageWidth(m_cur_page);
-        m_scale = m_scale_min;
+
+        m_scale = scale;
+        //to avoid page not rendered completely when zoomed,
+        // get the height using the passed scale and check if it exceeds the max size limit
+       /* Page page = m_doc.GetPage(m_cur_page);
+        int size_limit = GLBlock.m_cell_size * GLBlock.m_cell_size * 4;
+        int height = (int)page.ReflowStart(m_vw - m_page_gap, scale, true);
+        if((m_vw - m_page_gap) * height <= size_limit)  //acceptable scale
+            m_scale = scale;
+        else
+            Log.d(GLLayoutReflow.class.getSimpleName(), "Max zoom reached");*/
+        if( m_scale < m_scale_min ) m_scale = m_scale_min;
+
         BUTTON_SIZE = m_vw >> 3;
         Bitmap bmp = m_pages[m_cur_page].Reflow(m_vw - m_page_gap, m_scale, true);
         if( bmp != null )
@@ -86,7 +94,7 @@ public class GLLayoutReflow extends GLLayout
     @Override
     public boolean vSupportZoom()
     {
-        return false;
+        return true;
     }
     static private int BUTTON_SIZE = 60;
     public void gl_draw(GL10 gl10)

@@ -112,7 +112,7 @@ public class PDFViewThumb extends PDFView {
                 cur++;
             }
             m_docw = left + m_w / 2;
-        } else if (m_orientation == 2) {
+        } else if (m_orientation == 2) { //RTOL horizontal
             float maxh = size[1];
             m_scale_min = ((float) (m_h - m_page_gap)) / maxh;
             m_scale_max = m_scale_min * Global.zoomLevel;
@@ -183,6 +183,9 @@ public class PDFViewThumb extends PDFView {
                 if (m_docw < m_pages[cur].GetWidth()) m_docw = m_pages[cur].GetWidth();
                 cur++;
             }
+            if (cnt % columns != 0 && columns < cnt)
+                top += maxh + m_page_gap;
+
             m_doch = top;
         }
     }

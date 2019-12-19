@@ -249,6 +249,9 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 if(saveAsResult) callbackContext.success("Document save success");
                 else callbackContext.error("Document save error");
                 break;
+			case "closeReader":
+                mPdfManager.closeReader();
+                break;
             case "willShowReaderCallback":
                 sWillShowReader = callbackContext;
                 break;

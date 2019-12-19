@@ -129,6 +129,13 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		m_layout = (RelativeLayout)LayoutInflater.from(this).inflate(R.layout.pdf_gllayout, null);
 		m_view = (PDFGLLayoutView)m_layout.findViewById(R.id.pdf_view);
 
+		RadaeePluginCallback.getInstance().setActivityListener(new RadaeePluginCallback.PDFActivityListener() {
+			@Override
+			public void closeReader() {
+				onClose(false);
+				finish();
+			}
+		});
 		RadaeePluginCallback.getInstance().willShowReader();
 
 		Intent intent = getIntent();
@@ -234,35 +241,46 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		m_view.BundleRestorePos(savedInstanceState);
 	}
 
-	@Override
-	public void onBackPressed()
-	{
-		if(m_controller == null || m_controller.OnBackPressed())
-		{
-			if(m_modified)
-			{
+	public void onBackPressed() {
+		if (m_controller == null || m_controller.OnBackPressed())
+			onClose(true);
+	}
+
+	private void onClose(final boolean onBackPressed) {
+		if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
+			if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
+				if (m_controller == null) m_controller.savePDF();
+				if(onBackPressed) super.onBackPressed();
+			} else {
 				TextView txtView = new TextView(this);
-				txtView.setText("Document modified\r\nDo you want save it?");
-				new AlertDialog.Builder(this).setTitle("Exiting").setView(
-						txtView).setPositiveButton("Yes", new DialogInterface.OnClickListener()
-				{
+				txtView.setText(R.string.save_msg);
+				new AlertDialog.Builder(this).setTitle(R.string.exiting).setView(
+						txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						m_doc.Save();
-						PDFGLViewAct.super.onBackPressed();
+					public void onClick(DialogInterface dialog, int which) {
+						if (m_controller == null) m_controller.savePDF();
+						if(onBackPressed) PDFGLViewAct.super.onBackPressed();
 					}
-				}).setNegativeButton("No", new DialogInterface.OnClickListener()
-				{
+				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						PDFGLViewAct.super.onBackPressed();
+					public void onClick(DialogInterface dialog, int which) {
+						if(onBackPressed) PDFGLViewAct.super.onBackPressed();
 					}
 				}).show();
 			}
-			else super.onBackPressed();
-		}
+		} else if(onBackPressed) super.onBackPressed();
+	}
+
+	/**
+	 * To get the current file state.
+	 *
+	 * @return a string that contains one of the following values:
+	 * Not modified
+	 * Modified but not saved
+	 * Modified and saved
+	 */
+	public static int getFileState() {
+		return PDFViewController.getFileState();
 	}
 
 	@SuppressLint("InlinedApi")
