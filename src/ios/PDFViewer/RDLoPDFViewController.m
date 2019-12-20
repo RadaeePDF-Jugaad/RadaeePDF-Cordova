@@ -388,7 +388,8 @@
     }
     
     m_view = [[PDFLayoutView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height)];
-    [m_view setReadOnly:readOnly];
+    [m_view setReadOnly:readOnlyEnabled];
+    readOnly = readOnlyEnabled;
     BOOL res = [m_view PDFOpen:m_doc :4 :self];
     [self.view addSubview:m_view];
     pagecount = [m_doc pageCount];
@@ -2193,6 +2194,11 @@
 -(void)HighLight :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (readOnly) {
+            [self showDocReadonlyAlert];
+            [self endSelect];
+            return;
+        }
         //0HighLight
         [m_view vSelMarkup :GLOBAL.g_annot_highlight_clr :0];
         [self endSelect];
@@ -2202,6 +2208,11 @@
 -(void)UnderLine :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (readOnly) {
+            [self showDocReadonlyAlert];
+            [self endSelect];
+            return;
+        }
         //1UnderLine
         [m_view vSelMarkup:GLOBAL.g_annot_underline_clr :1];
         [self endSelect];
@@ -2210,6 +2221,11 @@
 -(void)StrikeOut :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (readOnly) {
+            [self showDocReadonlyAlert];
+            [self endSelect];
+            return;
+        }
         //2strikethrough
         [m_view vSelMarkup :GLOBAL.g_annot_strikeout_clr :2];
         [self endSelect];
