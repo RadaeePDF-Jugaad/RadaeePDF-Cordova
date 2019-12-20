@@ -453,6 +453,10 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().saveDocumentToPath(path);
     }
 
+    public void closeReader() {
+        RadaeePluginCallback.getInstance().closeReader();
+    }
+
     @Override
     public void willShowReader() {
         Global.def_view = mViewMode;

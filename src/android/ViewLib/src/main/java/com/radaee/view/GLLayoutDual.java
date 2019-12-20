@@ -473,7 +473,7 @@ public class GLLayoutDual extends GLLayout {
     @Override
     public void vGotoPage( int pageno )
     {
-        if( m_pages == null || m_doc == null || m_vw <= 0 || m_vh <= 0 || pageno < 0 || pageno >= m_cells.length) return;
+        if( m_pages == null || m_doc == null || m_vw <= 0 || m_vh <= 0 || pageno < 0 || pageno >= m_pages.length) return;
         gl_abort_scroll();
         int ccur = 0;
         while( ccur < m_cells.length )
@@ -493,7 +493,7 @@ public class GLLayoutDual extends GLLayout {
     @Override
     public void vScrolltoPage( int pageno )
     {
-        if( m_pages == null || m_doc == null || m_vw <= 0 || m_vh <= 0 || pageno < 0 || pageno >= m_cells.length) return;
+        if( m_pages == null || m_doc == null || m_vw <= 0 || m_vh <= 0 || pageno < 0 || pageno >= m_pages.length) return;
         gl_abort_scroll();
         int ccur = 0;
         while( ccur < m_cells.length )
@@ -519,7 +519,7 @@ public class GLLayoutDual extends GLLayout {
         m_scroller.computeScrollOffset();
         PDFPos pos = vGetPos(m_vw / 2, m_vh / 2);
 
-        if( m_pages == null || m_doc == null || m_vw <= 0 || m_vh <= 0 || pos.pageno < 0 || pos.pageno >= m_cells.length) return;
+        if( m_pages == null || m_doc == null || m_vw <= 0 || m_vh <= 0 || pos.pageno < 0 || pos.pageno >= m_pages.length) return;
         gl_abort_scroll();
         int ccur = 0;
         while( ccur < m_cells.length )
