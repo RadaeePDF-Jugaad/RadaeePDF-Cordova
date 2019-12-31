@@ -48,6 +48,9 @@
         m_disp_pg2 = -1;
         m_scale = 1;
         m_zooming = 0;
+        m_scales = NULL;
+        m_scales_min = NULL;
+        m_scales_max = NULL;
         m_finder = [[RDVFinder alloc] init];
         m_del = del;
         CGRect srect = [[UIScreen mainScreen] bounds];
@@ -89,12 +92,17 @@
     }
 }
 
--(void)ProOnRenderDestroy :(RDVCache *)cache
-{
-    [cache vDestroyLayer];
-    [cache vDestroy];
-    cache = nil;
-}
+ -(void)ProOnRenderDestroy :(RDVCache *)cache
+ {
+     [CATransaction begin];
+     //[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+     [CATransaction setDisableActions :YES];
+     [cache vDestroyLayer];
+     [CATransaction commit];
+     [cache vDestroy];
+     cache = nil;
+ }
+
 
 -(void)ProLayout
 {
@@ -170,10 +178,12 @@
 
 -(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay
 {
+    if (!doc) return;
+    [self vClose];//if already opened, close it.
     m_doc = doc;
     m_page_gap = page_gap;
-    if(m_page_gap < 0) m_page_gap = 0;
-    if(m_page_gap & 1) m_page_gap &= (~1);
+    if (m_page_gap < 0) m_page_gap = 0;
+    if (m_page_gap & 1) m_page_gap &= (~1);
     m_rlayer = rlay;
     m_pages_cnt = [m_doc pageCount];
     m_pages = [[NSMutableArray alloc] initWithCapacity:m_pages_cnt];
@@ -193,9 +203,9 @@
     [m_thread create:self :&callback];
     
     // custom scales
-    m_scales_min = malloc(m_pages_cnt * sizeof(*m_scales_min));
-    m_scales_max = malloc(m_pages_cnt * sizeof(*m_scales_max));
-    m_scales = malloc(m_pages_cnt * sizeof(*m_scales));
+    m_scales = malloc(m_pages_cnt * sizeof(float) * 3);
+    m_scales_min = m_scales + m_pages_cnt;
+    m_scales_max = m_scales_min + m_pages_cnt;
     
     [self ProLayout];
 }
@@ -221,6 +231,13 @@
         m_pages_cnt = 0;
         m_doc = nil;
         m_scale = 1;
+    }
+    if(m_scales)//do not forgot to free memory.
+    {
+        free(m_scales);
+        m_scales = NULL;
+        m_scales_min = NULL;
+        m_scales_max = NULL;
     }
 }
 
@@ -296,17 +313,17 @@
         [self ProRefreshDispRange];
 	    int pg1 = m_disp_pg1;
 	    int pg2 = m_disp_pg2;
-	    int docx = m_docx - (m_w >> 1);
-	    int docy = m_docy - (m_h >> 1);
-	    int lw = m_w * 2;
-	    int lh = m_h * 2;
+	    int docx = m_docx - m_cellw;
+	    int docy = m_docy - m_cellh;
+	    int lw = m_w + m_cellw * 2;
+	    int lh = m_h + m_cellh * 2;
         while(pg1 < pg2)
         {
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
             [vp vLayerInit:m_rlayer];
             [vp vDrawZoom :m_scales[pg1]];
             [vp vDraw :m_thread :docx :docy :lw :lh];
-            if([vp vFinished]) [vp vZoomEnd];
+            if([vp vFinished]) [vp vZoomEnd :m_thread];
             if( pg1 == find_page )
                 [m_finder find_draw_all:canvas :vp];
             pg1++;
@@ -359,7 +376,7 @@
     while(pg1 < pg2)
     {
         RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
-        [vp vZoomEnd];
+        [vp vZoomEnd :m_thread];
         pg1++;
     }
     pg1 = m_disp_pg2;
@@ -367,7 +384,7 @@
     while(pg1 < pg2)
     {
         RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
-        [vp vZoomEnd];
+        [vp vZoomEnd :m_thread];
         pg1++;
     }
 }
@@ -384,20 +401,21 @@
 -(void)vRenderAsync:(int)pageno
 {
     RDVPage *vp = (RDVPage *)m_pages[pageno];
-    [vp vEndPage:m_thread];
-    [vp vRenderAsync :m_thread :m_docx :m_docy :m_w :m_h];
+    NSMutableArray *caches = [vp vBackCache];
+    [vp vRenderAsync :m_thread :m_docx - m_cellw :m_docy - m_cellw :m_w + m_cellw * 2 :m_h + m_cellh * 2];
+    [vp vBackEnd :m_thread :caches];
 }
 
 -(void)vRenderSync:(int)pageno
 {
+    RDVPage *vp = (RDVPage *)m_pages[pageno];
+    NSMutableArray *caches = [vp vBackCache];//get all rendered caches of page
     [CATransaction begin];
     //[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     [CATransaction setDisableActions :YES];
-    RDVPage *vp = (RDVPage *)m_pages[pageno];
-    NSMutableArray *caches = [vp vBackCache];
-    [vp vRenderSync :m_thread :m_docx :m_docy :m_w :m_h];
-    [vp vBackEnd:caches];
+    [vp vRenderSync :m_thread :m_docx - m_cellw :m_docy - m_cellw :m_w + m_cellw * 2 :m_h + m_cellh * 2];//display all new caches over old cache
     [CATransaction commit];
+    [vp vBackEnd :m_thread :caches];//delete all old caches.
 }
 
 -(void)vFindStart:(NSString *)pat : (bool)match_case :(bool)whole_word
@@ -708,10 +726,8 @@
 {
     //RDVPage *vp1 = [self ProGetPage :-m_w :-m_h];
     //RDVPage *vp2 = [self ProGetPage :m_w<<1 :m_h<<1];
-    int csize = m_w;
-    if(csize > m_h) csize = m_h;
-    RDVPage *vp1 = [self ProGetPage :-csize :-csize];
-    RDVPage *vp2 = [self ProGetPage :m_w + csize :m_h + csize];
+    RDVPage *vp1 = [self ProGetPage :-m_cellw :-m_cellh];
+    RDVPage *vp2 = [self ProGetPage :m_w + m_cellw :m_h + m_cellh];
     if(!vp1 || !vp2) return;
     int pg1 = [vp1 pageno];
     int pg2 = [vp2 pageno];

@@ -193,7 +193,7 @@
 -(void)vDestroy :(RDVThread *) thread;
 {
     [self vLayerDel];
-    [self vZoomEnd];
+    [self vZoomEnd :thread];
     [self blocks_destroy :thread];
     if(m_layer)
     {
@@ -245,7 +245,7 @@
 
 -(void)vEndPage :(RDVThread *) thread
 {
-    [self vZoomEnd];
+    [self vZoomEnd :thread];
 	if (!m_caches) return;
 	int xcur = 0;
 	int ycur = 0;
@@ -263,9 +263,26 @@
 }
 -(NSMutableArray *)vBackCache
 {
-    [self vZoomEnd];
-    if (!m_caches) return nil;
     NSMutableArray *ret = [[NSMutableArray alloc] init];
+    if (m_caches_zoom)
+    {
+        RDVCacheSet *zcaches = m_caches_zoom;
+        m_caches_zoom = nil;
+        int xcur = 0;
+        int ycur = 0;
+        int xcnt = [zcaches cols];
+        int ycnt = [zcaches rows];
+        //remove all zoom cache in backing thread.
+        for(ycur = 0; ycur < ycnt; ycur++)
+        {
+            for(xcur = 0; xcur < xcnt; xcur++)
+            {
+                RDVCache *cache = [zcaches get :xcur :ycur];
+                [ret addObject:cache];
+            }
+        }
+    }
+    if (!m_caches) return nil;
     int xcur = 0;
     int ycur = 0;
     int xcnt = [m_caches cols];
@@ -275,23 +292,20 @@
         for(xcur = 0; xcur < xcnt; xcur++)
         {
             RDVCache *cache = [m_caches get :xcur :ycur];
-            if ([cache vIsRendering]) [m_caches set :xcur :ycur :[cache vClone]];
-            [ret addObject:cache];
+            [m_caches set :xcur :ycur :[cache vClone]];
+            if ([cache vIsRendering] || [cache vIsRenderFinished])
+                [ret addObject:cache];
         }
     }
     return ret;
 }
 
--(void)vBackEnd :(NSMutableArray *)arr
+-(void)vBackEnd :(RDVThread *) thread :(NSMutableArray *)arr
 {
     if(!arr) return;
-    int cnt = [arr count];
+    int cnt = (int)[arr count];
     int cur = 0;
-    for(cur = 0; cur < cnt; cur++)
-    {
-        [[arr objectAtIndex:cur] vDestroyLayer];
-        [[arr objectAtIndex:cur] vDestroy];
-    }
+    for(cur = 0; cur < cnt; cur++) [thread end_render:[arr objectAtIndex:cur]];
 }
 
 -(bool)vFinished
@@ -404,6 +418,7 @@
 		for(int xval = x0; xval < m_x1 && xcur < xcnt; xcur++)
 		{
             RDVCache *vc = [m_caches get :xcur :ycur];
+            [vc vStart];
 			[vc vRender];
             [vc vDraw:m_layer];
 			xval += vc.w;
@@ -488,44 +503,27 @@
 
 -(void)vZoomStart
 {
-    if(!m_caches_zoom)
-    {
-        [self vZoomEnd];
-        m_caches_zoom = m_caches;
-    }
+    if(!m_caches_zoom) m_caches_zoom = m_caches;
     m_caches = nil;
 }
 
--(void)vZoomEnd
+-(void)vZoomEnd :(RDVThread *) thread
 {
     if (!m_caches_zoom) return;
     RDVCacheSet *zcaches = m_caches_zoom;
     m_caches_zoom = nil;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC >> 2),
-    	dispatch_get_main_queue(), ^
+    int xcur = 0;
+    int ycur = 0;
+    int xcnt = [zcaches cols];
+    int ycnt = [zcaches rows];
+    //start to remove all implict animation
+    for(ycur = 0; ycur < ycnt; ycur++)
     {
-        int xcur = 0;
-        int ycur = 0;
-        int xcnt = [zcaches cols];
-        int ycnt = [zcaches rows];
-	    //start to remove all implict animation
-	    [CATransaction begin];
-	    [CATransaction setDisableActions:YES];
-        for(ycur = 0; ycur < ycnt; ycur++)
+        for(xcur = 0; xcur < xcnt; xcur++)
         {
-            for(xcur = 0; xcur < xcnt; xcur++)
-            {
-                RDVCache *cache = [zcaches get :xcur :ycur];
-                if(cache)
-                {
-                    [cache vDestroyLayer];
-                    [cache vDestroy];
-                }
-            }
+            [thread end_render:[zcaches get :xcur :ycur]];
         }
-	    //all drawing are finished, now we commit all layers to GPU.
-	    [CATransaction commit];
-    });
+    }
 }
 
 @end

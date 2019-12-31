@@ -32,6 +32,7 @@
         m_dib = NULL;
         m_status = 0;
         m_render = false;
+        m_layer = nil;
         m_scale_pix = [[UIScreen mainScreen] scale];
     }
     return self;
@@ -81,23 +82,52 @@
 
 -(void)vRender
 {
-    PDFDIB *dib = [[PDFDIB alloc] init :m_dibw :m_dibh];
+    if(m_status < 0) return;
+    if(m_dib)//this condition shall never happen.
+    {
+        PDF_DIB dib = m_dib;
+        m_dib = NULL;
+        Global_dibFree(dib);
+        //NSString *smsg = [NSString stringWithFormat:@"free dib from vRender w:%d h:%d", m_dibw, m_dibh];
+        //NSLog(smsg);
+    }
+    PDF_DIB dib = Global_dibGet(NULL, m_dibw, m_dibh);//use PDF_DIB in direct may has better performance.
+    //NSString *smsg = [NSString stringWithFormat:@"alloc dib w:%d h:%d", m_dibw, m_dibh];
+    //NSLog(smsg);
+    PDFPage *page = [m_doc page :m_pageno];
+    Page_renderPrepare([page handle], dib);
     if(m_status < 0)
     {
-        dib = NULL;
+        Global_dibFree(dib);
         return;
     }
-    PDFPage *page = [m_doc page :m_pageno];
-    [page renderPrepare :dib];
-    if(m_status < 0) return;
-    m_dib = dib;
-    //if(!m_thumb) m_page = page;
     m_page = page;
-    
-    PDFMatrix *mat = [[PDFMatrix alloc] init :m_scale :-m_scale :-m_dibx :[m_doc pageHeight :m_pageno] * m_scale - m_diby];
-    [page render :dib :mat :2];//always render best.
-    mat = NULL;
-    if(m_status >= 0) m_status = 1;
+    //if(!m_thumb) m_page = page;
+    PDF_MATRIX mat = Matrix_createScale(m_scale, -m_scale, -m_dibx, [m_doc pageHeight :m_pageno] * m_scale - m_diby);
+    Page_render([page handle],  dib, mat, true, 2);
+    Matrix_destroy(mat);
+    if (GLOBAL.g_dark_mode && m_status >= 0)
+    {
+        Byte *data = Global_dibGetData(dib);
+        int w = Global_dibGetWidth(dib);
+        int h = Global_dibGetHeight(dib);
+        //invert pixel and convert to gray, we have a faster way:
+        Byte *data_cur = data;
+        Byte *data_end = data + w * h * 4;
+        while(data_cur < data_end)
+        {
+            //alpha channel always is 255;
+            int gray = (306 * (255 - data_cur[2]) + 601 * (255 - data_cur[1]) + 117 * (255 - data_cur[0]))>>10;
+            data_cur[0] = data_cur[1] = data_cur[2] = gray;
+            data_cur += 4;
+        }
+    }
+    if(m_status >= 0)
+    {
+        m_status = 1;
+        m_dib = dib;
+    }
+    else Global_dibFree(dib);
 }
 
 //the layer object must create and destroy on main thread.
@@ -116,79 +146,40 @@
     m_status = 0;
     m_page = nil;
     m_render = false;
-    m_dib = nil;
+    Global_dibFree(m_dib);
+    m_dib = NULL;
 }
+
+void RDDataProviderReleaseDataCallback(void *info, const void *data, size_t size)
+{
+    //int w = Global_dibGetWidth((PDF_DIB)info);
+    //int h = Global_dibGetHeight((PDF_DIB)info);
+    //NSString *smsg = [NSString stringWithFormat:@"free dib from CALayer w:%d h:%d", w, h];
+    //NSLog(smsg);
+    Global_dibFree((PDF_DIB)info);
+}
+extern void rdcpy_ints(unsigned int *dst, const unsigned int *src, int len);
 
 -(CALayer *)ProLayer
 {
     if(m_layer) return m_layer;
-    if(![self vIsRenderFinished] || !m_dib) return nil;
-    Byte *data = (Byte *)[m_dib data];
-    int w = [m_dib width];
-    int h = [m_dib height];
-    m_layer = [[CALayer alloc] init];
-    [m_layer removeAllAnimations];
-    
-    if (GLOBAL.g_dark_mode) {
-        // run through every pixel, a scan line at a time...
-        for(int ay = 0; ay < h; ay++)
-        {
-            // get a pointer to the start of this scan line
-            unsigned char *linePointer = &data[ay * w * 4];
-            
-            // step through the pixels one by one...
-            for(int ax = 0; ax < w; ax++)
-            {
-                // get RGB values. We're dealing with premultiplied alpha
-                // here, so we need to divide by the alpha channel (if it
-                // isn't zero, of course) to get uninflected RGB. We
-                // multiply by 255 to keep precision while still using
-                // integers
-                int r, g, b;
-                if(linePointer[3])
-                {
-                    r = linePointer[0] * 255 / linePointer[3];
-                    g = linePointer[1] * 255 / linePointer[3];
-                    b = linePointer[2] * 255 / linePointer[3];
-                }
-                else
-                    r = g = b = 0;
-                
-                // perform the colour inversion
-                r = 255 - r;
-                g = 255 - g;
-                b = 255 - b;
-                
-                int avg = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-                r = g = b = avg;
-                
-                // multiply by alpha again, divide by 255 to undo the
-                // scaling before, store the new values and advance
-                // the pointer we're reading pixel data from
-                linePointer[0] = r * linePointer[3] / 255;
-                linePointer[1] = g * linePointer[3] / 255;
-                linePointer[2] = b * linePointer[3] / 255;
-                linePointer += 4;
-            }
-        }
-    }
-    
-    CGDataProviderRef provider = CGDataProviderCreateWithData( NULL, data, w * h * 4, NULL );
+    PDF_DIB dib = m_dib;//use PDF_DIB in direct may has better performance.
+    if(![self vIsRenderFinished] || !dib) return nil;
+
+    m_dib = NULL;
+    CGDataProviderRef provider = CGDataProviderCreateWithData( dib, Global_dibGetData(dib), m_dibw * m_dibh * 4, RDDataProviderReleaseDataCallback );
     CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-    CGImageRef img = CGImageCreate( w, h, 8, 32, w<<2, cs,
-        kCGBitmapByteOrder32Little|kCGImageAlphaNoneSkipFirst,
-        provider, NULL, FALSE, kCGRenderingIntentDefault );
+    CGImageRef img = CGImageCreate( m_dibw, m_dibh, 8, 32, m_dibw<<2, cs,
+                                   kCGBitmapByteOrder32Little|kCGImageAlphaNoneSkipFirst,
+                                   provider, NULL, FALSE, kCGRenderingIntentDefault );
+    
     CGColorSpaceRelease(cs);
     CGDataProviderRelease(provider);
     
-    if(img)
-    {
-        m_layer.contents = (__bridge id)img;
-        CGImageRelease(img);
-        //m_dib = nil;
-    }
-    else
-        m_layer = nil;
+    m_layer = [[CALayer alloc] init];
+    [m_layer removeAllAnimations];
+    m_layer.contents = (__bridge id)img;
+    CGImageRelease(img);
     return m_layer;
 }
 

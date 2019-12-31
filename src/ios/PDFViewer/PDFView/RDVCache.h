@@ -22,7 +22,7 @@
     int m_status;//1 mean render finished without cancel, -1 mean render cancelled, others: 0
     bool m_render;//true if rendering request is posted, false means rendering request never posted.
     bool m_thumb;
-    PDFDIB *m_dib;
+    PDF_DIB m_dib;//use PDF_DIB in direct may has better performance.
     CALayer *m_layer;
 }
 @property int x;

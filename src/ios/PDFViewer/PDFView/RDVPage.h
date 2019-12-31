@@ -62,12 +62,12 @@
 -(void)vClips :(RDVThread *) thread :(bool) clip;
 -(void)vEndPage :(RDVThread *) thread;
 -(NSMutableArray *)vBackCache;
--(void)vBackEnd :(NSMutableArray *)arr;
+-(void)vBackEnd :(RDVThread *) thread :(NSMutableArray *)arr;
 -(bool)vFinished;
 -(void)vRenderAsync :(RDVThread *) thread :(int) docx :(int) docy :(int) vw :(int) vh;
 -(void)vRenderSync :(RDVThread *) thread :(int) docx :(int) docy :(int) vw :(int) vh;
 -(void)vDraw :(RDVThread *) thread :(int) docx :(int) docy :(int) vw :(int) vh;
 -(bool)vDrawZoom :(float)scale;
 -(void)vZoomStart;
--(void)vZoomEnd;
+-(void)vZoomEnd :(RDVThread *) thread;
 @end

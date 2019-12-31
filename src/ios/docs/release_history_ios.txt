@@ -1,7 +1,14 @@
 PDFViewer SDK for iOS - Release notes
 
-3.58
+3.59
 - FIX crash on page draw with high zoom level
+- FIX check box multiple selection issue for a check box group
+- FIX rendering issue related to JPX decoding
+- FIX check tail of CBC mode in AES
+- Optimize AES decoding in ARM64 CPU
+- FIX OOM issue
+
+3.58
 - FIX crashed issue when close the special PDF file
 - FIX issue for AddAnnotEditBox in rotated page
 
