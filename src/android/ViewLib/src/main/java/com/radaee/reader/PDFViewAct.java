@@ -268,7 +268,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     private void onClose(final boolean onBackPressed) {
         if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
             if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
-                if (m_controller == null) m_controller.savePDF();
+                if (m_controller != null) m_controller.savePDF();
                 if(onBackPressed) super.onBackPressed();
             } else {
                 TextView txtView = new TextView(this);
@@ -277,7 +277,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
                         txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (m_controller == null) m_controller.savePDF();
+                        if (m_controller != null) m_controller.savePDF();
                         if(onBackPressed) PDFViewAct.super.onBackPressed();
                     }
                 }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
