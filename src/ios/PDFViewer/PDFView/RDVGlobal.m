@@ -317,7 +317,7 @@
 - (void)setup {
     _renderQuality = mode_normal;
     
-    _g_render_mode = 7;
+    _g_render_mode = 0;
     _g_zoom_level = 15;
     _g_ink_width = 2;
     _g_rect_width = 2;
