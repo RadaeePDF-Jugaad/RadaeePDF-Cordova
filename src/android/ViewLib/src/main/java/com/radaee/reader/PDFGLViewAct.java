@@ -41,7 +41,6 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 	private RelativeLayout m_layout = null;
 	private PDFGLLayoutView m_view = null;
 	private PDFViewController m_controller = null;
-	private boolean m_modified = false;
 	private boolean need_save_doc = false;
 	private void onFail(String msg)//treat open failed.
 	{
@@ -249,7 +248,7 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 	private void onClose(final boolean onBackPressed) {
 		if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
 			if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
-				if (m_controller == null) m_controller.savePDF();
+				if (m_controller != null) m_controller.savePDF();
 				if(onBackPressed) super.onBackPressed();
 			} else {
 				TextView txtView = new TextView(this);
@@ -258,7 +257,7 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 						txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						if (m_controller == null) m_controller.savePDF();
+						if (m_controller != null) m_controller.savePDF();
 						if(onBackPressed) PDFGLViewAct.super.onBackPressed();
 					}
 				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -313,7 +312,7 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 	@Override
 	public void OnPDFPageModified(int pageno)
 	{
-		m_modified = true;
+		if (m_controller != null) m_controller.onPageModified(pageno);
 	}
 	@Override
 	public void OnPDFPageChanged(int pageno)
