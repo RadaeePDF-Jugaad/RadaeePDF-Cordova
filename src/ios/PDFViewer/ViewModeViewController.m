@@ -110,7 +110,12 @@ static int  currentIndex=0;
     NSIndexPath *oldIndexPath = [NSIndexPath indexPathForRow:currentIndex inSection:0];
     UITableViewCell *cell =[tableView cellForRowAtIndexPath:indexPath];
     
-    GLOBAL.g_render_mode = indexPath.row;
+    GLOBAL.g_render_mode = (int)indexPath.row;
+    
+    if ((int)indexPath.row == 6) {
+        GLOBAL.g_render_mode = 7;
+    }
+    
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_mode forKey:@"ViewMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -133,7 +138,7 @@ static int  currentIndex=0;
     {
         oldCell.accessoryType=UITableViewCellAccessoryCheckmark;
     }
-    currentIndex = indexPath.row;
+    currentIndex = (int)indexPath.row;
     
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

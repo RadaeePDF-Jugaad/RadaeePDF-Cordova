@@ -46,6 +46,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText :(float)textSize;
 - (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index;
 - (void)OnAnnotList:(PDFAnnot *)annot items :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
+- (void)OnAnnotSignature:(PDFAnnot *)annot;
 - (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
 
 @end
@@ -136,6 +137,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     FTSOccurrence *currentOccurrence;
 #endif
 }
+
+@property (nonatomic) NSUInteger pageViewNo;
 
 -(id)initWithFrame:(CGRect)frame;
 -(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;
@@ -248,6 +251,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
 - (NSString *)getImageFromAnnot:(PDFAnnot *)annot;
+- (NSString *)emptyImageFromAnnot:(PDFAnnot *)annot;
 - (NSString *)emptyAnnotWithSize:(CGSize)size;
 
 - (BOOL)addAttachmentFromPath:(NSString *)path;

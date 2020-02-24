@@ -179,7 +179,6 @@
 -(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay
 {
     if (!doc) return;
-    [self vClose];//if already opened, close it.
     m_doc = doc;
     m_page_gap = page_gap;
     if (m_page_gap < 0) m_page_gap = 0;
@@ -1287,3 +1286,126 @@
 
 @end
 
+@implementation RDVLayoutSingle
+-(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol :(int)pageno
+{
+    self = [super init :del];
+    if(self)
+    {
+        m_align = align_vcenter;
+        m_rtol = rtol;
+        m_thumb = false;
+        pageViewNo = pageno;
+    }
+    return self;
+}
+
+-(void)vSetAlign :(PAGE_ALIGN) align
+{
+    m_align = align;
+    [self ProLayout];
+}
+
+-(void)ProLayout
+{
+    if(m_w <= 0 || m_h <= 0) return;
+    [self vCalculateScales];
+    
+    m_docw = 0;
+    int pageno = pageViewNo;
+    int docx = (m_thumb) ? m_w >> 1 : m_page_gap >> 1;
+    m_doch = m_h * m_scale;
+    
+    int cur = 0;
+    
+    int pw = [m_doc pageWidth:pageViewNo] * m_scales[0];
+    int ph = [m_doc pageHeight:pageViewNo] * m_scales[0];
+    
+    docx = (m_w - m_page_gap/2 - pw)/2;
+    
+    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
+    vp.thumbMode = m_thumb;
+    [vp vLayout :docx :(m_doch - ph) >> 1 :m_scales[0] :true];
+    docx += pw;
+    docx += m_page_gap;
+ 
+    m_docw = m_w;
+}
+
+-(RDVPage *)ProGetPage :(int)vx :(int)vy
+{
+    if( m_docw <= 0 || m_doch <= 0)
+        return nil;
+    return [m_pages objectAtIndex:0];
+}
+
+-(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay :(int)pageno
+{
+    if (!doc) return;
+    m_doc = doc;
+    m_page_gap = page_gap;
+    if (m_page_gap < 0) m_page_gap = 0;
+    if (m_page_gap & 1) m_page_gap &= (~1);
+    m_rlayer = rlay;
+    m_pages_cnt = 1;
+    m_pages = [NSMutableArray array];
+    
+    RDVPage *vp = [[RDVPage alloc] init :m_doc :pageno :m_cellw :m_cellh];
+    [m_pages addObject:vp];
+    
+    m_thread = [[RDVThread alloc] init];
+    struct RDVThreadBack callback;
+    callback.OnCacheRendered = @selector(ProOnRenderFinished:);
+    callback.OnCacheDestroy = @selector(ProOnRenderDestroy:);
+    callback.OnFound = @selector(ProOnFound:);
+    [m_thread create:self :&callback];
+    
+    // custom scales
+    m_scales = malloc(m_pages_cnt * sizeof(float) * 3);
+    m_scales_min = m_scales + m_pages_cnt;
+    m_scales_max = m_scales_min + m_pages_cnt;
+    
+    [self ProLayout];
+}
+
+-(void)ProRefreshDispRange
+{
+    RDVPage *vp1 = (RDVPage *)[m_pages objectAtIndex:0];
+    RDVPage *vp2 = (RDVPage *)[m_pages objectAtIndex:0];
+    if(!vp1 || !vp2) return;
+    int pg1 = [vp1 pageno];
+    int pg2 = [vp2 pageno];
+    if(pg1 > pg2)
+    {
+        int tmp = pg1;
+        pg1 = pg2;
+        pg2 = tmp;
+    }
+    pg2++;
+    
+    if(m_zooming)
+    {
+        m_disp_pg1 = pg1;
+        m_disp_pg2 = pg2;
+    }
+    else
+    {
+        m_disp_pg1 = 0;
+        m_disp_pg2 = 1;
+        
+        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:0];
+        [vp vClips:m_thread :true];
+    }
+}
+
+- (void)vCalculateScales {
+    BOOL vert = [self isKindOfClass:[RDVLayoutVert class]];
+    PDF_SIZE sz = [m_doc getPagesMaxSize];
+    for (int i = 0; i < m_pages_cnt; i++) {
+        float w = (GLOBAL.g_static_scale) ? sz.cx : [m_doc pageWidth:pageViewNo];
+        float h = (GLOBAL.g_static_scale) ? sz.cy : [m_doc pageHeight:pageViewNo];
+        [self vLoadPageLayout:i width:w height:h vert:vert];
+    }
+}
+
+@end

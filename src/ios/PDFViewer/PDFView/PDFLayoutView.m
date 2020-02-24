@@ -51,13 +51,14 @@
         m_zoom = 1;
         self.minimumZoomScale = 1;
         self.maximumZoomScale = GLOBAL.g_zoom_level;
+        self.bouncesZoom = NO;
         m_child = [[PDFOffScreenView alloc] initWithFrame
                    :CGRectMake(0, 0, frame.size.width, frame.size.height)];
         [m_child setDelegate :self];
         [self addSubview:m_child];
         [self resignFirstResponder];
         
-        if ([self respondsToSelector:@selector(contentInsetAdjustmentBehavior)]) {
+        if (@available(iOS 11.0, *)) {
             self.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
         
@@ -132,16 +133,26 @@
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
             break;
-        default:// Vertical
-            GLOBAL.g_paging_enabled = NO;
-            m_layout = [[RDVLayoutVert alloc] init : self];
-            break;
-    }
-    free( horzs );
-    if ([self pagingAvailable]) {
-        self.pagingEnabled = GLOBAL.g_paging_enabled;
-    }
-    [m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer];
+        case 7:// PageView RTOL
+                doublePage = NO;
+                GLOBAL.g_paging_enabled = NO;
+                memset(horzs, 0, sizeof(bool));
+                m_layout = [[RDVLayoutSingle alloc] init:self :true :(int)_pageViewNo];
+                break;
+            default:// Vertical
+                GLOBAL.g_paging_enabled = NO;
+                m_layout = [[RDVLayoutVert alloc] init : self];
+                break;
+        }
+        free( horzs );
+        if ([self pagingAvailable]) {
+            self.pagingEnabled = GLOBAL.g_paging_enabled;
+        }
+        if (GLOBAL.g_render_mode == 7) {
+            [(RDVLayoutSingle *)m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer :(int)_pageViewNo];
+        } else {
+            [m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer];
+        }
     [self bringSubviewToFront:m_child];
     m_status = sta_none;
     m_zoom = 1;
@@ -170,6 +181,7 @@
 
 - (void)setModified:(BOOL)modified force:(BOOL)force
 {
+    if(m_modified == modified) return;
     if (!m_modified) {
         m_modified = modified;
     }
@@ -258,13 +270,21 @@
     UIImage *img = [UIImage imageWithCGImage:[dib image]];
     
     // Create path.
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
     
     // Save image.
     [UIImagePNGRepresentation(img) writeToFile:filePath atomically:YES];
     
     return filePath;
+}
+
+- (NSString *)emptyImageFromAnnot:(PDFAnnot *)annot {
+    PDF_RECT rect;
+    [annot getRect:&rect];
+    int width = (rect.right - rect.left) * m_scale_pix;
+    int height = (rect.bottom- rect.top) * m_scale_pix;
+    return [self emptyAnnotWithSize:CGSizeMake(width, height)];
 }
 
 - (NSString *)emptyAnnotWithSize:(CGSize)size
@@ -274,7 +294,7 @@
     UIImage *emptyImg = [UIImage imageWithCGImage:[emptyDib image]];
     
     // Create path.
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE_EMPTY];
     
     // Save image.
@@ -1873,6 +1893,81 @@
     
     [self autoSave];
 }
+
+- (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum {
+    // Create path.
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
+    
+    UIImage *image = [UIImage imageWithContentsOfFile:filePath];
+    
+    //get the PDFVPage
+    RDVPage *vpage = [m_layout vGetPage:pageNum];
+    if( !vpage ) return NO;
+    
+    //get the PDFPage
+    PDFPage *page = [vpage GetPage];
+    if (!page) {
+        return NO;
+    }
+    
+    //get the annotation
+    PDFAnnot *annot = [page annotAtIndex:index];
+    
+    //init PDFDocForm and PDFPageContent
+    PDFDocForm *form = [m_doc newForm];
+    PDFPageContent *content = [[PDFPageContent alloc] init];
+    [content gsSave];
+    
+    //create PDFDocImage with CGImageRef
+    CGImageRef ref = [image CGImage];
+    PDFDocImage *docImage = [m_doc newImage:ref :YES];
+    PDF_PAGE_IMAGE rimg = [form addResImage:docImage];
+    
+    PDF_RECT rect;
+    [annot getRect:&rect];
+    
+    float width = (rect.right - rect.left);
+    float height = (rect.bottom - rect.top);
+    float originalWidth = image.size.width;
+    float originalHeight = image.size.height;
+    float scale = height / originalHeight;
+    float scaleW = width / originalWidth;
+    if (scaleW < scale) scale = scaleW;
+    
+    float xTranslation = (width - originalWidth * scale) / 2.0f;
+    float yTranslation = (height - originalHeight * scale) / 2.0f;
+    
+    //set the matrix 20x20
+    PDFMatrix *matrix = [[PDFMatrix alloc] init:scale * originalWidth :scale * originalHeight :xTranslation :yTranslation];
+    [content gsCatMatrix:matrix];
+    matrix = nil;
+    
+    //draw the image on the PDFPageContent
+    [content drawImage:rimg];
+    [content gsRestore];
+    
+    //set the content on the PDFDocForm
+    [form setContent:0 :0 :width :height :content];
+    
+    //set the custom icon
+    BOOL success = [annot setIcon2:@"myIcon" :form];
+    
+    //free objects
+    content = nil;
+    page = nil;
+    
+    [self ProUpdatePage:pageNum];
+    
+    // Delete temp signature image
+    [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+    
+    if (success) {
+        [self setModified:YES force:NO];
+    }
+    
+    return success;
+}
 /*
 -(void)vGetTextFromPoint:(CGPoint )point
 {
@@ -2025,7 +2120,7 @@
 - (BOOL)useTempImage
 {
     // Create path.
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
@@ -2196,6 +2291,12 @@
         [self vAnnotEnd];
         return;
     }
+    if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
+        if (m_del && [m_del respondsToSelector:@selector(OnAnnotSignature:)]) {
+            [m_del OnAnnotSignature:m_annot];
+        }
+        return;
+    }
     [self vAnnotEnd];
     return;
 }
@@ -2310,12 +2411,11 @@
         PDFPage *page = [vpage GetPage];
         [mat transformInk:m_ink];
         [page addAnnotInk:m_ink];
-        
-        //Action Stack Manger
-        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
-        
         // Set Author and Modify date
         [self updateLastAnnotInfoAtPage:page];
+
+        //Action Stack Manger
+        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
         
         [self ProUpdatePage :pos.pageno];
         [self setModified:YES force:NO];

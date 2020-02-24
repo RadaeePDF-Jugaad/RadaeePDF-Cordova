@@ -831,6 +831,32 @@
     [self presentViewController:annotListTV animated:YES completion:nil];
 }
 
+- (void)OnAnnotSignature:(PDFAnnot *)annot {
+    cachedAnnot = annot;
+    
+    NSString *annotImage = [m_view getImageFromAnnot:annot];
+    NSString *emptyImage = [m_view emptyImageFromAnnot:annot];
+    
+    NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:annotImage error:nil];
+    NSDictionary *emptyAttr = [[NSFileManager defaultManager] attributesOfItemAtPath:emptyImage error:nil];
+    
+    if (attr.fileSize != emptyAttr.fileSize) {
+         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable") message:NSLocalizedString(@"Signature already exist. Do you want delete it?", nil) preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+            [self presentSignatureViewController];
+        }];
+        UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [m_view vAnnotEnd];
+        }];
+              
+        [alert addAction:ok];
+        [alert addAction:cancel];
+        [self presentViewController:alert animated:YES completion:nil];
+    } else {
+        [self presentSignatureViewController];
+    }
+}
+
 - (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
 {
     if (_delegate && [_delegate respondsToSelector:@selector(didTapOnAnnotationOfType:atPage:atPoint:)]) {
@@ -1583,6 +1609,31 @@
     [self presentViewController:sign animated:YES completion:nil];
 }
 #endif
+
+#pragma mark - Signature
+
+- (void)presentSignatureViewController
+{
+    b_outline = YES;
+    SignatureViewController *sv = [[SignatureViewController alloc] init];
+    sv.delegate = self;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        sv.modalPresentationStyle = UIModalPresentationFormSheet;
+    } else {
+        sv.modalPresentationStyle = UIModalPresentationFullScreen;
+    }
+    
+    [self presentViewController:sv animated:YES completion:nil];
+}
+
+- (void)didSign
+{
+    [self dismissViewControllerAnimated:YES completion:^{
+        [m_view setSignatureImageAtIndex:cachedAnnot.getIndex atPage:[m_view vGetCurrentPage]];
+        [m_view vAnnotEnd];
+    }];
+}
 
 - (NSString *)composeFile
 {

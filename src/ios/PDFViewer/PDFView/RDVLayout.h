@@ -157,6 +157,16 @@ typedef enum _PAGE_ALIGN
 }
 -(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol :(const bool *)verts :(int)verts_cnt :(const bool *)horzs :(int) horzs_cnt;
 -(void)vSetAlign :(PAGE_ALIGN) align;
-
 @end
 
+@interface RDVLayoutSingle :RDVLayout
+{
+    PAGE_ALIGN m_align;
+    bool       m_rtol;
+    bool       m_thumb;
+    int        pageViewNo;
+}
+-(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol :(int)pageno;
+-(void)vSetAlign :(PAGE_ALIGN) align;
+-(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay :(int)pageno;
+@end

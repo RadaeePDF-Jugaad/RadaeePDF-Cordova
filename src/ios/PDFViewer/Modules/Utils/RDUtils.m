@@ -85,6 +85,9 @@
         
         [RDUtils setTagId:pdfid doc:m_doc];
         
+        m_doc = nil;
+        free(pConstChar);
+        
         return pdfid;
     }
     

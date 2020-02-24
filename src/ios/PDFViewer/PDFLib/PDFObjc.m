@@ -7,6 +7,9 @@
 //
 
 #import "PDFObjc.h"
+extern uint annotHighlightColor;
+extern uint annotUnderlineColor;
+extern uint annotStrikeoutColor;
 
 @implementation PDFSign
 @synthesize handle = m_sign;
@@ -1855,9 +1858,16 @@
 -(NSString *)meta:(NSString *)tag
 {
     const char *stag = [tag UTF8String];
-    char smeta[512];
-    Document_getMeta(m_doc, stag, smeta, 511);
-    return [NSString stringWithUTF8String: smeta];
+    char *smeta = (char *)malloc(1024);
+	int slen = 1024;
+    while(slen < (1<<20) && Document_getMeta(m_doc, stag, smeta, slen) >= (slen - 1))
+	{
+		slen <<= 1;
+		smeta = realloc(smeta, slen);
+	}
+    NSString *ret = [NSString stringWithUTF8String: smeta];
+	free(smeta);
+	return ret;
 }
 
 -(bool)setMeta:(NSString *)tag :(NSString *)val
@@ -1984,3 +1994,9 @@
 }
 
 @end
+
+
+
+
+
+

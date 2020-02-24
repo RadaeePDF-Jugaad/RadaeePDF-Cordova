@@ -371,59 +371,104 @@ NSString *pdfFullPath;
     pdfName = (NSMutableString *)[path substringFromIndex:pdfPath.length];
     pdfFullPath = path;
     
-    if( m_pdf == nil )
-    {
-        m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
-    }
-    NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
-    NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
-    NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
-    RDUPassWord* pwdDlg = [[RDUPassWord alloc]
-                           initWithTitle:Enterpassword
-                           message:nil
-                           delegate:self
-                           cancelButtonTitle:ok
-                           otherButtonTitles:cancel, nil];
-    
-    NSLock *theLock = [[NSLock alloc] init];
-    
-    if(GLOBAL.g_render_mode == 5) {
-        m_pdfR = [[RDPDFReflowViewController alloc] initWithNibName:@"RDPDFReflowViewController" bundle:nil];
-        [m_pdfR PDFOpen:pdfFullPath];
+    if (GLOBAL.g_render_mode == 7) {
+        m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
+        NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
+        NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
+        NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
+        RDUPassWord* pwdDlg = [[RDUPassWord alloc]
+                               initWithTitle:Enterpassword
+                               message:nil
+                               delegate:self
+                               cancelButtonTitle:ok
+                               otherButtonTitles:cancel, nil];
         
-        m_pdfR.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:m_pdfR animated:YES];
-        return;
-    }
-    
-    if ([theLock tryLock])
-    {
-        NSString *pwd = NULL;
-        
-        //Open PDF file
-        int result = [m_pdf PDFOpen:pdfFullPath :pwd];
+        NSLock *theLock = [[NSLock alloc] init];
+        if ([theLock tryLock])
+        {
+            NSString *pwd = NULL;
+            
+            //Set PDF file
+            int result = [m_pdfP PDFOpenAtPath:pdfFullPath withPwd:pwd];
 
-        if(result == 1)
-        {
-            m_pdf.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:m_pdf animated:YES];
+            if(result == 1)
+            {
+                m_pdfP.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:m_pdfP animated:YES];
+            }
+            //return value is encryption document
+            else if(result == 2)
+            {
+                [pwdDlg show];
+            }
+            else if (result == 0)
+            {
+                NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+                NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
+                NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+                UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+                [alter show];
+            }
+            [theLock unlock];
         }
-        //return value is encryption document
-        else if(result == 2)
-        {
-            [pwdDlg show];
+        
+    } else {
+        if( m_pdf == nil )
+            {
+                m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
+            }
+            NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
+            NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
+            NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
+            RDUPassWord* pwdDlg = [[RDUPassWord alloc]
+                                   initWithTitle:Enterpassword
+                                   message:nil
+                                   delegate:self
+                                   cancelButtonTitle:ok
+                                   otherButtonTitles:cancel, nil];
+            
+            NSLock *theLock = [[NSLock alloc] init];
+            
+            if(GLOBAL.g_render_mode == 5) {
+                m_pdfR = [[RDPDFReflowViewController alloc] initWithNibName:@"RDPDFReflowViewController" bundle:nil];
+                [m_pdfR PDFOpen:pdfFullPath];
+                
+                m_pdfR.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:m_pdfR animated:YES];
+                return;
+            }
+            
+            if ([theLock tryLock])
+            {
+                NSString *pwd = NULL;
+                
+                //Open PDF file
+                int result = [m_pdf PDFOpen:pdfFullPath :pwd];
+
+                if(result == 1)
+                {
+                    m_pdf.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:m_pdf animated:YES];
+                }
+                //return value is encryption document
+                else if(result == 2)
+                {
+                    [pwdDlg show];
+                }
+                else if (result == 0)
+                {
+                    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+                    NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
+                    NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+                    UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
+                    [alter show];
+                }
+                [theLock unlock];
+            }
         }
-        else if (result == 0)
-        {
-            NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-            NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
-            NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-            UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-            [alter show];
-        }
-        [theLock unlock];
     }
-}
+    
+    
 - (void)alertView:(UIAlertView *)pwdDlg clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     int result;

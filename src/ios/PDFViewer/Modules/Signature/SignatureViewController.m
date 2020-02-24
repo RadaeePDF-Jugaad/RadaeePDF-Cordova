@@ -29,6 +29,7 @@
     
     toolbar = [[UIToolbar alloc] init];
     [toolbar setItems:@[done, flex, reset]];
+    toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     sigView = [[UviSignatureView alloc] init];
     self.view = sigView;
@@ -39,10 +40,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationLandscapeRight) forKey:@"orientation"];
-    }
 }
 
 - (void)viewDidAppear:(BOOL)animated

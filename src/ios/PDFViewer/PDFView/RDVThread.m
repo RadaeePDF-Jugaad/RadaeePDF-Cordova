@@ -62,9 +62,12 @@
 }
 -(void)end_render:(RDVCache *)cache;
 {
-    if (![cache vEnd]) return;
+    if (!cache || ![cache vEnd]) return;
+    //why we using backing thread to notify UI thread to destroy cache?
+    //imaging that this cache is rendering on backing thread.
+    //if destroy on UI thread directly, the data in cache is not synchronized,
+    //using backing thread to nitify UI thread, can ensure render->destroy order.
     dispatch_async(m_queue, ^{
-        [cache vDestroy];
         //it must delete CALayer in main UI thread, so we send cache object to main thread.
         [self notify_dealloc:cache];
     });

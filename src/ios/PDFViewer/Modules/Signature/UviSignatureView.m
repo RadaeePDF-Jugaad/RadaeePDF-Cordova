@@ -101,7 +101,7 @@ static CGPoint midpoint(CGPoint p0, CGPoint p1) {
     resultImage = UIGraphicsGetImageFromCurrentImageContext();
     
     // Create path.
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
 
     // Save image.
