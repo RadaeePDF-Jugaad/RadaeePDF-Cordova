@@ -1,0 +1,87 @@
+/*
+ Localizable.strings
+ PDFViewer
+ 
+ Created by radaee on 13-1-7.
+ Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+ */
+"All Files" = "Tutti i file";
+"PDF File" = "PDF File";
+"Marks" = "Marks";
+"Setting" = "Impostazioni";
+"More" = "Altro";
+"Swipe Speed" = "Velocità swipe";
+"Render Quality" = "Qualità di visualizzazione";
+"Swipe Distance" = "Distanza swipe";
+"View Mode" = "Modalità visualizzazione";
+"Zooming Ratio" = "Zooming Ratio";
+"Ink Width" = "Spessore Ink";
+"Alert" = "Attenzione";
+"Click OK to reset all properties to default" = "Clicca OK per resettare le impostazioni";
+"OK" = "OK";
+"Cancel" = "Annulla";
+"BookMark Already Exist" = "Bookmark già presente";
+"Page " = "Pagina ";
+"Add BookMark Success!"="Bookmark aggiunto!";
+"Ink Color" = "Colore Ink";
+"Rect Color" = "Colore Rect";
+"Draw Line on file" = "Disegna linea nel file";
+"Draw Rect on file" = "Disegna rettangolo nel file";
+"This Document is readonly" = "Il documento è in sola lettura";
+"Outline" = "Outline";
+"Please Enter PassWord" = "Inserisci password";
+"PassWord" = "Password";
+"Error PassWord" = "Password errata";
+"Error Document,Can't open" = "Non è possibile aprire il documento";
+"Do you want to open:" = "Vuoi aprire:";
+"Underline Color" = "Colore sottolineatura";
+"Strikeout Color" = "Colore linea";
+"Text Annot" = "Annotazione testuale";
+"Highlight Color" = "Colore evidenziatura";
+"Oval Color" = "Colore ovale";
+"Select Action" = "Seleziona Azione";
+"Add Bookmark" = "Aggiungi Bookmark";
+"Bookmark List" = "Lista Bookmark";
+"View Mode" = "Modalità visualizzazione";
+"View Menu" = "Indice";
+"Save" = "Salva";
+"Print" = "Stampa";
+"Share" = "Condividi";
+"Exiting" = "Chiusura";
+"Document modified.\r\nDo you want to save it?" = "Il documento è stato modificato.\r\nVuoi salvare i cambiamenti?";
+"Yes" = "Si";
+"No" = "No";
+"Close" = "Chiudi";
+"Select Draw Mode" = "Modalità di disegno";
+"Ink" = "Disegno libero";
+"Line" = "Linea";
+"Rect" = "Rettangolo";
+"Ellipse" = "Ellisse";
+"Stamp" = "Immagine";
+"Note" = "Nota";
+"Search" = "Cerca";
+"Warning" = "Attenzione";
+"Find Over" = "Non ci sono altri risultati";
+"Signature already exist. Do you want delete it?" = "Firma già esistente. Vuoi cancellarla?";
+"Delete" = "Cancella";
+"Error" = "Errore";
+"Couldn't find media file" = "Nessun media trovato";
+"Select View Mode" = "Modalità di visualizzazione";
+"Vertical" = "Verticale";
+"Horizontal" = "Orizzontale";
+"Single Page" = "Pagina Singola";
+"Double Page" = "Pagina Doppia";
+"Notice" = "Avviso";
+"Document saved" = "Documento salvato";
+"Reached first occurrence" = "Prima occorrenze";
+"Reached last occurrence" = "Ultima occorrenza";
+"Searching... (%i)" = "Ricerca in corso... (%i)";
+"%i occurrences" = "%i occorrenze";
+/*
+ 
+ 
+ "Render Quality" = "Render Quality"
+ "Swipe Distance" = "Swipe Distance";
+ "View Mode" = "View Mode";
+ "Zooming Ratio" = "Zooming Ratio";
+ "Ink Width" = "Ink Width";*/

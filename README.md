@@ -30,7 +30,7 @@ If you, as user and developer need new features or fixes you shall submit them h
 	
 2. Add the android/iOS platform.  
    `cd RadaeePDF-Cordova`    
-	`cordova platform add android@6 --save` and/or `cordova platform add ios --save`
+	`cordova platform add android@latest --save` and/or `cordova platform add ios --save`
 	
 3. Add the plugin.  
    `cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git --save`
@@ -42,8 +42,9 @@ After doing these steps, you will have a ready to use project.
 
 ## Compatibility
 
-We do not yet support cordova-android 7.0.0, latest supported version is 6.4.0.  
-To be able to try the latest changes and improvements, please check the beta version https://github.com/gearit/RadaeePDF-Cordova/tree/beta
+We now support Cordova 6,7,8 and 9 for both Android and iOS platforms.  
+For cordova-android, latest supported version is 8.0.0, We support cordova-android@7 from version 7.1.4 onwards.  
+Make sure to update to latest plugin version and to use the command `cordova platform add android@latest`
 
 ## The JavaScript Interfaces
 
@@ -74,7 +75,8 @@ RadaeePDFPlugin.activateLicense(
 RadaeePDFPlugin.open(
 	{
 		url: "", //The path of the pdf to open
-		password: "" //password if needed
+		password: "", //password if needed
+		engine: 0 //for Android, 0: for GPU based layout(OpenGL), 1: for CPU based layout.
 	},
 	function(message) {
 		 console.log("Success: " + message);
@@ -130,9 +132,14 @@ RadaeePDFPlugin.getFileState(
 
 For more examples, check demo/js/index.js  
 
+### Framework Rendering
+
+- Android: OpenGL and CPU rendering flavors.
+- iOS: CALayer based tiled rendering.
+
 RadaeePDF library version included:
-- Android: v3.50
-- iOS: v3.8.4
+- Android: v3.53.1
+- iOS: v3.58
 
 Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  

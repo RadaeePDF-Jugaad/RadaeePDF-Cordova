@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.4.2">
+        id="com.radaee.cordova" version="1.5.4">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -41,7 +41,6 @@
 
         <!-- Plugin source -->
         <source-file src="src/android/RadaeePDFPlugin.java" target-dir="src/com/radaee/cordova" />
-        <source-file src="src/android/ViewLib/libs/com.radaee.view.jar" target-dir="libs" />
 
         <!-- Radaee source - java.com.radaee.pdf -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/adv/Obj.java" target-dir="src/com/radaee/pdf/adv" />
@@ -104,7 +103,41 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
-        
+		
+		<!-- Radaee source - java.com.radaee.view -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayout.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutCurl.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutReflow.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/ILayoutView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayout.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayoutVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFPageView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVCache.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVFinder.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFView.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewCurl.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewHorz.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewPager.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewReflow.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewThumb.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFViewVert.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVSel.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFVThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VFinder.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VSel.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VThread.java" target-dir="src/com/radaee/view"/>
+
         <!-- Radaee source - java.com.radaee.util -->
 
         <source-file src="src/android/ViewLib/src/main/jniLibs/arm64-v8a/librdpdf.so" target-dir="libs/arm64-v8a" />
@@ -156,10 +189,10 @@
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinebi" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/cousinei" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/rdf013" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinos" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinosb" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinosbi" target-dir="res/raw" />
-        <source-file src="src/android/ViewLib/src/main/res/raw/tinosi" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgy.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgyb.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgybi.otf" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/texgyi.otf" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/symbol" target-dir="res/raw" />
 		<source-file src="src/android/ViewLib/src/main/res/raw/umaps.dat" target-dir="res/raw" />
 
@@ -224,7 +257,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/ARIMO_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/COUSINE_LICENSE.txt" target-dir="res" />
 		<source-file src="src/android/ViewLib/src/main/res/FONT-LICENSE.txt" target-dir="res" />
-		<source-file src="src/android/ViewLib/src/main/res/TINOS_LICENSE.txt" target-dir="res" />
+		<source-file src="src/android/ViewLib/src/main/res/GUST e-foundry License.txt" target-dir="res" />
 
         <!-- Fonts -->
         <source-file src="fonts/Roboto-Black.ttf" target-dir="assets/fonts" />
@@ -349,163 +382,99 @@
         <framework src="libc++.dylib" />
 
         <!-- Plugin sources and resources -->
+        <resource-file src="src/ios/PDFViewer/Images.xcassets" />
+
+        <!-- Radaee sources -->
         <source-file src="src/ios/RadaeePDFPlugin.m" />
         <header-file src="src/ios/RadaeePDFPlugin.h" />
-        <source-file src="src/ios/PDFView/RDPDFViewController.m" />
-        <header-file src="src/ios/PDFView/RDPDFViewController.h" />
-        <resource-file src="src/ios/PDFView/RDPDFViewController.xib" />
-        <resource-file src="src/ios/Resources/btn_annot_remove.png" />
-        <resource-file src="src/ios/Resources/backImage.png" />
-        <resource-file src="src/ios/Resources/btn_annot_ellipse.png" />
-        <resource-file src="src/ios/Resources/btn_annot_ink.png" />
-        <resource-file src="src/ios/Resources/btn_annot_rect.png" />
-        <resource-file src="src/ios/Resources/btn_done.png" />
-        <resource-file src="src/ios/Resources/btn_left.png" />
-        <resource-file src="src/ios/Resources/btn_outline.png" />
-        <resource-file src="src/ios/Resources/btn_perform.png" />
-        <resource-file src="src/ios/Resources/btn_print.png" />
-        <resource-file src="src/ios/Resources/btn_remove.png" />
-        <resource-file src="src/ios/Resources/btn_right.png" />
-        <resource-file src="src/ios/Resources/btn_search.png" />
-        <resource-file src="src/ios/Resources/btn_view_dual.png" />
-        <resource-file src="src/ios/Resources/btn_view_single.png" />
-        <resource-file src="src/ios/Resources/btn_view_vert.png" />
-        <resource-file src="src/ios/Resources/btn_view.png" />
-        <resource-file src="src/ios/Resources/btn_grid.png" />
-        <resource-file src="src/ios/Resources/export_annot.png" />
-        <resource-file src="src/ios/Resources/btn_back.png" />
-        <resource-file src="src/ios/Resources/btn_more.png" />
-        <resource-file src="src/ios/Resources/btn_select.png" />
-        <resource-file src="src/ios/Resources/btn_show.png" />
-        <resource-file src="src/ios/Resources/btn_view_horz.png" />
-        <resource-file src="src/ios/Resources/btn_add.png" />
-        <resource-file src="src/ios/Resources/btn_save.png" />
-        <resource-file src="src/ios/Resources/btn_ink.png" />
-        <resource-file src="src/ios/Resources/btn_annot_line.png" />
-        <resource-file src="src/ios/Resources/pdf_custom_stamp.png" />
-        <resource-file src="src/ios/Resources/btn_annot_note.png" />
-        <resource-file src="src/ios/Resources/btn_undo.png" />
-        <resource-file src="src/ios/Resources/btn_redo.png" />
-        <resource-file src="src/ios/Resources/btn_share.png" />
-        
+        <source-file src="src/ios/PDFViewer/RDLoPDFViewController.m" />
+        <header-file src="src/ios/PDFViewer/RDLoPDFViewController.h" />
+        <source-file src="src/ios/PDFViewer/PDFOffScreenView.m" />
+        <header-file src="src/ios/PDFViewer/PDFOffScreenView.h" />
+        <source-file src="src/ios/PDFViewer/BookmarkTableViewController.m" />
+        <header-file src="src/ios/PDFViewer/BookmarkTableViewController.h" />
+        <source-file src="src/ios/PDFViewer/OUTLINE_ITEM.m" />
+        <header-file src="src/ios/PDFViewer/OUTLINE_ITEM.h" />
+        <source-file src="src/ios/PDFViewer/OutLineViewController.m" />
+        <header-file src="src/ios/PDFViewer/OutLineViewController.h" />
+        <source-file src="src/ios/PDFViewer/TextAnnotViewController.m" />
+        <header-file src="src/ios/PDFViewer/TextAnnotViewController.h" />
+        <source-file src="src/ios/PDFViewer/ViewModeTableViewController.m" />
+        <header-file src="src/ios/PDFViewer/ViewModeTableViewController.h" />
+        <source-file src="src/ios/PDFViewer/PDFReflowView.m" />
+        <header-file src="src/ios/PDFViewer/PDFReflowView.h" />
+        <header-file src="src/ios/PDFViewer/PDFView/PDFGridView.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/PDFGridView.m" />
+        <source-file src="src/ios/PDFViewer/PDFView/PDFThumbView.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/PDFThumbView.h" />
+        <source-file src="src/ios/PDFViewer/PDFHttpStream.m" />
+        <header-file src="src/ios/PDFViewer/PDFHttpStream.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVLayout.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVLayout.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVCanvas.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVCanvas.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVCache.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVCache.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVFinder.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVFinder.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVGlobal.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVGlobal.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVSel.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVSel.h" />
+        <header-file src="src/ios/PDFViewer/RDToolBar.h" />
+        <source-file src="src/ios/PDFViewer/RDToolBar.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVPage.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVPage.m" />
+        <source-file src="src/ios/PDFViewer/PDFView/RDVThread.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/RDVThread.h" />
+        <source-file src="src/ios/PDFViewer/PDFLib/PDFObjc.m" />
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFObjc.h" />
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFIOS.h" />
+        <source-file src="src/ios/PDFViewer/PDFLib/libRDPDFLib.a" framework="true" />
 
         <!-- Radaee sources -->
-        <source-file src="src/ios/PDFView/BookmarkTableViewController.m" />
-        <header-file src="src/ios/PDFView/BookmarkTableViewController.h" />
-        <source-file src="src/ios/PDFView/OUTLINE_ITEM.m" />
-        <header-file src="src/ios/PDFView/OUTLINE_ITEM.h" />
-        <source-file src="src/ios/PDFView/OutLineViewController.m" />
-        <header-file src="src/ios/PDFView/OutLineViewController.h" />
-        <source-file src="src/ios/PDFView/TextAnnotViewController.m" />
-        <header-file src="src/ios/PDFView/TextAnnotViewController.h" />
-        <source-file src="src/ios/PDFView/ViewModeTableViewController.m" />
-        <header-file src="src/ios/PDFView/ViewModeTableViewController.h" />
-        <header-file src="src/ios/PDFView/PopUpView/PopupMenu.h"/>
-        <source-file src="src/ios/PDFView/PopUpView/PopupMenu.m"/>
-        <header-file src="src/ios/PDFView/PopUpView/PopupMenuItem.h"/>
-        <source-file src="src/ios/PDFView/PopUpView/PopupMenuItem.m"/>
-        <header-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.h"/>
-        <source-file src="src/ios/PDFView/PopUpView/PopupMenuOverlayView.m"/>
-        <source-file src="src/ios/PDFView/PDFReflowView.m" />
-        <header-file src="src/ios/PDFView/PDFReflowView.h" />
-        <header-file src="src/ios/PDFView/PDFGridView.h" />
-        <source-file src="src/ios/PDFView/PDFGridView.m" />
-        <source-file src="src/ios/PDFView/PDFThumbView.m" />
-        <header-file src="src/ios/PDFView/PDFThumbView.h" />
-        <source-file src="src/ios/PDFView/PDFHttpStream.m" />
-        <header-file src="src/ios/PDFView/PDFHttpStream.h" />
-        <source-file src="src/ios/PDFView/PDFV.m" />
-        <header-file src="src/ios/PDFView/PDFV.h" />
-        <source-file src="src/ios/PDFView/PDFVCanvas.m" />
-        <header-file src="src/ios/PDFView/PDFVCanvas.h" />
-        <source-file src="src/ios/PDFView/PDFVFinder.m" />
-        <header-file src="src/ios/PDFView/PDFVFinder.h" />
-        <source-file src="src/ios/PDFView/PDFVGlobal.m" />
-        <header-file src="src/ios/PDFView/PDFVGlobal.h" />
-        <source-file src="src/ios/PDFView/PDFView.m" />
-        <header-file src="src/ios/PDFView/PDFView.h" />
-        <header-file src="src/ios/PDFView/RDAnnotToolBar.h" />
-        <source-file src="src/ios/PDFView/RDAnnotToolBar.m" />
-        <header-file src="src/ios/PDFView/RDGlobal.h" />
-        <source-file src="src/ios/PDFView/RDGlobal.m" />
-        <header-file src="src/ios/PDFView/PDFVPage.h" />
-        <source-file src="src/ios/PDFView/PDFVPage.m" />
-        <source-file src="src/ios/PDFView/PDFVThread.m" />
-        <header-file src="src/ios/PDFView/PDFVThread.h" />
-        <source-file src="src/ios/PDFLib/PDFObjc.m" />
-        <header-file src="src/ios/PDFLib/PDFObjc.h" />
-        <header-file src="src/ios/PDFLib/PDFIOS.h" />
-        <source-file src="src/ios/PDFLib/libRDPDFLib.a" framework="true" />
-
-        <!-- Radaee sources -->
-        <source-file src="src/ios/PDFView/More/RDMoreTableViewController.m" />
-        <header-file src="src/ios/PDFView/More/RDMoreTableViewController.h" />
-        <resource-file src="src/ios/PDFView/More/RDMoreTableViewController.xib" />
-        <source-file src="src/ios/PDFView/ListBox/RDAnnotListViewController.m" />
-        <header-file src="src/ios/PDFView/ListBox/RDAnnotListViewController.h" />
-        <resource-file src="src/ios/PDFView/ListBox/RDAnnotListViewController.xib" />
-        <source-file src="src/ios/PDFView/DrawMode/DrawModeTableViewController.m" />
-        <header-file src="src/ios/PDFView/DrawMode/DrawModeTableViewController.h" />
+        <source-file src="src/ios/PDFViewer/RDMoreTableViewController.m" />
+        <header-file src="src/ios/PDFViewer/RDMoreTableViewController.h" />
+        <resource-file src="src/ios/PDFViewer/RDMoreTableViewController.xib" />
+        <source-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.m" />
+        <header-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.h" />
+        <source-file src="src/ios/PDFViewer/Modules/DrawMode/DrawModeTableViewController.m" />
+        <header-file src="src/ios/PDFViewer/Modules/DrawMode/DrawModeTableViewController.h" />
 
 
         <!-- Radaee Modules -->
-        <source-file src="src/ios/Modules/ReaderHandler/ReaderHandler.m" />
-        <header-file src="src/ios/Modules/ReaderHandler/ReaderHandler.h" />
+        <source-file src="src/ios/PDFViewer/Modules/ReaderHandler/ReaderHandler.m" />
+        <header-file src="src/ios/PDFViewer/Modules/ReaderHandler/ReaderHandler.h" />
         
-        <source-file src="src/ios/Modules/SearchList/RDExtendedSearch.m" />
-        <header-file src="src/ios/Modules/SearchList/RDExtendedSearch.h" />
-        <source-file src="src/ios/Modules/SearchList/SearchResultTableViewController.m" />
-        <header-file src="src/ios/Modules/SearchList/SearchResultTableViewController.h" />
-        <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewController.xib" />
-        <resource-file src="src/ios/Modules/SearchList/SearchResultTableViewCell.xib" />
+        <source-file src="src/ios/PDFViewer/Modules/SearchList/RDExtendedSearch.m" />
+        <header-file src="src/ios/PDFViewer/Modules/SearchList/RDExtendedSearch.h" />
+        <source-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.m" />
+        <header-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.h" />
         
-        <source-file src="src/ios/Modules/FormManager/RDFormManager.m" />
-        <header-file src="src/ios/Modules/FormManager/RDFormManager.h" />
+        <source-file src="src/ios/PDFViewer/Modules/FormManager/RDFormManager.m" />
+        <header-file src="src/ios/PDFViewer/Modules/FormManager/RDFormManager.h" />
         
-        <source-file src="src/ios/Modules/Utils/RDUtils.m" />
-        <header-file src="src/ios/Modules/Utils/RDUtils.h" />
+        <source-file src="src/ios/PDFViewer/Modules/Utils/RDUtils.m" />
+        <header-file src="src/ios/PDFViewer/Modules/Utils/RDUtils.h" />
         
-        <source-file src="src/ios/Modules/ActionStack/ActionStackManager.m" />
-        <header-file src="src/ios/Modules/ActionStack/ActionStackManager.h" />
+        <source-file src="src/ios/PDFViewer/Modules/ActionStack/ActionStackManager.m" />
+        <header-file src="src/ios/PDFViewer/Modules/ActionStack/ActionStackManager.h" />
         
-        <source-file src="src/ios/Modules/Signature/SignatureViewController.m" />
-        <header-file src="src/ios/Modules/Signature/SignatureViewController.h" />
-        <source-file src="src/ios/Modules/Signature/UviSignatureView.m" />
-        <header-file src="src/ios/Modules/Signature/UviSignatureView.h" />
+        <source-file src="src/ios/PDFViewer/Modules/Signature/SignatureViewController.m" />
+        <header-file src="src/ios/PDFViewer/Modules/Signature/SignatureViewController.h" />
+        <source-file src="src/ios/PDFViewer/Modules/Signature/UviSignatureView.m" />
+        <header-file src="src/ios/PDFViewer/Modules/Signature/UviSignatureView.h" />
 
         <!-- Radaee resources -->
-        <resource-file src="src/ios/cmaps/cmaps.dat" />
-        <resource-file src="src/ios/cmaps/umaps.dat" />
-        <resource-file src="src/ios/cmaps/cmyk_rgb.dat" />
-        <resource-file src="src/ios/fdat/stdRes/00" />
-        <resource-file src="src/ios/fdat/stdRes/01" />
-        <resource-file src="src/ios/fdat/stdRes/02" />
-        <resource-file src="src/ios/fdat/stdRes/03" />
-        <resource-file src="src/ios/fdat/stdRes/04" />
-        <resource-file src="src/ios/fdat/stdRes/05" />
-        <resource-file src="src/ios/fdat/stdRes/06" />
-        <resource-file src="src/ios/fdat/stdRes/07" />
-        <resource-file src="src/ios/fdat/stdRes/08" />
-        <resource-file src="src/ios/fdat/stdRes/09" />
-        <resource-file src="src/ios/fdat/stdRes/10" />
-        <resource-file src="src/ios/fdat/stdRes/11" />
-        <resource-file src="src/ios/fdat/stdRes/12" />
-        <resource-file src="src/ios/fdat/stdRes/13" />
-        <resource-file src="src/ios/fdat/stdFont/argbsn00lp.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/arimo.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/arimob.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/arimobi.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/arimoi.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/cousine.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/cousineb.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/cousinebi.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/cousinei.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/rdf008.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/rdf013.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/tinos.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/tinosb.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/tinosbi.ttf" />
-        <resource-file src="src/ios/fdat/stdFont/tinosi.ttf" />
+        <!--
+        <resource-file src="src/ios/PDFViewer/cmaps/cmaps.dat" target-dir="cmaps"/>
+        <resource-file src="src/ios/PDFViewer/cmaps/umaps.dat" target-dir="cmaps"/>
+        <resource-file src="src/ios/PDFViewer/cmaps/cmyk_rgb.dat" target-dir="cmaps"/>
+        -->
+        <resource-file src="src/ios/PDFViewer/cmaps" target-dir="cmaps"/>
+        <resource-file src="src/ios/PDFViewer/fdat" target-dir="fdat"/>
 
         <!-- fonts -->
         <resource-file src="fonts/Roboto-Black.ttf" />
@@ -526,8 +495,9 @@
 		</config-file>
 
         <!-- hooks -->
+        <!--
         <hook type="before_compile" src="hooks/configure-ios.js"/>
-
+        -->
     </platform>
 
 </plugin>

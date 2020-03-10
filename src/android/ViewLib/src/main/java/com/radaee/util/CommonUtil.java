@@ -189,6 +189,9 @@ public class CommonUtil {
 
                         mAnnotInfoJson.put("SignStatus", mAnnotation.GetSignStatus());
 
+                        mAnnotInfoJson.put("ReadOnly", (mAnnotation.IsReadOnly()) ? 1 : 0);
+                        mAnnotInfoJson.put("Locked", (mAnnotation.IsLocked()) ? 1 : 0);
+
                         mPagesAnnot.put(mAnnotInfoJson);
                     }
                 }
@@ -258,6 +261,12 @@ public class CommonUtil {
                                     }
                                     break;
                             }
+                            //readonly
+                            if(!mAnnotInfo.isNull("ReadOnly"))
+                                mAnnotation.SetReadOnly((mAnnotInfo.getInt("ReadOnly") == 1) ? true : false);
+                            //locked
+                            if(!mAnnotInfo.isNull("Locked"))
+                                mAnnotation.SetLocked((mAnnotInfo.getInt("Locked") == 1) ? true : false);
                         }
                     }
                     mPage.Close();

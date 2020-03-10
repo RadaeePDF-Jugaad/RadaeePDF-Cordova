@@ -1,0 +1,87 @@
+/*
+ Localizable.strings
+ PDFViewer
+ 
+ Created by radaee on 13-1-7.
+ Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+ */
+"All Files" = "All Files";
+"PDF File" = "PDF File";
+"Marks" = "Marks";
+"Setting" = "Setting";
+"More" = "More";
+"Swipe Speed" = "Swipe Speed";
+"Render Quality" = "Render Quality";
+"Swipe Distance" = "Swipe Distance";
+"View Mode" = "View Mode";
+"Zooming Ratio" = "Zooming Ratio";
+"Ink Width" = "Ink Width";
+"Alert" = "Alert";
+"Click OK to reset all properties to default" = "Click OK to reset all properties to default";
+"OK" = "OK";
+"Cancel" = " Cancel";
+"BookMark Already Exist" = "BookMark Already Exist";
+"Page " = "Page ";
+"Add BookMark Success!"="Add BookMark Success!";
+"Ink Color" = "Ink Color";
+"Rect Color" = "Rect Color";
+"Draw Line on file" = "Draw Line on file";
+"Draw Rect on file" = "Draw Rect on file";
+"This Document is readonly" = "This Document is readonly";
+"Outline" = "Outline";
+"Please Enter PassWord" = "Please Enter PassWord";
+"PassWord" = "PassWord";
+"Error PassWord" = "Error PassWord";
+"Error Document,Can't open" = "Error Document,Can't open";
+"Do you want to open:" = "Do you want to open:";
+"Underline Color" = "Underline Color";
+"Strikeout Color" = "Strikeout Color";
+"Text Annot" = "Text Annot";
+"Highlight Color" = "Highlight Color";
+"Oval Color" = "Oval Color";
+"Select Action" = "Select Action";
+"Add Bookmark" = "Add Bookmark";
+"Bookmark List" = "Bookmark List";
+"View Mode" = "View Mode";
+"View Menu" = "View Menu";
+"Save" = "Save";
+"Share" = "Share";
+"Print" = "Print";
+"Exiting" = "Exiting";
+"Document modified.\r\nDo you want to save it?" = "Document modified.\r\nDo you want to save it?";
+"Yes" = "Yes";
+"No" = "No";
+"Close" = "Close";
+"Select Draw Mode" = "Select Draw Mode";
+"Ink" = "Ink";
+"Line" = "Line";
+"Rect" = "Rect";
+"Ellipse" = "Ellipse";
+"Stamp" = "Stamp";
+"Note" = "Note";
+"Search" = "Search";
+"Warning" = "Warning";
+"Find Over" = "Find Over";
+"Signature already exist. Do you want delete it?" = "Signature already exist. Do you want delete it?";
+"Delete" = "Delete";
+"Error" = "Error";
+"Couldn't find media file" = "Couldn't find media file";
+"Select View Mode" = "Select View Mode";
+"Vertical" = "Vertical";
+"Horizontal" = "Horizontal";
+"Single Page" = "Single Page";
+"Double Page" = "Double Page";
+"Notice" = "Notice";
+"Document saved" = "Document saved";
+"Reached first occurrence" = "Reached first occurrence";
+"Reached last occurrence" = "Reached last occurrence";
+"Searching... (%i)" = "Searching... (%i)";
+"%i occurrences" = "%i occurrences";
+/*
+ 
+ 
+ "Render Quality" = "Render Quality"
+ "Swipe Distance" = "Swipe Distance";
+ "View Mode" = "View Mode";
+ "Zooming Ratio" = "Zooming Ratio";
+ "Ink Width" = "Ink Width";*/

@@ -12,6 +12,7 @@ public class RadaeePluginCallback {
 
     private PDFReaderListener mListener;
     private PDFThumbListener mThumbListener;
+    private PDFActivityListener mActivityListener;
     private PDFControllerListener mControlListener;
     private static RadaeePluginCallback mInstance;
 
@@ -34,6 +35,10 @@ public class RadaeePluginCallback {
 
     public void setControllerListener(PDFControllerListener listener) {
         mControlListener = listener;
+    }
+
+    public void setActivityListener(PDFActivityListener listener) {
+        mActivityListener = listener;
     }
 
     public void willShowReader() {
@@ -138,6 +143,11 @@ public class RadaeePluginCallback {
         return mControlListener != null && mControlListener.saveDocumentToPath(path);
     }
 
+    public void closeReader() {
+        if(mActivityListener != null)
+            mActivityListener.closeReader();
+    }
+
     /**
      * An interface that can help in recognizing some events.
      */
@@ -179,5 +189,12 @@ public class RadaeePluginCallback {
         boolean flatAnnotAtPage(int page);
         boolean flatAnnots();
         boolean saveDocumentToPath(String path);
+    }
+
+    /**
+     * Interface to help pass events to the Activity
+     */
+    public interface PDFActivityListener {
+        void closeReader();
     }
 }

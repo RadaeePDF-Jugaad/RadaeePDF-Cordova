@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
+import com.radaee.reader.PDFGLViewAct;
 import com.radaee.reader.PDFViewAct;
 import com.radaee.viewlib.R;
 
@@ -24,10 +25,16 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     private int mCurrentPage = -1;
     private int mIconsBgColor = -1;
     private int mTitleBgColor = -1;
+
+    private int mLayoutType = CPU_BASED_LAYOUT;
+    public static final int GPU_BASED_LAYOUT = 0;
+    public static final int CPU_BASED_LAYOUT = 1;
+
     public static boolean sHideSaveButton = false;
     public static boolean sHideMoreButton = false;
     public static boolean sHideUndoButton = false;
     public static boolean sHideRedoButton = false;
+    public static boolean sHideShareButton = false;
     public static boolean sHidePrintButton = false;
     public static boolean sHideAnnotButton = false;
     public static boolean sHideSelectButton = false;
@@ -76,7 +83,8 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param password the pdf's password, if no password, pass empty string
      */
     public void show(Context context, String url, String password) {
-        show(context, url, password, false, false, 0, null, null);
+        show(context, url, password, false, false, 0, null,
+                null, mLayoutType);
     }
 
     /**
@@ -90,8 +98,11 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param gotoPage if greater than 0, the reader will render directly the passed page (0-index: from 0 to Document.GetPageCount - 1)
      * @param bmpFormat bmp format, can be RGB_565 or ARGB_4444, default is ALPHA_8
      * @param author if not empty, it will be used to set annotations' author during creation.
+     * @param layoutType determine the type of the layout to be used for rendering, (GPU or CPU) based layout, GPU_BASED_LAYOUT:0 (OpenGL), CPU_BASED_LAYOUT:1
      */
-    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave, int gotoPage, String bmpFormat, String author) {
+    public void show(Context context, String url, String password, boolean readOnlyMode, boolean automaticSave,
+                     int gotoPage, String bmpFormat, String author, int layoutType) {
+        mLayoutType = layoutType;
         if(!TextUtils.isEmpty(url)) {
             String name;
             if(URLUtil.isHttpUrl(url) || URLUtil.isHttpsUrl(url))
@@ -103,7 +114,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
             } else
                 name = "PDFPath";
             Global.sAnnotAuthor = author;
-            Intent intent = new Intent(context, PDFViewAct.class);
+            Intent intent = new Intent(context, mLayoutType == GPU_BASED_LAYOUT ? PDFGLViewAct.class : PDFViewAct.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra( name, url);
             intent.putExtra( "PDFPswd", password);
@@ -136,7 +147,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param bmpFormat bmp format, can be RGB_565 or ARGB_4444, default is ALPHA_8
      */
     public void openFromAssets(Context context, String path, String password, String bmpFormat) {
-        Intent intent = new Intent(context, PDFViewAct.class);
+        Intent intent = new Intent(context, mLayoutType == GPU_BASED_LAYOUT ? PDFGLViewAct.class : PDFViewAct.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra( "PDFAsset", path);
         intent.putExtra( "PDFPswd", password);
@@ -151,9 +162,11 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param context the current context.
      * @param path the pdf file path
      * @param password the pdf's password, if no password, pass empty string
+     * @param layoutType determine the type of the layout to be used for rendering, (GPU or CPU) based layout, GPU_BASED_LAYOUT:0 (OpenGL), CPU_BASED_LAYOUT:1
      */
-    public void openFromPath(Context context, String path, String password) {
-        Intent intent = new Intent(context, PDFViewAct.class);
+    public void openFromPath(Context context, String path, String password, int layoutType) {
+        mLayoutType = layoutType;
+        Intent intent = new Intent(context, mLayoutType == GPU_BASED_LAYOUT ? PDFGLViewAct.class : PDFViewAct.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra( "PDFPath", path);
         intent.putExtra( "PDFPswd", password);
@@ -220,6 +233,14 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     public void setFirstPageCover(boolean firstPageCover) {
         if(!firstPageCover)
             mViewMode = 4;
+    }
+
+    /**
+     * determine the type of the layout to be used for rendering, (GPU or CPU) based layout
+     * @param layoutType GPU_BASED_LAYOUT:0 (OpenGL), CPU_BASED_LAYOUT:1
+     */
+    public void setLayoutType(int layoutType) {
+        mLayoutType = layoutType;
     }
 
     /**
@@ -430,6 +451,10 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
 
     public boolean saveDocumentToPath(String path) {
         return RadaeePluginCallback.getInstance().saveDocumentToPath(path);
+    }
+
+    public void closeReader() {
+        RadaeePluginCallback.getInstance().closeReader();
     }
 
     @Override

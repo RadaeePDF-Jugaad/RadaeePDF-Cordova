@@ -157,12 +157,12 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		btn_annot_oval = (ImageView)layout.findViewById(R.id.btn_annot_oval);
 		btn_annot_stamp = (ImageView)layout.findViewById(R.id.btn_annot_stamp);
 		btn_annot_note = (ImageView)layout.findViewById(R.id.btn_annot_note);
-		LinearLayout layout1 = (LinearLayout)m_menu_view.MenuGetView();
+		RelativeLayout layout1 = (RelativeLayout)m_menu_view.MenuGetView();
 		view_vert = layout1.findViewById(R.id.view_vert);
 		view_horz = layout1.findViewById(R.id.view_horz);
 		view_single = layout1.findViewById(R.id.view_single);
 		view_dual = layout1.findViewById(R.id.view_dual);
-		LinearLayout moreLayout = (LinearLayout)m_menu_more.MenuGetView();
+		RelativeLayout moreLayout = (RelativeLayout) m_menu_more.MenuGetView();
 		btn_save = moreLayout.findViewById(R.id.save);
 		btn_print = moreLayout.findViewById(R.id.print);
 		btn_share = moreLayout.findViewById(R.id.share);
@@ -228,8 +228,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 
 		if(mNavigationMode == NAVIGATION_THUMBS) {
 			m_thumb_view = new PDFBotBar(m_parent, R.layout.thumb_view);
-			layout1 = (LinearLayout) m_thumb_view.BarGetView();
-			mThumbView = (PDFThumbView) layout1.findViewById(R.id.thumb_view);
+			mThumbView = m_thumb_view.BarGetView().findViewById(R.id.thumb_view);
 
 			mThumbView.thumbOpen(m_view.PDFGetDoc(), new PDFViewThumb.PDFThumbListener() {
 				@Override
@@ -276,6 +275,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		btn_print.setVisibility(RadaeePDFManager.sHidePrintButton ? View.GONE : View.VISIBLE);
 		btn_annot.setVisibility(RadaeePDFManager.sHideAnnotButton ? View.GONE : View.VISIBLE);
 		btn_find.setVisibility(RadaeePDFManager.sHideSearchButton ? View.GONE : View.VISIBLE);
+		btn_share.setVisibility(RadaeePDFManager.sHideShareButton ? View.GONE : View.VISIBLE);
 		btn_select.setVisibility(RadaeePDFManager.sHideSelectButton ? View.GONE : View.VISIBLE);
 		btn_view.setVisibility(RadaeePDFManager.sHideViewModeButton ? View.GONE : View.VISIBLE);
 		btn_outline.setVisibility(RadaeePDFManager.sHideOutlineButton ? View.GONE : View.VISIBLE);
@@ -845,10 +845,11 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 		}
 	}
 
-	public void savePDF() {
-		m_view.PDFGetDoc().Save();
-		sFileState = MODIFIED_AND_SAVED;
-		Toast.makeText(m_parent.getContext(), R.string.saved_message, Toast.LENGTH_SHORT).show();
+	void savePDF() {
+		if(m_view.PDFSave()) {
+			sFileState = MODIFIED_AND_SAVED;
+			Toast.makeText(m_parent.getContext(), R.string.saved_message, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.KITKAT)

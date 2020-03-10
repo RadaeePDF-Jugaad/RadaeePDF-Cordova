@@ -127,6 +127,9 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public void PDFGotoPage(int pageno) {
         m_view.PDFGotoPage(pageno);
     }
+    public void PDFScrolltoPage(int pageno) {
+        m_view.PDFScrolltoPage(pageno);
+    }
 
     public void PDFUndo() {
         m_view.PDFUndo();
@@ -138,6 +141,11 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
 
     public boolean PDFCanSave() {
         return m_view.PDFCanSave();
+    }
+
+    @Override
+    public boolean PDFSave() {
+        return m_view.PDFSave();
     }
 
     @Override
@@ -159,5 +167,13 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public void PDFAddAnnotRect(float x, float y, float width, float height, int p)
     {
         m_view.PDFAddAnnotRect(x, y, width, height, p);
+    }
+
+    public float[] toPDFRect(float[] viewRect) {
+        return m_view.toPDFRect(viewRect);
+    }
+
+    public void setReadOnly(boolean readonly) {
+        m_view.setReadOnly(readonly);
     }
 }

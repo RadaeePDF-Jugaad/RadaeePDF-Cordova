@@ -7,7 +7,7 @@
 //
 
 #import "RadaeePDFPlugin.h"
-#import "RDPDFViewController.h"
+#import "RDLoPDFViewController.h"
 #import "PDFHttpStream.h"
 #import "RDFormManager.h"
 
@@ -142,6 +142,12 @@
     [self showReader];
 }
 
+- (void)closeReader:(CDVInvokedUrlCommand *)command
+{
+    if (m_pdf != nil) {
+        [m_pdf closeView];
+    }
+}
 
 - (void)activateLicense:(CDVInvokedUrlCommand *)command
 {
@@ -159,7 +165,7 @@
     
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    APP_Init();
+    [RDVGlobal Init];
     
     [self activateLicenseResult:[[NSUserDefaults standardUserDefaults] boolForKey:@"actIsActive"]];
 }
@@ -337,7 +343,7 @@
 {
     if( m_pdf == nil )
     {
-        m_pdf = [[RDPDFViewController alloc] initWithNibName:@"RDPDFViewController" bundle:nil];
+        m_pdf = [[RDLoPDFViewController alloc] init];
     }
     
     [m_pdf setDelegate:self];
@@ -422,11 +428,11 @@
     //toggle thumbnail/seekbar
     if (bottomBar < 1){
         [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
-        [m_pdf PDFThumbNailinit:1];
+        //[m_pdf PDFThumbNailinit:1];
         [m_pdf setThumbnailBGColor:thumbBackgroundColor];
     }
-    else
-        [m_pdf PDFSeekBarInit:1];
+    //else
+    //[m_pdf PDFSeekBarInit:1];
     
     [m_pdf setReaderBGColor:readerBackgroundColor];
     
@@ -452,6 +458,7 @@
     }
     
     [navController.navigationBar setTranslucent:NO];
+    navController.modalPresentationStyle = UIModalPresentationFullScreen;
     
     [self.viewController presentViewController:navController animated:YES completion:nil];
 }
@@ -703,17 +710,17 @@
     [[NSUserDefaults standardUserDefaults] setInteger:selColor forKey:@"SelColor"];
     [[NSUserDefaults standardUserDefaults] setInteger:arrowColor forKey:@"ArrowColor"];
     
-    GLOBAL.g_def_view = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"DefView"];
-    GLOBAL.g_MatchWholeWord = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"MatchWholeWord"];
+    GLOBAL.g_render_mode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"DefView"];
+    GLOBAL.g_match_whole_word = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"MatchWholeWord"];
     
     GLOBAL.g_rect_color = rectColor;
     GLOBAL.g_ink_color = inkColor;
     GLOBAL.g_sel_color = selColor;
     GLOBAL.g_oval_color = ovalColor;
     GLOBAL.g_line_color = arrowColor;
-    GLOBAL.annotHighlightColor = highlightColor;
-    GLOBAL.annotUnderlineColor = underlineColor;
-    GLOBAL.annotStrikeoutColor = strikeoutColor;
+    GLOBAL.g_annot_highlight_clr = highlightColor;
+    GLOBAL.g_annot_underline_clr = underlineColor;
+    GLOBAL.g_annot_strikeout_clr = strikeoutColor;
     //annotSquigglyColor = 0xFF00FF00;
     
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -727,7 +734,7 @@
     
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"];  //[params objectForKey:@"pdfPath"];
+    NSString *path = [params objectForKey:@"pdfPath"];
     
     [self cdvOkWithMessage:[RadaeePDFPlugin addToBookmarks:path page:[[params objectForKey:@"page"] intValue] label:[params objectForKey:@"label"]]];
 }
@@ -738,7 +745,7 @@
     
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"]; //[params objectForKey:@"pdfPath"];
+    NSString *path = [params objectForKey:@"pdfPath"];
     
     [RadaeePDFPlugin removeBookmark:[[params objectForKey:@"page"] intValue] pdfPath:path];
 }
@@ -749,7 +756,7 @@
     
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"pdf"]; //[params objectForKey:@"pdfPath"];
+    NSString *path = [params objectForKey:@"pdfPath"];
     
     [self cdvOkWithMessage:[RadaeePDFPlugin getBookmarks:path]];
 }
@@ -805,6 +812,7 @@
 
 + (NSString *)addToBookmarks:(NSString *)pdfPath page:(int)page label:(NSString *)label
 {
+    pdfPath = [pdfPath stringByReplacingOccurrencesOfString:@"file://" withString:@""];
     NSString *tempName = [[pdfPath lastPathComponent] stringByDeletingPathExtension];
     NSString *tempFile = [tempName stringByAppendingFormat:@"%d%@",page,@".bookmark"];
     
@@ -836,6 +844,7 @@
 
 + (void)removeBookmark:(int)page pdfPath:(NSString *)pdfPath
 {
+    pdfPath = [pdfPath stringByReplacingOccurrencesOfString:@"file://" withString:@""];
     NSString *item = [[pdfPath lastPathComponent] stringByDeletingPathExtension];
     NSString *folder = [pdfPath stringByDeletingLastPathComponent];
     NSString *bookmarkFile = [folder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%i.bookmark", item, page]];
@@ -847,6 +856,7 @@
 
 + (NSString *)getBookmarks:(NSString *)pdfPath
 {
+    pdfPath = [pdfPath stringByReplacingOccurrencesOfString:@"file://" withString:@""];
     if ([[NSFileManager defaultManager] fileExistsAtPath:pdfPath]) {
         NSMutableArray *bookmarks = [RadaeePDFPlugin loadBookmarkForPdf:pdfPath withPath:NO];
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:bookmarks options:NSJSONWritingPrettyPrinted error:nil];

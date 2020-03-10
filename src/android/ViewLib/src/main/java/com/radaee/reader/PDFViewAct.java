@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -148,6 +147,13 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
         m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.pdf_layout, null);
         m_view = (PDFLayoutView) m_layout.findViewById(R.id.pdf_view);
 
+        RadaeePluginCallback.getInstance().setActivityListener(new RadaeePluginCallback.PDFActivityListener() {
+            @Override
+            public void closeReader() {
+                onClose(false);
+                finish();
+            }
+        });
         RadaeePluginCallback.getInstance().willShowReader();
         if (!Global.cacheEnabled)
             m_layout.findViewById(R.id.progress).setVisibility(View.GONE);
@@ -255,30 +261,33 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
     @Override
     public void onBackPressed() {
-        if (m_controller == null || m_controller.OnBackPressed()) {
-            if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
-                if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
-                    m_controller.savePDF();
-                    super.onBackPressed();
-                } else {
-                    TextView txtView = new TextView(this);
-                    txtView.setText(R.string.save_msg);
-                    new AlertDialog.Builder(this).setTitle(R.string.exiting).setView(
-                            txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            m_controller.savePDF();
-                            PDFViewAct.super.onBackPressed();
-                        }
-                    }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            PDFViewAct.super.onBackPressed();
-                        }
-                    }).show();
-                }
-            } else super.onBackPressed();
-        }
+        if (m_controller == null || m_controller.OnBackPressed())
+            onClose(true);
+    }
+
+    private void onClose(final boolean onBackPressed) {
+        if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
+            if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
+                if (m_controller != null) m_controller.savePDF();
+                if(onBackPressed) super.onBackPressed();
+            } else {
+                TextView txtView = new TextView(this);
+                txtView.setText(R.string.save_msg);
+                new AlertDialog.Builder(this).setTitle(R.string.exiting).setView(
+                        txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (m_controller != null) m_controller.savePDF();
+                        if(onBackPressed) PDFViewAct.super.onBackPressed();
+                    }
+                }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(onBackPressed) PDFViewAct.super.onBackPressed();
+                    }
+                }).show();
+            }
+        } else if(onBackPressed) super.onBackPressed();
     }
 
     @SuppressLint("InlinedApi")
@@ -321,10 +330,14 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
     @Override
     public void OnPDFAnnotTapped(int pageno, Annotation annot) {
+        if (annot != null) {
+            RadaeePluginCallback.getInstance().onAnnotTapped(annot);
+            if (!m_view.PDFCanSave() && annot.GetType() != 2)
+                return;
+        }
         if (m_controller != null)
             m_controller.OnAnnotTapped(annot);
-        if (annot != null)
-            RadaeePluginCallback.getInstance().onAnnotTapped(annot);
+
     }
 
     @Override
@@ -342,7 +355,6 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @SuppressLint("NewApi")
             public void onClick(DialogInterface dialog, int which) {
                 if (rad_group.getCheckedRadioButtonId() == R.id.rad_copy) {
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);

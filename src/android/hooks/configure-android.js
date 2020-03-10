@@ -7,9 +7,14 @@ module.exports = function (ctx) {
     if (ctx.opts.platforms.indexOf('android') < 0) {
         return;
     }
-    var fs = ctx.requireCordovaModule('fs'),
+    /*var fs = ctx.requireCordovaModule('fs'),
         path = ctx.requireCordovaModule('path'),
-        deferral = ctx.requireCordovaModule('q').defer();
+        deferral = ctx.requireCordovaModule('q').defer(); substitute with require to be compatible with cordova 9.0.0*/
+	
+	var fs = require('fs'),
+        path = require('path'),
+		Q = require('q');
+	var deferral = new Q.defer();
 
     function replace_string_in_file(filename, to_replace, replace_with) {
         var data = fs.readFileSync(filename, 'utf8');

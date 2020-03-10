@@ -91,7 +91,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     private float m_rects[];
     private VPage m_note_pages[];
     private int m_note_indecs[];
-	private ILayoutView.PDFLayoutListener m_listener;
+    private ILayoutView.PDFLayoutListener m_listener;
     private VSel m_sel = null;
     private int m_edit_type = 0;
     private int m_combo_item = -1;
@@ -360,7 +360,10 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                         onListAnnot();
                     else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
                         handleSignatureField();
-                    else if (PDFCanSave() && m_listener != null)
+                    else if(m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
+                        m_listener.OnPDFOpenURI(m_annot.GetURI());
+                        PDFEndAnnot();
+                    } else if (m_listener != null)
                         m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                     invalidate();
                 }
@@ -903,7 +906,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                     m_annot_rect0 = null;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly())) {
+                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly()) && PDFCanSave()) {
                     float x = event.getX();
                     float y = event.getY();
                     m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
@@ -914,7 +917,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly())) {
+                if (m_annot_rect0 != null && !m_annot.IsLocked() && !(Global.g_annot_readonly && m_annot.IsReadOnly()) && PDFCanSave()) {
                     float x = event.getX();
                     float y = event.getY();
                     PDFPos pos = m_layout.vGetPos((int) x, (int) y);
@@ -1172,9 +1175,9 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 invalidate();
             } else if (pos != null) {
                 if(style == 3 || style == 4 || style == 6)
-					m_layout.vGotoPage(pos.pageno);
-				else
-				    m_layout.vSetPos(0, 0, pos);
+                    m_layout.vGotoPage(pos.pageno);
+                else
+                    m_layout.vSetPos(0, 0, pos);
                 m_layout.vMoveEnd();
             }
         }
@@ -1209,6 +1212,19 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             invalidate();
         }
     }
+    public void PDFScrolltoPage(int pageno)
+    {
+        if (m_layout == null) return;
+        if (m_layout.vGetHeight() <= 0 || m_layout.vGetWidth() <= 0) {
+            m_goto_pos = m_layout.new PDFPos();
+            m_goto_pos.pageno = pageno;
+            m_goto_pos.x = 0;
+            m_goto_pos.y = m_doc.GetPageHeight(pageno) + 1;
+        } else {
+            m_layout.vScrolltoPage(pageno);
+            invalidate();
+        }
+    }
 
     public void PDFClose() {
         if (m_layout != null) {
@@ -1223,7 +1239,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     }
 
     public boolean PDFIsOpen() {
-        return m_layout != null;
+        return m_layout != null && m_doc != null && m_doc.IsOpened();
     }
 
     public void OnPageChanged(int pageno) {
@@ -1234,7 +1250,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     public void OnPageRendered(int pageno) {
         invalidate();
-        if (m_listener != null)
+        if (m_listener != null && m_layout != null)
             m_listener.OnPDFPageRendered(m_layout.vGetPage(pageno));
     }
 
@@ -1443,6 +1459,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             }
             m_annot_page = null;
             m_status = STA_NONE;
+            invalidate();
         } else {
             if (Global.useSelIcons) {
                 m_sel_icon1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.pt_start);
@@ -1635,8 +1652,13 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     }
 
     public void PDFRemoveAnnot() {
-        if (m_status != STA_ANNOT || !PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
-                || (Global.g_annot_lock && m_annot.IsLocked())) return;
+        if (m_status != STA_ANNOT) return;
+        if(!PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
+                || (Global.g_annot_lock && m_annot.IsLocked())) {
+            Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
+            PDFEndAnnot();
+            return;
+        }
         //add to redo/undo stack.
         Page page = m_doc.GetPage(m_annot_page.GetPageNo());
         page.ObjsStart();
@@ -1662,12 +1684,15 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             if (m_pEdit != null && m_pEdit.isShowing()) m_pEdit.dismiss();
             if (m_pCombo != null && m_pCombo.isShowing()) m_pCombo.dismiss();
         } catch (Exception e) { e.getMessage(); }
-        if (m_listener != null)
-            m_listener.OnPDFAnnotTapped(-1, null);
     }
 
     public void PDFEditAnnot() {
         if (m_status != STA_ANNOT) return;
+        if(!PDFCanSave()) {
+            Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
+            PDFEndAnnot();
+            return;
+        }
         RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dlg_note, null);
         final EditText subj = (EditText) layout.findViewById(R.id.txt_subj);
         final EditText content = (EditText) layout.findViewById(R.id.txt_content);
@@ -1821,8 +1846,6 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         return m_pageno;
     }
 
-
-
     public final PDFPos PDFGetPos(int x, int y) {
         if (m_layout != null)
             return m_layout.vGetPos(x, y);
@@ -1866,6 +1889,11 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     public final boolean PDFCanSave() {
         return !mReadOnly && m_doc.CanSave();
+    }
+
+    @Override
+    public boolean PDFSave() {
+        return m_doc.Save();
     }
 
     public void PDFUndo() {
@@ -1938,6 +1966,15 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     public float PDFGetZoom() {
         return m_layout != null ? m_layout.vGetZoom() : 0;
+    }
+
+    public float[] toPDFRect(float[] viewRect) {
+        if(m_layout != null) {
+            VPage vpage = m_layout.vGetPage(PDFGetCurrPage());
+            Matrix mat = vpage.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
+            mat.TransformRect(viewRect);
+        }
+        return viewRect;
     }
 
     private static int tmp_idx = 0;

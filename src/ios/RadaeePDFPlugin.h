@@ -1,6 +1,6 @@
 #import <Cordova/CDV.h>
 
-@class RDPDFViewController;
+@class RDLoPDFViewController;
 
 // define the protocol for the delegate
 @protocol RadaeePDFPluginDelegate
@@ -18,7 +18,7 @@
 
 @interface RadaeePDFPlugin : CDVPlugin{
     CDVInvokedUrlCommand* cdv_command;
-    RDPDFViewController *m_pdf;
+    RDLoPDFViewController *m_pdf;
     
     NSURLConnection *pdfConn;
     NSString *url;
@@ -94,6 +94,7 @@
 - (void)activateLicense:(CDVInvokedUrlCommand*)command;
 - (void)openFromAssets:(CDVInvokedUrlCommand*)command;
 - (void)openFromPath:(CDVInvokedUrlCommand*)command;
+- (void)closeReader:(CDVInvokedUrlCommand *)command;
 - (void)fileState:(CDVInvokedUrlCommand*)command;
 - (void)getPageNumber:(CDVInvokedUrlCommand*)command;
 - (void)getPageCount:(CDVInvokedUrlCommand*)command;

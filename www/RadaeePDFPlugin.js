@@ -49,6 +49,11 @@ RadaeePDFPlugin.prototype.openFromAssets = function(params, successCallback, err
                 exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'openFromAssets', [params]);
 };
 
+RadaeePDFPlugin.prototype.closeReader = function(params, successCallback, errorCallback) {
+       params = params || {};
+               exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'closeReader', [params]);
+};
+
 RadaeePDFPlugin.prototype.getFileState = function (params, successCallback, errorCallback) {
         params = params || {};
 

@@ -8,10 +8,10 @@ import com.radaee.pdf.adv.Obj;
 import com.radaee.pdf.adv.Ref;
 
 /**
-class for PDF Document.
-@author Radaee
-@version 1.1
-*/
+ class for PDF Document.
+ @author Radaee
+ @version 1.1
+ */
 public class Document
 {
 	public interface PDFFontDelegate
@@ -29,54 +29,54 @@ public class Document
 		 */
 		public String GetExtFont(String collection, String fname, int flag, int[] ret_flags);
 	}
-    public interface PDFJSDelegate
-    {
-        /**
-         * console command
-         * @param cmd 0: clear console.<br/>
-         *            1: hide console.<br/>
-         *            2: print line on sonsole.<br/>
-         *            3: show console.
-         * @param para only valid when cmd == 2;
-         */
-        void OnConsole(int cmd, String para);
+	public interface PDFJSDelegate
+	{
+		/**
+		 * console command
+		 * @param cmd 0: clear console.<br/>
+		 *            1: hide console.<br/>
+		 *            2: print line on sonsole.<br/>
+		 *            3: show console.
+		 * @param para only valid when cmd == 2;
+		 */
+		void OnConsole(int cmd, String para);
 
-        /**
-         * show a alert dialog on screen.
-         * @param btn buttons show on dialog.<br/>
-         *            0: OK<br/>
-         *            1: OK, Cancel<br/>
-         *            2: Yes, No<br/>
-         *            3: Yes, No, Cancel<br/>
-         * @param msg message to be show..
-         * @param title title to be show.
-         * @return which button user clicked? values as below:<br/>
-         * 1:OK<br/>
-         * 2:Cancel<br/>
-         * 3:No<br/>
-         * 4:Yes<br/>
-         */
-        int OnAlert(int btn, String msg, String title);
+		/**
+		 * show a alert dialog on screen.
+		 * @param btn buttons show on dialog.<br/>
+		 *            0: OK<br/>
+		 *            1: OK, Cancel<br/>
+		 *            2: Yes, No<br/>
+		 *            3: Yes, No, Cancel<br/>
+		 * @param msg message to be show..
+		 * @param title title to be show.
+		 * @return which button user clicked? values as below:<br/>
+		 * 1:OK<br/>
+		 * 2:Cancel<br/>
+		 * 3:No<br/>
+		 * 4:Yes<br/>
+		 */
+		int OnAlert(int btn, String msg, String title);
 
-        /**
-         * callback when document closed.
-         * @return true is the Document object need save, otherwise false.
-         */
-        boolean OnDocClose();
+		/**
+		 * callback when document closed.
+		 * @return true is the Document object need save, otherwise false.
+		 */
+		boolean OnDocClose();
 
-        /**
-         * generate a tmp file name that JS needed in background.
-         * @return absolute path to temp path generated.
-         */
-        String OnTmpFile();
+		/**
+		 * generate a tmp file name that JS needed in background.
+		 * @return absolute path to temp path generated.
+		 */
+		String OnTmpFile();
 
-        /**
-         * callback when an Uncaught exception appears.
-         * @param code error code.
-         * @param msg error message.
-         */
-        void OnUncaughtException(int code, String msg);
-    }
+		/**
+		 * callback when an Uncaught exception appears.
+		 * @param code error code.
+		 * @param msg error message.
+		 */
+		void OnUncaughtException(int code, String msg);
+	}
 	public interface PDFStream
 	{
 		/**
@@ -240,7 +240,6 @@ public class Document
 		}
 	}
 	protected long hand_val = 0;
-	private int page_count = 0;
 	private String mDocPath; //Nermeen
 	private String mDocPwd; //Manu
 	private boolean isAsset = false; // Dario
@@ -252,25 +251,28 @@ public class Document
 	private static native long openWithCert( String path, String cert_file, String password ) throws Exception;
 	private static native long openMemWithCert( byte[] data, String cert_file, String password ) throws Exception;
 	private static native long openStreamWithCert( PDFStream stream, String cert_file, String password ) throws Exception;
-    private static native long openStreamNoLoadPages( PDFStream stream, String password ) throws Exception;
+	private static native long openStreamNoLoadPages( PDFStream stream, String password ) throws Exception;
 	private static native boolean setCache( long hand, String path );
-    private static native boolean runJS(long hand, String js, PDFJSDelegate del) throws Exception;
+	private static native boolean runJS(long hand, String js, PDFJSDelegate del) throws Exception;
 	private static native void setFontDel( long hand, PDFFontDelegate del );
-    private static native int getEFCount( long hand );
-    private static native String getEFName( long hand, int index );
+	private static native int getEFCount( long hand );
+	private static native String getEFName( long hand, int index );
 	private static native String getEFDesc( long hand, int index );
-    private static native boolean getEFData( long hand, int index, String save_path );
-    private static native int getPermission( long hand );
+	private static native boolean getEFData( long hand, int index, String save_path );
+	private static native int getJSCount( long hand );
+	private static native String getJSName( long hand, int index );
+	private static native String getJS( long hand, int index );
+	private static native int getPermission( long hand );
 	private static native int getPerm( long hand );
 	private static native String exportForm( long hand );
 	private static native void close( long hand );
 	private static native long getPage( long hand, int pageno );
-    static private native long getPage0(long hand);
+	static private native long getPage0(long hand);
 	private static native int getPageCount( long hand );
 	private static native float getPageWidth( long hand, int pageno );
 	private static native float getPageHeight( long hand, int pageno );
 	private static native String getPageLabel(long hand, int pageno);
-    private static native float[] getPagesMaxSize(long hand);
+	private static native float[] getPagesMaxSize(long hand);
 	private static native boolean changePageRect( long hand, int pageno, float dl, float dt, float dr, float db );
 	private static native boolean setPageRotate( long hand, int pageno, int degree );
 	private static native String getOutlineTitle( long hand, long outline );
@@ -286,7 +288,8 @@ public class Document
 	private static native String getMeta( long hand, String tag );
 	private static native byte[] getID( long hand, int index);
 	private static native boolean setMeta( long hand, String tag, String value );
-    private static native String getXMP(long hand);
+	private static native String getXMP(long hand);
+	private static native boolean setXMP(long hand, String xmp);
 	private static native boolean canSave( long hand );
 	private static native boolean save( long hand ) throws Exception;
 	private static native boolean saveAs( long hand, String dst, boolean rem_sec ) throws Exception;//remove security info and save to another file.
@@ -300,8 +303,8 @@ public class Document
 	private static native boolean removePage( long hand, int pageno );
 	private static native boolean movePage( long hand, int pageno1, int pageno2 );
 	private static native long newFontCID( long hand, String name, int style );
-    private static native long newForm(long doc);
-    private static native float getFontAscent( long hand, long font );
+	private static native long newForm(long doc);
+	private static native float getFontAscent( long hand, long font );
 	private static native float getFontDescent( long hand, long font );
 	private static native long newGState(long hand);
 	private static native boolean setGStateStrokeAlpha(long hand, long gstate, int alpha);
@@ -310,116 +313,116 @@ public class Document
 	private static native boolean setGStateBlendMode(long hand, long state, int bmode);
 	private static native long newImage( long hand, Bitmap bmp, boolean has_alpha );
 	private static native long newImageJPEG( long hand, String path );
-    private static native long newImageJPEGByArray( long hand, byte[] data, int length );
+	private static native long newImageJPEGByArray( long hand, byte[] data, int length );
 	private static native long newImageJPX( long hand, String path );
-    private static native long addFormResFont(long doc, long form, long font);
-    private static native long addFormResImage(long doc, long form, long image);
-    private static native long addFormResGState(long doc, long form, long gstate);
-    private static native long addFormResForm(long doc, long form, long sub);
-    private static native void setFormContent(long doc, long form, float x, float y, float w, float h, long content);
+	private static native long addFormResFont(long doc, long form, long font);
+	private static native long addFormResImage(long doc, long form, long image);
+	private static native long addFormResGState(long doc, long form, long gstate);
+	private static native long addFormResForm(long doc, long form, long sub);
+	private static native void setFormContent(long doc, long form, float x, float y, float w, float h, long content);
 	private static native void setFormTransparency(long hand, long form, boolean isolate, boolean knockout);
-    private static native void freeForm(long doc, long form);
+	private static native void freeForm(long doc, long form);
 
 	private static native int verifySign(long doc, long sign);
 
 
-    private static native long advGetObj(long doc, long ref);
-    private static native long advNewIndirectObj(long doc);
-    private static native long advNewIndirectObjWithData(long doc, long obj_hand);
-    private static native long advGetRef(long doc);
-    private static native long advNewFlateStream(long doc, byte[] source);
-    private static native long advNewRawStream(long doc, byte[] source);
-    private static native void advReload(long doc);
-    static private Ref adv_create_ref(long ret)
-    {
-        if(ret == 0) return null;
-        return new Ref(ret);
-    }
-    static private final Obj adv_create_obj(long ret)
-    {
-        if(ret == 0) return null;
-        return new Obj(ret);
-    }
+	private static native long advGetObj(long doc, long ref);
+	private static native long advNewIndirectObj(long doc);
+	private static native long advNewIndirectObjWithData(long doc, long obj_hand);
+	private static native long advGetRef(long doc);
+	private static native long advNewFlateStream(long doc, byte[] source);
+	private static native long advNewRawStream(long doc, byte[] source);
+	private static native void advReload(long doc);
+	static private Ref adv_create_ref(long ret)
+	{
+		if(ret == 0) return null;
+		return new Ref(ret);
+	}
+	static private final Obj adv_create_obj(long ret)
+	{
+		if(ret == 0) return null;
+		return new Obj(ret);
+	}
 
-    /**
-     * advanced function to get object from Document to edit.<br/>
-     * this method require premium license.<br/>
-     * @param ref PDF cross reference ID, which got from:<br/>
-     *            Advance_NewIndirectObj()<br/>
-     *            Advance_GetCatalog()<br/>
-     *            Advance_GetPage()<br/>
-     *            Advance_NewFlateStream()<br/>
-     *            Advance_NewRawStream()<br/>
-     * @return PDF Object or null.
-     */
-    public Obj Advance_GetObj(Ref ref)
-    {
-        return adv_create_obj(advGetObj(hand_val, ref.get_hand()));
-    }
+	/**
+	 * advanced function to get object from Document to edit.<br/>
+	 * this method require premium license.<br/>
+	 * @param ref PDF cross reference ID, which got from:<br/>
+	 *            Advance_NewIndirectObj()<br/>
+	 *            Advance_GetCatalog()<br/>
+	 *            Advance_GetPage()<br/>
+	 *            Advance_NewFlateStream()<br/>
+	 *            Advance_NewRawStream()<br/>
+	 * @return PDF Object or null.
+	 */
+	public Obj Advance_GetObj(Ref ref)
+	{
+		return adv_create_obj(advGetObj(hand_val, ref.get_hand()));
+	}
 
-    /**
-     * advanced function to create an empty indirect object to edit.<br/>
-     * this method require premium license.<br/>
-     * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
-     */
-    public Ref Advance_NewIndirectObj()
-    {
-        return adv_create_ref(advNewIndirectObj(hand_val));
-    }
+	/**
+	 * advanced function to create an empty indirect object to edit.<br/>
+	 * this method require premium license.<br/>
+	 * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
+	 */
+	public Ref Advance_NewIndirectObj()
+	{
+		return adv_create_ref(advNewIndirectObj(hand_val));
+	}
 
-    /**
-     * advanced function to create an indirect object, and then copy source object to this indirect object.<br/>
-     * this method require premium license.<br/>
-     * @param obj source object to be copied.
-     * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
-     */
-    public Ref Advance_NewIndirectAndCopyObj(Obj obj)
-    {
-        return adv_create_ref(advNewIndirectObjWithData(hand_val, obj.get_hand()));
-    }
-    /**
-     * advanced function to create a stream using zflate compression(zlib).<br/>
-     * stream byte contents can't modified, once created.<br/>
-     * the byte contents shall auto compress and encrypt by native library.<br/>
-     * this method require premium license, and need Document.SetCache() invoked.<br/>
-     * @param source
-     * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
-     */
-    public Ref Advance_NewFlateStream(byte[] source)
-    {
-        return adv_create_ref(advNewFlateStream(hand_val, source));
-    }
-    /**
-     * advanced function to create a stream using raw data.<br/>
-     * if u pass compressed data to this method, u shall modify dictionary of this stream.<br/>
-     * like "Filter" and other item from dictionary.<br/>
-     * the byte contents shall auto encrypt by native library, if document if encrypted.<br/>
-     * this method require premium license, and need Document.SetCache() invoked.<br/>
-     * @param source
-     * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
-     */
-    public Ref Advance_NewRawStream(byte[] source)
-    {
-        return adv_create_ref(advNewRawStream(hand_val, source));
-    }
-    /**
-     * advanced function to get reference of catalog object(root object of PDF).<br/>
-     * this method require premium license.<br/>
-     * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
-     */
-    public Ref Advance_GetRef()
-    {
-        return adv_create_ref(advGetRef(hand_val));
-    }
-    /**
-     * advanced function to reload document objects.<br/>
-     * this method require premium license.<br/>
-     * all pages object return from Document.GetPage() shall not available, after this method invoked.
-     */
-    public void Advance_Reload()
-    {
-        advReload(hand_val);
-    }
+	/**
+	 * advanced function to create an indirect object, and then copy source object to this indirect object.<br/>
+	 * this method require premium license.<br/>
+	 * @param obj source object to be copied.
+	 * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
+	 */
+	public Ref Advance_NewIndirectAndCopyObj(Obj obj)
+	{
+		return adv_create_ref(advNewIndirectObjWithData(hand_val, obj.get_hand()));
+	}
+	/**
+	 * advanced function to create a stream using zflate compression(zlib).<br/>
+	 * stream byte contents can't modified, once created.<br/>
+	 * the byte contents shall auto compress and encrypt by native library.<br/>
+	 * this method require premium license, and need Document.SetCache() invoked.<br/>
+	 * @param source
+	 * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
+	 */
+	public Ref Advance_NewFlateStream(byte[] source)
+	{
+		return adv_create_ref(advNewFlateStream(hand_val, source));
+	}
+	/**
+	 * advanced function to create a stream using raw data.<br/>
+	 * if u pass compressed data to this method, u shall modify dictionary of this stream.<br/>
+	 * like "Filter" and other item from dictionary.<br/>
+	 * the byte contents shall auto encrypt by native library, if document if encrypted.<br/>
+	 * this method require premium license, and need Document.SetCache() invoked.<br/>
+	 * @param source
+	 * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
+	 */
+	public Ref Advance_NewRawStream(byte[] source)
+	{
+		return adv_create_ref(advNewRawStream(hand_val, source));
+	}
+	/**
+	 * advanced function to get reference of catalog object(root object of PDF).<br/>
+	 * this method require premium license.<br/>
+	 * @return PDF cross reference to new object, using Advance_GetObj to get Object data.
+	 */
+	public Ref Advance_GetRef()
+	{
+		return adv_create_ref(advGetRef(hand_val));
+	}
+	/**
+	 * advanced function to reload document objects.<br/>
+	 * this method require premium license.<br/>
+	 * all pages object return from Document.GetPage() shall not available, after this method invoked.
+	 */
+	public void Advance_Reload()
+	{
+		advReload(hand_val);
+	}
 
 	public class DocFont
 	{
@@ -469,12 +472,12 @@ public class Document
 		 * set dash for stroke operation.
 		 * @param dash dash arra, if null, means set to solid.
 		 * @param phase phase value, mostly, it is 0.
-         * @return true or false.
+		 * @return true or false.
 		 * eaxmple:<br/>
 		 * [2, 1], 0  means 2 on, 1 off, 2 on, 1 off, …<br/>
 		 * [2, 1], 0.5 means 1.5 on, 1 off, 2 on 1 off, …<br/>
 		 * for more details, plz see PDF-Reference 1.7 (4.3.2) Line Dash Pattern.<br/>
-         */
+		 */
 		public boolean SetStrokeDash(float[] dash, float phase)
 		{
 			return setGStateStrokeDash(doc.hand_val, hand, dash, phase);
@@ -507,85 +510,85 @@ public class Document
 	{
 		protected long hand;
 	}
-    public class DocForm
-    {
-        protected Document m_doc;
-        protected long hand;
+	public class DocForm
+	{
+		protected Document m_doc;
+		protected long hand;
 
-        /**
-         * add font as resource of form.
-         * @param dfont returned by Document.NewFontCID()
-         * @return resource handle
-         */
-        public ResFont AddResFont(Document.DocFont dfont)
-        {
-            if(dfont == null) return null;
-            long ret = addFormResFont(m_doc.hand_val, hand, dfont.hand);
-            if(ret == 0) return null;
-            ResFont res_font = new ResFont();
-            res_font.hand = ret;
-            return res_font;
-        }
+		/**
+		 * add font as resource of form.
+		 * @param dfont returned by Document.NewFontCID()
+		 * @return resource handle
+		 */
+		public ResFont AddResFont(Document.DocFont dfont)
+		{
+			if(dfont == null) return null;
+			long ret = addFormResFont(m_doc.hand_val, hand, dfont.hand);
+			if(ret == 0) return null;
+			ResFont res_font = new ResFont();
+			res_font.hand = ret;
+			return res_font;
+		}
 
-        /**
-         * add image as resource of form.
-         * @param dimg returned by Document.NewImageXXX()
-         * @return resource handle
-         */
-        public ResImage AddResImage(Document.DocImage dimg)
-        {
-            if(dimg == null) return null;
-            long ret = addFormResImage(m_doc.hand_val, hand, dimg.hand);
-            if(ret == 0) return null;
-            ResImage res_img = new ResImage();
-            res_img.hand = ret;
-            return res_img;
-        }
+		/**
+		 * add image as resource of form.
+		 * @param dimg returned by Document.NewImageXXX()
+		 * @return resource handle
+		 */
+		public ResImage AddResImage(Document.DocImage dimg)
+		{
+			if(dimg == null) return null;
+			long ret = addFormResImage(m_doc.hand_val, hand, dimg.hand);
+			if(ret == 0) return null;
+			ResImage res_img = new ResImage();
+			res_img.hand = ret;
+			return res_img;
+		}
 
-        /**
-         * add Graphic State as resource of form.
-         * @param dgs returned by Document.NewGState()
-         * @return resource handle
-         */
-        public ResGState AddResGState(Document.DocGState dgs)
-        {
-            if(dgs == null) return null;
-            long ret = addFormResGState(m_doc.hand_val, hand, dgs.hand);
-            if(ret == 0) return null;
-            ResGState res_gs = new ResGState();
-            res_gs.hand = ret;
-            return res_gs;
-        }
+		/**
+		 * add Graphic State as resource of form.
+		 * @param dgs returned by Document.NewGState()
+		 * @return resource handle
+		 */
+		public ResGState AddResGState(Document.DocGState dgs)
+		{
+			if(dgs == null) return null;
+			long ret = addFormResGState(m_doc.hand_val, hand, dgs.hand);
+			if(ret == 0) return null;
+			ResGState res_gs = new ResGState();
+			res_gs.hand = ret;
+			return res_gs;
+		}
 
-        /**
-         * add sub-form as resource of form.<br/>
-         * @param dform returned by Document.NewForm()
-         * @return resource handle
-         */
-        public ResForm AddResForm(DocForm dform)
-        {
-            if(dform == null) return null;
-            long ret = addFormResForm(m_doc.hand_val, hand, dform.hand);
-            if(ret == 0) return null;
-            ResForm res_form = new ResForm();
-            res_form.hand = ret;
-            return res_form;
-        }
+		/**
+		 * add sub-form as resource of form.<br/>
+		 * @param dform returned by Document.NewForm()
+		 * @return resource handle
+		 */
+		public ResForm AddResForm(DocForm dform)
+		{
+			if(dform == null) return null;
+			long ret = addFormResForm(m_doc.hand_val, hand, dform.hand);
+			if(ret == 0) return null;
+			ResForm res_form = new ResForm();
+			res_form.hand = ret;
+			return res_form;
+		}
 
-        /**
-         * set content of form, need a box defined in form.<br/>
-         * the box define edge of form area, which PageContent object includes.
-         * @param content PageContent object.
-         * @param x x of form's box
-         * @param y y of form's box
-         * @param w width of form's box
-         * @param h height of form's box
-         */
-        public void SetContent(PageContent content, float x, float y, float w, float h)
-        {
-            if(content == null) return;
-            setFormContent(m_doc.hand_val, hand, x, y, w, h, content.hand);
-        }
+		/**
+		 * set content of form, need a box defined in form.<br/>
+		 * the box define edge of form area, which PageContent object includes.
+		 * @param content PageContent object.
+		 * @param x x of form's box
+		 * @param y y of form's box
+		 * @param w width of form's box
+		 * @param h height of form's box
+		 */
+		public void SetContent(PageContent content, float x, float y, float w, float h)
+		{
+			if(content == null) return;
+			setFormContent(m_doc.hand_val, hand, x, y, w, h, content.hand);
+		}
 
 		/**
 		 * set this form as transparency.
@@ -595,33 +598,32 @@ public class Document
 		public void SetTransparency(boolean isolate, boolean knockout)
 		{
 			setFormTransparency(m_doc.hand_val, hand, isolate, knockout);
-        }
-        @Override
-        protected void finalize() throws Throwable
-        {
-            if(m_doc != null)
-            {
-                freeForm(m_doc.hand_val, hand);
-                m_doc = null;
-            }
-            hand = 0;
-            super.finalize();
-        }
-    }
+		}
+		@Override
+		protected void finalize() throws Throwable
+		{
+			if(m_doc != null)
+			{
+				freeForm(m_doc.hand_val, hand);
+				m_doc = null;
+			}
+			hand = 0;
+			super.finalize();
+		}
+	}
 	public Document()
 	{
 	}
 	/**
 	 * inner function.
-	 * @param vals
+	 * @param hand
 	 */
-	public Document(int vals[] )
+	public Document(long hand)
 	{
-		if( vals != null )
-		{
-			hand_val = vals[0];
-			page_count = vals[1];
-		}
+		//modified by radaee.
+		//in fact, the handle value is pointer, which is 64 bits on 64 bits system.
+		//int vals is 32 bits values.
+		hand_val = hand;
 	}
 	private long getOutlineRoot()
 	{
@@ -650,10 +652,8 @@ public class Document
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
 			else {
-				page_count = getPageCount(hand_val);
 				mDocPath = path; // Nermeen
 			}
 			return ret;
@@ -675,10 +675,7 @@ public class Document
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
-			else
-				page_count = getPageCount(hand_val);
 			return ret;
 		}
 		return 0;
@@ -702,7 +699,7 @@ public class Document
 	{
 		setFontDel(hand_val, del);
 	}
-	
+
 	/**
 	 * open document.<br/>
 	 * first time, SDK try password as user password, and then try password as owner password.
@@ -722,22 +719,20 @@ public class Document
 		if( hand_val == 0 )
 		{
 			int ret = 0;
-            try {
-                hand_val = open(path, password);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                hand_val = -10;
-            }
+			try {
+				hand_val = open(path, password);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				hand_val = -10;
+			}
 			if( hand_val <= 0 && hand_val >= -10 )//error
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
 			else {
-				page_count = getPageCount(hand_val);
 				mDocPath = path; // Nermeen
 				isAsset = false;
 			}
@@ -772,10 +767,8 @@ public class Document
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
 			else {
-				page_count = getPageCount(hand_val);
 				mDocPath = path; // Nermeen
 				isAsset = false;
 			}
@@ -802,22 +795,19 @@ public class Document
 		if( hand_val == 0 )
 		{
 			int ret = 0;
-            try {
-                hand_val = openMem(data, password);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                hand_val = -10;
-            }
+			try {
+				hand_val = openMem(data, password);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				hand_val = -10;
+			}
 			if( hand_val <= 0 && hand_val >= -10 )//error
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
-			else
-				page_count = getPageCount(hand_val);
 			return ret;
 		}
 		return 0;
@@ -848,10 +838,7 @@ public class Document
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
-			else
-				page_count = getPageCount(hand_val);
 			return ret;
 		}
 		return 0;
@@ -875,20 +862,17 @@ public class Document
 		if( hand_val == 0 )
 		{
 			int ret = 0;
-            try {
-                hand_val = openStream(stream, password);
-            }catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+			try {
+				hand_val = openStream(stream, password);
+			}catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 			if( hand_val <= 0 && hand_val >= -10 )//error
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
-			else
-				page_count = getPageCount(hand_val);
 			return ret;
 		}
 		return 0;
@@ -919,92 +903,116 @@ public class Document
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-				page_count = 0;
 			}
-			else
-				page_count = getPageCount(hand_val);
 			return ret;
 		}
 		return 0;
 	}
-    public int OpenStreamWithoutLoadingPages( PDFStream stream, String password )
-    {
+	public int OpenStreamWithoutLoadingPages( PDFStream stream, String password )
+	{
 		mDocPwd = password; //Manu
-        if( hand_val == 0 )
-        {
-            int ret = 0;
-            try {
-                hand_val = openStreamNoLoadPages(stream, password);
-            }catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-            if( hand_val <= 0 && hand_val >= -10 )//error
-            {
-                ret = (int)hand_val;
-                hand_val = 0;
-                page_count = 0;
-            }
-            else
-                page_count = getPageCount(hand_val);
-            return ret;
-        }
-        return 0;
-    }
-    /**
-     * run javascript, NOTICE:considering some complex js, this method is not thread-safe.<br/>
-     * this method require premium license, it always return false if using other license type.
-     * @param js javascript string, can't be null.
-     * @param del delegate for javascript running, can't be null.
-     * @return if js or del is null, or no premium license actived, return false.<br/>
-     * if success running, return true.<br/>
-     * otherwise, an exception shall throw to java.
-     */
-    public boolean RunJS(String js, PDFJSDelegate del) throws Exception
-    {
-        return runJS(hand_val, js, del);
-    }
+		if( hand_val == 0 )
+		{
+			int ret = 0;
+			try {
+				hand_val = openStreamNoLoadPages(stream, password);
+			}catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			if( hand_val <= 0 && hand_val >= -10 )//error
+			{
+				ret = (int)hand_val;
+				hand_val = 0;
+			}
+			return ret;
+		}
+		return 0;
+	}
+	/**
+	 * run javascript, NOTICE:considering some complex js, this method is not thread-safe.<br/>
+	 * this method require premium license, it always return false if using other license type.
+	 * @param js javascript string, can't be null.
+	 * @param del delegate for javascript running, can't be null.
+	 * @return if js or del is null, or no premium license actived, return false.<br/>
+	 * if success running, return true.<br/>
+	 * otherwise, an exception shall throw to java.
+	 */
+	public boolean RunJS(String js, PDFJSDelegate del) throws Exception
+	{
+		return runJS(hand_val, js, del);
+	}
 
-    /**
-     * get embed files count, for document level.<br/>
-     * this method require premium license, it always return 0 if using other license type.
-     * @return count
-     */
-    public int GetEmbedFilesCount()
-    {
-        return getEFCount(hand_val);
-    }
+	/**
+	 * get embed files count, for document level.<br/>
+	 * this method require premium license, it always return 0 if using other license type.
+	 * @return count
+	 */
+	public int GetEmbedFilesCount()
+	{
+		return getEFCount(hand_val);
+	}
 
-    /**
-     * get name of embed file.
-     * @param index range in [0, GetEmbedFilesCount())
-     * @return name of embed file
-     */
-    public String GetEmbedFileName( int index )
-    {
-        return getEFName(hand_val, index);
-    }
+	/**
+	 * get name of embed file.
+	 * @param index range in [0, GetEmbedFilesCount())
+	 * @return name of embed file
+	 */
+	public String GetEmbedFileName( int index )
+	{
+		return getEFName(hand_val, index);
+	}
 
 	/**
 	 * get Description of embed file.
 	 * @param index range in [0, GetEmbedFilesCount())
 	 * @return Description of embed file
-     */
+	 */
 	public String GetEmbedFileDesc( int index )
 	{
 		return getEFDesc(hand_val, index);
 	}
 
-    /**
-     * get embed file data, and save to save_path
-     * @param index range in [0, GetEmbedFilesCount())
-     * @param save_path absolute path to save embed file.
-     * @return true or false.
-     */
-    public boolean GetEmbedFileData( int index, String save_path )
-    {
-        return getEFData(hand_val, index, save_path);
-    }
+	/**
+	 * get embed file data, and save to save_path
+	 * @param index range in [0, GetEmbedFilesCount())
+	 * @param save_path absolute path to save embed file.
+	 * @return true or false.
+	 */
+	public boolean GetEmbedFileData( int index, String save_path )
+	{
+		return getEFData(hand_val, index, save_path);
+	}
+	/**
+	 * get java script count, for document level.<br/>
+	 * this method require premium license, it always return 0 if using other license type.
+	 * @return count
+	 */
+	public int GetJSCount()
+	{
+		return getJSCount(hand_val);
+	}
+
+	/**
+	 * get name of javascript.
+	 * @param index range in [0, GetJSCount())g
+	 * @return name of javascript
+	 */
+	public String GetJSName( int index )
+	{
+		return getJSName(hand_val, index);
+	}
+
+	/**
+	 * get javascript.
+	 * @param index range in [0, GetJSCount())
+	 * @return javascript string
+	 */
+	public String GetJS( int index )
+	{
+		return getJS(hand_val, index);
+	}
+
 	/**
 	 * get permission of PDF, this value defined in PDF reference 1.7<br/>
 	 * mostly, it means the permission from encryption.<br/>
@@ -1050,27 +1058,26 @@ public class Document
 		if( hand_val != 0 )
 			close( hand_val );
 		hand_val = 0;
-		page_count = 0;
 	}
 
-    /**
-     * fast get first page, used in first page thumbnail generating.<br/>
-     * do not use this method for other purpose.
-     * @return Page object or null.
-     */
-    public Page GetPage0()
-    {
-        if( hand_val == 0 ) return null;
-        long hand = getPage0( hand_val );
-        if( hand == 0 ) return null;
-        Page page = new Page();
-        if( page != null )
-        {
-            page.hand = hand;
-            page.m_doc = this;
-        }
-        return page;
-    }
+	/**
+	 * fast get first page, used in first page thumbnail generating.<br/>
+	 * do not use this method for other purpose.
+	 * @return Page object or null.
+	 */
+	public Page GetPage0()
+	{
+		if( hand_val == 0 ) return null;
+		long hand = getPage0( hand_val );
+		if( hand == 0 ) return null;
+		Page page = new Page();
+		if( page != null )
+		{
+			page.hand = hand;
+			page.m_doc = this;
+		}
+		return page;
+	}
 	/**
 	 * get a Page object for page NO.
 	 * @param pageno 0 based page NO. range:[0, GetPageCount()-1]
@@ -1083,10 +1090,10 @@ public class Document
 		if( hand == 0 ) return null;
 		Page page = new Page();
 		if( page != null )
-        {
-            page.hand = hand;
-            page.m_doc = this;
-        }
+		{
+			page.hand = hand;
+			page.m_doc = this;
+		}
 		return page;
 	}
 	/**
@@ -1096,7 +1103,10 @@ public class Document
 	public int GetPageCount()
 	{
 		//it loads all pages. sometimes the function is very slow.
-		return page_count;
+		//modified by radaee.
+		//only first time to invoke getPageCount() maybe very slow.
+		//since second time, it return from native int value directly.
+		return getPageCount(hand_val);
 	}
 	/**
 	 * get page width by page NO.
@@ -1139,14 +1149,14 @@ public class Document
 		return getPageLabel(hand_val, pageno);
 	}
 
-    /**
-     * get max width and max height of all pages.
-     * @return 2 elements container width and height values, or null if failed.
-     */
-    public float[] GetPagesMaxSize()
-    {
-        return getPagesMaxSize(hand_val);
-    }
+	/**
+	 * get max width and max height of all pages.
+	 * @return 2 elements container width and height values, or null if failed.
+	 */
+	public float[] GetPagesMaxSize()
+	{
+		return getPagesMaxSize(hand_val);
+	}
 	/**
 	 * get meta data of document.
 	 * @param tag Predefined values:"Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate", "ModDate".<br/>or you can pass any key that self-defined.
@@ -1157,14 +1167,25 @@ public class Document
 		return getMeta( hand_val, tag );
 	}
 
-    /**
-     * get XMP string from document.
-     * @return null or XML string.
-     */
-    public String GetXMP()
-    {
-        return getXMP( hand_val );
-    }
+	/**
+	 * get XMP string from document.
+	 * @return null or XML string.
+	 */
+	public String GetXMP()
+	{
+		return getXMP( hand_val );
+	}
+
+	/**
+	 * set XMP string from document.<br/>
+	 * this method require premium license.
+	 * @param xmp xmp string to set.
+	 * @return true or false.
+	 */
+	public boolean SetXMP(String xmp)
+	{
+		return setXMP(hand_val, xmp);
+	}
 	/**
 	 * get id of document.
 	 * @param index must 0 or 1, 0 means first 16 bytes, 1 means last 16 bytes.
@@ -1214,14 +1235,14 @@ public class Document
 	 */
 	public boolean Save()
 	{
-        try {
-            return save(hand_val);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();;
-            return false;
-        }
+		try {
+			return save(hand_val);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();;
+			return false;
+		}
 	}
 	/**
 	 * save as the document to another file.<br/>
@@ -1232,14 +1253,14 @@ public class Document
 	 */
 	public boolean SaveAs( String path, boolean rem_sec )
 	{
-        try {
-            return saveAs(hand_val, path, rem_sec);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+		try {
+			return saveAs(hand_val, path, rem_sec);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 	/**
 	 * encrypt document and save as the document to another file.<br/>
@@ -1255,18 +1276,18 @@ public class Document
 	 * others: see PDF reference
 	 * @param method set 3 means using AES 256bits encrypt(Acrobat X), V=5 and R = 6 mode, others AES with V=4 and R=4 mode.
 	 * @param id must be 32 bytes for file ID. it is divided to 2 array in native library, as each 16 bytes.
-	 * @return true or false. 
+	 * @return true or false.
 	 */
 	public boolean EncryptAs( String dst, String upswd, String opswd, int perm, int method, byte[] id)
 	{
-        try {
-            return encryptAs(hand_val, dst, upswd, opswd, perm, method, id);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+		try {
+			return encryptAs(hand_val, dst, upswd, opswd, perm, method, id);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 	/**
 	 * check if document is encrypted.
@@ -1278,7 +1299,7 @@ public class Document
 	}
 	/**
 	 * new a root outline to document, it insert first root outline to Document.<br/>
-	 * the old first root outline, shall be next of this outline. 
+	 * the old first root outline, shall be next of this outline.
 	 * @param label label to display
 	 * @param pageno pageno to jump
 	 * @param top y position in PDF coordinate
@@ -1291,9 +1312,9 @@ public class Document
 	/**
 	 * Start import operations, import page from src<br/>
 	 * a premium license is required for this method.<br/>
-	 * you shall maintenance the source Document object until all pages are imported and ImportContext.Destroy() invoked. 
+	 * you shall maintenance the source Document object until all pages are imported and ImportContext.Destroy() invoked.
 	 * @param src source Document object that opened.
-	 * @return a context object used in ImportPage. 
+	 * @return a context object used in ImportPage.
 	 */
 	public ImportContext ImportStart( Document src )
 	{
@@ -1314,14 +1335,16 @@ public class Document
 	public boolean ImportPage( ImportContext ctx, int srcno, int dstno )
 	{
 		if( ctx == null ) return false;
-        try {
-            return importPage(hand_val, ctx.hand, srcno, dstno);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+		try {
+			boolean ret = importPage(hand_val, ctx.hand, srcno, dstno);
+			//modified by radaee.
+			return ret;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 	/**
 	 * insert a page to Document<br/>
@@ -1338,6 +1361,7 @@ public class Document
 		long ret = newPage( hand_val, pageno, w, h );
 		if( ret != 0 )
 		{
+			//modified by radaee.
 			Page page = new Page();
 			page.hand = ret;
 			return page;
@@ -1352,6 +1376,7 @@ public class Document
 	 */
 	public boolean RemovePage( int pageno )
 	{
+		//modified by radaee.
 		return removePage(hand_val, pageno);
 	}
 	/**
@@ -1445,27 +1470,27 @@ public class Document
 		else return null;
 	}
 
-    /**
-     * create an image from JPEG/JPG byte array.<br/>
-     * supported image color space:<br/>
-     * --GRAY<br/>
-     * --RGB<br/>
-     * --CMYK<br/>
-     * @param data byte array include whole jpg file.
-     * @param len byte length of data.
-     * @return DocImage object or null.
-     */
-    public DocImage NewImageByMem( byte[] data, int len )
-    {
-        long ret = newImageJPEGByArray(hand_val, data, len);
-        if( ret != 0 )
-        {
-            DocImage img = new DocImage();
-            img.hand = ret;
-            return img;
-        }
-        else return null;
-    }
+	/**
+	 * create an image from JPEG/JPG byte array.<br/>
+	 * supported image color space:<br/>
+	 * --GRAY<br/>
+	 * --RGB<br/>
+	 * --CMYK<br/>
+	 * @param data byte array include whole jpg file.
+	 * @param len byte length of data.
+	 * @return DocImage object or null.
+	 */
+	public DocImage NewImageByMem( byte[] data, int len )
+	{
+		long ret = newImageJPEGByArray(hand_val, data, len);
+		if( ret != 0 )
+		{
+			DocImage img = new DocImage();
+			img.hand = ret;
+			return img;
+		}
+		else return null;
+	}
 	/**
 	 * create an image from JPX/JPEG 2k file.<br/>
 	 * @param path path to JPX file.
@@ -1487,16 +1512,16 @@ public class Document
 	 * new a form from Document level.
 	 * this method require SetCache() invoked.
 	 * @return DocForm object or null.
-     */
-    public DocForm NewForm()
-    {
-        long ret = newForm(hand_val);
-        if(ret == 0) return null;
-        DocForm form = new DocForm();
-        form.hand = ret;
-        form.m_doc = this;
-        return form;
-    }
+	 */
+	public DocForm NewForm()
+	{
+		long ret = newForm(hand_val);
+		if(ret == 0) return null;
+		DocForm form = new DocForm();
+		form.hand = ret;
+		form.m_doc = this;
+		return form;
+	}
 	/**
 	 * change page rect.<br/>
 	 * a premium license is required for this method.
@@ -1536,19 +1561,16 @@ public class Document
 	public static void BundleSave(Bundle bundle, Document doc)
 	{
 		bundle.putLong("pdf_doc_handle", doc.hand_val);
-		bundle.putInt("pdf_page_count", doc.page_count);
 	}
 	public static Document BundleRestore(Bundle bundle)
 	{
 		try
 		{
 			long hand = bundle.getLong("pdf_doc_handle");
-			int pcount = bundle.getInt("pdf_page_count");
 			if( hand != 0 )
 			{
 				Document doc = new Document();
 				doc.hand_val = hand;
-				doc.page_count = pcount;
 				return doc;
 			}
 			else return null;
@@ -1558,12 +1580,12 @@ public class Document
 			return null;
 		}
 	}
-    @Override
-    protected void finalize() throws Throwable
-    {
-        Close();
-        super.finalize();
-    }
+	@Override
+	protected void finalize() throws Throwable
+	{
+		Close();
+		super.finalize();
+	}
 
 	public String getDocPath() {
 		return mDocPath;

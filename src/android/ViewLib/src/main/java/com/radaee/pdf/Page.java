@@ -832,6 +832,17 @@ public class Page
 		{
 			return Page.getAnnotComboItem(page.hand, hand, item);
 		}
+
+		/**
+		 * get export value of combo-box.
+		 * this method require premium license
+		 * @param item 0 based item index. range:[0, GetAnnotComboItemCount()-1]
+		 * @return null if this is not combo-box, "" if no item selected, otherwise the item selected.
+		 */
+		final public String GetComboItemVal( int item )
+		{
+			return Page.getAnnotComboItemVal(page.hand, hand, item);
+		}
 		/**
 		 * get current selected item index of combo-box.<br/>
 		 * this method require premium license
@@ -878,6 +889,16 @@ public class Page
         final public String GetListItem( int item )
 		{
 			return Page.getAnnotListItem(page.hand, hand, item);
+		}
+		/**
+		 * get export value of list-box item.<br/>
+		 * this method require premium license
+		 * @param item 0 based item index. range:[0, GetListItemCount()-1]
+		 * @return null if this is not list-box, "" if no item selected, otherwise the item selected.
+		 */
+		final public String GetListItemVal( int item )
+		{
+			return Page.getAnnotListItemVal(page.hand, hand, item);
 		}
 
         /**
@@ -1518,11 +1539,13 @@ public class Page
     static private native boolean setAnnotEditFont( long hand, long annot, long font);
 	static private native int getAnnotComboItemCount( long hand, long annot );
 	static private native String getAnnotComboItem( long hand, long annot, int item );
+	static private native String getAnnotComboItemVal( long hand, long annot, int item );
 	static private native int getAnnotComboItemSel( long hand, long annot );
 	static private native boolean setAnnotComboItem( long hand, long annot, int item );
 	static private native boolean isAnnotListMultiSel(long hand, long annot);
 	static private native int getAnnotListItemCount( long hand, long annot );
 	static private native String getAnnotListItem( long hand, long annot, int item );
+	static private native String getAnnotListItemVal( long hand, long annot, int item );
 	static private native int[] getAnnotListSels( long hand, long annot );
 	static private native boolean setAnnotListSels( long hand, long annot, int[] items );
     static private native boolean removeAnnotListItem( long hand, long annot, int item);

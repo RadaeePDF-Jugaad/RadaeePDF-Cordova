@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key></key>
+	<array>
+		<string>Più veloce</string>
+		<string>Veloce</string>
+		<string>Normale</string>
+		<string>Lento</string>
+		<string>Più lento</string>
+	</array>
+</dict>
+</plist>
