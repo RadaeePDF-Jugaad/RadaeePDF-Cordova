@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.5.4">
+        id="com.radaee.cordova" version="1.5.5">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -467,6 +467,14 @@
         <source-file src="src/ios/PDFViewer/Modules/Signature/UviSignatureView.m" />
         <header-file src="src/ios/PDFViewer/Modules/Signature/UviSignatureView.h" />
 
+        
+        <!-- Radaee Page Curling -->
+        <header-file src="src/ios/PDFViewer/RDPageView/RDPageViewController.h" />
+        <source-file src="src/ios/PDFViewer/RDPageView/RDPageViewController.m" />
+        <resource-file src="src/ios/PDFViewer/RDPageView/RDPageViewController.xib" />
+        <header-file src="src/ios/PDFViewer/RDPageView/ViewController.h"/>
+        <source-file src="src/ios/PDFViewer/RDPageView/ViewController.m"/>
+        
         <!-- Radaee resources -->
         <!--
         <resource-file src="src/ios/PDFViewer/cmaps/cmaps.dat" target-dir="cmaps"/>

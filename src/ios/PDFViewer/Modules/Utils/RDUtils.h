@@ -29,5 +29,7 @@
 + (NSDate *)dateFromPdfDate:(NSString *)dateString;
 + (NSString *)pdfDateFromDate:(NSDate *)date;
 + (UIColor *)invertColor:(UIColor *)color;
++ (id)getGlobalFromString:(NSString *)string;
++ (void)setGlobalFromString:(NSString *)string withValue:(id)value;
 
 @end

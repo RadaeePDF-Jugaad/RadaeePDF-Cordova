@@ -14,6 +14,7 @@
 #import "RDVFinder.h"
 #import "RDVSel.h"
 #import "RDUtils.h"
+#import "ActionStackManager.h"
 
 /*#import "FTSManager.h"*/
 #import "ReaderHandler.h"
@@ -26,6 +27,7 @@
 #ifdef FTS_ENABLED
     FTSOccurrence *currentOccurrence;
 #endif
+    ActionStackManager *actionManger;
 }
 
 @end
@@ -71,10 +73,19 @@
     [self PDFClose];
 }
 
+- (void)clean {
+    [self PDFClose];
+    if (!m_child) {
+        m_child = [[PDFOffScreenView alloc] initWithFrame:self.frame];
+        [m_child setDelegate :self];
+        [self addSubview:m_child];
+    }
+}
+
 -(BOOL)PDFOpen:(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del
 {
-    [self PDFClose];
-    
+    [self clean];
+
     // Load global var
     doublePage = GLOBAL.g_double_page_enabled;
     
@@ -84,7 +95,7 @@
     doubleTapZoomMode = 1;
     
     m_doc = doc;
-    m_del = del;
+    self.m_del = del;
     
     // Set meta tag UUID with the pdf id
     [self setUUIDMeta];
@@ -408,6 +419,9 @@
     m_status = sta_none;
     m_zoom = 1;
     self.zoomScale = 1;
+    [m_child removeFromSuperview];
+    m_child = nil;
+    self.m_del = nil;
 }
 
 -(void)ProRedrawOS
@@ -418,7 +432,7 @@
 -(void)ProUpdatePage:(int) pageno
 {
     [m_layout vRenderSync:pageno];
-    [m_del OnPageUpdated:pageno];
+    [self.m_del OnPageUpdated:pageno];
 }
 
 - (void)RDVOnPageRendered:(int)pageno
@@ -438,10 +452,10 @@
         [self refresh];
     });
     
-    if( m_del )
+    if( self.m_del )
     {
         int pageno = [finder find_get_page];
-        [m_del OnFound: (pageno >= 0 && pageno < [m_doc pageCount])];
+        [self.m_del OnFound: (pageno >= 0 && pageno < [m_doc pageCount])];
     }
 }
 
@@ -685,8 +699,8 @@
     if( m_cur_page != pos.pageno )
     {
         m_cur_page = pos.pageno;
-        if( m_del )
-            [m_del OnPageChanged:m_cur_page];
+        if( self.m_del )
+            [self.m_del OnPageChanged:m_cur_page];
     }
 }
 
@@ -1055,8 +1069,8 @@
         }
     }
     
-    if (m_del) {
-        [m_del OnDoubleTapped:[touch locationInView:self.window].x :[touch locationInView:self.window].y];
+    if (self.m_del) {
+        [self.m_del OnDoubleTapped:[touch locationInView:self.window].x :[touch locationInView:self.window].y];
     }
     
     [self performSelector:@selector(delayedDoubleTapping) withObject:nil afterDelay:0.5];
@@ -1066,7 +1080,7 @@
 - (void)delayedOnSingleTapping:(NSArray *)a
 {
     if (!isDoubleTapping && a) {
-        [m_del OnSingleTapped:[[a objectAtIndex:0] floatValue]:[[a objectAtIndex:1] floatValue]];
+        [self.m_del OnSingleTapped:[[a objectAtIndex:0] floatValue]:[[a objectAtIndex:1] floatValue]];
     }
 }
 
@@ -1103,7 +1117,7 @@
         RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
         if( !vpage )//shall not happen
         {
-            if(m_del) [m_del OnSingleTapped:x:y];
+            if(self.m_del) [self.m_del OnSingleTapped:x:y];
             return;
        	}
         PDFPage *page = [vpage GetPage];
@@ -1114,13 +1128,13 @@
         {
             m_annot_idx = [m_annot getIndex];
             
-            if(m_del && [m_del respondsToSelector:@selector(didTapAnnot:atPage:atPoint:)])
+            if(self.m_del && [self.m_del respondsToSelector:@selector(didTapAnnot:atPage:atPoint:)])
             {
-                [m_del didTapAnnot:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
+                [self.m_del didTapAnnot:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
             }
             
             if (![self canSaveDocument] && m_annot.type != 1) {
-                if( m_del )
+                if( self.m_del )
                 {
                     if (!isDoubleTapping) {
                         NSArray *a = [NSArray arrayWithObjects:[NSNumber numberWithFloat:x], [NSNumber numberWithFloat:y], nil];
@@ -1175,8 +1189,8 @@
                 
                 [self executeAnnotJS];
                 
-                if (m_del){
-                    [m_del OnAnnotCommboBox:arr selected:[m_annot getComboSel]];
+                if (self.m_del){
+                    [self.m_del OnAnnotCommboBox:arr selected:[m_annot getComboSel]];
                 }
                 return ;
             }
@@ -1205,21 +1219,21 @@
                     cur++;
                 }
                 
-                if (m_del){
-                    [m_del OnAnnotList:m_annot items:arr selectedIndexes:selected_items]; // Modified method
+                if (self.m_del){
+                    [self.m_del OnAnnotList:m_annot items:arr selectedIndexes:selected_items]; // Modified method
                 }
                 return;
             }
             
             NSString *nuri = [m_annot getEditText];
             if (nuri) {
-                if (m_del) {
+                if (self.m_del) {
                     CGRect annotRect;
                     annotRect.origin.x = m_annot_rect.left / m_scale_pix;
                     annotRect.origin.y = m_annot_rect.top / m_scale_pix;
                     annotRect.size.width = (m_annot_rect.right - m_annot_rect.left)/m_scale_pix;
                     annotRect.size.height = (m_annot_rect.bottom - m_annot_rect.top)/m_scale_pix;
-                    [m_del OnAnnotEditBox:annotRect :nuri :([m_annot getEditTextSize] / m_scale_pix) * (m_zoom * [m_layout vGetScaleMin:m_cur_page])];
+                    [self.m_del OnAnnotEditBox:annotRect :nuri :([m_annot getEditTextSize] / m_scale_pix) * (m_zoom * [m_layout vGetScaleMin:m_cur_page])];
                 }
                 return ;
             }
@@ -1227,19 +1241,19 @@
             nuri = [m_annot getURI];
             if(nuri)//open url
             {
-                if( m_del && GLOBAL.g_auto_launch_link)
+                if( self.m_del && GLOBAL.g_auto_launch_link)
                 {
-                    [m_del OnAnnotOpenURL:nuri];
+                    [self.m_del OnAnnotOpenURL:nuri];
                     [self vAnnotEnd];
                     return;
                 }
             }
             
-            if(m_del) [m_del OnAnnotClicked:m_annot:x:y];
+            if(self.m_del) [self.m_del OnAnnotClicked:m_annot:x:y];
         }
         else
         {
-            if(m_del) {
+            if(self.m_del) {
                 NSArray *a = [NSArray arrayWithObjects:[NSNumber numberWithFloat:x], [NSNumber numberWithFloat:y], nil];
                 [self performSelector:@selector(delayedOnSingleTapping:) withObject:a afterDelay:0.3];
             }
@@ -1255,8 +1269,8 @@
     [m_layout vGetPos : m_tx * m_zoom: m_ty * m_zoom :&m_sel_pos];
     
     m_sel = [[RDVSel alloc] init:[m_doc page :m_sel_pos.pageno] :m_sel_pos.pageno];
-    if( m_del )
-        [m_del OnSelStart:point.x: point.y];
+    if( self.m_del )
+        [self.m_del OnSelStart:point.x: point.y];
     return true;
 }
 
@@ -1276,8 +1290,8 @@
 {
     if( m_status != sta_sel ) return false;
 
-    if( m_del )
-        [m_del OnSelEnd :m_tx/m_scale_pix :m_ty/m_scale_pix :point.x :point.y];
+    if( self.m_del )
+        [self.m_del OnSelEnd :m_tx/m_scale_pix :m_ty/m_scale_pix :point.x :point.y];
     return true;
 }
 
@@ -1341,8 +1355,8 @@
 {
     if (m_status != sta_annot) return false;
     if (m_annot.type == 20) { // EditText
-        if (m_del) {
-            [m_del OnAnnotEnd];
+        if (self.m_del) {
+            [self.m_del OnAnnotEnd];
         }
     }
     
@@ -1741,8 +1755,8 @@
             if( dx < 10 && dx > -10 && dy < 10 && dy > -10 )
             {
                 m_status = sta_none;
-                if( m_del )
-                    [m_del OnLongPressed :point.x :point.y];
+                if( self.m_del )
+                    [self.m_del OnLongPressed :point.x :point.y];
             }
         }
     }
@@ -1773,8 +1787,8 @@
             long_press = false;
         if( long_press )
         {
-            if( m_del )
-                [m_del OnLongPressed:point.x :point.y];
+            if( self.m_del )
+                [self.m_del OnLongPressed:point.x :point.y];
         }
     }
 }
@@ -2184,7 +2198,7 @@
 {
     if( [m_layout vFind:dir] < 0 )//no more found.
     {
-        if( m_del ) [m_del OnFound:false];
+        if( self.m_del ) [self.m_del OnFound:false];
     }
     
     [self ProRedrawOS];
@@ -2246,16 +2260,16 @@
     int pageno = [m_annot getDest];
     if( pageno >= 0 )//goto page
     {
-        if(m_del)
-            [m_del OnAnnotGoto:pageno];
+        if(self.m_del)
+            [self.m_del OnAnnotGoto:pageno];
         [self vAnnotEnd];
         return;
     }
     NSString *nuri = [m_annot getURI];
     if(nuri)//open url
     {
-        if(m_del)
-            [m_del OnAnnotOpenURL:nuri];
+        if(self.m_del)
+            [self.m_del OnAnnotOpenURL:nuri];
         [self vAnnotEnd];
         return;
     }
@@ -2264,8 +2278,8 @@
     {
         nuri = [[NSTemporaryDirectory() stringByAppendingString:@"/"] stringByAppendingString:nuri];
         [m_annot getMovieData:nuri];
-        if(m_del)
-            [m_del OnAnnotMovie:nuri];
+        if(self.m_del)
+            [self.m_del OnAnnotMovie:nuri];
         [self vAnnotEnd];
         return;
     }
@@ -2275,8 +2289,8 @@
         int spara[4];
         nuri = [[NSTemporaryDirectory() stringByAppendingString:@"/"] stringByAppendingString:nuri];
         [m_annot getSoundData:spara :nuri];
-        if(m_del)
-            [m_del OnAnnotSound:nuri];
+        if(self.m_del)
+            [self.m_del OnAnnotSound:nuri];
         [self vAnnotEnd];
         return;
     }
@@ -2286,14 +2300,14 @@
         //popup dialog to show text and subject.
         //nuri is text content.
         //subj is subject string.
-        if(m_del && (![m_annot isAnnotReadOnly] || m_annot.type == 1))
-            [m_del OnAnnotPopup:m_annot];
+        if(self.m_del && (![m_annot isAnnotReadOnly] || m_annot.type == 1))
+            [self.m_del OnAnnotPopup:m_annot];
         [self vAnnotEnd];
         return;
     }
     if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
-        if (m_del && [m_del respondsToSelector:@selector(OnAnnotSignature:)]) {
-            [m_del OnAnnotSignature:m_annot];
+        if (self.m_del && [self.m_del respondsToSelector:@selector(OnAnnotSignature:)]) {
+            [self.m_del OnAnnotSignature:m_annot];
         }
         return;
     }
@@ -2344,8 +2358,8 @@
     m_annot = nil;
     [self setNeedsDisplay];
     [m_child setNeedsDisplay];
-    if(m_del)
-        [m_del OnAnnotEnd];
+    if(self.m_del)
+        [self.m_del OnAnnotEnd];
 }
 
 -(bool)vNoteStart

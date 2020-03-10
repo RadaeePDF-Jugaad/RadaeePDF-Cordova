@@ -11,6 +11,10 @@
 @interface RDPageViewController ()
 {
     PDFDoc *doc;
+    BOOL statusBarHidden;
+    BOOL isImmersive;
+    int pageno;
+    int bgColor;
 }
 
 @end
@@ -53,7 +57,16 @@
     ViewController *viewController = [[ViewController alloc] init];
     viewController.doc = doc;
     viewController.pageViewNo = index;
+    pageno = (int)index+1;
+    if (bgColor) {
+        [viewController.pdfView setReaderBackgroundColor:bgColor];
+    }
     return viewController;
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+    return statusBarHidden;
 }
 
 #pragma mark - Page View Controller Data Source
@@ -104,5 +117,159 @@
     // Pass the selected object to the new view controller.
 }
 */
+- (void)closeView
+{
+    self.navigationController.navigationBarHidden = NO;
+    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    doc = NULL;
+}
 
+
+#pragma mark - lib methods
+
+- (id)getDoc
+{
+    return doc;
+}
+
+- (int)getCurrentPage
+{
+    return pageno;
+}
+
+- (CGImageRef)imageForPage:(int)pg
+{
+    return nil;
+}
+
+- (void)setThumbnailBGColor:(int)color
+{
+}
+
+- (void)setThumbGridBGColor:(int)color
+{
+}
+
+- (void)setThumbGridElementHeight:(float)height
+{
+}
+
+- (void)setThumbGridGap:(float)gap
+{
+}
+
+- (void)setThumbGridViewMode:(int)mode
+{
+}
+
+- (void)setReaderBGColor:(int)color
+{
+    bgColor = color;
+}
+
+- (void)setToolbarColor:(int)color {
+    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(color);
+}
+
+- (void)setToolbarTintColor:(int)color {
+    self.navigationController.navigationBar.tintColor = UIColorFromRGB(color);
+}
+
+
+- (void)setThumbHeight:(float)height
+{
+}
+
+- (void)setFirstPageCover:(BOOL)cover
+{
+}
+
+- (void)setDoubleTapZoomMode:(int)mode
+{
+}
+
+- (void)setImmersive:(BOOL)immersive
+{
+    isImmersive = immersive;
+    
+    if (isImmersive) {
+        [self hideBars];
+    } else {
+        [self showBars];
+    }
+}
+
+#pragma mark - Attachments
+
+- (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
+{
+    return NO;
+}
+
+#pragma mark - Annot render
+
+- (BOOL)addAttachmentFromPath:(NSString *)path
+{
+    return NO;
+}
+
+#pragma mark - Flat annot
+
+- (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc
+{
+    return NO;
+}
+
+- (bool)flatAnnots
+{
+    return nil;
+}
+
+#pragma mark - Save document
+
+- (bool)saveDocumentToPath:(NSString *)path
+{
+    NSString *prefix = @"file://";
+    if([path rangeOfString:prefix].location != NSNotFound)
+    {
+        path = [path substringFromIndex:prefix.length];
+    }
+    return [doc saveAs:path: NO];
+}
+
+#pragma mark - Form Manager
+
+- (NSString *)getJSONFormFields
+{
+    return @"";
+}
+
+- (NSString *)getJSONFormFieldsAtPage:(int)page
+{
+    return @"";
+}
+
+- (NSString *)setFormFieldWithJSON:(NSString *)json
+{
+    return @"";
+}
+
+#pragma mark - Utils Method
+
+- (void)showBars
+{
+    statusBarHidden = NO;
+    [self prefersStatusBarHidden];
+    isImmersive = NO;
+    [self.navigationController setNavigationBarHidden:isImmersive animated:YES];
+}
+
+- (void)hideBars
+{
+    statusBarHidden = YES;
+    [self prefersStatusBarHidden];
+    isImmersive = YES;
+    [self.navigationController setNavigationBarHidden:isImmersive animated:YES];
+}
 @end

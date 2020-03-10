@@ -97,7 +97,6 @@
 - (int)PDFOpenStream:(id<PDFStream>)stream :(NSString *)password;
 - (int)PDFOpenMem:(void *)data :(int)data_size :(NSString *)pwd;
 - (void)PDFGoto:(int)pageno;
-- (void)closeView;
 
 #pragma mark - lib methods
 

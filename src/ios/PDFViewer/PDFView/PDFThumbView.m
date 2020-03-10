@@ -30,7 +30,7 @@
     m_zoom = 1;
     m_doc = doc;
     m_delegate = del;
-    m_del = nil;
+    self.m_del = nil;
     page_gap = 1;
     m_sel_pno = -1;
     m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 2)];

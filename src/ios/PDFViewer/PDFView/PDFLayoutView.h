@@ -8,11 +8,8 @@
 #pragma once
 #import "PDFObjc.h"
 #import "RDVLayout.h"
-#import "RDVSel.h"
 #import "RDVFinder.h"
 #import "PDFOffScreenView.h"
-
-#import "ActionStackManager.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
@@ -74,7 +71,6 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     float m_zoom;
     RDVPos m_zoom_pos;
     CGPoint zoomPoint;
-    id<PDFLayoutDelegate> m_del;
     PDFOffScreenView *m_child;
     
     bool m_modified;
@@ -114,8 +110,6 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     int m_ellipse_max;
     bool m_ellipse_drawing;
     
-    ActionStackManager *actionManger;
-    
     BOOL readOnlyEnabled;
     BOOL doublePage;
     
@@ -139,6 +133,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 }
 
 @property (nonatomic) NSUInteger pageViewNo;
+@property (nonatomic, weak) id<PDFLayoutDelegate> m_del;
 
 -(id)initWithFrame:(CGRect)frame;
 -(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;

@@ -5,11 +5,12 @@
 //  Created by Paolo Messina on 06/07/15.
 //
 //
-
 #import "RadaeePDFPlugin.h"
 #import "RDLoPDFViewController.h"
+#import "RDPageViewController.h"
 #import "PDFHttpStream.h"
 #import "RDFormManager.h"
+#import "RDUtils.h"
 
 #pragma mark - Synthesize
 
@@ -131,7 +132,13 @@
     
     [self readerInit];
     
-    int result = [m_pdf PDFOpen:filePath :password atPage:page readOnly:readOnly autoSave:autoSave author:@""];
+    int result = 0;
+    
+    if (_viewMode == 7) {
+        result = [m_pdfP PDFOpenAtPath:filePath withPwd:password];
+    } else {
+        result = [m_pdf PDFOpen:filePath :password atPage:page readOnly:readOnly autoSave:autoSave author:@""];
+    }
     
     NSLog(@"%d", result);
     if(result != err_ok && result != err_open){
@@ -144,8 +151,12 @@
 
 - (void)closeReader:(CDVInvokedUrlCommand *)command
 {
-    if (m_pdf != nil) {
+    if (m_pdf != nil && ![self isPageViewController]) {
         [m_pdf closeView];
+    }
+    else if (m_pdfP != nil && _viewMode == 7)
+    {
+        [m_pdfP closeView];
     }
 }
 
@@ -210,7 +221,13 @@
         return;
     }
     
-    int page = [m_pdf getCurrentPage];
+    int page = 0;
+    if (![self isPageViewController]) {
+        page = [m_pdf getCurrentPage];
+    } else {
+        page = [m_pdfP getCurrentPage];
+    }
+    
     [self cdvOkWithMessage:[NSString stringWithFormat:@"%i", page]];
 }
 
@@ -308,6 +325,54 @@
     thumbHeight = [[params objectForKey:@"height"] floatValue];
 }
 
+- (void)getGlobal:(CDVInvokedUrlCommand *)command
+{
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    NSString *name = [params objectForKey:@"name"];
+    id value = [RDUtils getGlobalFromString:name];
+    
+    if (value) {
+        [self cdvOkWithMessage:[NSString stringWithFormat:@"%@ = %@", name, value]];
+    }
+    
+}
+
+- (void)setGlobal:(CDVInvokedUrlCommand *)command
+{
+    self.cdv_command = command;
+    
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    
+    NSString *name = [params objectForKey:@"name"];
+    id value = [params objectForKey:@"value"];
+    
+    NSArray *uintegerGlobals = [NSArray arrayWithObjects: @"g_render_quality", @"g_rect_color", @"g_line_color", @"g_ink_color", @"g_sel_color", @"g_oval_color", @"g_render_mode", @"g_annot_highlight_clr", @"g_annot_underline_clr", @"g_annot_strikeout_clr", @"g_annot_squiggly_clr", @"g_annot_transparency",nil];
+    
+    NSArray *floatGlobals = [NSArray arrayWithObjects: @"g_ink_width", @"g_rect_width", @"g_line_width", @"g_oval_width", @"g_swipe_speed", @"g_swipe_distance", @"g_zoom_level", nil];
+    
+    NSArray *boolGlobals = [NSArray arrayWithObjects: @"g_case_sensitive", @"g_match_whole_word", @"g_sel_right", @"g_screen_awake", @"g_save_doc", @"g_static_scale", @"g_paging_enabled", @"g_double_page_enabled", @"g_curl_enabled", @"g_cover_page_enabled", @"g_fit_signature_to_field", @"g_execute_annot_JS", @"g_dark_mode", @"g_annot_lock", @"g_annot_readonly", @"g_auto_launch_link", nil];
+    
+    NSArray *stringGlobals = [NSArray arrayWithObjects: @"g_pdf_name", @"g_pdf_path", @"g_author", nil];
+    
+    if ([uintegerGlobals containsObject:name]) {
+        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:[NSNumber numberWithUnsignedInt:(uint)value]];
+    }
+
+    else if ([floatGlobals containsObject:name]) {
+        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:[NSNumber numberWithFloat:[value floatValue]]];
+    }
+    
+    else if ([boolGlobals containsObject:name])
+    {
+        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:[NSNumber numberWithBool:(BOOL)value]];
+    }
+    
+    else if ([stringGlobals containsObject:name]) {
+        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:value];
+    }
+}
+
 - (void)setFirstPageCover:(CDVInvokedUrlCommand*)command
 {
     self.cdv_command = command;
@@ -341,83 +406,83 @@
 
 - (void)readerInit
 {
-    if( m_pdf == nil )
+    if( m_pdf == nil && ![self isPageViewController])
     {
         m_pdf = [[RDLoPDFViewController alloc] init];
-    }
-    
-    [m_pdf setDelegate:self];
-    
-    [self setPagingEnabled:NO];
-    [self setDoublePageEnabled:YES];
-    
-    [m_pdf setFirstPageCover:firstPageCover];
-    [m_pdf setDoubleTapZoomMode:2];
-    [m_pdf setImmersive:NO];
-    
-    [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
-    [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
-    [m_pdf setLineImage:[UIImage imageNamed:@"btn_annot_ink.png"]];
-    [m_pdf setRectImage:[UIImage imageNamed:@"btn_annot_rect.png"]];
-    [m_pdf setEllipseImage:[UIImage imageNamed:@"btn_annot_ellipse.png"]];
-    [m_pdf setOutlineImage:[UIImage imageNamed:@"btn_outline.png"]];
-    [m_pdf setPrintImage:[UIImage imageNamed:@"btn_print.png"]];
-    [m_pdf setGridImage:[UIImage imageNamed:@"btn_grid.png"]];
-    [m_pdf setUndoImage:[UIImage imageNamed:@"btn_undo.png"]];
-    [m_pdf setRedoImage:[UIImage imageNamed:@"btn_redo.png"]];
-    [m_pdf setMoreImage:[UIImage imageNamed:@"btn_more.png"]];
-    
-    [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
-    
-    [m_pdf setPrevImage:[UIImage imageNamed:@"btn_left.png"]];
-    [m_pdf setNextImage:[UIImage imageNamed:@"btn_right.png"]];
-    
-    [m_pdf setPerformImage:[UIImage imageNamed:@"btn_perform.png"]];
-    [m_pdf setDeleteImage:[UIImage imageNamed:@"btn_remove.png"]];
-    
-    [m_pdf setDoneImage:[UIImage imageNamed:@"btn_done.png"]];
-    
-    [m_pdf setHideGridImage:YES];
-    
-    if (disableToolbar) {
-        [m_pdf setHideSearchImage:YES];
-        [m_pdf setHideDrawImage:YES];
-        [m_pdf setHideSelImage:YES];
-        [m_pdf setHideUndoImage:YES];
-        [m_pdf setHideRedoImage:YES];
-        [m_pdf setHideMoreImage:YES];
+    } if (_viewMode == 7) {
+        m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
     } else {
-        [m_pdf setHideSearchImage:NO];
-        [m_pdf setHideDrawImage:NO];
-        [m_pdf setHideSelImage:NO];
-        [m_pdf setHideUndoImage:NO];
-        [m_pdf setHideRedoImage:NO];
-        [m_pdf setHideMoreImage:NO];
+        [m_pdf setDelegate:self];
+        
+        [self setPagingEnabled:NO];
+        [self setDoublePageEnabled:YES];
+        
+        [m_pdf setFirstPageCover:firstPageCover];
+        [m_pdf setDoubleTapZoomMode:2];
+        [m_pdf setImmersive:NO];
+        
+        [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
+        [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
+        [m_pdf setLineImage:[UIImage imageNamed:@"btn_annot_ink.png"]];
+        [m_pdf setRectImage:[UIImage imageNamed:@"btn_annot_rect.png"]];
+        [m_pdf setEllipseImage:[UIImage imageNamed:@"btn_annot_ellipse.png"]];
+        [m_pdf setOutlineImage:[UIImage imageNamed:@"btn_outline.png"]];
+        [m_pdf setPrintImage:[UIImage imageNamed:@"btn_print.png"]];
+        [m_pdf setGridImage:[UIImage imageNamed:@"btn_grid.png"]];
+        [m_pdf setUndoImage:[UIImage imageNamed:@"btn_undo.png"]];
+        [m_pdf setRedoImage:[UIImage imageNamed:@"btn_redo.png"]];
+        [m_pdf setMoreImage:[UIImage imageNamed:@"btn_more.png"]];
+        [m_pdf setRemoveImage:[UIImage imageNamed:@"annot_remove.png"]];
+        
+        [m_pdf setPrevImage:[UIImage imageNamed:@"btn_left.png"]];
+        [m_pdf setNextImage:[UIImage imageNamed:@"btn_right.png"]];
+        
+        [m_pdf setPerformImage:[UIImage imageNamed:@"btn_perform.png"]];
+        [m_pdf setDeleteImage:[UIImage imageNamed:@"btn_remove.png"]];
+        
+        [m_pdf setDoneImage:[UIImage imageNamed:@"btn_done.png"]];
+        
+        [m_pdf setHideGridImage:YES];
+        
+        if (disableToolbar) {
+            [m_pdf setHideSearchImage:YES];
+            [m_pdf setHideDrawImage:YES];
+            [m_pdf setHideSelImage:YES];
+            [m_pdf setHideUndoImage:YES];
+            [m_pdf setHideRedoImage:YES];
+            [m_pdf setHideMoreImage:YES];
+        } else {
+            [m_pdf setHideSearchImage:NO];
+            [m_pdf setHideDrawImage:NO];
+            [m_pdf setHideSelImage:NO];
+            [m_pdf setHideUndoImage:NO];
+            [m_pdf setHideRedoImage:NO];
+            [m_pdf setHideMoreImage:NO];
+        }
+        
+        /*
+         SetColor, Available features
+         
+         0: inkColor
+         1: rectColor
+         2: underlineColor
+         3: strikeoutColor
+         4: highlightColor
+         5: ovalColor
+         6: selColor
+         7: arrowColor
+         
+         */
+        
+        [self setColor:0xFF000000 forFeature:0];
+        [self setColor:0xFF000000 forFeature:1];
+        [self setColor:0xFF000000 forFeature:2];
+        [self setColor:0xFF000000 forFeature:3];
+        [self setColor:0xFFFFFF00 forFeature:4];
+        [self setColor:0xFF000000 forFeature:5];
+        [self setColor:0x400000C0 forFeature:6];
+        [self setColor:0xFF000000 forFeature:7];
     }
-    
-    /*
-     SetColor, Available features
-     
-     0: inkColor
-     1: rectColor
-     2: underlineColor
-     3: strikeoutColor
-     4: highlightColor
-     5: ovalColor
-     6: selColor
-     7: arrowColor
-     
-     */
-    
-    [self setColor:0xFF000000 forFeature:0];
-    [self setColor:0xFF000000 forFeature:1];
-    [self setColor:0xFF000000 forFeature:2];
-    [self setColor:0xFF000000 forFeature:3];
-    [self setColor:0xFFFFFF00 forFeature:4];
-    [self setColor:0xFF000000 forFeature:5];
-    [self setColor:0x400000C0 forFeature:6];
-    [self setColor:0xFF000000 forFeature:7];
-    
     [self loadSettingsWithDefaults];
 }
 
@@ -425,26 +490,36 @@
 {
     [self pdfChargeDidFinishLoading];
     
-    //toggle thumbnail/seekbar
-    if (bottomBar < 1){
-        [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
-        //[m_pdf PDFThumbNailinit:1];
-        [m_pdf setThumbnailBGColor:thumbBackgroundColor];
+    if (![self isPageViewController]) {
+        //toggle thumbnail/seekbar
+        if (bottomBar < 1){
+            [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
+            //[m_pdf PDFThumbNailinit:1];
+            [m_pdf setThumbnailBGColor:thumbBackgroundColor];
+        }
+        //else
+        //[m_pdf PDFSeekBarInit:1];
+        
+        [m_pdf setReaderBGColor:readerBackgroundColor];
+        
+        //Set thumbGridView
+        [m_pdf setThumbGridBGColor:gridBackgroundColor];
+        [m_pdf setThumbGridElementHeight:gridElementHeight];
+        [m_pdf setThumbGridGap:gridGap];
+        [m_pdf setThumbGridViewMode:gridMode];
+        
+        m_pdf.hidesBottomBarWhenPushed = YES;
     }
-    //else
-    //[m_pdf PDFSeekBarInit:1];
     
-    [m_pdf setReaderBGColor:readerBackgroundColor];
     
-    //Set thumbGridView
-    [m_pdf setThumbGridBGColor:gridBackgroundColor];
-    [m_pdf setThumbGridElementHeight:gridElementHeight];
-    [m_pdf setThumbGridGap:gridGap];
-    [m_pdf setThumbGridViewMode:gridMode];
+    UINavigationController *navController;
     
-    m_pdf.hidesBottomBarWhenPushed = YES;
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:m_pdf];
+    navController = [[UINavigationController alloc] initWithRootViewController:([self isPageViewController]) ? m_pdfP : m_pdf];
     
+    if ([self isPageViewController]) {
+        navController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_back"] style:UIBarButtonItemStyleDone target:nil action:@selector(closeReader:)];
+    }
+
     if (titleBackgroundColor != 0) {
         navController.navigationBar.barTintColor = UIColorFromRGB(titleBackgroundColor);
     } else {
@@ -687,6 +762,14 @@
         default:
             break;
     }
+}
+
+- (BOOL)isPageViewController
+{
+    if (_viewMode != 7) {
+        return NO;
+    }
+    else return YES;
 }
 
 #pragma mark - Init defaults
