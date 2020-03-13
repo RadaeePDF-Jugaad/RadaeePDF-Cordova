@@ -61,7 +61,7 @@ static int  currentIndex=1;
 {
     [super viewWillAppear:animated];
     
-    GLOBAL.g_annot_strikeout_clr = [[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
+    GLOBAL.g_annot_strikeout_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
     if(GLOBAL.g_annot_strikeout_clr ==0)
     {
         GLOBAL.g_annot_strikeout_clr =0xFFFF0000;
@@ -80,17 +80,6 @@ static int  currentIndex=1;
 }
 //END
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return [self.arrayData count];
@@ -101,17 +90,6 @@ static int  currentIndex=1;
     NSString *stringDataKey = [self.arrayData objectAtIndex:section];
     NSArray *arraySection = [self.dicData objectForKey:stringDataKey];
     return [arraySection count];
-}
-
--(UITableViewCellAccessoryType)tableView:(UITableView *)tableView accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath
-{
-    if(indexPath.row == currentIndex)
-    {
-        return UITableViewCellAccessoryCheckmark;
-    }
-    else{
-        return UITableViewCellAccessoryNone;
-    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -167,7 +145,7 @@ static int  currentIndex=1;
     {
         oldCell.accessoryType=UITableViewCellAccessoryCheckmark;
     }
-    currentIndex = indexPath.row;
+    currentIndex = (int)indexPath.row;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {

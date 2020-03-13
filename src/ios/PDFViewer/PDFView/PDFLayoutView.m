@@ -52,7 +52,7 @@
         self.delegate = self;
         m_zoom = 1;
         self.minimumZoomScale = 1;
-        self.maximumZoomScale = GLOBAL.g_zoom_level;
+        self.maximumZoomScale = GLOBAL.g_layout_zoom_level;
         self.bouncesZoom = NO;
         m_child = [[PDFOffScreenView alloc] initWithFrame
                    :CGRectMake(0, 0, frame.size.width, frame.size.height)];
@@ -104,7 +104,7 @@
     
     
     bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
-    self.backgroundColor = (readerBackgroundColor != 0) ? UIColorFromRGB(readerBackgroundColor) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
+    self.backgroundColor = (GLOBAL.g_readerview_bg_color != 0) ? UIColorFromRGB(GLOBAL.g_readerview_bg_color) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
     m_child.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
 
     switch (GLOBAL.g_render_mode) {
@@ -483,7 +483,7 @@
 
 -(void)osDrawAnnot:(CGContextRef)context
 {
-    if( m_status == sta_annot )
+    if( m_status == sta_annot && GLOBAL.g_highlight_annotation)
     {
         int dx = (m_tx - m_px) / m_scale_pix;
         int dy = (m_ty - m_py) / m_scale_pix;
@@ -1013,19 +1013,19 @@
     NSLog(@"double tap");
     
     if (doubleTapZoomMode > 0) {
-        if (m_zoom > 1){
+        if (m_zoom > GLOBAL.g_zoom_level){
             if ([self pagingAvailable]) {
                 self.pagingEnabled = GLOBAL.g_paging_enabled;
             }
             [self resetZoomLevel];
-        }else {
+        } else {
             self.pagingEnabled = NO;
             
             if (doubleTapZoomMode == 1) {
                 [self defaultZoom:touch];
             } else {
 #ifndef SMART_ZOOM
-                [self defaultZoom:touch];
+                //[self defaultZoom:touch];
 #else
                 [self initZoomWithPoint:[touch locationInView:self.window]];
                 RDVPos pos;
@@ -1100,12 +1100,19 @@
         center.y += self.contentOffset.y;
         imgAnnot.center = center;
     }
+    
     m_status = m_status_buf;
 }
 
 - (void)defaultZoom:(UITouch *)touch
 {
-    [self zoomPageToScale:2.0 atPoint:[touch locationInView:self.window]];
+    if (self.zoomScale == GLOBAL.g_zoom_level && GLOBAL.g_zoom_step > 0) {
+        GLOBAL.g_zoom_step *= -1;
+    } else if (self.zoomScale <= self.minimumZoomScale && GLOBAL.g_zoom_step) {
+        GLOBAL.g_zoom_step = 1;
+    }
+    self.zoomScale = (self.zoomScale + GLOBAL.g_zoom_step > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : self.zoomScale + GLOBAL.g_zoom_step;
+    [self zoomPageToScale:self.zoomScale atPoint:[touch locationInView:self.window]];
 }
 
 -(void)OnSingleTap:(float)x :(float)y
@@ -1198,7 +1205,7 @@
             nu = [m_annot getListItemCount];
             if (nu != -1){
                 
-                BOOL multi = [m_annot isMultiSel];
+                //BOOL multi = [m_annot isMultiSel];
                 
                 NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
                 for (int i = 0; i < nu; i++) {
@@ -2114,10 +2121,10 @@
 
 - (void)setReaderBackgroundColor:(int)color
 {
-    readerBackgroundColor = color;
+    GLOBAL.g_readerview_bg_color = color;
     
-    if (readerBackgroundColor != 0) {
-        self.backgroundColor = UIColorFromRGB(readerBackgroundColor);
+    if (GLOBAL.g_readerview_bg_color != 0) {
+        self.backgroundColor = UIColorFromRGB(color);
     }
 }
 
@@ -2306,7 +2313,7 @@
         return;
     }
     if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
-        if (self.m_del && [self.m_del respondsToSelector:@selector(OnAnnotSignature:)]) {
+        if (self.m_del && [self.m_del respondsToSelector:@selector(OnAnnotSignature:)] && GLOBAL.g_enable_graphical_signature) {
             [self.m_del OnAnnotSignature:m_annot];
         }
         return;
@@ -2520,7 +2527,7 @@
                 PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
-                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_line_width :0 :1 :GLOBAL.g_line_color :GLOBAL.g_line_color];
+                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_line_width :GLOBAL.g_line_annot_style1 :GLOBAL.g_line_annot_style2 :GLOBAL.g_line_color :GLOBAL.g_line_annot_fill_color];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -2626,7 +2633,7 @@
             PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                       :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&rect];
-            [page addAnnotRect:&rect: GLOBAL.g_rect_width * m_scale_pix / [vpage scale]: GLOBAL.g_rect_color: 0];
+            [page addAnnotRect:&rect: GLOBAL.g_rect_width * m_scale_pix / [vpage scale]: GLOBAL.g_rect_color: GLOBAL.g_rect_annot_fill_color];
             
             //Action Stack Manger
             [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -2730,7 +2737,7 @@
             PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                       :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&rect];
-            [page addAnnotEllipse:&rect:GLOBAL.g_oval_width * m_scale_pix / [vpage scale] :GLOBAL.g_oval_color:0];
+            [page addAnnotEllipse:&rect:GLOBAL.g_oval_width * m_scale_pix / [vpage scale] :GLOBAL.g_oval_color:GLOBAL.g_ellipse_annot_fill_color];
             
             //Action Stack Manger
             [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];

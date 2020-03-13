@@ -54,19 +54,12 @@ static int currentIndex=2;
     self.arrayData = array;
 }
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
 //GEAR
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    GLOBAL.g_annot_underline_clr = [[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
+    GLOBAL.g_annot_underline_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
     if(GLOBAL.g_annot_underline_clr ==0)
     {
         GLOBAL.g_annot_underline_clr =0xFF0000FF;
@@ -85,25 +78,11 @@ static int currentIndex=2;
 }
 //END
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return [self.arrayData count];
 }
 
--(UITableViewCellAccessoryType)tableView:(UITableView *)tableView accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath
-{
-    if(indexPath.row == currentIndex)
-    {
-        return UITableViewCellAccessoryCheckmark;
-    }
-    else{
-        return UITableViewCellAccessoryNone;
-    }
-}
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     NSString *stringDataKey = [self.arrayData objectAtIndex:section];
@@ -175,7 +154,7 @@ static int currentIndex=2;
     {
         oldCell.accessoryType=UITableViewCellAccessoryCheckmark;
     }
-    currentIndex = indexPath.row;
+    currentIndex = (int)indexPath.row;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {

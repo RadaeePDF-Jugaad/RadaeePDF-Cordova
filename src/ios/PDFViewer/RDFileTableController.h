@@ -7,7 +7,6 @@
 
 
 #import <UIKit/UIKit.h>
-#import "RDUPassWord.h"
 #import "sys/utsname.h"
 #import "PDFHttpStream.h"
 #import "RDLoPDFViewController.h"

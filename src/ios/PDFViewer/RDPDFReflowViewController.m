@@ -48,13 +48,13 @@
 -(void)createToolbarItems
 {
     toolBar.barStyle = UIBarStyleBlackOpaque;
-    UIBarButtonItem *fontBigButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"fontBig"] style:UIBarStyleBlackOpaque target:self action:@selector(fontBig)];
+    UIBarButtonItem *fontBigButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"fontBig"] style:UIBarButtonItemStylePlain target:self action:@selector(fontBig)];
     fontBigButton.width =29;
-    UIBarButtonItem *fontSmallButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"fontSmall"] style:UIBarStyleBlackOpaque target:self action:@selector(fontSmall)];
+    UIBarButtonItem *fontSmallButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"fontSmall"] style:UIBarButtonItemStylePlain target:self action:@selector(fontSmall)];
     fontSmallButton.width =29;
-    UIBarButtonItem *nextPageButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_right"] style:UIBarStyleBlackOpaque target:self action:@selector(nextPage)];
+    UIBarButtonItem *nextPageButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_right"] style:UIBarButtonItemStylePlain target:self action:@selector(nextPage)];
     nextPageButton.width =29;
-    UIBarButtonItem *prePageButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_left"] style:UIBarStyleBlackOpaque target:self action:@selector(prePage)];
+    UIBarButtonItem *prePageButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_left"] style:UIBarButtonItemStylePlain target:self action:@selector(prePage)];
     prePageButton.width =29;
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
                                initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace

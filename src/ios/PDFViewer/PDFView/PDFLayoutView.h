@@ -230,10 +230,12 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
 
+/*
 - (CGImageRef )vGetImageForPage:(int)pg withSize:(CGSize)size withBackground:(BOOL)hasBackground;
 - (float)getViewWidth;
 - (float)getViewHeight;
 - (BOOL)isCurlEnabled;
+*/
 
 - (void)refreshCurrentPage;
 - (void)refreshCachedPages;

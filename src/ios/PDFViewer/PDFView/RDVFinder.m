@@ -229,7 +229,7 @@
     if( m_finder != NULL && m_page_find_index >= 0 && m_page_find_index < m_page_find_cnt )
     {
         int ichar = [m_finder objsIndex:m_page_find_index];
-        int ichar_end = ichar + [m_str length];
+        int ichar_end = ichar + (int)[m_str length];
         PDF_RECT rect;
         PDF_RECT rect_word;
         PDF_RECT rect_draw;
@@ -252,7 +252,7 @@
                 rect_draw.top = ([page GetVY:rect_word.bottom] - docy) * imul;
                 rect_draw.right = ([page GetVX:rect_word.right] - docx) * imul;
                 rect_draw.bottom = ([page GetVY:rect_word.top] - docy) * imul;
-                [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color];
+                [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_find_primary_color];
                 rect_word = rect;
             }
             ichar++;
@@ -261,7 +261,7 @@
         rect_draw.top = ([page GetVY:rect_word.bottom] - docy) * imul;
         rect_draw.right = ([page GetVX:rect_word.right] - docx) * imul;
         rect_draw.bottom = ([page GetVY:rect_word.top] - docy) * imul;
-        [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color];
+        [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_find_primary_color];
     }
 }
 
@@ -277,7 +277,7 @@
     if( m_finder != NULL && m_page_find_index >= 0 && m_page_find_index < m_page_find_cnt )
     {
         int ichar = [m_finder objsIndex:m_page_find_index];
-        int ichar_end = ichar + [m_str length];
+        int ichar_end = ichar + (int)[m_str length];
         PDF_RECT rect;
         PDF_RECT rect_word;
         PDF_RECT rect_draw;
@@ -300,7 +300,7 @@
                 rect_draw.top = [page GetVY:rect_word.bottom] * imul;
                 rect_draw.right = [page GetVX:rect_word.right] * imul;
                 rect_draw.bottom = [page GetVY:rect_word.top] * imul;
-                [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color];
+                [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_find_primary_color];
                 rect_word = rect;
             }
             ichar++;
@@ -309,7 +309,7 @@
         rect_draw.top = [page GetVY:rect_word.bottom] * imul;
         rect_draw.right = [page GetVX:rect_word.right] * imul;
         rect_draw.bottom = [page GetVY:rect_word.top] * imul;
-        [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_sel_color];
+        [canvas FillRect:CGRectMake(rect_draw.left, rect_draw.top, (rect_draw.right - rect_draw.left), (rect_draw.bottom - rect_draw.top)): GLOBAL.g_find_primary_color];
     }
 }
 - (void)find_draw_all:(RDVCanvas *)canvas :(RDVPage *)page

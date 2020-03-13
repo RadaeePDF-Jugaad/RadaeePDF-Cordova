@@ -36,13 +36,22 @@
 @property (strong, nonatomic) NSMutableString *pdfName;
 @property (strong, nonatomic) NSMutableString *pdfPath;
 @property (strong, nonatomic) NSString *g_author;
+@property (strong, nonatomic) NSString *g_sign_pad_descr;
 
-@property (nonatomic) int g_render_quality;
 @property (nonatomic) uint g_rect_color;
 @property (nonatomic) uint g_line_color;
 @property (nonatomic) uint g_ink_color;
 @property (nonatomic) uint g_sel_color;
 @property (nonatomic) uint g_oval_color;
+@property (nonatomic) uint g_rect_annot_fill_color;
+@property (nonatomic) uint g_ellipse_annot_fill_color;
+@property (nonatomic) uint g_line_annot_fill_color;
+@property (nonatomic) uint g_annot_highlight_clr;
+@property (nonatomic) uint g_annot_underline_clr;
+@property (nonatomic) uint g_annot_strikeout_clr;
+@property (nonatomic) uint g_annot_squiggly_clr;
+@property (nonatomic) uint g_annot_transparency;
+@property (nonatomic) uint g_find_primary_color;
 
 @property (nonatomic) bool g_case_sensitive;
 @property (nonatomic) bool g_match_whole_word;
@@ -56,9 +65,10 @@
 @property (nonatomic) float g_oval_width;
 @property (nonatomic) float g_swipe_speed;
 @property (nonatomic) float g_swipe_distance;
-
-@property (nonatomic) int g_render_mode;
 @property (nonatomic) float g_zoom_level;
+@property (nonatomic) float g_layout_zoom_level;
+@property (nonatomic) float g_zoom_step;
+
 @property (nonatomic) bool g_static_scale;
 @property (nonatomic) bool g_paging_enabled;
 @property (nonatomic) bool g_double_page_enabled;
@@ -70,14 +80,18 @@
 @property (nonatomic) bool g_annot_lock;
 @property (nonatomic) bool g_annot_readonly;
 @property (nonatomic) bool g_auto_launch_link;
-@property (nonatomic) int renderQuality;
+@property (nonatomic) bool g_highlight_annotation;
+@property (nonatomic) bool g_enable_graphical_signature;
 
-@property (nonatomic) uint g_annot_highlight_clr;
-@property (nonatomic) uint g_annot_underline_clr;
-@property (nonatomic) uint g_annot_strikeout_clr;
-@property (nonatomic) uint g_annot_squiggly_clr;
+@property (nonatomic) int g_render_quality;
+@property (nonatomic) int g_render_mode;
+@property (nonatomic) int g_navigation_mode;
+@property (nonatomic) int g_line_annot_style1;
+@property (nonatomic) int g_line_annot_style2;
+@property (nonatomic) int g_thumbview_bg_color;
+@property (nonatomic) int g_thumbview_height;
+@property (nonatomic) int g_readerview_bg_color;
 
-@property (nonatomic) uint g_annot_transparency;
 
 + (RDVGlobal *)sharedInstance;
 + (void)Init;

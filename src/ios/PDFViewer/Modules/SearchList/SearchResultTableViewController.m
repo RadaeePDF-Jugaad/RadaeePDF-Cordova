@@ -32,21 +32,21 @@
     void(^progressBlock)(NSMutableArray *, NSMutableArray *) = ^(NSMutableArray *occurrences, NSMutableArray *total){
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (items.count != (total.count - occurrences.count)) {
+            if (self->items.count != (total.count - occurrences.count)) {
                 for (id occ in occurrences) {
                     [total removeObject:occ];
                 }
-                items = total;
+                self->items = total;
                 [self.tableView reloadData];
             }
             
             if (occurrences.count > 0) {
                 NSLog(@"--- SEARCHED PAGE: %i ---", [(RDSearchResult *)[occurrences objectAtIndex:0] page]);
                 [self.tableView beginUpdates];
-                [items addObjectsFromArray:occurrences];
+                [self->items addObjectsFromArray:occurrences];
                 NSMutableArray *indexPaths = [NSMutableArray array];
                 for (int i = 0; i < occurrences.count; i++) {
-                    [indexPaths addObject:[NSIndexPath indexPathForRow:(items.count - occurrences.count) + i inSection:0]];
+                    [indexPaths addObject:[NSIndexPath indexPathForRow:(self->items.count - occurrences.count) + i inSection:0]];
                 }
                 [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
                 [self updateFooterText];
@@ -56,7 +56,7 @@
         });
     };
     
-    void(^finishBlock)() = ^(){
+    void(^finishBlock)(void) = ^(){
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"--- SEARCH FINISHED ---");
             [self updateFooterText];
@@ -74,7 +74,7 @@
         [[RDExtendedSearch sharedInstance] clearSearch:^{
             // ricerca asincrona
             NSLog(@"--- SEARCH START ---");
-            [[RDExtendedSearch sharedInstance] searchText:_searchedString inDoc:_doc progress:^(NSMutableArray *occurrences, NSMutableArray *total) {
+            [[RDExtendedSearch sharedInstance] searchText:self->_searchedString inDoc:self->_doc progress:^(NSMutableArray *occurrences, NSMutableArray *total) {
                 progressBlock(occurrences, total);
             } finish:^{
                 finishBlock();

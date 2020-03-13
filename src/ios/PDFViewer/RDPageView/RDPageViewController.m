@@ -165,7 +165,7 @@
 
 - (void)setReaderBGColor:(int)color
 {
-    bgColor = color;
+    GLOBAL.g_readerview_bg_color = color;
 }
 
 - (void)setToolbarColor:(int)color {

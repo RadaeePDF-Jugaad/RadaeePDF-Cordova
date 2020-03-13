@@ -40,7 +40,7 @@
     closeButton.width = ICON_WIDTH;
     
     UIImage *searchImg = (_searchImage) ? _searchImage : [UIImage imageNamed:@"btn_search"];
-    _searchButton = [[UIBarButtonItem alloc]initWithImage:searchImg style:UIBarStyleBlackOpaque target:self action:@selector(searchClick)];
+    _searchButton = [[UIBarButtonItem alloc]initWithImage:searchImg style:UIBarButtonItemStylePlain target:self action:@selector(searchClick)];
     _searchButton.width = ICON_WIDTH;
     
     UIImage *drawImg = (_drawImage) ? _drawImage : [UIImage imageNamed:@"btn_ink"];
@@ -68,28 +68,28 @@
     normalToolBarArray = [[NSMutableArray alloc] initWithObjects:_searchButton,drawButton,selectText,undoButton,redoButton,gridButton, [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil], _moreButton,nil];
     
     UIImage *rightImg = (_nextImage) ? _nextImage : [UIImage imageNamed:@"btn_right"];
-    UIBarButtonItem *nextbutton=[[UIBarButtonItem alloc]initWithImage:rightImg style:UIBarStyleBlackOpaque target:self action:@selector(nextword)];
+    UIBarButtonItem *nextbutton=[[UIBarButtonItem alloc]initWithImage:rightImg style:UIBarButtonItemStylePlain target:self action:@selector(nextword)];
     nextbutton.width = ICON_WIDTH;
     
     UIImage *leftImg = (_prevImage) ? _prevImage : [UIImage imageNamed:@"btn_left"];
-    UIBarButtonItem *prevbutton=[[UIBarButtonItem alloc]initWithImage:leftImg style:UIBarStyleBlackOpaque target:self action:@selector(prevword)];
+    UIBarButtonItem *prevbutton=[[UIBarButtonItem alloc]initWithImage:leftImg style:UIBarButtonItemStylePlain target:self action:@selector(prevword)];
     prevbutton.width = ICON_WIDTH;
     
     UIImage *removeImg = (_removeImage) ? _removeImage : [UIImage imageNamed:@"btn_annot_remove"];
-    UIBarButtonItem *searchCancelbtn=[[UIBarButtonItem alloc]initWithImage:removeImg style:UIBarStyleBlackOpaque target:self action:@selector(searchCancel)];
+    UIBarButtonItem *searchCancelbtn=[[UIBarButtonItem alloc]initWithImage:removeImg style:UIBarButtonItemStylePlain target:self action:@selector(searchCancel)];
     searchCancelbtn.width = ICON_WIDTH;
     searchToolBarArray = [[NSArray alloc]initWithObjects:_searchButton,prevbutton,nextbutton,searchCancelbtn,nil];
     
     UIImage *performImg = (_performImage) ? _performImage : [UIImage imageNamed:@"btn_perform"];
-    UIBarButtonItem *playbutton=[[UIBarButtonItem alloc]initWithImage:performImg style:UIBarStyleBlackOpaque target:self action:@selector(performAnnot)];
+    UIBarButtonItem *playbutton=[[UIBarButtonItem alloc]initWithImage:performImg style:UIBarButtonItemStylePlain target:self action:@selector(performAnnot)];
     playbutton.width = ICON_WIDTH;
     
     UIImage *deleteImg = (_deleteImage) ? _deleteImage : [UIImage imageNamed:@"btn_remove"];
-    UIBarButtonItem *deletebutton=[[UIBarButtonItem alloc]initWithImage:deleteImg style:UIBarStyleBlackOpaque target:self action:@selector(deleteAnnot)];
+    UIBarButtonItem *deletebutton=[[UIBarButtonItem alloc]initWithImage:deleteImg style:UIBarButtonItemStylePlain target:self action:@selector(deleteAnnot)];
     deletebutton.width = ICON_WIDTH;
     
     UIImage *cancelImg = (_removeImage) ? _removeImage : [UIImage imageNamed:@"btn_annot_remove"];
-    UIBarButtonItem *cancelbtn=[[UIBarButtonItem alloc]initWithImage:cancelImg style:UIBarStyleBlackOpaque target:self action:@selector(annotCancel)];
+    UIBarButtonItem *cancelbtn=[[UIBarButtonItem alloc]initWithImage:cancelImg style:UIBarButtonItemStylePlain target:self action:@selector(annotCancel)];
     cancelbtn.width = ICON_WIDTH;
     performToolBarArray = [[NSArray alloc]initWithObjects:playbutton,deletebutton,cancelbtn,nil];
     

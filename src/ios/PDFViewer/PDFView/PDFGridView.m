@@ -76,7 +76,7 @@
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
@@ -97,7 +97,7 @@
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     
     if( cnt == 1 )
     {
@@ -114,7 +114,7 @@
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];

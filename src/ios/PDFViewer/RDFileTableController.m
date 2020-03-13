@@ -74,7 +74,7 @@ NSString *pdfFullPath;
 -(bool)seek:(unsigned long long)pos
 {
     if( !m_file ) return false;
-    fseek(m_file, pos , SEEK_SET);
+    fseek(m_file, (int)pos , SEEK_SET);
     return true;
 }
 @end
@@ -215,26 +215,16 @@ NSString *pdfFullPath;
     
     NSString *testfile1 = documentPath;
     
-    char *path1 = [testfile1 UTF8String];
+    char *path1 = (char *)[testfile1 UTF8String];
     FILE *file1 = fopen(path1, "rb");
     fseek(file1, 0, SEEK_END);
-    int filesize1 = ftell(file1);
+    int filesize1 = (int)ftell(file1);
     fseek(file1, 0, SEEK_SET);
     buffer = malloc((filesize1)*sizeof(char));
     fread(buffer, filesize1, 1, file1);
     fclose(file1);
     
     [m_pdf PDFOpenMem: buffer :filesize1 :nil];
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return YES;
 }
 
 - (BOOL)shouldAutorotate
@@ -373,15 +363,6 @@ NSString *pdfFullPath;
     
     if (GLOBAL.g_render_mode == 7) {
         m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
-        NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
-        NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
-        NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
-        RDUPassWord* pwdDlg = [[RDUPassWord alloc]
-                               initWithTitle:Enterpassword
-                               message:nil
-                               delegate:self
-                               cancelButtonTitle:ok
-                               otherButtonTitles:cancel, nil];
         
         NSLock *theLock = [[NSLock alloc] init];
         if ([theLock tryLock])
@@ -399,15 +380,19 @@ NSString *pdfFullPath;
             //return value is encryption document
             else if(result == 2)
             {
-                [pwdDlg show];
+                [self presentPwdAlertControllerWithTitle:NSLocalizedString(@"Please Enter PassWord", @"Localizable") message:nil];
             }
             else if (result == 0)
             {
                 NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
                 NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
                 NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-                UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-                [alter show];
+                UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                           message:str2
+                                           preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+                [alert addAction:okAction];
+                [self presentViewController:alert animated:YES completion:nil];
             }
             [theLock unlock];
         }
@@ -417,15 +402,6 @@ NSString *pdfFullPath;
             {
                 m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
             }
-            NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
-            NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
-            NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
-            RDUPassWord* pwdDlg = [[RDUPassWord alloc]
-                                   initWithTitle:Enterpassword
-                                   message:nil
-                                   delegate:self
-                                   cancelButtonTitle:ok
-                                   otherButtonTitles:cancel, nil];
             
             NSLock *theLock = [[NSLock alloc] init];
             
@@ -453,22 +429,26 @@ NSString *pdfFullPath;
                 //return value is encryption document
                 else if(result == 2)
                 {
-                    [pwdDlg show];
+                    [self presentPwdAlertControllerWithTitle:NSLocalizedString(@"Please Enter PassWord", @"Localizable") message:nil];
                 }
                 else if (result == 0)
                 {
                     NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
                     NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
                     NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-                    UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-                    [alter show];
+                    UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                               message:str2
+                                               preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+                    [alert addAction:okAction];
+                    [self presentViewController:alert animated:YES completion:nil];
                 }
                 [theLock unlock];
             }
         }
     }
     
-    
+/*
 - (void)alertView:(UIAlertView *)pwdDlg clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     int result;
@@ -500,6 +480,44 @@ NSString *pdfFullPath;
     }
     
 }
+ */
+
+- (void)presentPwdAlertControllerWithTitle:(NSString *)title message:(NSString *)message
+{
+    UIAlertController *pwdAlert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    [pwdAlert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = NSLocalizedString(@"PassWord", @"Localizable");
+        textField.secureTextEntry = YES;
+    }];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        UITextField *password = pwdAlert.textFields.firstObject;
+        if (![password.text isEqualToString:@""]) {
+            int result = [self->m_pdf PDFOpen:pdfFullPath :password.text];
+                if(result == 1)
+                {
+                    UINavigationController *nav = self.navigationController;
+                    self->m_pdf.hidesBottomBarWhenPushed = YES;
+                    nav.hidesBottomBarWhenPushed =NO;
+                    [nav pushViewController:self->m_pdf animated:YES];
+                }
+                else if(result == 2)
+                {
+                    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+                    NSString *str2=NSLocalizedString(@"Error PassWord", @"Localizable");
+                    [self presentPwdAlertControllerWithTitle:str1 message:str2];
+                }
+        }
+        else
+        {
+            [self presentViewController:pwdAlert animated:YES completion:nil];
+        }
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Localizable")  style:UIAlertActionStyleCancel handler:nil];
+    
+    [pwdAlert addAction:okAction];
+    [pwdAlert addAction:cancel];
+    [self presentViewController:pwdAlert animated:YES completion:nil];
+}
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
@@ -519,17 +537,15 @@ NSString *pdfFullPath;
         GLOBAL.g_render_quality =1;
     }
     
-    GLOBAL.renderQuality = GLOBAL.g_render_quality;
-    
     GLOBAL.g_render_mode =  (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
     
     //for curl mode
     GLOBAL.g_curl_enabled = (GLOBAL.g_render_mode == 6);
     
     GLOBAL.g_ink_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
-    if(GLOBAL.g_ink_color ==0)
+    if(GLOBAL.g_ink_color == 0)
     {
-        GLOBAL.g_ink_color =0xFF0000FF;
+        GLOBAL.g_ink_color = 0xFF0000FF;
     }
     
     GLOBAL.g_ink_width = [[NSUserDefaults standardUserDefaults] floatForKey:@"InkWidth"];

@@ -16,7 +16,6 @@
 {
     id<PDFThumbViewDelegate> m_delegate;
     int m_sel_pno;
-    int thumbBackgroundColor;
 }
 - (id)initWithFrame:(CGRect)frame;
 - (BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;

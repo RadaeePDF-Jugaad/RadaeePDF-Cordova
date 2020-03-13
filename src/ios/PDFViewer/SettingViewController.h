@@ -32,7 +32,6 @@
     OvalColorViewController *ovalColor;
     
     UIButton *button;
-    NSUserDefaults *userDefaults;
    
 }
 - (IBAction) updateSwitchDarkMode:(id) sender;
