@@ -26,26 +26,12 @@
 + (RadaeePDFPlugin *)pluginInit
 {
     RadaeePDFPlugin *r = [[RadaeePDFPlugin alloc] init];
-    [r pluginInitialize];
-    
     return r;
-}
-
-- (void)pluginInitialize
-{
-    inkColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
-    rectColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RectColor"];
-    underlineColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
-    strikeoutColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
-    highlightColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
-    ovalColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"OvalColor"];
-    selColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SelColor"];
-    arrowColor = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ArrowColor"];
 }
 
 #pragma mark - Plugin API
 
-- (void)show:(CDVInvokedUrlCommand*)command;
+- (void)show:(CDVInvokedUrlCommand*)command
 {
     self.cdv_command = command;
     
@@ -250,7 +236,7 @@
     
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    thumbBackgroundColor = [[params objectForKey:@"color"] intValue];
+    GLOBAL.g_thumbview_bg_color = [[params objectForKey:@"color"] intValue];
 }
 
 - (void)setThumbGridBGColor:(CDVInvokedUrlCommand*)command
@@ -268,7 +254,7 @@
     
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    readerBackgroundColor = [[params objectForKey:@"color"] intValue];
+    GLOBAL.g_readerview_bg_color = [[params objectForKey:@"color"] intValue];
 }
 
 - (void)setThumbGridElementHeight:(CDVInvokedUrlCommand *)command
@@ -322,11 +308,13 @@
     
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
-    thumbHeight = [[params objectForKey:@"height"] floatValue];
+    GLOBAL.g_thumbview_height = [[params objectForKey:@"height"] floatValue];
 }
 
 - (void)getGlobal:(CDVInvokedUrlCommand *)command
 {
+    self.cdv_command = command;
+    
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     
     NSString *name = [params objectForKey:@"name"];
@@ -335,7 +323,6 @@
     if (value) {
         [self cdvOkWithMessage:[NSString stringWithFormat:@"%@ = %@", name, value]];
     }
-    
 }
 
 - (void)setGlobal:(CDVInvokedUrlCommand *)command
@@ -347,31 +334,50 @@
     NSString *name = [params objectForKey:@"name"];
     id value = [params objectForKey:@"value"];
     
-    NSArray *uintegerGlobals = [NSArray arrayWithObjects: @"g_render_quality", @"g_rect_color", @"g_line_color", @"g_ink_color", @"g_sel_color", @"g_oval_color", @"g_render_mode", @"g_annot_highlight_clr", @"g_annot_underline_clr", @"g_annot_strikeout_clr", @"g_annot_squiggly_clr", @"g_annot_transparency",nil];
+    NSArray *integerGlobals = [NSArray arrayWithObjects: @"g_render_quality", @"g_render_mode", @"g_navigation_mode", @"g_line_annot_style1", @"g_line_annot_style2", @"g_thumbview_height", nil];
     
-    NSArray *floatGlobals = [NSArray arrayWithObjects: @"g_ink_width", @"g_rect_width", @"g_line_width", @"g_oval_width", @"g_swipe_speed", @"g_swipe_distance", @"g_zoom_level", nil];
+    NSArray *uintegerGlobals = [NSArray arrayWithObjects: @"g_rect_color", @"g_line_color", @"g_ink_color", @"g_sel_color", @"g_oval_color", @"g_rect_annot_fill_color" @"g_ellipse_annot_fill_color", @"g_line_annot_fill_color", @"g_annot_highlight_clr", @"g_annot_underline_clr", @"g_annot_strikeout_clr", @"g_annot_squiggly_clr", @"g_annot_transparency", @"g_find_primary_color", @"g_readerview_bg_color", @"g_thumbview_bg_color" ,nil];
     
-    NSArray *boolGlobals = [NSArray arrayWithObjects: @"g_case_sensitive", @"g_match_whole_word", @"g_sel_right", @"g_screen_awake", @"g_save_doc", @"g_static_scale", @"g_paging_enabled", @"g_double_page_enabled", @"g_curl_enabled", @"g_cover_page_enabled", @"g_fit_signature_to_field", @"g_execute_annot_JS", @"g_dark_mode", @"g_annot_lock", @"g_annot_readonly", @"g_auto_launch_link", nil];
+    NSArray *floatGlobals = [NSArray arrayWithObjects: @"g_ink_width", @"g_rect_width", @"g_line_width", @"g_oval_width", @"g_zoom_level", @"g_layout_zoom_level", @"g_zoom_step",  nil];
     
-    NSArray *stringGlobals = [NSArray arrayWithObjects: @"g_pdf_name", @"g_pdf_path", @"g_author", nil];
+    NSArray *boolGlobals = [NSArray arrayWithObjects: @"g_case_sensitive", @"g_match_whole_word", @"g_sel_right", @"g_save_doc", @"g_static_scale", @"g_paging_enabled", @"g_double_page_enabled", @"g_curl_enabled", @"g_cover_page_enabled", @"g_fit_signature_to_field", @"g_execute_annot_JS", @"g_dark_mode", @"g_annot_lock", @"g_annot_readonly", @"g_auto_launch_link", @"g_highlight_annotation", @"g_enable_graphical_signature", nil];
     
-    if ([uintegerGlobals containsObject:name]) {
-        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:[NSNumber numberWithUnsignedInt:(uint)value]];
+    NSArray *stringGlobals = [NSArray arrayWithObjects: @"g_pdf_name", @"g_pdf_path", @"g_author", @"g_sign_pad_descr", nil];
+    
+    if ([integerGlobals containsObject:name]) {
+        if ([value isKindOfClass:[NSString class]]) {
+            [self cdvErrorWithMessage:[NSString stringWithFormat:@"Bad property"]];
+        }
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[NSNumber numberWithUnsignedInt:(uint)value]];
+    }
+    
+    else if ([uintegerGlobals containsObject:name]) {
+        if ([value isKindOfClass:[NSString class]]) {
+            [self cdvErrorWithMessage:[NSString stringWithFormat:@"Bad property"]];
+        }
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[NSNumber numberWithUnsignedInt:(uint)value]];
     }
 
     else if ([floatGlobals containsObject:name]) {
-        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:[NSNumber numberWithFloat:[value floatValue]]];
+        if ([value isKindOfClass:[NSString class]]) {
+            [self cdvErrorWithMessage:[NSString stringWithFormat:@"Bad property"]];
+        }
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[NSNumber numberWithFloat:[value floatValue]]];
     }
     
     else if ([boolGlobals containsObject:name])
     {
-        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:[NSNumber numberWithBool:(BOOL)value]];
+        if ([value isKindOfClass:[NSString class]]) {
+            [self cdvErrorWithMessage:[NSString stringWithFormat:@"Bad property"]];
+        }
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[NSNumber numberWithBool:(BOOL)value]];
     }
     
     else if ([stringGlobals containsObject:name]) {
-        [RDUtils setGlobalFromString:[[params objectForKey:@"name"] stringValue] withValue:value];
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:value];
     }
 }
+
 
 - (void)setFirstPageCover:(CDVInvokedUrlCommand*)command
 {
@@ -473,17 +479,7 @@
          7: arrowColor
          
          */
-        
-        [self setColor:0xFF000000 forFeature:0];
-        [self setColor:0xFF000000 forFeature:1];
-        [self setColor:0xFF000000 forFeature:2];
-        [self setColor:0xFF000000 forFeature:3];
-        [self setColor:0xFFFFFF00 forFeature:4];
-        [self setColor:0xFF000000 forFeature:5];
-        [self setColor:0x400000C0 forFeature:6];
-        [self setColor:0xFF000000 forFeature:7];
     }
-    [self loadSettingsWithDefaults];
 }
 
 - (void)showReader
@@ -493,14 +489,14 @@
     if (![self isPageViewController]) {
         //toggle thumbnail/seekbar
         if (bottomBar < 1){
-            [m_pdf setThumbHeight:(thumbHeight > 0) ? thumbHeight : 50];
+            [m_pdf setThumbHeight:(GLOBAL.g_thumbview_height > 0) ? GLOBAL.g_thumbview_height : 50];
             //[m_pdf PDFThumbNailinit:1];
-            [m_pdf setThumbnailBGColor:thumbBackgroundColor];
+            [m_pdf setThumbnailBGColor:GLOBAL.g_thumbview_bg_color];
         }
         //else
         //[m_pdf PDFSeekBarInit:1];
         
-        [m_pdf setReaderBGColor:readerBackgroundColor];
+        [m_pdf setReaderBGColor:GLOBAL.g_readerview_bg_color];
         
         //Set thumbGridView
         [m_pdf setThumbGridBGColor:gridBackgroundColor];
@@ -724,89 +720,12 @@
     disableToolbar = !enabled;
 }
 
-- (void)setColor:(int)color forFeature:(int)feature
-{
-    switch (feature) {
-        case 0:
-            inkColor = color;
-            break;
-            
-        case 1:
-            rectColor = color;
-            break;
-            
-        case 2:
-            underlineColor = color;
-            break;
-            
-        case 3:
-            strikeoutColor = color;
-            break;
-            
-        case 4:
-            highlightColor = color;
-            break;
-            
-        case 5:
-            ovalColor = color;
-            break;
-            
-        case 6:
-            selColor = color;
-            break;
-            
-        case 7:
-            arrowColor = color;
-            break;
-            
-        default:
-            break;
-    }
-}
-
 - (BOOL)isPageViewController
 {
     if (_viewMode != 7) {
         return NO;
     }
     else return YES;
-}
-
-#pragma mark - Init defaults
-
-- (void)loadSettingsWithDefaults
-{
-    [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CaseSensitive"];
-    [[NSUserDefaults standardUserDefaults] setFloat:2.0f forKey:@"InkWidth"];
-    [[NSUserDefaults standardUserDefaults] setFloat:2.0f forKey:@"RectWidth"];
-    [[NSUserDefaults standardUserDefaults] setFloat:0.15f forKey:@"SwipeSpeed"];
-    [[NSUserDefaults standardUserDefaults] setFloat:1.0f forKey:@"SwipeDistance"];
-    [[NSUserDefaults standardUserDefaults] setInteger:1.0f forKey:@"RenderQuality"];
-    [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"MatchWholeWord"];
-    [[NSUserDefaults standardUserDefaults] setInteger:inkColor forKey:@"InkColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:rectColor forKey:@"RectColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:underlineColor forKey:@"UnderlineColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:strikeoutColor forKey:@"StrikeoutColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:highlightColor forKey:@"HighlightColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:ovalColor forKey:@"OvalColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:_viewMode forKey:@"DefView"];
-    [[NSUserDefaults standardUserDefaults] setInteger:selColor forKey:@"SelColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:arrowColor forKey:@"ArrowColor"];
-    
-    GLOBAL.g_render_mode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"DefView"];
-    GLOBAL.g_match_whole_word = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"MatchWholeWord"];
-    
-    GLOBAL.g_rect_color = rectColor;
-    GLOBAL.g_ink_color = inkColor;
-    GLOBAL.g_sel_color = selColor;
-    GLOBAL.g_oval_color = ovalColor;
-    GLOBAL.g_line_color = arrowColor;
-    GLOBAL.g_annot_highlight_clr = highlightColor;
-    GLOBAL.g_annot_underline_clr = underlineColor;
-    GLOBAL.g_annot_strikeout_clr = strikeoutColor;
-    //annotSquigglyColor = 0xFF00FF00;
-    
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark - Bookmarks

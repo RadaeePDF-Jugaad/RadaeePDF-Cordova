@@ -1,4 +1,3 @@
-cordova.define("com.radaee.cordova.RadaeePDFPlugin", function(require, exports, module) {
 //  RadaeePDFPlugin
 //  GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 //  Created by Nermeen Solaiman on 06/06/16.
@@ -271,5 +270,3 @@ RadaeePDFPlugin.prototype.didTapOnAnnotationOfTypeCallback = function (successCa
 };
 
 module.exports = new RadaeePDFPlugin();
-
-});

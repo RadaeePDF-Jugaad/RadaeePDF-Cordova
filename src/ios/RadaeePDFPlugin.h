@@ -28,22 +28,10 @@
     void *buffer;
     
     //colors
-    int inkColor;
-    int rectColor;
-    int underlineColor;
-    int strikeoutColor;
-    int highlightColor;
-    int ovalColor;
-    int selColor;
-    int arrowColor;
-    
-    int thumbBackgroundColor;
     int gridBackgroundColor;
-    int readerBackgroundColor;
     int titleBackgroundColor;
     int iconsBackgroundColor;
     
-    float thumbHeight;
     int gridElementHeight;
     int gridGap;
     int gridMode;
