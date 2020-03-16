@@ -33,8 +33,8 @@
 @interface RDVGlobal :NSObject
 
 @property (strong, nonatomic) NSString *text;
-@property (strong, nonatomic) NSMutableString *pdfName;
-@property (strong, nonatomic) NSMutableString *pdfPath;
+@property (strong, nonatomic) NSMutableString *g_pdf_name;
+@property (strong, nonatomic) NSMutableString *g_pdf_path;
 @property (strong, nonatomic) NSString *g_author;
 @property (strong, nonatomic) NSString *g_sign_pad_descr;
 
@@ -52,12 +52,8 @@
 @property (nonatomic) uint g_annot_squiggly_clr;
 @property (nonatomic) uint g_annot_transparency;
 @property (nonatomic) uint g_find_primary_color;
-
-@property (nonatomic) bool g_case_sensitive;
-@property (nonatomic) bool g_match_whole_word;
-@property (nonatomic) bool g_sel_right;
-@property (nonatomic) bool g_screen_awake;
-@property (nonatomic) bool g_save_doc;
+@property (nonatomic) uint g_readerview_bg_color;
+@property (nonatomic) uint g_thumbview_bg_color;
 
 @property (nonatomic) float g_ink_width;
 @property (nonatomic) float g_rect_width;
@@ -69,6 +65,11 @@
 @property (nonatomic) float g_layout_zoom_level;
 @property (nonatomic) float g_zoom_step;
 
+@property (nonatomic) bool g_case_sensitive;
+@property (nonatomic) bool g_match_whole_word;
+@property (nonatomic) bool g_sel_right;
+@property (nonatomic) bool g_screen_awake;
+@property (nonatomic) bool g_save_doc;
 @property (nonatomic) bool g_static_scale;
 @property (nonatomic) bool g_paging_enabled;
 @property (nonatomic) bool g_double_page_enabled;
@@ -88,10 +89,7 @@
 @property (nonatomic) int g_navigation_mode;
 @property (nonatomic) int g_line_annot_style1;
 @property (nonatomic) int g_line_annot_style2;
-@property (nonatomic) int g_thumbview_bg_color;
 @property (nonatomic) int g_thumbview_height;
-@property (nonatomic) int g_readerview_bg_color;
-
 
 + (RDVGlobal *)sharedInstance;
 + (void)Init;

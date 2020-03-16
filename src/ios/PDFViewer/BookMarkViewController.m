@@ -219,12 +219,12 @@ int bookMarkNum =0;
     NSString *pwd = NULL;
     NSDictionary *row_item = [m_files objectAtIndex:indexPath.row];
     NSString *path = [row_item objectForKey:@"Path"];
-    GLOBAL.pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
-    GLOBAL.pdfName = [[[path lastPathComponent] stringByAppendingPathExtension:@"pdf"] mutableCopy];
+    GLOBAL.g_pdf_path = [[path stringByDeletingLastPathComponent] mutableCopy];
+    GLOBAL.g_pdf_name = [[[path lastPathComponent] stringByAppendingPathExtension:@"pdf"] mutableCopy];
     NSString *temp2=[row_item objectForKey:@"Page"];
     int pageno = [temp2 intValue];
     pdfFullPath = path;
-    int result = [m_pdf1 PDFOpen:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :pwd];
+    int result = [m_pdf1 PDFOpen:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :pwd];
     
     if(result == 1)
     {
@@ -268,7 +268,7 @@ int bookMarkNum =0;
     NSArray *row_item = [m_files objectAtIndex:indexPath.row];
     NSString *path = [row_item objectAtIndex:0];
     NSArray *arr = [m_files objectAtIndex:indexPath.row];
-    GLOBAL.pdfName = (NSMutableString *)[[arr objectAtIndex:1] stringByAppendingFormat:@".pdf"];
+    GLOBAL.g_pdf_name = (NSMutableString *)[[arr objectAtIndex:1] stringByAppendingFormat:@".pdf"];
     NSString *temp2=[arr objectAtIndex:2];
     //int pageno = [temp2 intValue];
     pdfFullPath = path;

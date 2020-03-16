@@ -90,10 +90,6 @@ static int  currentIndex=0;
     
     GLOBAL.g_render_mode = (int)indexPath.row;
     
-    if ((int)indexPath.row == 6) {
-        GLOBAL.g_render_mode = 7;
-    }
-    
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_mode forKey:@"ViewMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     

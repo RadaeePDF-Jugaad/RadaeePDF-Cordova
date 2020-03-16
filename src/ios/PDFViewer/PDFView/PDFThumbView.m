@@ -33,7 +33,7 @@
     self.m_del = nil;
     page_gap = 1;
     m_sel_pno = -1;
-    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 2)];
+    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 7)];
     [m_layout vOpen:m_doc :page_gap * m_scale_pix :self.layer];
     [self bringSubviewToFront:m_child];
     m_status = sta_none;

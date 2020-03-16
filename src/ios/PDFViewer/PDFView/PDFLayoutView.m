@@ -113,11 +113,11 @@
             GLOBAL.g_paging_enabled = NO;
             m_layout = [[RDVLayoutHorz alloc] init:self :false];
             break;
-        case 2:// Horizontal RTOL
+        case 2:// PageView RTOL
             doublePage = NO;
             GLOBAL.g_paging_enabled = NO;
-            memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutHorz alloc] init:self :true];
+            memset(horzs, 0, sizeof(bool));
+            m_layout = [[RDVLayoutSingle alloc] init:self :true :(int)_pageViewNo];
             break;
         case 3:// Single Page (LTOR, paging enabled)
             doublePage = NO;
@@ -125,17 +125,7 @@
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
             break;
-        case 4:// Double Page (LTOR, paging enabled)
-            GLOBAL.g_paging_enabled = YES;
-            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
-            break;
-        case 5:// Double Page (RTOL, paging enabled)
-            GLOBAL.g_paging_enabled = YES;
-            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :true :NULL :0 :horzs :[doc pageCount]];
-            break;
-        case 6: //Double Page first page single (paging enabled)
+        case 4: // Double Page first page single (paging enabled)
             for (int i = 0; i < m_doc.pageCount; i++) {
                 if (i > 0) {
                     horzs[i] = true;
@@ -144,13 +134,23 @@
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
             break;
-        case 7:// PageView RTOL
-                doublePage = NO;
-                GLOBAL.g_paging_enabled = NO;
-                memset(horzs, 0, sizeof(bool));
-                m_layout = [[RDVLayoutSingle alloc] init:self :true :(int)_pageViewNo];
-                break;
-            default:// Vertical
+        case 5:// Double Page (RTOL, paging enabled)
+            GLOBAL.g_paging_enabled = YES;
+            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
+            m_layout = [[RDVLayoutDual alloc] init:self :true :NULL :0 :horzs :[doc pageCount]];
+            break;
+        case 6:// Double Page (LTOR, paging enabled)
+            GLOBAL.g_paging_enabled = YES;
+            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
+            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
+            break;
+        case 7:// Horizontal RTOL
+            doublePage = NO;
+            GLOBAL.g_paging_enabled = NO;
+            memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
+            m_layout = [[RDVLayoutHorz alloc] init:self :true];
+            break;
+            default:// 0: Vertical
                 GLOBAL.g_paging_enabled = NO;
                 m_layout = [[RDVLayoutVert alloc] init : self];
                 break;
@@ -159,7 +159,7 @@
         if ([self pagingAvailable]) {
             self.pagingEnabled = GLOBAL.g_paging_enabled;
         }
-        if (GLOBAL.g_render_mode == 7) {
+        if (GLOBAL.g_render_mode == 2) {
             [(RDVLayoutSingle *)m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer :(int)_pageViewNo];
         } else {
             [m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer];
@@ -353,7 +353,7 @@
     CGDataProviderRelease(provider);
     
     // Save the image
-    NSString *filePath = [GLOBAL.pdfPath stringByAppendingPathComponent:@"test.png"];
+    NSString *filePath = [GLOBAL.g_pdf_path stringByAppendingPathComponent:@"test.png"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     }
@@ -926,7 +926,7 @@
 
 - (void)centerPage
 {
-    if(GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 4)
+    if(GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 6)
     {
         //[self resetZoomLevel];
     }

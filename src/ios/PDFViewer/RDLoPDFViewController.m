@@ -77,7 +77,6 @@
     UIColor *toolbarTintColor;
     
     UILabel *sliderLabel;
-    BOOL showThumb;
 }
 @end
 
@@ -307,11 +306,9 @@
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd atPage:(int)page readOnly:(BOOL)readOnlyEnabled autoSave:(BOOL)autoSave author:(NSString *)author
 {
     GLOBAL.g_author = author;
-    GLOBAL.pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
-    GLOBAL.pdfName = [[path lastPathComponent] mutableCopy];
+    GLOBAL.g_pdf_path = [[path stringByDeletingLastPathComponent] mutableCopy];
+    GLOBAL.g_pdf_name = [[path lastPathComponent] mutableCopy];
     GLOBAL.g_save_doc = autoSave;
-    
-    showThumb = GLOBAL.g_navigation_mode;
     
     CGRect rect = [self screenRect];
     m_doc = [[PDFDoc alloc] init];
@@ -476,7 +473,7 @@
     [m_Thumbview PDFOpen:m_doc :4 :self];
     [m_Thumbview vGoto:pageno];//page 0 for default selected page.
     [self.view addSubview:m_Thumbview];
-    m_Thumbview.hidden = !showThumb;
+    m_Thumbview.hidden = !GLOBAL.g_navigation_mode;
     
     sliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, GLOBAL.g_thumbview_height / 3)];
     sliderLabel.textColor = [UIColor whiteColor];
@@ -493,7 +490,7 @@
     [m_slider addTarget:self action:@selector(OnSliderTouchUp:) forControlEvents:UIControlEventTouchUpInside];
     m_slider.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
     [m_slider addSubview:sliderLabel];
-    m_slider.hidden = showThumb;
+    m_slider.hidden = GLOBAL.g_navigation_mode;
     [self.view addSubview:m_slider];
 }
 
@@ -1236,21 +1233,7 @@
         m_view = NULL;
     }
     
-    switch (mode) {
-        case 2:
-        {
-            GLOBAL.g_render_mode = 3;
-            break;
-        }
-        case 3:
-        {
-            GLOBAL.g_render_mode = 4;
-            break;
-        }
-        default:
-            GLOBAL.g_render_mode = mode;
-            break;
-    }
+    GLOBAL.g_render_mode = mode;
     
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_mode forKey:@"ViewMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1274,7 +1257,7 @@
 
 - (NSMutableArray *)loadBookmarkForPdf:(NSString *)pdfPath withPath:(BOOL)withPath
 {
-    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[GLOBAL.pdfName stringByDeletingPathExtension] withPath:withPath];
+    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[GLOBAL.g_pdf_name stringByDeletingPathExtension] withPath:withPath];
 }
 
 - (NSMutableArray *)addBookMarks:(NSString *)dpath :(NSString *)subdir :(NSFileManager* )fm pdfName:(NSString *)pdfName withPath:(BOOL)withPath
@@ -1322,7 +1305,7 @@
 - (void)bookmarkList
 {
     BookmarkTableViewController *b = [[BookmarkTableViewController alloc] init];
-    b.items = [self loadBookmarkForPdf:GLOBAL.pdfPath withPath:YES];
+    b.items = [self loadBookmarkForPdf:GLOBAL.g_pdf_path withPath:YES];
     b.delegate = self;
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -1593,7 +1576,7 @@
 
 - (NSString *)composeFile
 {
-    NSString *pdfpath = [GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName];
+    NSString *pdfpath = [GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name];
     RDVPos pos;
     [m_view vGetPos:&pos];
     int pageno = pos.pageno;
@@ -1860,10 +1843,10 @@
     float y = pos.pdfy;
     NSString *tempFile;
     NSString *tempName;
-    tempName = [GLOBAL.pdfName substringToIndex:GLOBAL.pdfName.length-4];
+    tempName = [GLOBAL.g_pdf_name substringToIndex:GLOBAL.g_pdf_name.length-4];
     tempFile = [tempName stringByAppendingFormat:@"%d%@",pageno,@".bookmark"];
     NSString *tempPath;
-    tempPath = [GLOBAL.pdfPath stringByAppendingFormat:@"%@",GLOBAL.pdfName];
+    tempPath = [GLOBAL.g_pdf_path stringByAppendingFormat:@"%@",GLOBAL.g_pdf_name];
     NSString *fileContent = [NSString stringWithFormat:@"%@,%@,%d,%f,%f",tempPath,tempName,pageno,x,y];
     NSString *BookMarkDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)objectAtIndex:0];
     
@@ -1900,7 +1883,7 @@
 
 -(void)printPdf
 {
-    NSString *path = [GLOBAL.pdfPath stringByAppendingString:GLOBAL.pdfName];
+    NSString *path = [GLOBAL.g_pdf_path stringByAppendingString:GLOBAL.g_pdf_name];
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Warning"
                                        message:@"PDF file not available"
@@ -1920,7 +1903,7 @@
         
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
-        printInfo.jobName = [GLOBAL.pdfPath lastPathComponent];
+        printInfo.jobName = [GLOBAL.g_pdf_path lastPathComponent];
         printInfo.duplex = UIPrintInfoDuplexLongEdge;
         pic.printInfo = printInfo;
         pic.showsPageRange = YES;
@@ -1948,7 +1931,7 @@
 
 - (void)sharePDF
 {
-    NSURL *url = [NSURL fileURLWithPath:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName]];
+    NSURL *url = [NSURL fileURLWithPath:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name]];
     if(url)
     {
         UIActivityViewController *a = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
@@ -2485,7 +2468,7 @@
 {
     if (doc == nil) {
         doc = [[PDFDoc alloc] init];
-        [doc open:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :@""];
+        [doc open:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :@""];
     }
     
     if(page >= 0 && page < doc.pageCount)
@@ -2504,7 +2487,7 @@
 {
     PDFDoc *doc = [[PDFDoc alloc] init];
     if (m_doc == nil) {
-        [doc open:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :@""];
+        [doc open:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :@""];
     } else {
         doc = m_doc;
     }
@@ -2644,8 +2627,8 @@
 
 - (void)showBars
 {
-    m_Thumbview.hidden = !showThumb;
-    m_slider.hidden = showThumb;
+    m_Thumbview.hidden = !GLOBAL.g_navigation_mode;
+    m_slider.hidden = GLOBAL.g_navigation_mode;
     [pageNumLabel setHidden:false];
     toolBar.hidden = NO;
     [self prefersStatusBarHidden];

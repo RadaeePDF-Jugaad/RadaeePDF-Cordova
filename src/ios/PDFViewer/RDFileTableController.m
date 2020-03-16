@@ -361,7 +361,7 @@ NSString *pdfFullPath;
     pdfName = (NSMutableString *)[path substringFromIndex:pdfPath.length];
     pdfFullPath = path;
     
-    if (GLOBAL.g_render_mode == 7) {
+    if (GLOBAL.g_render_mode == 2) {
         m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
         
         NSLock *theLock = [[NSLock alloc] init];
@@ -540,7 +540,7 @@ NSString *pdfFullPath;
     GLOBAL.g_render_mode =  (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
     
     //for curl mode
-    GLOBAL.g_curl_enabled = (GLOBAL.g_render_mode == 6);
+    GLOBAL.g_curl_enabled = (GLOBAL.g_render_mode == 2);
     
     GLOBAL.g_ink_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
     if(GLOBAL.g_ink_color == 0)

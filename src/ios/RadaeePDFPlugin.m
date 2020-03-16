@@ -722,7 +722,7 @@
 
 - (BOOL)isPageViewController
 {
-    if (_viewMode != 7) {
+    if (_viewMode != 2) {
         return NO;
     }
     else return YES;
