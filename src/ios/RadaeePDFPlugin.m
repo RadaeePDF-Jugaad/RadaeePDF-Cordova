@@ -348,7 +348,7 @@
         if ([value isKindOfClass:[NSString class]]) {
             [self cdvErrorWithMessage:[NSString stringWithFormat:@"Bad property"]];
         }
-        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[NSNumber numberWithUnsignedInt:(uint)value]];
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[[NSNumber numberWithInt:[value intValue]]];
     }
     
     else if ([uintegerGlobals containsObject:name]) {
