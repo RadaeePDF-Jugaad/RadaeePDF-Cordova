@@ -120,7 +120,7 @@
     
     int result = 0;
     
-    if (_viewMode == 7) {
+    if ([self isPageViewController]) {
         result = [m_pdfP PDFOpenAtPath:filePath withPwd:password];
     } else {
         result = [m_pdf PDFOpen:filePath :password atPage:page readOnly:readOnly autoSave:autoSave author:@""];
@@ -140,7 +140,7 @@
     if (m_pdf != nil && ![self isPageViewController]) {
         [m_pdf closeView];
     }
-    else if (m_pdfP != nil && _viewMode == 7)
+    else if (m_pdfP != nil && [self isPageViewController])
     {
         [m_pdfP closeView];
     }
@@ -415,7 +415,7 @@
     if( m_pdf == nil && ![self isPageViewController])
     {
         m_pdf = [[RDLoPDFViewController alloc] init];
-    } if (_viewMode == 7) {
+    } if ([self isPageViewController]) {
         m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
     } else {
         [m_pdf setDelegate:self];
