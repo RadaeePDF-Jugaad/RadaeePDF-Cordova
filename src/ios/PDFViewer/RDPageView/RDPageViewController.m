@@ -25,14 +25,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.dataSource = self;
-    
-    UIViewController *vc = [self viewControllerAtIndex:0];
-    [self setViewControllers:@[vc] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    self.delegate = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    UIViewController *vc = [self viewControllerAtIndex:0];
+    [self setViewControllers:@[vc] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_back"] style:UIBarButtonItemStyleDone target:self action:@selector(closeView)];
 }
 
 - (int)PDFOpenAtPath:(NSString *)path withPwd:(NSString *)pwd
@@ -55,6 +58,7 @@
 {
     // Create a new view controller and pass suitable data.
     ViewController *viewController = [[ViewController alloc] init];
+    viewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     viewController.doc = doc;
     viewController.pageViewNo = index;
     pageno = (int)index+1;
@@ -108,6 +112,15 @@
     return [self viewControllerAtIndex:index];
 }
 
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed {
+    for (ViewController *v in previousViewControllers) {
+        if(v.pdfView != nil)
+        {
+            [self closeViewController:v];
+        }
+    }
+}
+
 /*
 #pragma mark - Navigation
 
@@ -122,9 +135,30 @@
     self.navigationController.navigationBarHidden = NO;
     [self.navigationController popViewControllerAnimated:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
+    [self PDFClose];
+}
+
+-(void)PDFClose
+{
+    for (ViewController *v in self.viewControllers) {
+        if(v.pdfView != nil)
+        {
+            [self closeViewController:v];
+        }
+    }
+    
     doc = NULL;
 }
 
+- (void)closeViewController:(ViewController *)v {
+    if(v.pdfView != nil)
+    {
+        [v.pdfView PDFClose];
+        [v.pdfView removeFromSuperview];
+        v.pdfView = NULL;
+        v.doc = NULL;
+    }
+}
 
 #pragma mark - lib methods
 

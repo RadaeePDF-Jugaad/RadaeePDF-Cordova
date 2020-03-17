@@ -348,7 +348,7 @@
         if ([value isKindOfClass:[NSString class]]) {
             [self cdvErrorWithMessage:[NSString stringWithFormat:@"Bad property"]];
         }
-        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[[NSNumber numberWithInt:[value intValue]]];
+        [RDUtils setGlobalFromString:[params objectForKey:@"name"] withValue:[NSNumber numberWithInt:[value intValue]]];
     }
     
     else if ([uintegerGlobals containsObject:name]) {
@@ -485,7 +485,6 @@
 - (void)showReader
 {
     [self pdfChargeDidFinishLoading];
-    
     if (![self isPageViewController]) {
         //toggle thumbnail/seekbar
         if (bottomBar < 1){
@@ -511,10 +510,6 @@
     UINavigationController *navController;
     
     navController = [[UINavigationController alloc] initWithRootViewController:([self isPageViewController]) ? m_pdfP : m_pdf];
-    
-    if ([self isPageViewController]) {
-        navController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_back"] style:UIBarButtonItemStyleDone target:nil action:@selector(closeReader:)];
-    }
 
     if (titleBackgroundColor != 0) {
         navController.navigationBar.barTintColor = UIColorFromRGB(titleBackgroundColor);
@@ -529,6 +524,7 @@
     }
     
     [navController.navigationBar setTranslucent:NO];
+    
     navController.modalPresentationStyle = UIModalPresentationFullScreen;
     
     [self.viewController presentViewController:navController animated:YES completion:nil];
@@ -706,7 +702,7 @@
     
     int mode = [[params objectForKey:@"mode"] intValue];
     
-    _viewMode = mode;
+    GLOBAL.g_render_mode = mode;
 }
 
 - (void)setToolbarEnabled:(CDVInvokedUrlCommand *)command
@@ -722,7 +718,7 @@
 
 - (BOOL)isPageViewController
 {
-    if (_viewMode != 2) {
+    if (GLOBAL.g_render_mode != 2) {
         return NO;
     }
     else return YES;

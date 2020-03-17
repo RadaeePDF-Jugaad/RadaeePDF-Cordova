@@ -59,7 +59,6 @@
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_didTapOnAnnotationOfType;
 @property (nonatomic, retain) CDVInvokedUrlCommand *cdv_onAnnotExported;
 
-@property (nonatomic) int viewMode;
 @property (strong, nonatomic) NSString *lastOpenedPath;
 @property (strong, nonatomic) UIImage *viewModeImage;
 @property (strong, nonatomic) UIImage *searchImage;
