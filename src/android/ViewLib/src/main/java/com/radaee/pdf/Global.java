@@ -16,7 +16,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.53.1
+ * @version 3.53.3beta7
  */
 public class Global
 {
@@ -416,6 +416,21 @@ public class Global
 
     //true: calculate scale of each page, false: calculate scale based on the dimensions of the largest page
 	public static boolean fit_different_page_size = false;
+
+	/**
+	 * 	Enables automatic save
+	 */
+	public static boolean g_save_doc = false;
+
+	/**
+	 * 	Enables 'whole word' matching
+	 */
+	public static boolean g_match_whole_word = false;
+
+	/**
+	 * 	Enables case-sensitive search
+	 */
+	public static boolean g_case_sensitive = false;
 
 	static private void load_file(Resources res, int res_id, File save_file)
 	{

@@ -839,7 +839,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
 				m_view.PDFFind(direction);
 			else {
 				m_find_str = val;
-				m_view.PDFFindStart(val, false, false);
+				m_view.PDFFindStart(val, Global.g_case_sensitive, Global.g_match_whole_word);
 				m_view.PDFFind(direction);
 			}
 		}

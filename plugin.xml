@@ -137,6 +137,8 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VPage.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VSel.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VThread.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowBlock.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowCanvas.java" target-dir="src/com/radaee/view"/>
 
         <!-- Radaee source - java.com.radaee.util -->
 

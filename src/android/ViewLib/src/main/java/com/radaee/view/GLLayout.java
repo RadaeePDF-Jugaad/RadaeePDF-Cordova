@@ -83,6 +83,8 @@ abstract public class GLLayout {
     {
         m_ctx = context;
         m_scroller = new Scroller(context);
+        m_scroller.startScroll(0, 0, 0, 0);
+        m_scroller.computeScrollOffset();
         m_scale = -1;
         m_layw = 0;
         m_layh = 0;
@@ -492,5 +494,14 @@ abstract public class GLLayout {
         if(m_finder == null) return false;
         int pageno0 = m_finder.find_get_page();
         return (pageno0 >= m_pageno1 && pageno0 < m_pageno2);
+    }
+    public final void vClear(GL10 gl10, int color)
+    {
+        //gl10.glClear(GL10.GL_COLOR_BUFFER_BIT);
+        //gl10.glClearColor(((m_back_color >> 16) & 0xff) / 255.0f, ((m_back_color >> 8) & 0xff) / 255.0f, (m_back_color & 0xff) / 255.0f, ((m_back_color >> 24) & 0xff) / 255.0f);
+        gl10.glBindTexture(GL10.GL_TEXTURE_2D, m_def_text);
+        GLBlock.drawQuadColor(gl10, 0, 0, 0, m_vw << 16, 0, 0, m_vh << 16, m_vw << 16, m_vh << 16,
+                ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, (color & 0xff) / 255.0f);
+        gl10.glBindTexture(GL10.GL_TEXTURE_2D, 0);
     }
 }

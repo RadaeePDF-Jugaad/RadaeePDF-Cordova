@@ -139,8 +139,8 @@ public class GLBlock {
     protected final boolean gl_end(GL10 gl10)
     {
         if(m_status == 0 || m_status == -1) return false;
-        m_status = -1;
         if(m_status == 1 && m_page != null) m_page.RenderCancel();
+        m_status = -1;
         if(m_texture != 0)
         {
             gl10.glDeleteTextures(1, new int[]{m_texture}, 0);

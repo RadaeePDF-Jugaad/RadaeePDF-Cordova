@@ -523,6 +523,10 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                 gl10.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
                 gl10.glEnable(GL10.GL_BLEND);
                 gl10.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+                gl10.glDisable(GL10.GL_ALPHA_TEST);
+                gl10.glDisable(GL10.GL_STENCIL_TEST);
+                gl10.glDisable(GL10.GL_DEPTH_TEST);
+                gl10.glDepthMask(false);
                 m_gl10 = gl10;
                 if (m_layout == null) return;
 
@@ -538,8 +542,8 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                     m_layout.vSetPos(0, 0, m_goto_pos);
                     m_goto_pos = null;
                 }
-                gl10.glClearColor(((m_back_color >> 16) & 0xff) / 255.0f, ((m_back_color >> 8) & 0xff) / 255.0f, (m_back_color & 0xff) / 255.0f, ((m_back_color >> 24) & 0xff) / 255.0f);
                 gl10.glClear(GL10.GL_COLOR_BUFFER_BIT);
+                gl10.glClearColor(((m_back_color >> 16) & 0xff) / 255.0f, ((m_back_color >> 8) & 0xff) / 255.0f, (m_back_color & 0xff) / 255.0f, ((m_back_color >> 24) & 0xff) / 255.0f);
                 gl10.glEnableClientState(GL10.GL_VERTEX_ARRAY);
                 gl10.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
                 m_layout.gl_draw(gl10);
@@ -711,7 +715,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
                         if (view_mode == 3 || view_mode == 4 || view_mode == 6) {
                             m_layout.vGotoPage(pos.pageno);
                         } else {
-                            m_layout.vSetPos(0, 0, pos);
+                            m_layout.vSetPos(m_w >> 1, m_h >> 1, pos);
                             m_layout.gl_move_end();
                         }
                     }
@@ -1195,10 +1199,10 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
 
     private void onDrawSelect(Canvas canvas) {
         if (m_status == STA_SELECT && m_sel != null && m_annot_page != null) {
-            int orgx = m_annot_page.GetVX(0) - m_layout.vGetX();
-            int orgy = m_annot_page.GetVY(m_doc.GetPageHeight(m_annot_page.GetPageNo())) - m_layout.vGetY();
-            float scale = m_annot_page.GetScale();
             float pheight = m_doc.GetPageHeight(m_annot_page.GetPageNo());
+            int orgx = m_annot_page.GetVX(0) - m_layout.vGetX();
+            int orgy = m_annot_page.GetVY(pheight) - m_layout.vGetY();
+            float scale = m_annot_page.GetScale();
             m_sel.DrawSel(canvas, scale, pheight, orgx, orgy);
             int rect1[] = m_sel.GetRect1(scale, pheight, orgx, orgy);
             int rect2[] = m_sel.GetRect2(scale, pheight, orgx, orgy);

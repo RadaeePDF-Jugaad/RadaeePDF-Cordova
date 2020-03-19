@@ -67,7 +67,7 @@ public class GLLayoutHorz extends GLLayout {
             if(!zoom) m_pages[pcur].gl_alloc();
             x += (int)(m_doc.GetPageWidth(pcur) * pg_scale) + m_page_gap;
         }
-        m_layw = x;
+        m_layw = x - (m_page_gap >> 1);
     }
     private void layout_rtol(float scale, boolean zoom)
     {
@@ -87,7 +87,7 @@ public class GLLayoutHorz extends GLLayout {
                 pg_scale = m_scale * size[1] / ph;
             x += (int)(m_doc.GetPageWidth(pcur) * pg_scale) + m_page_gap;
         }
-        m_layw = x;
+        m_layw = x - (m_page_gap >> 1);
 
         x = m_layw - (m_page_gap >> 1);
         for(int pcur = 0; pcur < m_page_cnt; pcur++)

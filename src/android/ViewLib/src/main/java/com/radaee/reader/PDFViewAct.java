@@ -267,7 +267,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
     private void onClose(final boolean onBackPressed) {
         if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
-            if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false)) {
+            if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false) || Global.g_save_doc) {
                 if (m_controller != null) m_controller.savePDF();
                 if(onBackPressed) super.onBackPressed();
             } else {

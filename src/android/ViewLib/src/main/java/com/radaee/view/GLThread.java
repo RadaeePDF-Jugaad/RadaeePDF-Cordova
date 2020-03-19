@@ -6,6 +6,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.radaee.pdf.Page;
 import com.radaee.pdf.VNBlock;
 import com.radaee.pdf.VNCache;
 
@@ -73,6 +74,18 @@ public class GLThread extends Thread {
                     msg.obj = null;
                     super.handleMessage(msg);
                 }
+                else if(msg.what == 3)
+                {
+                    ((GLReflowBlock)msg.obj).render();
+                }
+                else if(msg.what == 4)
+                {
+                    ((GLReflowBlock)msg.obj).destroy();
+                }
+                else if(msg.what == 5)
+                {
+                    ((Page)msg.obj).Close();
+                }
                 else if( msg.what == 100 )//quit
                 {
                     super.handleMessage(msg);
@@ -126,5 +139,20 @@ public class GLThread extends Thread {
         catch(InterruptedException e)
         {
         }
+    }
+    public void reflow_start(GLReflowBlock blk)
+    {
+        if(blk.render_start())
+            m_hand.sendMessage(m_hand.obtainMessage(3, blk));
+    }
+    public void reflow_end(GLReflowBlock blk)
+    {
+        if(blk.render_cancel())
+            m_hand.sendMessage(m_hand.obtainMessage(4, blk));
+    }
+    public void reflow_destroy_page(Page page)
+    {
+        if(page == null) return;
+        m_hand.sendMessage(m_hand.obtainMessage(5, page));
     }
 }

@@ -270,6 +270,14 @@ public class GLPage implements ILayoutView.IVPage{
         mat.Invert();
         return mat;
     }
+    public GLReflowCanvas Reflow(int w, float scale, int gap)
+    {
+        Page page = m_doc.GetPage(m_pageno);
+        int height = (int)page.ReflowStart(w, scale, true);
+        GLReflowCanvas ret = new GLReflowCanvas(w, height, GLBlock.m_cell_size, gap);
+        ret.layout(page);
+        return ret;
+    }
     static private int size_limit = 0;
     public Bitmap Reflow(int w, float scale, boolean render_images)
     {

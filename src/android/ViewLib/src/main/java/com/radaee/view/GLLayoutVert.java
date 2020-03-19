@@ -70,6 +70,6 @@ public class GLLayoutVert extends GLLayout {
             if(!zoom) m_pages[pcur].gl_alloc();
             y += (int)(m_doc.GetPageHeight(pcur) * pg_scale) + m_page_gap;
         }
-        m_layh = y;
+        m_layh = y - (m_page_gap >> 1);
     }
 }
