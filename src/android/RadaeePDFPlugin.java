@@ -25,14 +25,16 @@
 package com.radaee.cordova;
 
 import android.content.Context;
+import android.telecom.Call;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.URLUtil;
 
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
 import com.radaee.reader.PDFViewAct;
 import com.radaee.reader.PDFViewController;
-import com.radaee.reader.R; 
+import com.radaee.reader.R;
 import com.radaee.util.BookmarkHandler;
 import com.radaee.util.RadaeePDFManager;
 import com.radaee.util.RadaeePluginCallback;
@@ -47,6 +49,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 /**
  * define the method exposed by the RadaeePDFPlugin
@@ -63,11 +69,79 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
     private static CallbackContext sDidSearchTerm;
     private static CallbackContext sDidTapOnPage;
     private static CallbackContext sDidTapOnAnnot;
-	private static CallbackContext sDidDoubleTap;
+    private static CallbackContext sDidDoubleTap;
     private static CallbackContext sDidLongPress;
     private static final String TAG = "RadaeePDFPlugin";
 
-	/**
+    private static final HashMap<String,String> sBooleanGlobalFieldsDictionary = new HashMap<String, String>() {
+        {
+            put("g_annot_lock","g_annot_lock");
+            put("g_annot_readonly","g_annot_readonly");
+            put("g_auto_launch_link","g_auto_launch_link");
+            put("g_case_sensitive","g_case_sensitive");
+            put("g_dark_mode","dark_mode");
+            put("g_enable_graphical_signature","sEnableGraphicalSignature");
+            put("g_execute_annot_JS","sExecuteAnnotJS");
+            put("g_fit_signature_to_field","sFitSignatureToField");
+            put("g_highlight_annotation","highlight_annotation");
+            put("g_match_whole_word","g_match_whole_word");
+            put("g_save_doc","g_save_doc");
+            put("g_sel_right","selRTOL");
+            put("g_static_scale","fit_different_page_size");
+        }
+    };
+
+    private static final HashMap<String,String> sFloatGlobalFieldsDictionary = new HashMap<String, String>() {
+        {
+            put("g_ink_width","inkWidth");
+            put("g_line_width","line_annot_width");
+            put("g_oval_width","ellipse_annot_width");
+            put("g_rect_width","rect_annot_width");
+            put("g_zoom_level","zoomLevel");
+            put("g_zoom_step","zoomStep");
+        }
+    };
+
+    private static final HashMap<String,String> sHexadecimalGlobalFieldsDictionary = new HashMap<String, String>() {
+        {
+            put("g_annot_highlight_clr","highlight_color");
+            put("g_annot_squiggly_clr","squiggle_color");
+            put("g_annot_strikeout_clr","strikeout_color");
+            put("g_annot_transparency","annotTransparencyColor");
+            put("g_annot_underline_clr","underline_color");
+            put("g_ellipse_annot_fill_color","ellipse_annot_fill_color");
+            put("g_find_primary_color","findPrimaryColor");
+            put("g_ink_color","inkColor");
+            put("g_line_annot_fill_color","line_annot_fill_color");
+            put("g_line_color","line_annot_color");
+            put("g_oval_color","ellipse_annot_color");
+            put("g_readerview_bg_color","readerViewBgColor");
+            put("g_rect_annot_fill_color","rect_annot_fill_color");
+            put("g_rect_color","rect_annot_color");
+            put("g_sel_color","selColor");
+            put("g_thumbview_bg_color","thumbViewBgColor");
+        }
+    };
+
+    private static final HashMap<String,String> sIntGlobalFieldsDictionary = new HashMap<String, String>() {
+        {
+            put("g_line_annot_style1","line_annot_style1");
+            put("g_line_annot_style2","line_annot_style2");
+            put("g_navigation_mode","navigationMode");
+            put("g_render_mode","def_view");
+            put("g_render_quality","render_mode");
+            put("g_thumbview_height","thumbViewHeight");
+        }
+    };
+
+    private static final HashMap<String,String> sStringGlobalFieldsDictionary = new HashMap<String, String>() {
+        {
+            put("g_author","sAnnotAuthor");
+            put("g_sign_pad_descr","sSignPadDescr");
+        }
+    };
+
+    /**
      * Constructor.
      */
     public RadaeePDFPlugin() {
@@ -86,7 +160,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
         mPdfManager.setDebugMode(false);
         mPdfManager.setLayoutType(RadaeePDFManager.GPU_BASED_LAYOUT);
     }
-    
+
     /**
      * Executes the request and returns PluginResult.
      *
@@ -100,6 +174,11 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
         BookmarkHandler.setDbPath(mContext.getFilesDir() + File.separator + "Bookmarks.db");
 
         JSONObject params;
+
+        String globalFieldName;
+        String exposedFieldName;
+        Class<Global> globalClass = Global.class;
+
         switch (action) {
             case "activateLicense":  //activate the license
                 params = args.getJSONObject(0);
@@ -142,7 +221,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 }
                 showPdfInProgress = true;
                 if (!TextUtils.isEmpty(targetPath)) {
-					mPdfManager.show(mContext, targetPath, params.optString("password"), params.optBoolean("readOnlyMode"),
+                    mPdfManager.show(mContext, targetPath, params.optString("password"), params.optBoolean("readOnlyMode"),
                             params.optBoolean("automaticSave"), params.optInt("gotoPage"), params.optString("bmpFormat"),
                             params.optString("author"), params.optInt("engine"));
                     showPdfInProgress = false;
@@ -181,7 +260,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 mPdfManager.setThumbHeight(params.optInt("height"));
                 callbackContext.success("Height passed to the reader");
                 break;
-			case "setDebugMode":  //Sets the debug mode in Global
+            case "setDebugMode":  //Sets the debug mode in Global
                 params = args.getJSONObject(0);
                 mPdfManager.setDebugMode(params.optBoolean("mode"));
                 callbackContext.success("property set successfully");
@@ -222,7 +301,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "getBookmarks":
                 handleBookmarkActions(action, args.getJSONObject(0), callbackContext);
                 break;
-			case "addAnnotAttachment":
+            case "addAnnotAttachment":
                 boolean result = mPdfManager.addAnnotAttachment(args.getJSONObject(0).optString("path"));
                 if(result) callbackContext.success("Attachment added successfully");
                 else callbackContext.error("Attachment error");
@@ -232,7 +311,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 callbackContext.success("Result = " + mPdfManager.renderAnnotToFile(params.optInt("page"), params.optInt("annotIndex"),
                         params.optString("renderPath"), params.optInt("width"), params.optInt("height")));
                 break;
-			case "flatAnnotAtPage":
+            case "flatAnnotAtPage":
                 params = args.getJSONObject(0);
                 boolean flatResult = mPdfManager.flatAnnotAtPage(params.optInt("page"));
                 if(flatResult) callbackContext.success("Page flattering success");
@@ -249,7 +328,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                 if(saveAsResult) callbackContext.success("Document save success");
                 else callbackContext.error("Document save error");
                 break;
-			case "closeReader":
+            case "closeReader":
                 mPdfManager.closeReader();
                 break;
             case "willShowReaderCallback":
@@ -276,11 +355,101 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "didTapOnAnnotationOfTypeCallback":
                 sDidTapOnAnnot = callbackContext;
                 break;
-			case "didDoubleTapOnPageCallback":
+            case "didDoubleTapOnPageCallback":
                 sDidDoubleTap = callbackContext;
                 break;
             case "didLongPressOnPageCallback":
                 sDidLongPress = callbackContext;
+                break;
+            case "getGlobal":
+                params = args.getJSONObject(0);
+                exposedFieldName = params.getString("name");
+                try {
+                    if (sBooleanGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        globalFieldName = sBooleanGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        Boolean obj = (Boolean) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " is: " + obj.toString());
+                    }
+                    else if (sFloatGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        globalFieldName = sFloatGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        Float obj = (Float) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " is: " + obj.toString());
+                    }
+                    else if (sIntGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        globalFieldName = sIntGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        Integer obj = (Integer) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " is: " + obj.toString());
+                    }
+                    else if (sHexadecimalGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        globalFieldName = sHexadecimalGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        Integer obj = (Integer) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " is: " + Integer.toHexString(obj));
+                    }
+                    else if (sStringGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        globalFieldName = sStringGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        String obj = (String) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " is: " + obj);
+                    }
+                    else callbackContext.error("Global value does not exist");
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    callbackContext.error("Value not accessible");
+                }
+                break;
+
+            case "setGlobal":
+                params = args.getJSONObject(0);
+                exposedFieldName = params.getString("name");
+
+                try {
+                    if (sBooleanGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        Boolean booleanValue = params.getBoolean("value");
+                        globalFieldName = sBooleanGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        globalClass.getField(globalFieldName).set(null, booleanValue);
+                        Boolean obj = (Boolean) globalClass.getField(globalFieldName).get(null);
+                        callbackContext.success("Requested global value for " + exposedFieldName + " has been set to: " + obj.toString());
+                    }
+                    else if (sFloatGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        Float floatValue = BigDecimal.valueOf(params.getDouble("value")).floatValue();
+                        globalFieldName = sFloatGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        globalClass.getField(globalFieldName).set(null, floatValue);
+                        Float obj = (Float) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " has been set to: " + obj.toString());
+                    }
+                    else if (sIntGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        Integer intValue = params.getInt("value");
+                        globalFieldName = sIntGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        globalClass.getField(globalFieldName).set(null,intValue);
+                        Integer obj = (Integer) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " has been set to: " + obj.toString());
+                    }
+                    else if (sHexadecimalGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        int intValue = params.getInt("value");
+                        globalFieldName = sHexadecimalGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        globalClass.getField(globalFieldName).set(null,intValue);
+                        Integer obj = (Integer) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " has been set to: " + Integer.toHexString(obj));
+                    }
+                    else if (sStringGlobalFieldsDictionary.containsKey(exposedFieldName)) {
+                        String stringValue = params.getString("value");
+                        globalFieldName = sStringGlobalFieldsDictionary.get(exposedFieldName);
+                        assert globalFieldName != null;
+                        globalClass.getField(globalFieldName).set(null,stringValue);
+                        String obj = (String) globalClass.getField(globalFieldName).get(new Object());
+                        callbackContext.success("Requested global value for " + exposedFieldName + " has been set to: " + obj);
+                    }
+                    else callbackContext.error("Global value does not exist");
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    callbackContext.error("Value not accessible");
+                }
                 break;
             default:
                 return false;
@@ -444,4 +613,8 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
         else
             callbackContext.success("Bookmarks json: " + bookmarks);
     }
+
+
+
+
 }

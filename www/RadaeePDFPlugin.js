@@ -1,3 +1,4 @@
+cordova.define("com.radaee.cordova.RadaeePDFPlugin", function(require, exports, module) {
 //  RadaeePDFPlugin
 //  GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
 //  Created by Nermeen Solaiman on 06/06/16.
@@ -205,6 +206,18 @@ RadaeePDFPlugin.prototype.saveDocumentToPath = function (params, successCallback
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'saveDocumentToPath', [params]);
 };
 
+RadaeePDFPlugin.prototype.getGlobal = function (params, successCallback, errorCallback) {
+       params = params || {};
+
+       exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getGlobal', [params]);
+};
+
+RadaeePDFPlugin.prototype.setGlobal = function (params, successCallback, errorCallback) {
+       params = params || {};
+
+       exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setGlobal', [params]);
+};
+
 // Callbacks
                
 RadaeePDFPlugin.prototype.willShowReaderCallback = function (successCallback) {
@@ -258,3 +271,5 @@ RadaeePDFPlugin.prototype.didTapOnAnnotationOfTypeCallback = function (successCa
 };
 
 module.exports = new RadaeePDFPlugin();
+
+});
