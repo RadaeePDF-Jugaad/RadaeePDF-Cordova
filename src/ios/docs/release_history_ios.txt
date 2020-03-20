@@ -15,7 +15,6 @@ PDFViewer SDK for iOS - Release notes
 - ALIGN render_mode to Android
 - FIX issue caused by null object into content stream of Annotation
 - FIX curling mode memory issue
-- 
 
 3.59
 - FIX crash on page draw with high zoom level
