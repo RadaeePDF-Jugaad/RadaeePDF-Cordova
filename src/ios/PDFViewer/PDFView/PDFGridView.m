@@ -29,7 +29,7 @@
     m_zoom = 1;
     m_doc = doc;
     m_delegate = del;
-    m_del = nil;
+    self.m_del = nil;
     page_gap = 1;
     m_sel_pno = -1;
     m_layout = [[RDVLayoutGrid alloc] init:self :100 :5];
@@ -76,7 +76,7 @@
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
@@ -97,7 +97,7 @@
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     
     if( cnt == 1 )
     {
@@ -114,7 +114,7 @@
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];

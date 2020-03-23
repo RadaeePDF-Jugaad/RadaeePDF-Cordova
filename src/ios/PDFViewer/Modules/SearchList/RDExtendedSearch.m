@@ -42,7 +42,7 @@
     return YES;
 }
 
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *, NSMutableArray *))progress finish:(void (^)())finish
+- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *, NSMutableArray *))progress finish:(void (^)(void))finish
 {
     _searching = YES;
     self.searchResults =  [[NSMutableArray alloc] init];
@@ -52,23 +52,23 @@
     finishBlock = finish;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i = 0; i < m_doc.pageCount; i++) {
-            if (_stop) {
-                _searching = NO;
-                [self clearSearch:finishBlock];
+        for (int i = 0; i < self->m_doc.pageCount; i++) {
+            if (self->_stop) {
+                self->_searching = NO;
+                [self clearSearch:self->finishBlock];
                 return;
             }
-            if (m_doc) {
-                m_page = [m_doc page:i];
-                if (m_page) {
-                    [m_page objsStart];
-                    m_finder = [m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
+            if (self->m_doc) {
+                self->m_page = [self->m_doc page:i];
+                if (self->m_page) {
+                    [self->m_page objsStart];
+                    self->m_finder = [self->m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
                     
-                    if (m_finder.count > 0) {
-                        [self addPageSearchResults:m_finder forPage:i progress:progressBlock];
+                    if (self->m_finder.count > 0) {
+                        [self addPageSearchResults:self->m_finder forPage:i progress:self->progressBlock];
                     }
                     
-                    m_page = nil;
+                    self->m_page = nil;
                 } else {
                     break;
                 }
@@ -76,9 +76,9 @@
                 break;
             }
         }
-        _searching = NO;
-        if (finishBlock) {
-            finishBlock();
+        self->_searching = NO;
+        if (self->finishBlock) {
+            self->finishBlock();
         }
     });
 }
@@ -181,7 +181,7 @@
     [self clearSearch:nil];
 }
 
-- (void)clearSearch:(void (^)())finish
+- (void)clearSearch:(void (^)(void))finish
 {
     finishBlock = finish;
     
@@ -206,7 +206,7 @@
     progressBlock = progress;
 }
 
-- (void)restoreFinish:(void (^)())finish {
+- (void)restoreFinish:(void (^)(void))finish {
     finishBlock = finish;
 }
 

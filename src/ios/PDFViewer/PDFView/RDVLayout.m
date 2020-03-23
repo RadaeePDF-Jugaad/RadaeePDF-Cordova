@@ -489,7 +489,7 @@
     if( scale1 > scale2 && !vert) scale1 = scale2;
     
     m_scales_min[pcur] = scale1;
-    m_scales_max[pcur] = m_scales_min[pcur] * GLOBAL.g_zoom_level;
+    m_scales_max[pcur] = m_scales_min[pcur] * GLOBAL.g_layout_zoom_level;
     m_scales[pcur] = m_scale * m_scales_min[pcur];
     
     if( m_scales[pcur] < m_scales_min[pcur] ) m_scales[pcur] = m_scales_min[pcur];
@@ -820,7 +820,7 @@
     PDF_SIZE sz = [m_doc getPagesMaxSize];
     
     m_scale_min = (((float)(m_height)) / sz.cy);
-    m_scale_max = m_scale_min * GLOBAL.g_zoom_level;
+    m_scale_max = m_scale_min * GLOBAL.g_layout_zoom_level;
     m_scale = m_scale_min;
     
     float elementWidth = (sz.cx * m_scale);
@@ -966,7 +966,7 @@
     int pageno = 0;
     int pcnt = [m_doc pageCount];
     float maxh = 0;
-    float maxw = 0;
+    //float maxw = 0;
     int ccur = 0;
     int ccnt = 0;
     m_cell_w = 0;
@@ -1312,7 +1312,7 @@
     [self vCalculateScales];
     
     m_docw = 0;
-    int pageno = pageViewNo;
+    //int pageno = pageViewNo;
     int docx = (m_thumb) ? m_w >> 1 : m_page_gap >> 1;
     m_doch = m_h * m_scale;
     

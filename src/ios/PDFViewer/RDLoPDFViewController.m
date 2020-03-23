@@ -44,7 +44,7 @@
     int pagenow;
     NSMutableArray *tempfiles;
    
-    MPMoviePlayerViewController *mpvc;
+    AVPlayerViewController *avvc;
     UIPickerView *pickerView;
     NSArray *pickViewArr;
     UIButton *confirmPickerBtn;
@@ -55,7 +55,7 @@
     UIAlertController *moreItemsContainer;
     RDMoreTableViewController *moreTVContainer;
     BookmarkTableViewController *b;
-    UIPopoverController *bookmarkPopover;
+    //UIPopoverController *bookmarkPopover;
     CGPoint annotTapped;
     RDAnnotListViewController *annotListTV;
     UIMenuController *selectMC;
@@ -77,7 +77,6 @@
     UIColor *toolbarTintColor;
     
     UILabel *sliderLabel;
-    BOOL showThumb;
 }
 @end
 
@@ -165,8 +164,6 @@
     
     //delete temp files
     [self clearTempFiles];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -179,13 +176,6 @@
             [_delegate didCloseReader];
         }
     }
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"changeOrientation" object:nil];
-    return YES;
 }
 
 - (BOOL)shouldAutorotate
@@ -251,66 +241,14 @@
 {
     [m_view setFrame:CGRectMake(0, 0, size.width, size.height)];
     [m_view sizeThatFits:size];
-    m_Thumbview.frame = CGRectMake(0, size.height - thumbViewHeight, size.width, thumbViewHeight);
-    m_slider.frame = CGRectMake(0, size.height - thumbViewHeight, size.width, thumbViewHeight);
+    m_Thumbview.frame = CGRectMake(0, size.height - GLOBAL.g_thumbview_height, size.width, GLOBAL.g_thumbview_height);
+    m_slider.frame = CGRectMake(0, size.height - GLOBAL.g_thumbview_height, size.width, GLOBAL.g_thumbview_height);
     [m_Thumbview sizeThatFits:m_Thumbview.frame.size];
     [m_slider sizeThatFits:m_slider.frame.size];
     [m_Thumbview vGoto:pagenow];
     m_slider.value = pagenow +1;
     [self setSliderText:(int)m_slider.value];
 }
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    /*
-     CGRect rect =[[UIScreen mainScreen]bounds];
-     if ([self isPortrait])
-     {
-     if (rect.size.height < rect.size.width) {
-     
-     float height = rect.size.height;
-     rect.size.height = rect.size.width;
-     rect.size.width = height;
-     }
-     }
-     else
-     {
-     if (rect.size.height > rect.size.width) {
-     
-     float height = rect.size.height;
-     rect.size.height = rect.size.width;
-     rect.size.width = height;
-     }
-     }
-     
-     [m_view setFrame:rect];
-     [m_view sizeThatFits:rect.size];
-     [toolBar sizeToFit];
-     
-     CGRect boundsc = [[UIScreen mainScreen]bounds];
-     int cwidth = boundsc.size.width;
-     int cheight = boundsc.size.height;
-     
-     if ([self isPortrait]) {
-     if (cwidth > cheight) {
-     cwidth = cheight;
-     cheight = boundsc.size.width;
-     }
-     }
-     else
-     {
-     if (cwidth < cheight) {
-     cwidth = cheight;
-     cheight = boundsc.size.width;
-     }
-     }
-     
-     float hi = self.navigationController.navigationBar.bounds.size.height;
-     
-     [m_searchBar setFrame:CGRectMake(0,hi+20,cwidth,41)];
-     */
-}
-
 
 - (void)createToolbarItems
 {
@@ -368,11 +306,9 @@
 -(int)PDFOpen:(NSString *)path : (NSString *)pwd atPage:(int)page readOnly:(BOOL)readOnlyEnabled autoSave:(BOOL)autoSave author:(NSString *)author
 {
     GLOBAL.g_author = author;
-    GLOBAL.pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
-    GLOBAL.pdfName = [[path lastPathComponent] mutableCopy];
+    GLOBAL.g_pdf_path = [[path stringByDeletingLastPathComponent] mutableCopy];
+    GLOBAL.g_pdf_name = [[path lastPathComponent] mutableCopy];
     GLOBAL.g_save_doc = autoSave;
-    
-    showThumb = YES;
     
     CGRect rect = [self screenRect];
     m_doc = [[PDFDoc alloc] init];
@@ -518,8 +454,8 @@
 - (void)thumbInit:(int)pageno {
     CGRect rect = [self screenRect];
     
-    if (thumbViewHeight == 0) {
-        thumbViewHeight = THUMB_HEIGHT;
+    if (GLOBAL.g_thumbview_height == 0) {
+        GLOBAL.g_thumbview_height = THUMB_HEIGHT;
     }
     
     if (m_Thumbview) {
@@ -533,19 +469,19 @@
         m_slider = nil;
     }
     
-    m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, rect.size.height - thumbViewHeight, rect.size.width, thumbViewHeight)];
+    m_Thumbview = [[PDFThumbView alloc] initWithFrame:CGRectMake(0, rect.size.height - GLOBAL.g_thumbview_height, rect.size.width, GLOBAL.g_thumbview_height)];
     [m_Thumbview PDFOpen:m_doc :4 :self];
     [m_Thumbview vGoto:pageno];//page 0 for default selected page.
     [self.view addSubview:m_Thumbview];
-    m_Thumbview.hidden = !showThumb;
+    m_Thumbview.hidden = !GLOBAL.g_navigation_mode;
     
-    sliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, thumbViewHeight / 3)];
+    sliderLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, GLOBAL.g_thumbview_height / 3)];
     sliderLabel.textColor = [UIColor whiteColor];
     sliderLabel.textAlignment = NSTextAlignmentCenter;
     sliderLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [self setSliderText:pageno + 1];
     
-    m_slider = [[UISlider alloc] initWithFrame:CGRectMake(0, rect.size.height - thumbViewHeight, rect.size.width, thumbViewHeight)];
+    m_slider = [[UISlider alloc] initWithFrame:CGRectMake(0, rect.size.height - GLOBAL.g_thumbview_height, rect.size.width, GLOBAL.g_thumbview_height)];
     m_slider.minimumValue = 1;
     m_slider.maximumValue = m_doc.pageCount;
     //m_slider.continuous = NO;
@@ -554,7 +490,7 @@
     [m_slider addTarget:self action:@selector(OnSliderTouchUp:) forControlEvents:UIControlEventTouchUpInside];
     m_slider.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
     [m_slider addSubview:sliderLabel];
-    m_slider.hidden = showThumb;
+    m_slider.hidden = GLOBAL.g_navigation_mode;
     [self.view addSubview:m_slider];
 }
 
@@ -699,8 +635,12 @@
     
     if( !found )
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Waring" message:@"Find Over" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-        [alert show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Waring"
+                                   message:@"Find Over"
+                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 /*
@@ -846,7 +786,7 @@
             [self presentSignatureViewController];
         }];
         UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [m_view vAnnotEnd];
+            [self->m_view vAnnotEnd];
         }];
               
         [alert addAction:ok];
@@ -898,14 +838,18 @@
     [tempfiles addObject:fileName];
     NSURL *urlPath = [NSURL fileURLWithPath:fileName];
     if ([[NSFileManager defaultManager] fileExistsAtPath:fileName]) {
-        mpvc = [[MPMoviePlayerViewController alloc] initWithContentURL:urlPath];
-        mpvc.view.frame = self.view.bounds;
-        mpvc.modalPresentationStyle = UIModalPresentationFormSheet;
-        
-        [self presentMoviePlayerViewControllerAnimated:mpvc];
+        avvc = [[AVPlayerViewController alloc] init];
+        avvc.player = [AVPlayer playerWithURL:urlPath];
+        avvc.view.frame = self.view.bounds;
+        avvc.modalPresentationStyle = UIModalPresentationFormSheet;
+        [self presentViewController:avvc animated:YES completion:nil];
     }else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Couldn't find media file" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-        [alert show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                   message:@"Couldn't find media file"
+                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 //this mehod fired only when vAnnotPerform method invoked.
@@ -1045,7 +989,7 @@
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action)
                                  {
-                                     [m_view setModified:NO force:YES];
+            [self->m_view setModified:NO force:YES];
                                      [self PDFClose];
                                      [self.navigationController setNavigationBarHidden:NO];
                                      [self.navigationController popViewControllerAnimated:YES];
@@ -1138,7 +1082,7 @@
         
         UIAlertAction *cancel =  [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * action)
                                   {
-                                      [moreItemsContainer dismissViewControllerAnimated:YES completion:nil];
+            [self->moreItemsContainer dismissViewControllerAnimated:YES completion:nil];
                                   }];
         
         [viewMode setValue:[(_viewModeImage) ? _viewModeImage : [UIImage imageNamed:@"btn_view"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
@@ -1289,21 +1233,7 @@
         m_view = NULL;
     }
     
-    switch (mode) {
-        case 2:
-        {
-            GLOBAL.g_render_mode = 3;
-            break;
-        }
-        case 3:
-        {
-            GLOBAL.g_render_mode = 4;
-            break;
-        }
-        default:
-            GLOBAL.g_render_mode = mode;
-            break;
-    }
+    GLOBAL.g_render_mode = mode;
     
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_mode forKey:@"ViewMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1327,7 +1257,7 @@
 
 - (NSMutableArray *)loadBookmarkForPdf:(NSString *)pdfPath withPath:(BOOL)withPath
 {
-    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[GLOBAL.pdfName stringByDeletingPathExtension] withPath:withPath];
+    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[GLOBAL.g_pdf_name stringByDeletingPathExtension] withPath:withPath];
 }
 
 - (NSMutableArray *)addBookMarks:(NSString *)dpath :(NSString *)subdir :(NSFileManager* )fm pdfName:(NSString *)pdfName withPath:(BOOL)withPath
@@ -1375,15 +1305,24 @@
 - (void)bookmarkList
 {
     BookmarkTableViewController *b = [[BookmarkTableViewController alloc] init];
-    b.items = [self loadBookmarkForPdf:GLOBAL.pdfPath withPath:YES];
+    b.items = [self loadBookmarkForPdf:GLOBAL.g_pdf_path withPath:YES];
     b.delegate = self;
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         
-        bookmarkPopover = [[UIPopoverController alloc] initWithContentViewController:b];
-        bookmarkPopover.popoverContentSize = CGSizeMake(300, 44 * b.items.count);
+        //bookmarkPopover = [[UIPopoverController alloc] initWithContentViewController:b];
+        //bookmarkPopover.popoverContentSize = CGSizeMake(300, 44 * b.items.count);
         
-        [bookmarkPopover presentPopoverFromBarButtonItem:toolBar.moreButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        //[bookmarkPopover presentPopoverFromBarButtonItem:toolBar.moreButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        b.modalPresentationStyle = UIModalPresentationPopover;
+        b.delegate = self; 
+        b.preferredContentSize = CGSizeMake(320, (44 * 4) + 10);
+        
+        UIPopoverPresentationController *pop = b.popoverPresentationController;
+        pop.permittedArrowDirections = UIPopoverArrowDirectionUp;
+        pop.barButtonItem = toolBar.moreButton;
+        
+        [self presentViewController:b animated:YES completion:nil];
     }
     else
     {
@@ -1630,14 +1569,14 @@
 - (void)didSign
 {
     [self dismissViewControllerAnimated:YES completion:^{
-        [m_view setSignatureImageAtIndex:cachedAnnot.getIndex atPage:[m_view vGetCurrentPage]];
-        [m_view vAnnotEnd];
+        [self->m_view setSignatureImageAtIndex:self->cachedAnnot.getIndex atPage:[self->m_view vGetCurrentPage]];
+        [self->m_view vAnnotEnd];
     }];
 }
 
 - (NSString *)composeFile
 {
-    NSString *pdfpath = [GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName];
+    NSString *pdfpath = [GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name];
     RDVPos pos;
     [m_view vGetPos:&pos];
     int pageno = pos.pageno;
@@ -1707,11 +1646,17 @@
 
 - (void)showDocReadonlyAlert
 {
-    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-    NSString *str2=NSLocalizedString(@"This Document is readonly", @"Localizable");
-    NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-    UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-    [alter show];
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable")
+                                                                   message:NSLocalizedString(@"This Document is readonly", @"Localizable")
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction* ok = [UIAlertAction
+                         actionWithTitle:NSLocalizedString(@"OK", @"Localizable")
+                         style:UIAlertActionStyleDefault
+                         handler:nil];
+    
+    [alert addAction:ok];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)initDrawToolbar {
@@ -1731,9 +1676,9 @@
     }
     
     [self initDrawToolbar];
-    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(drawLineDone:)];
+    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarButtonItemStylePlain target:self action:@selector(drawLineDone:)];
     drawLineDoneBtn.width =30;
-    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(drawLineCancel:)];
+    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarButtonItemStylePlain target:self action:@selector(drawLineCancel:)];
     drawLineCancelBtn.width =30;
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
                                initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
@@ -1763,9 +1708,9 @@
     }
     
     [self initDrawToolbar];
-    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(drawRowDone)];
+    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarButtonItemStylePlain target:self action:@selector(drawRowDone)];
     drawLineDoneBtn.width =30;
-    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(drawRowCancel)];
+    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarButtonItemStylePlain target:self action:@selector(drawRowCancel)];
     drawLineCancelBtn.width =30;
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
                                initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
@@ -1798,9 +1743,9 @@
     }
     
     [self initDrawToolbar];
-    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(drawRectDone:)];
+    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarButtonItemStylePlain target:self action:@selector(drawRectDone:)];
     drawLineDoneBtn.width =30;
-    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(drawRectCancel:)];
+    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarButtonItemStylePlain target:self action:@selector(drawRectCancel:)];
     drawLineCancelBtn.width =30;
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
                                initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
@@ -1830,9 +1775,9 @@
     }
     
     [self initDrawToolbar];
-    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(drawEllipseDone:)];
+    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarButtonItemStylePlain target:self action:@selector(drawEllipseDone:)];
     drawLineDoneBtn.width =30;
-    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(drawEllipseCancel:)];
+    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarButtonItemStylePlain target:self action:@selector(drawEllipseCancel:)];
     drawLineCancelBtn.width =30;
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
                                initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
@@ -1862,9 +1807,9 @@
     }
     
     [self initDrawToolbar];
-    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarStyleBlackOpaque target:self action:@selector(drawImageDone)];
+    UIBarButtonItem *drawLineDoneBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_done"] style:UIBarButtonItemStylePlain target:self action:@selector(drawImageDone)];
     drawLineDoneBtn.width =30;
-    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarStyleBlackOpaque target:self action:@selector(drawImageCancel)];
+    UIBarButtonItem *drawLineCancelBtn=[[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"btn_annot_remove"] style:UIBarButtonItemStylePlain target:self action:@selector(drawImageCancel)];
     drawLineCancelBtn.width =30;
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc]
                                initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
@@ -1898,10 +1843,10 @@
     float y = pos.pdfy;
     NSString *tempFile;
     NSString *tempName;
-    tempName = [GLOBAL.pdfName substringToIndex:GLOBAL.pdfName.length-4];
+    tempName = [GLOBAL.g_pdf_name substringToIndex:GLOBAL.g_pdf_name.length-4];
     tempFile = [tempName stringByAppendingFormat:@"%d%@",pageno,@".bookmark"];
     NSString *tempPath;
-    tempPath = [GLOBAL.pdfPath stringByAppendingFormat:@"%@",GLOBAL.pdfName];
+    tempPath = [GLOBAL.g_pdf_path stringByAppendingFormat:@"%@",GLOBAL.g_pdf_name];
     NSString *fileContent = [NSString stringWithFormat:@"%@,%@,%d,%f,%f",tempPath,tempName,pageno,x,y];
     NSString *BookMarkDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)objectAtIndex:0];
     
@@ -1916,25 +1861,36 @@
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"Add BookMark Success!", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2  delegate:self cancelButtonTitle:str3 otherButtonTitles:nil, nil];
-        
-        [alter show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                          message:str2
+                                          preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     else {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"BookMark Already Exist", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:nil, nil];
-        [alter show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                       message:str2
+                                       preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
 }
 
 -(void)printPdf
 {
-    NSString *path = [GLOBAL.pdfPath stringByAppendingString:GLOBAL.pdfName];
+    NSString *path = [GLOBAL.g_pdf_path stringByAppendingString:GLOBAL.g_pdf_name];
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:@"Warning" message:@"PDF file not available"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-        [alter show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Warning"
+                                       message:@"PDF file not available"
+                                       preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
         return;
     }
     
@@ -1947,7 +1903,7 @@
         
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
-        printInfo.jobName = [GLOBAL.pdfPath lastPathComponent];
+        printInfo.jobName = [GLOBAL.g_pdf_path lastPathComponent];
         printInfo.duplex = UIPrintInfoDuplexLongEdge;
         pic.printInfo = printInfo;
         pic.showsPageRange = YES;
@@ -1963,15 +1919,19 @@
     }
     else
     {
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:@"Warning" message:@"Cannot print the file"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-        [alter show];
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Warning"
+                                       message:@"Cannot print the file"
+                                       preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     isPrint = YES;
 }
 
 - (void)sharePDF
 {
-    NSURL *url = [NSURL fileURLWithPath:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName]];
+    NSURL *url = [NSURL fileURLWithPath:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name]];
     if(url)
     {
         UIActivityViewController *a = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
@@ -2235,7 +2195,7 @@
 -(void)Copy :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSString* s = [m_view vSelGetText];
+        NSString* s = [self->m_view vSelGetText];
         UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
         pasteboard.string = s;
         [self endSelect];
@@ -2245,13 +2205,13 @@
 -(void)HighLight :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (readOnly) {
+        if (self->readOnly) {
             [self showDocReadonlyAlert];
             [self endSelect];
             return;
         }
         //0HighLight
-        [m_view vSelMarkup :GLOBAL.g_annot_highlight_clr :0];
+        [self->m_view vSelMarkup :GLOBAL.g_annot_highlight_clr :0];
         [self endSelect];
     });
     
@@ -2259,26 +2219,26 @@
 -(void)UnderLine :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (readOnly) {
+        if (self->readOnly) {
             [self showDocReadonlyAlert];
             [self endSelect];
             return;
         }
         //1UnderLine
-        [m_view vSelMarkup:GLOBAL.g_annot_underline_clr :1];
+        [self->m_view vSelMarkup:GLOBAL.g_annot_underline_clr :1];
         [self endSelect];
     });
 }
 -(void)StrikeOut :(id)sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (readOnly) {
+        if (self->readOnly) {
             [self showDocReadonlyAlert];
             [self endSelect];
             return;
         }
         //2strikethrough
-        [m_view vSelMarkup :GLOBAL.g_annot_strikeout_clr :2];
+        [self->m_view vSelMarkup :GLOBAL.g_annot_strikeout_clr :2];
         [self endSelect];
     });
 }
@@ -2461,9 +2421,9 @@
 
 - (void)setThumbHeight:(float)height
 {
-    thumbViewHeight = height;
+    GLOBAL.g_thumbview_height = height;
     CGRect rect = [self screenRect];
-    m_Thumbview.frame = CGRectMake(0, rect.size.height - thumbViewHeight, rect.size.width, thumbViewHeight);
+    m_Thumbview.frame = CGRectMake(0, rect.size.height - GLOBAL.g_thumbview_height, rect.size.width, GLOBAL.g_thumbview_height);
     [m_Thumbview sizeThatFits:m_Thumbview.frame.size];
 }
 
@@ -2508,7 +2468,7 @@
 {
     if (doc == nil) {
         doc = [[PDFDoc alloc] init];
-        [doc open:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :@""];
+        [doc open:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :@""];
     }
     
     if(page >= 0 && page < doc.pageCount)
@@ -2527,7 +2487,7 @@
 {
     PDFDoc *doc = [[PDFDoc alloc] init];
     if (m_doc == nil) {
-        [doc open:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :@""];
+        [doc open:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :@""];
     } else {
         doc = m_doc;
     }
@@ -2667,11 +2627,11 @@
 
 - (void)showBars
 {
-    m_Thumbview.hidden = !showThumb;
-    m_slider.hidden = showThumb;
+    m_Thumbview.hidden = !GLOBAL.g_navigation_mode;
+    m_slider.hidden = GLOBAL.g_navigation_mode;
     [pageNumLabel setHidden:false];
     toolBar.hidden = NO;
-    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    [self prefersStatusBarHidden];
     [m_searchBar setHidden:NO];
     statusBarHidden = NO;
     isImmersive = NO;

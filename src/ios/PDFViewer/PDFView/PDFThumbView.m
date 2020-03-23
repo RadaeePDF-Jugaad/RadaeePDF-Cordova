@@ -30,16 +30,16 @@
     m_zoom = 1;
     m_doc = doc;
     m_delegate = del;
-    m_del = nil;
+    self.m_del = nil;
     page_gap = 1;
     m_sel_pno = -1;
-    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 2)];
+    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 7)];
     [m_layout vOpen:m_doc :page_gap * m_scale_pix :self.layer];
     [self bringSubviewToFront:m_child];
     m_status = sta_none;
     [m_layout vResize:self.frame.size.width * m_scale_pix :self.frame.size.height * m_scale_pix];
     self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, 0);
-    self.backgroundColor = (thumbBackgroundColor != 0) ? UIColorFromRGB(thumbBackgroundColor) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
+    self.backgroundColor = (GLOBAL.g_thumbview_bg_color != 0) ? UIColorFromRGB(GLOBAL.g_thumbview_bg_color) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
     m_timer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(ProOnTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
     return TRUE;
@@ -84,7 +84,7 @@
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
@@ -105,7 +105,7 @@
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     
     if( cnt == 1 )
     {
@@ -122,7 +122,7 @@
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSSet *allTouches = [event allTouches];
-    int cnt = [allTouches count];
+    int cnt = (int)[allTouches count];
     if( cnt == 1 )
     {
         UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
@@ -198,10 +198,10 @@
 
 - (void)setThumbBackgroundColor:(int)color
 {
-    thumbBackgroundColor = color;
+    GLOBAL.g_thumbview_bg_color = color;
     
-    if (thumbBackgroundColor != 0) {
-        self.backgroundColor = UIColorFromRGB(thumbBackgroundColor);
+    if (GLOBAL.g_thumbview_bg_color != 0) {
+        self.backgroundColor = UIColorFromRGB(GLOBAL.g_thumbview_bg_color);
     }
 }
 

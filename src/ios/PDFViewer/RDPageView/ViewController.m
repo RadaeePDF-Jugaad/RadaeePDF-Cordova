@@ -14,8 +14,6 @@
 
 @implementation ViewController
 
-
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -24,7 +22,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
     _pdfView = [[PDFLayoutView alloc] initWithFrame:self.view.frame];
     _pdfView.scrollEnabled = NO;
     _pdfView.pageViewNo = _pageViewNo;

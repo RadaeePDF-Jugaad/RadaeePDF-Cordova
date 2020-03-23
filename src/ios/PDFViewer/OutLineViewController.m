@@ -44,20 +44,11 @@
     [self.view addSubview:self.outlineTableView];
 
 }
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     self.navigationController.navigationBarHidden = NO;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-	return YES;
 }
 
 -(void)setList:(PDFDoc *)doc :(PDFOutline *)parent :(PDFOutline *)first
@@ -146,11 +137,4 @@
     }
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [self.view sizeToFit];
-    [self.outlineTableView sizeToFit];
-    [self.outlineTableViewCell sizeToFit];
-    
-}
 @end

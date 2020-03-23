@@ -11,6 +11,10 @@
 @interface RDPageViewController ()
 {
     PDFDoc *doc;
+    BOOL statusBarHidden;
+    BOOL isImmersive;
+    int pageno;
+    int bgColor;
 }
 
 @end
@@ -21,14 +25,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.dataSource = self;
-    
-    UIViewController *vc = [self viewControllerAtIndex:0];
-    [self setViewControllers:@[vc] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    self.delegate = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    UIViewController *vc = [self viewControllerAtIndex:0];
+    [self setViewControllers:@[vc] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_back"] style:UIBarButtonItemStyleDone target:self action:@selector(closeView)];
 }
 
 - (int)PDFOpenAtPath:(NSString *)path withPwd:(NSString *)pwd
@@ -51,9 +58,19 @@
 {
     // Create a new view controller and pass suitable data.
     ViewController *viewController = [[ViewController alloc] init];
+    viewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     viewController.doc = doc;
     viewController.pageViewNo = index;
+    pageno = (int)index+1;
+    if (bgColor) {
+        [viewController.pdfView setReaderBackgroundColor:bgColor];
+    }
     return viewController;
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+    return statusBarHidden;
 }
 
 #pragma mark - Page View Controller Data Source
@@ -95,6 +112,15 @@
     return [self viewControllerAtIndex:index];
 }
 
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed {
+    for (ViewController *v in previousViewControllers) {
+        if(v.pdfView != nil)
+        {
+            [self closeViewController:v];
+        }
+    }
+}
+
 /*
 #pragma mark - Navigation
 
@@ -104,5 +130,180 @@
     // Pass the selected object to the new view controller.
 }
 */
+- (void)closeView
+{
+    self.navigationController.navigationBarHidden = NO;
+    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    [self PDFClose];
+}
 
+-(void)PDFClose
+{
+    for (ViewController *v in self.viewControllers) {
+        if(v.pdfView != nil)
+        {
+            [self closeViewController:v];
+        }
+    }
+    
+    doc = NULL;
+}
+
+- (void)closeViewController:(ViewController *)v {
+    if(v.pdfView != nil)
+    {
+        [v.pdfView PDFClose];
+        [v.pdfView removeFromSuperview];
+        v.pdfView = NULL;
+        v.doc = NULL;
+    }
+}
+
+#pragma mark - lib methods
+
+- (id)getDoc
+{
+    return doc;
+}
+
+- (int)getCurrentPage
+{
+    return pageno;
+}
+
+- (CGImageRef)imageForPage:(int)pg
+{
+    return nil;
+}
+
+- (void)setThumbnailBGColor:(int)color
+{
+}
+
+- (void)setThumbGridBGColor:(int)color
+{
+}
+
+- (void)setThumbGridElementHeight:(float)height
+{
+}
+
+- (void)setThumbGridGap:(float)gap
+{
+}
+
+- (void)setThumbGridViewMode:(int)mode
+{
+}
+
+- (void)setReaderBGColor:(int)color
+{
+    GLOBAL.g_readerview_bg_color = color;
+}
+
+- (void)setToolbarColor:(int)color {
+    self.navigationController.navigationBar.barTintColor = UIColorFromRGB(color);
+}
+
+- (void)setToolbarTintColor:(int)color {
+    self.navigationController.navigationBar.tintColor = UIColorFromRGB(color);
+}
+
+
+- (void)setThumbHeight:(float)height
+{
+}
+
+- (void)setFirstPageCover:(BOOL)cover
+{
+}
+
+- (void)setDoubleTapZoomMode:(int)mode
+{
+}
+
+- (void)setImmersive:(BOOL)immersive
+{
+    isImmersive = immersive;
+    
+    if (isImmersive) {
+        [self hideBars];
+    } else {
+        [self showBars];
+    }
+}
+
+#pragma mark - Attachments
+
+- (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
+{
+    return NO;
+}
+
+#pragma mark - Annot render
+
+- (BOOL)addAttachmentFromPath:(NSString *)path
+{
+    return NO;
+}
+
+#pragma mark - Flat annot
+
+- (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc
+{
+    return NO;
+}
+
+- (bool)flatAnnots
+{
+    return nil;
+}
+
+#pragma mark - Save document
+
+- (bool)saveDocumentToPath:(NSString *)path
+{
+    NSString *prefix = @"file://";
+    if([path rangeOfString:prefix].location != NSNotFound)
+    {
+        path = [path substringFromIndex:prefix.length];
+    }
+    return [doc saveAs:path: NO];
+}
+
+#pragma mark - Form Manager
+
+- (NSString *)getJSONFormFields
+{
+    return @"";
+}
+
+- (NSString *)getJSONFormFieldsAtPage:(int)page
+{
+    return @"";
+}
+
+- (NSString *)setFormFieldWithJSON:(NSString *)json
+{
+    return @"";
+}
+
+#pragma mark - Utils Method
+
+- (void)showBars
+{
+    statusBarHidden = NO;
+    [self prefersStatusBarHidden];
+    isImmersive = NO;
+    [self.navigationController setNavigationBarHidden:isImmersive animated:YES];
+}
+
+- (void)hideBars
+{
+    statusBarHidden = YES;
+    [self prefersStatusBarHidden];
+    isImmersive = YES;
+    [self.navigationController setNavigationBarHidden:isImmersive animated:YES];
+}
 @end

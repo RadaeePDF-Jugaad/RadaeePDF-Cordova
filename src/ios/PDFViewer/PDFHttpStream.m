@@ -40,13 +40,17 @@
 -(void)init_length
 {
     NSMutableURLRequest* urlRequest = [NSMutableURLRequest requestWithURL:m_url cachePolicy:NSURLRequestReloadRevalidatingCacheData timeoutInterval:60.0];
-    NSHTTPURLResponse *lenResponse;
+    __block NSHTTPURLResponse *lenResponse;
     
     [urlRequest setValue:@"Keep-Alive" forHTTPHeaderField:@"Close"];
     
-    [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&lenResponse error:nil];
+    NSURLSession *session = [NSURLSession sharedSession];
+    [session dataTaskWithRequest:urlRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        lenResponse = (NSHTTPURLResponse *)response;
+    }];
+    
     long len = [[[lenResponse allHeaderFields] objectForKey:@"Content-Length"] intValue];
-    m_total = len;
+    m_total = (int)len;
     [NSURLConnection cancelPreviousPerformRequestsWithTarget:urlRequest];
     if( len > 0 )
     {
@@ -109,13 +113,17 @@
                 len = (start - prev) * BLOCK_SIZE;
             
             NSMutableURLRequest* urlRequest = [NSMutableURLRequest requestWithURL:m_url cachePolicy:NSURLRequestReloadRevalidatingCacheData timeoutInterval:60 + 30 * (start - prev - 1)];
-            NSHTTPURLResponse *urlResponse;
+            __block NSHTTPURLResponse *urlResponse;
             [urlRequest setHTTPMethod:@"GET"];
             NSString *hval = [NSString stringWithFormat:@"bytes=%i-%i", off, off + len];
             [urlRequest setValue:hval forHTTPHeaderField:@"Range"];
-            NSError *err;
             NSLog(@"Starting synchronous request to %@ with byte range: %d-%d", m_url, off, off + len);
-            NSData *responseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&urlResponse error:&err];
+            __block NSData *responseData;
+            NSURLSession *session = [NSURLSession sharedSession];
+            [session dataTaskWithRequest:urlRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                urlResponse = (NSHTTPURLResponse *)response;
+                responseData = data;
+            }];
             if(responseData != NULL)
             {
                 memset( m_block_flags + prev, 1, start - prev );
@@ -139,7 +147,7 @@
     while( times > 0 && ![self download_blocks:bstart:bend]) times--;
     if( times == 0 ) return 0;
     fseek( m_file, m_pos, SEEK_SET );
-    int ret = fread( data, 1, len, m_file );
+    int ret = (int)fread( data, 1, len, m_file );
     m_pos += ret;
     return ret;
 }
@@ -167,7 +175,7 @@
     if( pos < 0.00000000001 ) pos = 0;
     if( pos > m_total ) pos = m_total;
     if(pos == m_pos) return true;
-    m_pos = pos;
+    m_pos = (int)pos;
     return true;
 }
 

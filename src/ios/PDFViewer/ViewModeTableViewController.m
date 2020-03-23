@@ -82,6 +82,13 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (indexPath.row == 2) {
+        [_delegate setReaderViewMode:3];
+        return;
+    } else if (indexPath.row == 3) {
+        [_delegate setReaderViewMode:6];
+        return;
+    }
     [_delegate setReaderViewMode:(int)indexPath.row];
 }
 

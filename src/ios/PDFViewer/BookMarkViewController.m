@@ -9,12 +9,15 @@
 #import "BookMarkViewController.h"
 
 @interface BookMarkViewController ()
+{
+    NSString *pdfFullPath;
+}
 
 @end
 
 @implementation BookMarkViewController
 
-NSString *pdfFullPath;
+
 int bookMarkNum =0;
 
 - (void)addBookMarks:(NSString *)dpath :(NSString *)subdir :(NSFileManager *)fm :(int)level
@@ -122,18 +125,6 @@ int bookMarkNum =0;
     
     [self.tableView reloadData];
 }
-- (void)viewDidUnload
-{
-    
-    [self.view removeFromSuperview];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 
 #pragma mark - Table view data source
 
@@ -224,26 +215,16 @@ int bookMarkNum =0;
     {
         m_pdf1 = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
     }
-    NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
-    NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
-    NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
-    RDUPassWord* pwdDlg = [[RDUPassWord alloc]
-                           initWithTitle:Enterpassword
-                           message:nil
-                           delegate:self
-                           cancelButtonTitle:ok
-                           otherButtonTitles:cancel, nil];
     
-    NSString *pwd = pwdDlg.uPwd.text;
-    
+    NSString *pwd = NULL;
     NSDictionary *row_item = [m_files objectAtIndex:indexPath.row];
     NSString *path = [row_item objectForKey:@"Path"];
-    GLOBAL.pdfPath = [[path stringByDeletingLastPathComponent] mutableCopy];
-    GLOBAL.pdfName = [[[path lastPathComponent] stringByAppendingPathExtension:@"pdf"] mutableCopy];
+    GLOBAL.g_pdf_path = [[path stringByDeletingLastPathComponent] mutableCopy];
+    GLOBAL.g_pdf_name = [[[path lastPathComponent] stringByAppendingPathExtension:@"pdf"] mutableCopy];
     NSString *temp2=[row_item objectForKey:@"Page"];
     int pageno = [temp2 intValue];
     pdfFullPath = path;
-    int result = [m_pdf1 PDFOpen:[GLOBAL.pdfPath stringByAppendingPathComponent:GLOBAL.pdfName] :pwd];
+    int result = [m_pdf1 PDFOpen:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :pwd];
     
     if(result == 1)
     {
@@ -258,15 +239,20 @@ int bookMarkNum =0;
     //Return value is encrypted document
     else if(result == 2)
     {
-        [pwdDlg show];
+        [self presentPwdAlertControllerWithTitle:NSLocalizedString(@"Please Enter PassWord", @"Localizable") message:nil];
     }
     else if (result == 0)
     {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-        [alter show];
+        
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                   message:str2
+                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     
 }
@@ -277,23 +263,14 @@ int bookMarkNum =0;
     {
         m_pdf1 = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
     }
-    NSString *Enterpassword =[[NSString alloc]initWithFormat:NSLocalizedString(@"Please Enter PassWord", @"Localizable")];
-    NSString *ok = [[NSString alloc]initWithFormat:NSLocalizedString(@"OK", @"Localizable")];
-    NSString *cancel = [[NSString alloc]initWithFormat:NSLocalizedString(@"Cancel", @"Localizable")];
-    RDUPassWord* pwdDlg = [[RDUPassWord alloc]
-                           initWithTitle:Enterpassword
-                           message:nil
-                           delegate:self
-                           cancelButtonTitle:ok
-                           otherButtonTitles:cancel, nil];
-    NSString *pwd = pwdDlg.uPwd.text;
     
+    NSString *pwd = NULL;
     NSArray *row_item = [m_files objectAtIndex:indexPath.row];
     NSString *path = [row_item objectAtIndex:0];
     NSArray *arr = [m_files objectAtIndex:indexPath.row];
-    GLOBAL.pdfName = (NSMutableString *)[[arr objectAtIndex:1] stringByAppendingFormat:@".pdf"];
+    GLOBAL.g_pdf_name = (NSMutableString *)[[arr objectAtIndex:1] stringByAppendingFormat:@".pdf"];
     NSString *temp2=[arr objectAtIndex:2];
-    int pageno = [temp2 intValue];
+    //int pageno = [temp2 intValue];
     pdfFullPath = path;
     int result = [m_pdf1 PDFOpen:path :pwd];
     
@@ -307,19 +284,25 @@ int bookMarkNum =0;
     //Return value is encrypted document
     else if(result == 2)
     {
-        [pwdDlg show];
+        [self presentPwdAlertControllerWithTitle:NSLocalizedString(@"Please Enter PassWord", @"Localizable") message:nil];
     }
     else if (result == 0)
     {
         NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
         NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-        [alter show];
+        
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                   message:str2
+                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     
 }
 
+/*
 - (void)alertView:(UIAlertView *)pwdDlg clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     int result;
@@ -348,4 +331,43 @@ int bookMarkNum =0;
         
     }
 }
+*/
+
+- (void)presentPwdAlertControllerWithTitle:(NSString *)title message:(NSString *)message
+{
+    UIAlertController *pwdAlert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    [pwdAlert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = NSLocalizedString(@"PassWord", @"Localizable");
+        textField.secureTextEntry = YES;
+    }];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        UITextField *password = pwdAlert.textFields.firstObject;
+        if (![password.text isEqualToString:@""]) {
+            int result = [self->m_pdf1 PDFOpen:self->pdfFullPath :password.text];
+                if(result == 1)
+                {
+                    UINavigationController *nav = self.navigationController;
+                    self->m_pdf1.hidesBottomBarWhenPushed = YES;
+                    nav.hidesBottomBarWhenPushed =NO;
+                    [nav pushViewController:self->m_pdf1 animated:YES];
+                }
+                else if(result == 2)
+                {
+                    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+                    NSString *str2=NSLocalizedString(@"Error PassWord", @"Localizable");
+                    [self presentPwdAlertControllerWithTitle:str1 message:str2];
+                }
+        }
+        else
+        {
+            [self presentViewController:pwdAlert animated:YES completion:nil];
+        }
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Localizable")  style:UIAlertActionStyleCancel handler:nil];
+    
+    [pwdAlert addAction:okAction];
+    [pwdAlert addAction:cancel];
+    [self presentViewController:pwdAlert animated:YES completion:nil];
+}
+
 @end

@@ -40,15 +40,15 @@
 + (RDExtendedSearch *)sharedInstance;
 
 - (BOOL)searchInit:(PDFDoc *)doc;
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress finish:(void (^)())finish;
+- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress finish:(void (^)(void))finish;
 - (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress;
 - (BOOL)pageIsInSearchResults:(int)page;
 - (int)getNextPageFromCurrentPage:(int)page;
 - (int)getPrevPageFromCurrentPage:(int)page;
 - (void)clearSearch;
-- (void)clearSearch:(void (^)())finish;
+- (void)clearSearch:(void (^)(void))finish;
 - (void)restoreProgress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress;
-- (void)restoreFinish:(void (^)())finish;
+- (void)restoreFinish:(void (^)(void))finish;
 
 - (BOOL)occurrenceAlreadyExist:(RDSearchResult *)searchResult;
 

@@ -6,11 +6,11 @@
 	<array>
 		<string>Vertical</string>
 		<string>Horizontal (LTOR)</string>
-		<string>Horizontal (RTOL)</string>
-		<string>Paging Single Page</string>
-		<string>Paging Double Page</string>
-		<string>Reflow Mode</string>
 		<string>Page Curling</string>
+		<string>Paging Single Page</string>
+		<string>Paging Cover Double Page</string>
+		<string>Reflow Mode</string>
+		<string>Paging Double Page</string>
 	</array>
 </dict>
 </plist>

@@ -47,13 +47,13 @@ NSUserDefaults *userDefaults;
     //  g_DarkMode = [userDefaults boolForKey:@"DarkMode"];
     GLOBAL.g_sel_right=[[NSUserDefaults standardUserDefaults] boolForKey:@"SelectTextRight"];
     GLOBAL.g_screen_awake = [[NSUserDefaults standardUserDefaults] boolForKey:@"KeepScreenAwake"];
-    GLOBAL.g_ink_color=[[NSUserDefaults standardUserDefaults]  integerForKey:@"InkColor"];
-    GLOBAL.g_rect_color = [[NSUserDefaults standardUserDefaults] integerForKey:@"RectColor"];
-    GLOBAL.g_render_mode = [[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
-    GLOBAL.g_annot_highlight_clr = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
-    GLOBAL.g_annot_strikeout_clr = [[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
-    GLOBAL.g_annot_underline_clr = [[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
-    GLOBAL.g_render_quality = [[NSUserDefaults standardUserDefaults] integerForKey:@"RenderQuality"];
+    GLOBAL.g_ink_color=(int)[[NSUserDefaults standardUserDefaults]  integerForKey:@"InkColor"];
+    GLOBAL.g_rect_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RectColor"];
+    GLOBAL.g_render_mode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
+    GLOBAL.g_annot_highlight_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
+    GLOBAL.g_annot_strikeout_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
+    GLOBAL.g_annot_underline_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
+    GLOBAL.g_render_quality = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RenderQuality"];
     
     self.partitationTableView = [[UITableView alloc]initWithFrame:CGRectMake(0,0,cwidth, cheight-110) style:UITableViewStyleGrouped];
     
@@ -72,13 +72,6 @@ NSUserDefaults *userDefaults;
     NSArray *array = [self.dicData allKeys];
     self.arrayData = [array sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     [button addTarget:self action:@selector(btnClicked:event:) forControlEvents:UIControlEventTouchUpInside];
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -110,7 +103,7 @@ NSUserDefaults *userDefaults;
     NSArray *arraySection = [self.dicData objectForKey:key];
     
     static NSString *partitation=nil;
-    partitation=[NSString stringWithFormat:@"partitation%d%d",[indexPath section],[indexPath row]];
+    partitation=[NSString stringWithFormat:@"partitation%ld%ld",(long)[indexPath section],(long)[indexPath row]];
     //   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:partitation];
     
     //  if(cell == nil)
@@ -306,12 +299,20 @@ NSUserDefaults *userDefaults;
         NSString *str2=NSLocalizedString(@"Click OK to reset all properties to default", @"Localizable");
         NSString *str3=NSLocalizedString(@"OK", @"Localizable");
         NSString *str4=NSLocalizedString(@"Cancel", @"Localizable");
-        UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:self cancelButtonTitle:str3 otherButtonTitles:str4, nil];
-        [alter show];
+        
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                   message:str2
+                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str4 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:cancelAction];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
     }
     
 }
 
+/*
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     //NSLog(@"%i",buttonIndex);
@@ -364,6 +365,7 @@ NSUserDefaults *userDefaults;
         [self.partitationTableView reloadData];
     }
 }
+*/
 
 - (void)btnClicked:(id)sender event:(id)event
 {
@@ -422,7 +424,7 @@ NSUserDefaults *userDefaults;
         GLOBAL.g_dark_mode =false;
     }
     //PDFVS_setDarkMode(g_DarkMode);
-    [userDefaults setBool:GLOBAL.g_dark_mode forKey:@"DarkMode"];
+    [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_dark_mode forKey:@"DarkMode"];
     //GEAR
     [self saveSettings];
     //END
@@ -443,7 +445,7 @@ NSUserDefaults *userDefaults;
         
     }
     //PDFVS_textRtol(g_sel_right);
-    [userDefaults setBool:GLOBAL.g_sel_right forKey:@"SelectTextRight"];
+    [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_sel_right forKey:@"SelectTextRight"];
     //GEAR
     [self saveSettings];
     //END
@@ -454,7 +456,7 @@ NSUserDefaults *userDefaults;
     UISwitch *switchView = (UISwitch *)sender;
     GLOBAL.g_screen_awake = [switchView isOn];
     [[UIApplication sharedApplication] setIdleTimerDisabled:GLOBAL.g_screen_awake];
-    [userDefaults setBool:GLOBAL.g_screen_awake forKey:@"KeepScreenAwake"];
+    [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_screen_awake forKey:@"KeepScreenAwake"];
     //GEAR
     [self saveSettings];
     //END
@@ -464,7 +466,7 @@ NSUserDefaults *userDefaults;
     UISwitch *switchView = (UISwitch *)sender;
     GLOBAL.g_case_sensitive = [switchView isOn];
     
-    [userDefaults setBool:GLOBAL.g_case_sensitive forKey:@"CaseSensitive"];
+    [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_case_sensitive forKey:@"CaseSensitive"];
     //GEAR
     [self saveSettings];
     //END
@@ -482,27 +484,12 @@ NSUserDefaults *userDefaults;
         GLOBAL.g_match_whole_word =false;
         
     }
-    [userDefaults setBool:GLOBAL.g_match_whole_word forKey:@"MatchWholeWord"];
+    [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_match_whole_word forKey:@"MatchWholeWord"];
     //GEAR
     [self saveSettings];
     //END
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return YES;
-}
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    //[self.view sizeToFit];
-    [self.parentViewController.view sizeToFit];
-    [self.partitationTableViewCell sizeToFit];
-    
-}
-- (BOOL)shouldAutorotate
-{
-    return YES;
-}
 - (BOOL)isPortrait
 {
     return ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait ||
@@ -512,7 +499,7 @@ NSUserDefaults *userDefaults;
 //GEAR
 - (void)saveSettings
 {
-    [userDefaults synchronize];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 -(void)performWillRotateOrientation:(UIInterfaceOrientation)toInterfaceOrientation

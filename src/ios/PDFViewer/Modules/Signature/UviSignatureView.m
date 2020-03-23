@@ -8,7 +8,7 @@
 
 #import "UviSignatureView.h"
 #import <QuartzCore/QuartzCore.h>
-
+#import "RDVGlobal.h"
 #define USER_SIGNATURE_PATH  @"user_signature_path"
 #define TEMP_SIGNATURE @"radaee_signature_temp.png"
 
@@ -242,7 +242,7 @@ static CGPoint midpoint(CGPoint p0, CGPoint p1) {
     }
     
     if (![self signatureExists] && (!signPath || [signPath isEmpty])) {
-        [@"Sign here" drawAtPoint:[self placeholderPoint]
+        [GLOBAL.g_sign_pad_descr drawAtPoint:[self placeholderPoint]
                                                                 withAttributes:@{ NSFontAttributeName : [UIFont fontWithName:@"Helvetica" size:12],
                                                                                   NSForegroundColorAttributeName : [[UIColor blackColor] colorWithAlphaComponent:0.2]}];
     }

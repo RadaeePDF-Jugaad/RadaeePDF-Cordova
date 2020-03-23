@@ -62,13 +62,12 @@ static int currentIndex=1;
 {
     [super viewWillAppear:animated];
     
-    GLOBAL.g_render_quality = [[NSUserDefaults standardUserDefaults] integerForKey:@"RenderQuality"];
+    GLOBAL.g_render_quality = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RenderQuality"];
     if(GLOBAL.g_render_quality == 0)
     {
         GLOBAL.g_render_quality =1;
     }
     currentIndex = GLOBAL.g_render_quality;
-    GLOBAL.renderQuality = GLOBAL.g_render_quality;
     
     [self.partitationTableView reloadData];
     
@@ -76,17 +75,6 @@ static int currentIndex=1;
 }
 //FINE
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return [self.arrayData count];
@@ -107,18 +95,18 @@ static int currentIndex=1;
     }
     switch (indexPath.row) {
         case 0:
-            GLOBAL.renderQuality = 0;
+            GLOBAL.g_render_quality = 0;
             break;
         case 1:
-            GLOBAL.renderQuality = 1;
+            GLOBAL.g_render_quality = 1;
             break;
         case 2:
-            GLOBAL.renderQuality = 2;
+            GLOBAL.g_render_quality = 2;
             break;
         default:
             break;
     }
-    GLOBAL.g_render_quality = GLOBAL.renderQuality;
+    GLOBAL.g_render_quality = GLOBAL.g_render_quality;
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_quality forKey:@"RenderQuality"];
     //GEAR
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -148,18 +136,9 @@ static int currentIndex=1;
     {
         oldCell.accessoryType=UITableViewCellAccessoryCheckmark;
     }
-    currentIndex = indexPath.row;
+    currentIndex = (int)indexPath.row;
 }
--(UITableViewCellAccessoryType)tableView:(UITableView *)tableView accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath
-{
-    if(indexPath.row == currentIndex)
-    {
-        return UITableViewCellAccessoryCheckmark;
-    }
-    else{
-        return UITableViewCellAccessoryNone;
-    }
-}
+
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSInteger section = [indexPath section];

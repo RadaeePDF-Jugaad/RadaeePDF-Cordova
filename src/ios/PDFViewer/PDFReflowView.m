@@ -67,9 +67,8 @@
     //imageView.image = nil;
     
     m_image = [UIImage imageWithCGImage:m_img];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *filePath = @"/Users/lujinrong/Downloads/image.png";
-    BOOL result =[UIImagePNGRepresentation(m_image)writeToFile:filePath   atomically:YES]; //
+    BOOL result =[UIImagePNGRepresentation(m_image)writeToFile:filePath atomically:YES]; //
     [imageView setImage:m_image];
     //CGImageRelease(m_img);
     [self setNeedsDisplay];

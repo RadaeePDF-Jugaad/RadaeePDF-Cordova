@@ -41,7 +41,7 @@
     unsigned char md5Buffer[CC_MD5_DIGEST_LENGTH];
     
     // Create 16 byte MD5 hash value, store in buffer
-    CC_MD5(ptr, strlen(ptr), md5Buffer);
+    CC_MD5(ptr, (int)strlen(ptr), md5Buffer);
     
     // Convert MD5 value in the buffer to NSString of hex values
     NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
@@ -148,6 +148,17 @@
     CGFloat r,g,b,a;
     [color getRed:&r green:&g blue:&b alpha:&a];
     return [UIColor colorWithRed:1.-r green:1.-g blue:1.-b alpha:a];
+}
+
++ (id)getGlobalFromString:(NSString *)string
+{
+    id global = [GLOBAL valueForKey:string];
+    return global;
+}
+
++ (void)setGlobalFromString:(NSString *)string withValue:(id)value
+{
+    [GLOBAL setValue:value forKey:string];
 }
 
 @end

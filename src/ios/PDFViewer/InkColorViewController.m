@@ -58,7 +58,7 @@ static int  currentIndex=0;
 {
     [super viewWillAppear:animated];
     
-    GLOBAL.g_ink_color = [[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
+    GLOBAL.g_ink_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
     if(GLOBAL.g_ink_color ==0)
     {
         GLOBAL.g_ink_color =0xFF000000;
@@ -77,17 +77,6 @@ static int  currentIndex=0;
 }
 //END
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return [self.arrayData count];
@@ -98,17 +87,6 @@ static int  currentIndex=0;
     NSString *stringDataKey = [self.arrayData objectAtIndex:section];
     NSArray *arraySection = [self.dicData objectForKey:stringDataKey];
     return [arraySection count];
-}
-
--(UITableViewCellAccessoryType)tableView:(UITableView *)tableView accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath
-{
-    if(indexPath.row == currentIndex)
-    {
-        return UITableViewCellAccessoryCheckmark;
-    }
-    else{
-        return UITableViewCellAccessoryNone;
-    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -165,7 +143,7 @@ static int  currentIndex=0;
     {
         oldCell.accessoryType=UITableViewCellAccessoryCheckmark;
     }
-    currentIndex = indexPath.row;
+    currentIndex = (int)indexPath.row;
     
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

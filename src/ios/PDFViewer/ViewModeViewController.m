@@ -57,7 +57,7 @@ static int  currentIndex=0;
 {
     [super viewWillAppear:animated];
     
-    GLOBAL.g_render_mode = [[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
+    GLOBAL.g_render_mode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
     currentIndex = GLOBAL.g_render_mode;
     
     [self.partitationTableView reloadData];
@@ -66,17 +66,6 @@ static int  currentIndex=0;
 }
 //END
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return [self.arrayData count];
@@ -87,17 +76,6 @@ static int  currentIndex=0;
     NSString *stringDataKey = [self.arrayData objectAtIndex:section];
     NSArray *arraySection = [self.dicData objectForKey:stringDataKey];
     return [arraySection count];
-}
-
--(UITableViewCellAccessoryType)tableView:(UITableView *)tableView accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath
-{
-    if(indexPath.row == currentIndex)
-    {
-        return UITableViewCellAccessoryCheckmark;
-    }
-    else{
-        return UITableViewCellAccessoryNone;
-    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -111,10 +89,6 @@ static int  currentIndex=0;
     UITableViewCell *cell =[tableView cellForRowAtIndexPath:indexPath];
     
     GLOBAL.g_render_mode = (int)indexPath.row;
-    
-    if ((int)indexPath.row == 6) {
-        GLOBAL.g_render_mode = 7;
-    }
     
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_mode forKey:@"ViewMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];

@@ -315,10 +315,12 @@
 }
 
 - (void)setup {
-    _renderQuality = mode_normal;
+    GLOBAL.g_render_quality = mode_normal;
     
     _g_render_mode = 0;
-    _g_zoom_level = 15;
+    _g_navigation_mode = 1;
+    _g_zoom_level = 3; //double tap, (2-5)
+    _g_layout_zoom_level = 11; //pinch to zoom
     _g_ink_width = 2;
     _g_rect_width = 2;
     _g_line_width = 2;
@@ -326,16 +328,26 @@
     _g_swipe_speed = 0.15f;
     _g_swipe_distance= 1.0f;
     _g_render_quality = 1;
+    _g_zoom_step = 1;
     
     _g_rect_color = 0xFF000000;
     _g_line_color = 0xFF000000;
     _g_ink_color = 0xFF000000;
     _g_sel_color = 0x400000C0;
     _g_oval_color = 0xFF000000;
+    _g_line_annot_fill_color = 0xFF000000;
+    _g_rect_annot_fill_color = 0;
+    _g_ellipse_annot_fill_color = 0;
     _g_annot_highlight_clr = 0xFFFFFF00;
     _g_annot_underline_clr = 0xFF0000FF;
     _g_annot_strikeout_clr = 0xFFFF0000;
     _g_annot_squiggly_clr = 0xFF00FF00;
+    
+    _g_line_annot_style1 = 0;
+    _g_line_annot_style2 = 1;
+    _g_readerview_bg_color = 0xFFBFBFBF;
+    _g_thumbview_height = 99;
+    _g_find_primary_color = 0x400000C0;
     
     _g_static_scale = false;
     _g_curl_enabled = false;
@@ -355,8 +367,11 @@
     _g_screen_awake = false;
     _g_auto_launch_link = true;
     _g_save_doc = false;
+    _g_highlight_annotation = true;
+    _g_enable_graphical_signature = true;
     
     _g_author = @"";
+    _g_sign_pad_descr = @"Sign here";
 }
 
 - (void)setG_annot_transparency:(uint)g_annot_transparency {

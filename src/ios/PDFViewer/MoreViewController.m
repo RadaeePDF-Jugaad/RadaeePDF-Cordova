@@ -63,24 +63,6 @@
     
     self.partitationTableView.frame = self.view.bounds;
 }
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return YES;
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [self.parentViewController.view sizeToFit];
-    [self.partitationTableViewCell sizeToFit];
-}
  
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -183,7 +165,7 @@
     return text;
 }
 
--(NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return UIInterfaceOrientationMaskAllButUpsideDown;
 }

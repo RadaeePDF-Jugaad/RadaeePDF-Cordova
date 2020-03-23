@@ -42,8 +42,6 @@
     BOOL isImmersive;
     BOOL readOnly;
     
-    float thumbViewHeight;
-    
     TextAnnotViewController *textAnnotVC;
     OutLineViewController *outlineView;
 }

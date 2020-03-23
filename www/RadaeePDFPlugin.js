@@ -101,6 +101,18 @@ RadaeePDFPlugin.prototype.setThumbHeight = function (params, successCallback, er
 
         exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setThumbHeight', [params]);
 };
+               
+RadaeePDFPlugin.prototype.getGlobal = function (params, successCallback, errorCallback) {
+       params = params || {};
+
+       exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getGlobal', [params]);
+};
+               
+RadaeePDFPlugin.prototype.setGlobal = function (params, successCallback, errorCallback) {
+      params = params || {};
+
+      exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setGlobal', [params]);
+};
 
 RadaeePDFPlugin.prototype.setDebugMode = function (params, successCallback, errorCallback) { //android only
         params = params || {};
