@@ -26,7 +26,6 @@
 
 -(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFThumbViewDelegate>)del
 {
-    //[self PDFClose];
     m_zoom = 1;
     m_doc = doc;
     m_delegate = del;
