@@ -18,7 +18,7 @@
 @synthesize dicData;
 @synthesize arrayData;
 
-static int currentIndex=1;
+static int currentIndex;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -160,6 +160,9 @@ static int currentIndex=1;
     // UISwitch *switchView = [[UISwitch alloc] init]; [switchView setOn:YES];
     //cell.accessoryView = switchView;
     cell.accessoryType = UITableViewCellStyleDefault;
+    if (indexPath.row == GLOBAL.g_render_quality) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    }
     return cell;
 }
 

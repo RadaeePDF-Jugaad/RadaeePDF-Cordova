@@ -7,6 +7,7 @@
 //
 
 #import "RDPageViewController.h"
+#import "RDSinglePageViewController.h"
 
 @interface RDPageViewController ()
 {
@@ -57,7 +58,7 @@
 - (UIViewController *)viewControllerAtIndex:(NSUInteger)index
 {
     // Create a new view controller and pass suitable data.
-    ViewController *viewController = [[ViewController alloc] init];
+    RDSinglePageViewController *viewController = [[RDSinglePageViewController alloc] init];
     viewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     viewController.doc = doc;
     viewController.pageViewNo = index;
@@ -87,7 +88,7 @@
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
 {
-    NSUInteger index = ((ViewController*) viewController).pageViewNo;
+    NSUInteger index = ((RDSinglePageViewController*) viewController).pageViewNo;
     
     if ((index == 0) || (index == NSNotFound)) {
         return nil;
@@ -99,7 +100,7 @@
  
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
 {
-    NSUInteger index = ((ViewController*) viewController).pageViewNo;
+    NSUInteger index = ((RDSinglePageViewController*) viewController).pageViewNo;
     
     if (index == NSNotFound) {
         return nil;
@@ -113,7 +114,7 @@
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed {
-    for (ViewController *v in previousViewControllers) {
+    for (RDSinglePageViewController *v in previousViewControllers) {
         if(v.pdfView != nil)
         {
             [self closeViewController:v];
@@ -140,7 +141,7 @@
 
 -(void)PDFClose
 {
-    for (ViewController *v in self.viewControllers) {
+    for (RDSinglePageViewController *v in self.viewControllers) {
         if(v.pdfView != nil)
         {
             [self closeViewController:v];
@@ -150,7 +151,7 @@
     doc = NULL;
 }
 
-- (void)closeViewController:(ViewController *)v {
+- (void)closeViewController:(RDSinglePageViewController *)v {
     if(v.pdfView != nil)
     {
         [v.pdfView PDFClose];

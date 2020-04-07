@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "PDFLayoutView.h"
 
-@interface ViewController : UIViewController <PDFLayoutDelegate>
+@interface RDSinglePageViewController : UIViewController <PDFLayoutDelegate>
 
 @property (strong, nonatomic) PDFDoc *doc;
 @property (strong, nonatomic) PDFLayoutView *pdfView;

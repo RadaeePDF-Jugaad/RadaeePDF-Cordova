@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ViewController.h"
+#import "PDFObjc.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

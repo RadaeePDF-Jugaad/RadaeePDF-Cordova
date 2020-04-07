@@ -1197,12 +1197,12 @@
         [horz setValue:[[UIImage imageNamed:@"btn_view_horz"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         UIAlertAction *singleP = [UIAlertAction actionWithTitle:NSLocalizedString(@"Single Page", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self setReaderViewMode:2];
+            [self setReaderViewMode:3];
         }];
         [singleP setValue:[[UIImage imageNamed:@"btn_view_single"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         
         UIAlertAction *doubleP = [UIAlertAction actionWithTitle:NSLocalizedString(@"Double Page", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self setReaderViewMode:3];
+            [self setReaderViewMode:6];
         }];
         [doubleP setValue:[[UIImage imageNamed:@"btn_view_dual"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] forKey:@"image"];
         

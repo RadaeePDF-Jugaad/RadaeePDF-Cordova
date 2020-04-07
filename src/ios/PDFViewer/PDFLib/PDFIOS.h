@@ -412,7 +412,7 @@ bool Document_canSave( PDF_DOC doc );
  *
  *	@return	length of label.
  */
-int Document_getOutlineLabel(PDF_DOC doc, PDF_OUTLINE outlinenode, char *label, int len);
+NSString* Document_getOutlineLabel(PDF_DOC doc, PDF_OUTLINE outlinenode);
 /**
  *	@brief	Get destination of Outline item.
  *
@@ -490,7 +490,7 @@ bool Document_removeOutline(PDF_DOC doc, PDF_OUTLINE outlinenode);
  *
  *	@return	length of meta data.
  */
-int Document_getMeta( PDF_DOC doc, const char *tag, char *meta, int len );
+NSString* Document_getMeta(PDF_DOC doc, const char* tag);
 bool Document_setMeta( PDF_DOC doc, const char *tag, const char *meta );
 
 bool Document_getID(PDF_DOC doc, unsigned char *fid);
@@ -833,7 +833,7 @@ int Page_objsGetCharCount( PDF_PAGE page );
  *
  *	@return	count of chars.
  */
-int Page_objsGetString( PDF_PAGE page, int from, int to, char *buf, int len );
+NSString *Page_objsGetString( PDF_PAGE page, int from, int to );
 /**
  *	@brief	get area rect of char.
             to invoke this function, developers should call Page_objsStart before.
@@ -982,7 +982,7 @@ bool Page_isAnnotHide( PDF_PAGE page, PDF_ANNOT annot );
  *	@param 	hide 	true or false
  */
 void Page_setAnnotHide( PDF_PAGE page, PDF_ANNOT annot, bool hide );
-bool Page_getAnnotName(PDF_PAGE page, PDF_ANNOT annot, char *name, int name_len);
+NSString* Page_getAnnotName(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_setAnnotName(PDF_PAGE page, PDF_ANNOT annot, const char *name);
 
 PDF_ANNOT Page_getAnnotByName(PDF_PAGE page, const char *name);
@@ -1078,7 +1078,7 @@ int Page_getAnnotFieldFullName( PDF_PAGE page, PDF_ANNOT annot, char *buf, int b
  *	@return	name of this annotation, like: "form1[0].EditBox1[0]"
  */
 int Page_getAnnotFieldFullName2( PDF_PAGE page, PDF_ANNOT annot, char *buf, int buf_size );
-bool Page_getAnnotFieldJS(PDF_PAGE page, PDF_ANNOT annot, int idx, char *text, int len);
+NSString* Page_getAnnotFieldJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
 
 bool Page_renderAnnot(PDF_PAGE page, PDF_ANNOT annot, PDF_DIB dib);
 /**

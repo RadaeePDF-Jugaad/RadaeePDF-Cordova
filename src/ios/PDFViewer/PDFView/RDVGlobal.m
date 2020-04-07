@@ -5,8 +5,8 @@
 //  Created by Radaee on 16/11/19.
 //  Copyright © 2016年 radaee. All rights reserved.
 //
-#import <UIKit/UIKit.h>
 #include "RDVGlobal.h"
+#import "PDFObjc.h"
 
 @implementation RDVLocker
 -(id)init

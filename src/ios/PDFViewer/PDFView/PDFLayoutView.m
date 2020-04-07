@@ -1006,7 +1006,11 @@
     [self touchesEnded:touches withEvent:event];
 }
 
-- (void)OnDoubleTap:(UITouch *)touch
+- (void)OnDoubleTap:(UITouch *)touch {
+    [self OnDoubleTapOnPoint:[touch locationInView:self.window]];
+}
+
+- (void)OnDoubleTapOnPoint:(CGPoint)point
 {
     isDoubleTapping = YES;
     
@@ -1014,6 +1018,7 @@
     
     if (doubleTapZoomMode > 0) {
         if (m_zoom > GLOBAL.g_zoom_level){
+        //if (m_zoom > 1){
             if ([self pagingAvailable]) {
                 self.pagingEnabled = GLOBAL.g_paging_enabled;
             }
@@ -1022,7 +1027,7 @@
             self.pagingEnabled = NO;
             
             if (doubleTapZoomMode == 1) {
-                [self defaultZoom:touch];
+                [self defaultZoom:point];
             } else {
 #ifndef SMART_ZOOM
                 //[self defaultZoom:touch];
@@ -1070,7 +1075,7 @@
     }
     
     if (self.m_del) {
-        [self.m_del OnDoubleTapped:[touch locationInView:self.window].x :[touch locationInView:self.window].y];
+        [self.m_del OnDoubleTapped:point.x :point.y];
     }
     
     [self performSelector:@selector(delayedDoubleTapping) withObject:nil afterDelay:0.5];
@@ -1080,7 +1085,8 @@
 - (void)delayedOnSingleTapping:(NSArray *)a
 {
     if (!isDoubleTapping && a) {
-        [self.m_del OnSingleTapped:[[a objectAtIndex:0] floatValue]:[[a objectAtIndex:1] floatValue]];
+        CGPoint point = CGPointMake([[a objectAtIndex:0] floatValue], [[a objectAtIndex:1] floatValue]);
+        [self.m_del OnSingleTapped:point.x:point.y];
     }
 }
 
@@ -1104,15 +1110,17 @@
     m_status = m_status_buf;
 }
 
-- (void)defaultZoom:(UITouch *)touch
+- (void)defaultZoom:(CGPoint )point
 {
+    //[self zoomPageToScale:2.0 atPoint:point];
+
     if (self.zoomScale == GLOBAL.g_zoom_level && GLOBAL.g_zoom_step > 0) {
         GLOBAL.g_zoom_step *= -1;
     } else if (self.zoomScale <= self.minimumZoomScale && GLOBAL.g_zoom_step) {
         GLOBAL.g_zoom_step = 1;
     }
-    self.zoomScale = (self.zoomScale + GLOBAL.g_zoom_step > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : self.zoomScale + GLOBAL.g_zoom_step;
-    [self zoomPageToScale:self.zoomScale atPoint:[touch locationInView:self.window]];
+    
+    [self zoomPageToScale:(self.zoomScale + GLOBAL.g_zoom_step > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : self.zoomScale + GLOBAL.g_zoom_step atPoint:point];
 }
 
 -(void)OnSingleTap:(float)x :(float)y

@@ -6,13 +6,13 @@
 //  Copyright © 2020 Federico Vellani. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "RDSinglePageViewController.h"
 
-@interface ViewController ()
+@interface RDSinglePageViewController ()
 
 @end
 
-@implementation ViewController
+@implementation RDSinglePageViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];

@@ -358,9 +358,7 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)label
 {
-    char label[512];
-    Document_getOutlineLabel(m_doc, m_handle, label, 511);
-    return [NSString stringWithUTF8String:label];
+    return Document_getOutlineLabel(m_doc, m_handle);
 }
 -(NSString *)fileLink
 {
@@ -877,15 +875,7 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getName
 {
-    char *stmp = (char *)malloc(1024);
-    if(!Page_getAnnotName(m_page, m_handle, stmp, 1023))
-    {
-        free(stmp);
-        return nil;
-    }
-    NSString *ret = [NSString stringWithUTF8String:stmp];
-    free(stmp);
-    return ret;
+    return Page_getAnnotName(m_page, m_handle);
 }
 -(bool)setName:(NSString *)name
 {
@@ -1215,10 +1205,7 @@ extern uint annotStrikeoutColor;
 
 -(NSString *)getFieldJS:(int)idx
 {
-	char buf[1024];
-	if( !Page_getAnnotFieldJS( m_page, m_handle, idx, buf, 1023 ) )
-		return NULL;
-	return [NSString stringWithUTF8String:buf];
+	return Page_getAnnotFieldJS( m_page, m_handle, idx );
 }
 
 -(bool)setEditText:(NSString *)val
@@ -1464,12 +1451,7 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)objsString:(int)from :(int)to
 {
-    if( to <= from ) return NULL;
-    char *buf = (char *)malloc(4 * (to - from) + 8);
-    Page_objsGetString(m_page, from, to, buf, 4 * (to - from) + 4);
-    NSString *str = [NSString stringWithUTF8String:buf];
-    free(buf);
-    return str;
+    return Page_objsGetString(m_page, from, to);
 }
 -(int)objsAlignWord:(int)index :(int)dir
 {
@@ -1858,16 +1840,7 @@ extern uint annotStrikeoutColor;
 -(NSString *)meta:(NSString *)tag
 {
     const char *stag = [tag UTF8String];
-    char *smeta = (char *)malloc(1024);
-	int slen = 1024;
-    while(slen < (1<<20) && Document_getMeta(m_doc, stag, smeta, slen) >= (slen - 1))
-	{
-		slen <<= 1;
-		smeta = realloc(smeta, slen);
-	}
-    NSString *ret = [NSString stringWithUTF8String: smeta];
-	free(smeta);
-	return ret;
+    return Document_getMeta(m_doc, stag);
 }
 
 -(bool)setMeta:(NSString *)tag :(NSString *)val
