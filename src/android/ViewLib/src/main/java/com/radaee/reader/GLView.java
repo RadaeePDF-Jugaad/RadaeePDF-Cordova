@@ -2012,7 +2012,15 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener
         m_goto_pos = pos;
     }
         else
-            m_layout.vGotoPage(pageno);
+        {
+            final int pgno = pageno;
+            queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    m_layout.vGotoPage(pgno);
+                }
+            });
+        }
         m_canvas.postInvalidate();
     }
 
