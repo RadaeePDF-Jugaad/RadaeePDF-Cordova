@@ -48,7 +48,7 @@ public class GLReflowBlock {
         if (m_status < 0) return false;
         DIB dib = new DIB();
         dib.CreateOrResize(m_w, m_h);
-        m_page.RenderPrepare(dib);
+        dib.DrawRect(-1, 0, 0, m_w, m_h, 0);
         m_page.Reflow(dib, (m_gap >> 1), (m_gap >> 1) - m_y);
         if(m_status < 0)
         {
