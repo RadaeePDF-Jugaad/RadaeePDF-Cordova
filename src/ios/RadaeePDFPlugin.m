@@ -450,6 +450,9 @@
         
         [m_pdf setHideGridImage:YES];
         
+        if (!disableToolbar && toolbarItemEdited)
+            return;
+        
         if (disableToolbar) {
             [m_pdf setHideSearchImage:YES];
             [m_pdf setHideDrawImage:YES];
@@ -479,6 +482,31 @@
          7: arrowColor
          
          */
+    }
+}
+
+- (void)setBarButtonVisibility:(CDVInvokedUrlCommand*)command
+{
+    self.cdv_command = command;
+    NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
+    NSString *code = [params objectForKey:@"code"];
+    BOOL visibility = ![[params objectForKey:@"visibility"] boolValue];
+    toolbarItemEdited = YES;
+    if (![self isPageViewController] && !m_pdf)
+        [self readerInit];
+    
+    if ([code isEqualToString:@"btn_search"]) {
+        [m_pdf setHideSearchImage:visibility];
+    } else if ([code isEqualToString:@"btn_draw"]) {
+        [m_pdf setHideDrawImage:visibility];
+    } else if ([code isEqualToString:@"btn_sel"]) {
+        [m_pdf setHideSelImage:visibility];
+    } else if ([code isEqualToString:@"btn_undo"]) {
+        [m_pdf setHideUndoImage:visibility];
+    } else if ([code isEqualToString:@"btn_redo"]) {
+        [m_pdf setHideRedoImage:visibility];;
+    } else if ([code isEqualToString:@"btn_more"]) {
+        [m_pdf setHideMoreImage:visibility];
     }
 }
 

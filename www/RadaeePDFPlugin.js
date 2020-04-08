@@ -113,6 +113,12 @@ RadaeePDFPlugin.prototype.setGlobal = function (params, successCallback, errorCa
 
       exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setGlobal', [params]);
 };
+               
+RadaeePDFPlugin.prototype.setBarButtonVisibility = function (params, successCallback, errorCallback) {
+     params = params || {};
+
+     exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setBarButtonVisibility', [params]);
+};
 
 RadaeePDFPlugin.prototype.setDebugMode = function (params, successCallback, errorCallback) { //android only
         params = params || {};

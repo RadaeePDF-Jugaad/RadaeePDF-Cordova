@@ -41,6 +41,7 @@
     BOOL firstPageCover;
     BOOL isImmersive;
     BOOL disableToolbar;
+    BOOL toolbarItemEdited;
     
     int bottomBar;
 }
