@@ -451,6 +451,53 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
                     callbackContext.error("Value not accessible");
                 }
                 break;
+
+            case "setBarButtonVisibility":
+                params = args.getJSONObject(0);
+                String btnCode = params.getString("code");
+                boolean visibility = params.getBoolean("visibility");
+                switch (btnCode) {
+                    case "btn_view":
+                        RadaeePDFManager.sHideViewModeButton = !visibility;
+                        break;
+                    case "btn_search":
+                        RadaeePDFManager.sHideSearchButton = !visibility;
+                        break;
+                    case "btn_more":
+                        RadaeePDFManager.sHideMoreButton = !visibility;
+                        break;
+                    case "btn_sel":
+                        RadaeePDFManager.sHideSelectButton = !visibility;
+                        break;
+                    case "btn_undo":
+                        RadaeePDFManager.sHideUndoButton = !visibility;
+                        break;
+                    case "btn_draw":
+                        RadaeePDFManager.sHideAnnotButton = !visibility;
+                        break;
+                    case "btn_redo":
+                        RadaeePDFManager.sHideRedoButton = !visibility;
+                        break;
+                    case "btn_outline":
+                        RadaeePDFManager.sHideOutlineButton = !visibility;
+                        break;
+                    case "btn_save":
+                        RadaeePDFManager.sHideSaveButton = !visibility;
+                        break;
+                    case "btn_share":
+                        RadaeePDFManager.sHideShareButton = !visibility;
+                        break;
+                    case "btn_print":
+                        RadaeePDFManager.sHidePrintButton = !visibility;
+                        break;
+                    case "btn_add_bookmark":
+                        RadaeePDFManager.sHideAddBookmarkButton = !visibility;
+                        break;
+                    case "btn_show_bookmarks":
+                        RadaeePDFManager.sHideShowBookmarksButton = !visibility;
+                        break;
+                    default:
+                }
             default:
                 return false;
         }
