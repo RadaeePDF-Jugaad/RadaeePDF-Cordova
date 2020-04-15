@@ -160,7 +160,7 @@ static int currentIndex;
     // UISwitch *switchView = [[UISwitch alloc] init]; [switchView setOn:YES];
     //cell.accessoryView = switchView;
     cell.accessoryType = UITableViewCellStyleDefault;
-    if (indexPath.row == GLOBAL.g_render_quality) {
+    if (indexPath.row == currentIndex) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     }
     return cell;

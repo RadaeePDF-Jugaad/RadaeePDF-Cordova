@@ -485,8 +485,6 @@ bool Document_removeOutline(PDF_DOC doc, PDF_OUTLINE outlinenode);
  *
  *	@param 	doc 	Document object returned from Document_open
  *	@param 	tag 	Predefined values:"Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate","ModDate".
- *	@param 	meta 	output value: meta data.
- *	@param 	len 	buffer length.
  *
  *	@return	length of meta data.
  */
@@ -1294,7 +1292,7 @@ int Page_getAnnotDest( PDF_PAGE page, PDF_ANNOT annot );
  *
  *	@return	length of uri, or 0.
  */
-int Page_getAnnotURI( PDF_PAGE page, PDF_ANNOT annot, char *uri, int len );
+NSString* Page_getAnnotURI(PDF_PAGE page, PDF_ANNOT annot);
 NSString *Page_getAnnotJS(PDF_PAGE page, PDF_ANNOT annot);
 NSString *Page_getAnnotAdditionalJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
 /**
@@ -1308,7 +1306,7 @@ NSString *Page_getAnnotAdditionalJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
  *
  *	@return	length of f3d, or 0.
  */
-int Page_getAnnot3D( PDF_PAGE page, PDF_ANNOT annot, char *f3d, int len );
+NSString* Page_getAnnot3D(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	get annotation's movie play action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1321,7 +1319,7 @@ int Page_getAnnot3D( PDF_PAGE page, PDF_ANNOT annot, char *f3d, int len );
  *
  *	@return	length of mov, or 0.
  */
-int Page_getAnnotMovie( PDF_PAGE page, PDF_ANNOT annot, char *mov, int len );
+NSString* Page_getAnnotMovie(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	get annotation's audio play action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1334,7 +1332,7 @@ int Page_getAnnotMovie( PDF_PAGE page, PDF_ANNOT annot, char *mov, int len );
  *
  *	@return	length of snd, or 0.
  */
-int Page_getAnnotSound( PDF_PAGE page, PDF_ANNOT annot, char *snd, int len );
+NSString* Page_getAnnotSound(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	get annotation's attachment open action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1347,7 +1345,7 @@ int Page_getAnnotSound( PDF_PAGE page, PDF_ANNOT annot, char *snd, int len );
  *
  *	@return	length of att, or 0.
  */
-int Page_getAnnotAttachment( PDF_PAGE page, PDF_ANNOT annot, char *att, int len );
+NSString* Page_getAnnotAttachment(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	get data of annotation's 3D open action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1424,7 +1422,7 @@ bool Page_setAnnotPopupOpen(PDF_PAGE page, PDF_ANNOT annot, bool open);
  *
  *	@return	true or false.
  */
-bool Page_getAnnotPopupSubject( PDF_PAGE page, PDF_ANNOT annot, char *subj, int len );
+NSString* Page_getAnnotPopupSubject(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	set subject of popup text annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1449,7 +1447,7 @@ bool Page_setAnnotPopupSubject( PDF_PAGE page, PDF_ANNOT annot, const char *subj
  *
  *	@return	true or false.
  */
-bool Page_getAnnotPopupText( PDF_PAGE page, PDF_ANNOT annot, char *text, int len );
+NSString* Page_getAnnotPopupText(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	set text of popup text annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1474,7 +1472,7 @@ bool Page_setAnnotPopupText( PDF_PAGE page, PDF_ANNOT annot, const char *text );
  *
  *	@return	true or false.
  */
-bool Page_getAnnotPopupLabel( PDF_PAGE page, PDF_ANNOT annot, char *text, int len );
+NSString* Page_getAnnotPopupLabel(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	set text of popup label annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1539,7 +1537,7 @@ bool Page_setAnnotEditTextSize(PDF_PAGE page, PDF_ANNOT annot, float fsize);
  *
  *	@return	true or false
  */
-bool Page_getAnnotEditText( PDF_PAGE page, PDF_ANNOT annot, char *text, int len );
+NSString* Page_getAnnotEditText(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	set text of edit-box, may either for free-text annotation and widget annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1620,8 +1618,8 @@ int Page_getAnnotComboItemCount( PDF_PAGE page, PDF_ANNOT annot );
  *
  *	@return	true or false
  */
-bool Page_getAnnotComboItem( PDF_PAGE page, PDF_ANNOT annot, int item, char *val, int len );
-bool Page_getAnnotComboItemVal(PDF_PAGE page, PDF_ANNOT annot, int item, char* val, int len);
+NSString* Page_getAnnotComboItem(PDF_PAGE page, PDF_ANNOT annot, int item);
+NSString* Page_getAnnotComboItemVal(PDF_PAGE page, PDF_ANNOT annot, int item);
 /**
  *	@brief	get index of selected item.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1673,8 +1671,8 @@ bool Page_isAnnotListMultiSel(PDF_PAGE page, PDF_ANNOT annot);
  *
  *	@return	true or false
  */
-bool Page_getAnnotListItem( PDF_PAGE page, PDF_ANNOT annot, int item, char *buf, int buf_len );
-bool Page_getAnnotListItemVal(PDF_PAGE page, PDF_ANNOT annot, int item, char* buf, int buf_len);
+NSString* Page_getAnnotListItem(PDF_PAGE page, PDF_ANNOT annot, int item);
+NSString* Page_getAnnotListItemVal(PDF_PAGE page, PDF_ANNOT annot, int item);
 /**
  *	@brief	get selected items of list-box.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1778,7 +1776,7 @@ bool Page_setAnnotReset( PDF_PAGE page, PDF_ANNOT annot );
  *
  *	@return	true or false.
  */
-bool Page_getAnnotSubmitTarget( PDF_PAGE page, PDF_ANNOT annot, char *tar, int len );
+NSString* Page_getAnnotSubmitTarget(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	get submit parameters.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -2549,8 +2547,8 @@ float Obj_getReal(PDF_OBJ hand);
 void Obj_setReal(PDF_OBJ hand, float v);
 const char *Obj_getName(PDF_OBJ hand);
 void Obj_setName(PDF_OBJ hand, const char *v);
-const char *Obj_getAsciiString(PDF_OBJ hand);
-void Obj_getTextString(PDF_OBJ hand, char *buf, int len);
+NSString* Obj_getAsciiString(PDF_OBJ hand);
+NSString* Obj_getTextString(PDF_OBJ hand);
 unsigned char *Obj_getHexString(PDF_OBJ hand, int *len);
 void Obj_setAsciiString(PDF_OBJ hand, const char *v);
 void Obj_setTextString(PDF_OBJ hand, const char *v);

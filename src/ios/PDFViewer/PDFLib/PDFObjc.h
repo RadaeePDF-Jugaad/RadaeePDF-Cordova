@@ -591,7 +591,7 @@
  */
 -(int)type;
 -(int)export :(unsigned char *)buf : (int)len;
--(int)signField;
+-(int)signField:(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact;
 /**
  * @brief	get annotation field type in acroForm.
  *			this method valid in premium version

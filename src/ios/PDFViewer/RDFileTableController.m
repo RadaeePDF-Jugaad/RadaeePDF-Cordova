@@ -401,6 +401,7 @@ NSString *pdfFullPath;
         if( m_pdf == nil )
             {
                 m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
+                m_pdf.view.frame = self.view.frame;
             }
             
             NSLock *theLock = [[NSLock alloc] init];

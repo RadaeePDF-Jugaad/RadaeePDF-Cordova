@@ -124,6 +124,8 @@
         [_delegate willShowReader];
     }
     
+    
+    [toolBar removeFromSuperview];
     [self createToolbarItems];
     [toolBar sizeToFit];
     b_findStart = NO;
@@ -131,8 +133,6 @@
     b_outline = NO;
     
     self.navigationController.navigationBarHidden = YES;
-    
-    [toolBar removeFromSuperview];
     
     [self refreshToolbarPosition];
     
@@ -737,6 +737,7 @@
 - (void)OnAnnotPopup:(PDFAnnot *)annot
 {
     if(annot){
+        cachedAnnot = annot;
         b_outline = true;
         textAnnotVC = [[TextAnnotViewController alloc]init];
         [textAnnotVC setDelegate:self];

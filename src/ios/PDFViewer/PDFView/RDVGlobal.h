@@ -7,8 +7,7 @@
 //
 #pragma once
 #import <pthread.h>
-#import "PDFObjc.h"
-
+#import <UIKit/UIKit.h>
 #define GLOBAL [RDVGlobal sharedInstance]
 
 @interface RDVLocker :NSObject

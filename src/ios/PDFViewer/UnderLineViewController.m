@@ -15,7 +15,7 @@
 @synthesize dicData;
 @synthesize arrayData;
 @synthesize checkStatus;
-static int currentIndex=2;
+static int  currentIndex;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -173,8 +173,10 @@ static int currentIndex=2;
         
     }
     cell.textLabel.text = [arraySection objectAtIndex:row];
-    
     cell.accessoryType = UITableViewCellStyleDefault;
+    if (indexPath.row == currentIndex) {
+        cell.accessoryType=UITableViewCellAccessoryCheckmark;
+    }
     return cell;
 }
 
