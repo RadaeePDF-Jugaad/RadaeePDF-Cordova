@@ -1411,10 +1411,10 @@
             [self vAnnotEnd];
             [self updateLastAnnotInfoAtPage:page];
         }
-        else
+        else if (m_tx != m_px && m_ty != m_py)
         {
             RDVPage *vdest = [m_layout vGetPage:pos.pageno];
-            PDFPage *dpage = [vpage GetPage];
+            PDFPage *dpage = [vdest GetPage];
             if( dpage )
             {
                 PDFMatrix *mat = [vdest CreateInvertMatrix
@@ -1427,11 +1427,12 @@
                 [m_annot getRect:&rect];
                 
                 PDF_OBJ_REF ref = [m_annot getRef];
-                
+            
                 [annot MoveToPage :dpage :&m_annot_rect];
+                
                 [self ProUpdatePage :m_annot_pos.pageno];
                 [self ProUpdatePage :pos.pageno];
-                
+               
                 ASMove *item = [[ASMove alloc] initWithPage:m_annot_pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:([dpage annotCount] - 1) ref:ref];
                 [actionManger push:item];
                 item.m_pageno = item.m_pageno0;
@@ -1442,6 +1443,8 @@
                 [self vAnnotEnd];
                 [self updateLastAnnotInfoAtPage:dpage];
             }
+        } else {
+            [self vAnnotEnd];
         }
         
         [self autoSave];
