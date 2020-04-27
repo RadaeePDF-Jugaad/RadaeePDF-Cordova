@@ -1036,11 +1036,8 @@
 #pragma mark - More
 
 -(void)showMoreButtons{
-    if (m_bSel == true)
-    {
-        [m_view vSelEnd];
-        m_bSel = false;
-    }
+    [self endSelect];
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone){
         
         moreItemsContainer = [UIAlertController
@@ -1383,6 +1380,7 @@
 
 - (void)undoAnnot
 {
+    [self endSelect];
     [m_view vUndo];
 }
 
@@ -1390,6 +1388,7 @@
 
 - (void)redoAnnot
 {
+    [self endSelect];
     [m_view vRedo];
 }
 
@@ -1397,11 +1396,7 @@
 
 - (void)showDrawModeTableView
 {
-    if (m_bSel == true)
-    {
-        [m_view vSelEnd];
-        m_bSel = false;
-    }
+    [self endSelect];
     
     DrawModeTableViewController *vm = [[DrawModeTableViewController alloc] init];
     vm.delegate = self;
@@ -1612,6 +1607,8 @@
 
 -(void)searchView
 {
+    [self endSelect];
+    
     [toolBar changeToSearchToolBar];
     
     CGRect frame = toolBar.bar.frame;

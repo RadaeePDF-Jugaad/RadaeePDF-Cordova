@@ -16,6 +16,7 @@
 - (void)searchView;
 - (void)showDrawModeTableView;
 - (void)selectIsStarting;
+- (void)stopSelect;
 - (void)undoAnnot;
 - (void)redoAnnot;
 - (void)toggleGrid;

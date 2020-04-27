@@ -8,6 +8,9 @@ PDFViewer SDK for iOS - Release notes
 - FIX text annot issue
 - FIX toolbar issue
 - FIX move annot issue
+- ENHANCED image rendering and transparency group rendering by checking drawable area.
+- ENHANCED image scaling precision
+- FIX issue with RenderToBmb in case of a specific file
 
 3.60
 - ENHANCED optimize tensor pattern rendering
