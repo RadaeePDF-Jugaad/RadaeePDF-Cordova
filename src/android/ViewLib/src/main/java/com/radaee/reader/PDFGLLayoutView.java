@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
+import com.radaee.annotui.UIAnnotMenu;
 import com.radaee.pdf.Document;
+import com.radaee.view.GLLayout;
 import com.radaee.view.ILayoutView;
+import com.radaee.view.PDFLayout;
 
 public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public PDFGLLayoutView(Context context) {
@@ -21,16 +24,19 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
 
     private GLView m_view;
     private GLCanvas m_canvas;
+    private UIAnnotMenu m_annot_menu;
 
     private void init(Context context) {
         m_view = new GLView(context);
         m_canvas = new GLCanvas(context);
         addView(m_view, 0);
         addView(m_canvas, 1);
+        m_annot_menu = new UIAnnotMenu(this);
     }
 
     public void PDFOpen(Document doc, ILayoutView.PDFLayoutListener listener) {
         m_view.PDFOpen(doc, listener, m_canvas, 4);
+        m_view.setAnnotMenu(m_annot_menu);
         m_canvas.vOpen(m_view);
     }
 
@@ -70,6 +76,10 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetStamp(code);
     }
 
+    public void PDFSetEditbox(int code)
+    {
+        m_view.PDFSetEditbox(code);
+    }
     @Override
     public boolean PDFSetAttachment(String attachmentPath) { //TODO
         return false;
@@ -169,11 +179,37 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFAddAnnotRect(x, y, width, height, p);
     }
 
+    @Override
+    public int GetScreenX(float pdfX, int pageno) {
+        return 0;
+    }
+
+    @Override
+    public int GetScreenY(float pdfY, int pageno) {
+        return 0;
+    }
+
     public float[] toPDFRect(float[] viewRect) {
         return m_view.toPDFRect(viewRect);
     }
 
     public void setReadOnly(boolean readonly) {
         m_view.setReadOnly(readonly);
+    }
+
+    public void PDFSaveView()
+    {
+        m_view.PDFSaveView();
+    }
+    public void PDFRestoreView()
+    {
+        m_view.PDFRestoreView();
+    }
+
+
+    public final GLLayout.PDFPos PDFGetPos(int x, int y) {
+        if (m_view != null)
+            return m_view.PDFGetPos(x, y);
+        else return null;
     }
 }

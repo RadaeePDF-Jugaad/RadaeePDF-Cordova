@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.radaee.reader.R;
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.util.PDFAssetStream;
@@ -64,7 +63,7 @@ public class PDFPagerAct extends Activity
     {
         super.onCreate(savedInstanceState);
         Global.Init(this);
-        m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.pdf_fragment, null);
+        m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(com.radaee.viewlib.R.layout.pdf_fragment, null);
         m_pager = (PDFViewPager)m_layout.findViewById(R.id.pdf_pager);
         m_doc = new Document();
         Intent intent = getIntent();
@@ -77,7 +76,7 @@ public class PDFPagerAct extends Activity
             m_http_stream = new PDFHttpStream();
             m_http_stream.open(pdf_http);
             m_doc = new Document();
-            int ret = m_doc.OpenStreamWithoutLoadingPages(m_http_stream, pdf_pswd);
+            int ret = m_doc.OpenStream(m_http_stream, pdf_pswd);
                 /*
                 Page page = m_doc.GetPage(0);
                 Bitmap bmp;

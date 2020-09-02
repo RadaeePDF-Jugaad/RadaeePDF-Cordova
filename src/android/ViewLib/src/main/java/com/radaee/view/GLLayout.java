@@ -368,6 +368,10 @@ abstract public class GLLayout {
     {
         gl_layout(zoom * m_scale_min, true);
     }
+    public void gl_zoom_set_pos(int vx, int vy, PDFPos pos)
+    {
+        vSetPos(vx, vy, pos);
+    }
     public void gl_zoom_start(GL10 gl10)
     {
         if( m_pageno1 < 0 || m_pageno2 < 0 ) return;

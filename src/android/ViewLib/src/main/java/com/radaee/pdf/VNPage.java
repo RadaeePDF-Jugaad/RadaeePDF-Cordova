@@ -17,6 +17,7 @@ public class VNPage {
         boolean Draw(long block, Canvas canvas, int src_left, int src_top, int src_right, int src_bottom, int dst_left, int dst_top, int dst_right, int dst_bottom);
     }
     protected static native long create(long doc, int pageno, int cw, int ch, Bitmap.Config format);
+    protected static native long createFromSuperDoc(long super_doc, int pageno, int cw, int ch, Bitmap.Config format);
     public static native void destroy(long vpage, VNPageListener callback);
     public static native boolean blkRendered(long vpage);
     public static native boolean blkDraw(long vpage, VNPageListener callback, Canvas canvas, float pdfx1, float pdfy1, float pdfx2, float pdfy2, int x, int y);

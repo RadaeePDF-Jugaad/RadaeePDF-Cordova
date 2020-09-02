@@ -16,7 +16,7 @@ class for PDF Page.
 */
 public class Page
 {
-	public class Annotation
+	static public class Annotation
 	{
 		protected long hand;
 		protected Page page;
@@ -716,6 +716,27 @@ public class Page
 		}
 
 		/**
+		 * get text align of edit-box and edit field.<br/>
+		 * this method require premium license
+		 * @return align of text, 0: left, 1: center, 2: right.
+		 */
+		final public int GetEditTextAlign()
+		{
+			return Page.getAnnotEditTextAlign(page.hand, hand);
+		}
+
+		/**
+		 * set text align of edit-box and edit field.<br/>
+		 * this method require premium license
+		 * @param align text align value, 0: left, 1: center, 2: right.
+		 * @return true or false.
+		 */
+		final public boolean SetEditTextAlign(int align)
+		{
+			return Page.setAnnotEditTextAlign(page.hand, hand, align);
+		}
+
+		/**
 		 * get jsvascript action of fields.<br/>
 		 * this method require premium license.
 		 * @param idx action index:<br/>
@@ -1136,6 +1157,10 @@ public class Page
 		{
 			return Page.setAnnotStrokeDash(page.hand, hand, dash);
 		}
+		final public float[] GetStrokeDash()
+		{
+			return Page.getAnnotStrokeDash(page.hand, hand);
+		}
 		/**
 		 * get Path object from Ink annotation.<br/>
 		 * this method require professional or premium license
@@ -1213,7 +1238,7 @@ public class Page
 		}
 
 		/**
-		 * get point from line annotation.<br/>
+		 * get point of line annotation.<br/>
 		 * this method require professional or premium license
 		 * @param idx 0: start point, others: end point.
          * @return array as [x,y], or null.
@@ -1221,6 +1246,27 @@ public class Page
 		final public float[] GetLinePoint(int idx)
 		{
 			return Page.getAnnotLinePoint(page.hand, hand, idx);
+		}
+
+		/**
+		 * get line style of line or polyline annotation.<br/>
+		 * this method require professional or premium license
+		 * @return (ret >> 16) is style of end point, (ret & 0xffff) is style of start point.
+		 */
+		final public int GetLineStyle()
+		{
+			return Page.getAnnotLineStyle(page.hand, hand);
+		}
+
+		/**
+		 * set line style of line or polyline annotation.<br/>
+		 * this method require professional or premium license
+		 * @param style (style >> 16) is style of end point, (style & 0xffff) is style of start point.
+		 * @return true or false.
+		 */
+		final public boolean SetLineStyle(int style)
+		{
+			return Page.setAnnotLineStyle(page.hand, hand, style);
 		}
 		/**
 		 * set icon for sticky text note/file attachment/Rubber Stamp annotation.<br/>
@@ -1336,7 +1382,7 @@ public class Page
 		}
 		/**
 		 * remove annotation<br/>
-		 * you should re-render page to display modified data.<br/>
+		 * you should render page again to display modified data.<br/>
 		 * this method require professional or premium license
 		 * @return true or false
 		 */
@@ -1347,6 +1393,18 @@ public class Page
 			return ret;
 		}
 
+		/**
+		 * flate single annotation<br/>
+		 * you should render page again to display modified data.<br/>
+		 * this method require professional or premium license
+		 * @return true or false
+		 */
+		final public boolean flateFromPage()
+		{
+			boolean ret = flateAnnot( page.hand, hand );
+			hand = 0;
+			return ret;
+		}
 		/**
 		 * export data from annotation.<br/>
 		 * a premium license is required for this method.
@@ -1421,6 +1479,7 @@ public class Page
 
     static private native long getAnnotRef(long page, long annot);
     static private native boolean addAnnot(long page, long annot_ref);
+	static private native boolean addAnnot2(long page, long annot_ref, int index);
 
 	static private native int sign(long hand, long form, float[] box, String cert_file, String pswd, String reason, String location, String contact);
 	static private native int signAnnotField(long hand, long annot, long form, String cert_file, String pswd, String reason, String location, String contact);
@@ -1451,6 +1510,7 @@ public class Page
 	static private native String reflowGetText( long hand, int iparagraph1, int ichar1, int iparagraph2, int ichar2 );
 
     static private native boolean flate(long hand);
+	static private native boolean flateAnnot(long hand, long annot);
 	static private native void objsStart( long hand, boolean rtol );
 	static private native String objsGetString( long hand, int from, int to );
 	static private native int objsAlignWord( long hand, int from, int dir );
@@ -1531,6 +1591,8 @@ public class Page
 	static private native boolean getAnnotEditTextRect( long hand, long annot, float[] rect );
 	static private native float getAnnotEditTextSize( long hand, long annot );
 	static private native boolean setAnnotEditTextSize( long hand, long annot, float fsize );
+	static private native int getAnnotEditTextAlign( long hand, long annot );
+	static private native boolean setAnnotEditTextAlign( long hand, long annot, int align );
 	static private native int getAnnotEditTextColor(long hand, long annot);
 	static private native boolean setAnnotEditTextColor(long hand, long annot, int color);
 	static private native String getAnnotEditText( long hand, long annot );
@@ -1569,6 +1631,7 @@ public class Page
 	static private native boolean setAnnotStrokeColor( long hand, long annot, int color );
 	static private native float getAnnotStrokeWidth( long hand, long annot );
 	static private native boolean setAnnotStrokeWidth( long hand, long annot, float width );
+	static private native float[] getAnnotStrokeDash(long hand, long annot);
 	static private native boolean setAnnotStrokeDash(long hand, long annot, float[] dash);
 	static private native long getAnnotInkPath( long hand, long annot );
 	static private native boolean setAnnotInkPath( long hand, long annot, long path );
@@ -1577,6 +1640,9 @@ public class Page
 	static private native long getAnnotPolylinePath( long hand, long annot );
 	static private native boolean setAnnotPolylinePath( long hand, long annot, long path );
 	static private native float[] getAnnotLinePoint(long hand, long annot, int idx);
+	static private native int getAnnotLineStyle(long page, long annot);
+	static private native boolean setAnnotLineStyle(long page, long annot, int style);
+
 	static private native boolean setAnnotIcon( long hand, long annot, int icon );
 	static private native int getAnnotIcon( long hand, long annot );
 	static private native boolean setAnnotIcon2( long hand, long annot, String name, long content );
@@ -1659,6 +1725,10 @@ public class Page
     {
         return addAnnot(hand, ref);
     }
+	final public boolean AddAnnot(long ref, int index)
+	{
+		return addAnnot2(hand, ref, index);
+	}
 
 	/**
 	 * Sign and save the PDF file.<br/>

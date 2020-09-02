@@ -139,13 +139,49 @@ public class RadaeePluginCallback {
         return mControlListener != null && mControlListener.flatAnnots();
     }
 
-    public boolean saveDocumentToPath(String path) {
-        return mControlListener != null && mControlListener.saveDocumentToPath(path);
+    public boolean saveDocumentToPath(String path, String pswd) {
+        return mControlListener != null && mControlListener.saveDocumentToPath(path, pswd);
     }
 
     public void closeReader() {
         if(mActivityListener != null)
             mActivityListener.closeReader();
+    }
+
+    public String onGetTextAnnotationDetails(int page) {
+        return mControlListener != null ? mControlListener.onGetTextAnnotationDetails(page) : "ERROR";
+    }
+
+    public String onGetMarkupAnnotationDetails(int page) {
+        return mControlListener != null ? mControlListener.onGetMarkupAnnotationDetails(page) : "ERROR";
+    }
+
+    public int onGetCharIndex(int page, float x, float y) {
+        return mControlListener != null ? mControlListener.onGetCharIndex(page,x,y) : -1;
+    }
+
+    public void onAddTextAnnotation(int page, float x, float y, String text, String subject) {
+        if (mControlListener != null)  mControlListener.onAddTextAnnotation(page,x,y,text,subject);
+    }
+
+    public void onAddMarkupAnnotation(int page, int type, int index1, int index2) {
+        if (mControlListener != null)  mControlListener.onAddMarkupAnnotation(page,type,index1,index2);
+    }
+
+    public String onGetPDFCoordinates(int x, int y) {
+        return mControlListener != null ? mControlListener.onGetPDFCoordinates(x,y) : "ERROR";
+    }
+
+    public String onGetScreenCoordinates(int pageno, float x, float y) {
+        return mControlListener != null ? mControlListener.onGetScreenCoordinates(pageno, x,y) : "ERROR";
+    }
+
+    public String onGetScreenRect(int pageno, float left, float top, float right, float bottom) {
+        return mControlListener != null ? mControlListener.onGetScreenRect(pageno,left,top,right,bottom) : "ERROR";
+    }
+
+    public String onGetPDFRect(int left, int top, int right, int bottom) {
+        return mControlListener != null ? mControlListener.onGetPDFRect(left,top,right,bottom) : "ERROR";
     }
 
     /**
@@ -188,7 +224,16 @@ public class RadaeePluginCallback {
         String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight);
         boolean flatAnnotAtPage(int page);
         boolean flatAnnots();
-        boolean saveDocumentToPath(String path);
+        boolean saveDocumentToPath(String path, String pswd);
+        String onGetTextAnnotationDetails(int page);
+        String onGetMarkupAnnotationDetails(int page);
+        int onGetCharIndex(int page, float x, float y);
+        void onAddTextAnnotation(int page, float x, float y, String text, String subject);
+        void onAddMarkupAnnotation(int page, int type, int index1, int index2);
+        String onGetPDFCoordinates(int x, int y);
+        String onGetScreenCoordinates(int pageno, float x, float y);
+        String onGetScreenRect(int pageno, float left, float top, float right, float bottom);
+        String onGetPDFRect(int left, int top, int right, int bottom);
     }
 
     /**

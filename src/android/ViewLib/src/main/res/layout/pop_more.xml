@@ -14,12 +14,36 @@
         android:layout_alignBottom="@+id/actual_content"
         android:background="@drawable/menu_back"/>
 
+
     <LinearLayout
         android:id="@+id/actual_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="4dp">
+
+        <LinearLayout
+            android:id="@+id/edit_pages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/edit_pages_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/btn_view_dual"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:text="@string/pages_list"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/add_bookmark"

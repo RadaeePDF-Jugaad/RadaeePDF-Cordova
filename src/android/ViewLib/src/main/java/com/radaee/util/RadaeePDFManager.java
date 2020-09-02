@@ -428,6 +428,44 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().onAddAnnotAttachment(attachmentPath);
     }
 
+
+    public String getTextAnnotationDetails(int page) {
+        return RadaeePluginCallback.getInstance().onGetTextAnnotationDetails(page);
+    }
+
+    public String getMarkupAnnotationDetails(int page) {
+        return RadaeePluginCallback.getInstance().onGetMarkupAnnotationDetails(page);
+    }
+
+    public int getCharIndex(int page, float x,float y) {
+        return RadaeePluginCallback.getInstance().onGetCharIndex(page, x,y);
+    }
+
+    public void addTextAnnotation(int page, float x,float y, String text, String subject) {
+        RadaeePluginCallback.getInstance().onAddTextAnnotation(page,x,y,text,subject);
+    }
+
+    public void addMarkupAnnotation(int page, int type, int index1, int index2) {
+        RadaeePluginCallback.getInstance().onAddMarkupAnnotation(page,type,index1,index2);
+    }
+
+    public String getPDFCoordinates(int x, int y) {
+        return RadaeePluginCallback.getInstance().onGetPDFCoordinates(x,y);
+    }
+
+    public String getScreenCoordinates(int pageno, float x, float y) {
+        return RadaeePluginCallback.getInstance().onGetScreenCoordinates(pageno, x,y);
+    }
+
+    public String getPDFRect(int left, int top, int right, int bottom) {
+        return RadaeePluginCallback.getInstance().onGetPDFRect(left,top,right,bottom);
+    }
+
+    public String getScreenRect(int pageno, float left, float top, float right, float bottom) {
+        return RadaeePluginCallback.getInstance().onGetScreenRect(pageno,left,top,right,bottom);
+    }
+
+
     /**
      * Render annot to a bitmap, and save it to the given path
      * @param page the page number, 0-index (from 0 to Document.GetPageCount - 1)
@@ -449,8 +487,12 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
         return RadaeePluginCallback.getInstance().flatAnnots();
     }
 
+    public boolean saveDocumentToPath(String path, String pswd) {
+        return RadaeePluginCallback.getInstance().saveDocumentToPath(path, pswd);
+    }
+
     public boolean saveDocumentToPath(String path) {
-        return RadaeePluginCallback.getInstance().saveDocumentToPath(path);
+        return RadaeePluginCallback.getInstance().saveDocumentToPath(path, "");
     }
 
     public void closeReader() {
