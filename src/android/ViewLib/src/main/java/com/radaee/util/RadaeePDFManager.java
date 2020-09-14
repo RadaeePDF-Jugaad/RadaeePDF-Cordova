@@ -231,8 +231,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param firstPageCover if true the first page will be single, if false it will be dual (same as view_mode = 4)
      */
     public void setFirstPageCover(boolean firstPageCover) {
-        if(!firstPageCover)
-            mViewMode = 4;
+        mViewMode = firstPageCover ? 6 : 4;
     }
 
     /**
