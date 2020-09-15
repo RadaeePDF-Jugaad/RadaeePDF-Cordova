@@ -38,6 +38,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
         private Runnable runable;
         private PDFGridItem item;
         private String pswd;
+        private String path;
         private int ret;
         Document doc;
         OpenTask(PDFGridItem item, String pswd)
@@ -50,6 +51,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
         {
             doc = new Document();
             ret = item.open_doc(doc, pswd);
+            path = item.get_name();
             return null;
         }
         @Override
@@ -87,7 +89,7 @@ public class PDFNavAct extends Activity implements OnItemClickListener
                     onFail(doc, getString(R.string.failed_invalid_path));
                     break;
                 case 0://succeeded, and continue
-                    InitView(doc);
+                    InitView(doc, path);
                     break;
                 default://unknown error
                     onFail(doc, getString(R.string.failed_unknown));
@@ -177,11 +179,12 @@ public class PDFNavAct extends Activity implements OnItemClickListener
             task.execute();
 		}
 	}
-    private void InitView(Document doc)//process to view PDF file
+    private void InitView(Document doc, String path)//process to view PDF file
     {
         if(m_engine != null && m_engine.compareTo("OPENGL") == 0)
         {
             PDFGLViewAct.ms_tran_doc = doc;
+            PDFGLViewAct.ms_tran_path = path;
             Intent intent = new Intent(this, PDFGLViewAct.class);
             startActivity(intent);
         }

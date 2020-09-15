@@ -20,6 +20,7 @@ abstract class OPItem
     int m_idx;
     abstract void op_undo(Document doc);
     abstract void op_redo(Document doc);
+    int get_pgno(int idx) {return m_pageno;}
 }
 
 class OPDel extends OPItem
@@ -34,7 +35,7 @@ class OPDel extends OPItem
     void op_undo(Document doc) {
         Page page = doc.GetPage(m_pageno);
         page.ObjsStart();
-        page.AddAnnot(hand);
+        page.AddAnnot(hand, m_idx);
         page.Close();
     }
 
@@ -69,7 +70,7 @@ class OPAdd extends OPItem
     void op_redo(Document doc) {
         Page page = doc.GetPage(m_pageno);
         page.ObjsStart();
-        page.AddAnnot(hand);
+        page.AddAnnot(hand, m_idx);
         page.Close();
     }
 }
@@ -125,7 +126,7 @@ class OPMove extends OPItem
     void op_redo(Document doc)
     {
         m_pageno = m_pageno1;
-        if(m_pageno == m_pageno1)
+        if(m_pageno == m_pageno0)
         {
             Page page = doc.GetPage(m_pageno);
             page.ObjsStart();
@@ -144,6 +145,13 @@ class OPMove extends OPItem
             page0.Close();
             page1.Close();
         }
+    }
+    int get_pgno(int idx)
+    {
+        if(idx == 0)
+            return m_pageno0;
+        else
+            return m_pageno1;
     }
 }
 

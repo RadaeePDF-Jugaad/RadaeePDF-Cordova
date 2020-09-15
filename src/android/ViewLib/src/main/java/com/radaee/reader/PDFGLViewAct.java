@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -24,6 +25,7 @@ import com.radaee.pdf.Global;
 import com.radaee.pdf.Page.Annotation;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
+import com.radaee.util.PDFThumbView;
 import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.ILayoutView;
 import com.radaee.viewlib.R;
@@ -34,10 +36,12 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 	private boolean mDidShowReader = false;
 
 	static protected Document ms_tran_doc;
+	static protected String ms_tran_path;
 	static private int m_tmp_index = 0;
 	private PDFAssetStream m_asset_stream = null;
 	private PDFHttpStream m_http_stream = null;
 	private Document m_doc = null;
+	private String m_path = null;
 	private RelativeLayout m_layout = null;
 	private PDFGLLayoutView m_view = null;
 	private PDFViewController m_controller = null;
@@ -108,7 +112,16 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		{
 			m_view.PDFOpen(m_doc, PDFGLViewAct.this);
 			m_view.setReadOnly(getIntent().getBooleanExtra("READ_ONLY", false));
-			m_controller = new PDFViewController(m_layout, m_view);
+			m_controller = new PDFViewController(m_layout, m_view, m_path,m_asset_stream != null || m_http_stream != null);
+			m_controller.SetPagesListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent();
+					intent.setClass(PDFGLViewAct.this, PDFPagesAct.class);
+					PDFPagesAct.ms_tran_doc = m_doc;
+					startActivityForResult(intent, 10000);
+				}
+			});
 			need_save_doc = need_save;
 			if(dlg != null)
 				dlg.dismiss();
@@ -116,6 +129,37 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 				handler.removeCallbacks(runable);
 		}
 	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if(requestCode != 10000) return;
+		if(resultCode != 1) return;
+
+		boolean removal[] = data.getBooleanArrayExtra("removal");
+		int rotate[] = data.getIntArrayExtra("rotate");
+		if (removal == null || rotate == null) return;
+
+		PDFThumbView thumb = m_controller.GetThumbView();
+		m_view.PDFSaveView();
+		thumb.thumbSave();
+
+		Document doc = m_view.PDFGetDoc();
+
+		int pcnt = removal.length;
+		int pcur = pcnt;
+		while(pcur > 0)
+		{
+			pcur--;
+			if(removal[pcur])
+				doc.RemovePage(pcur);
+			else if((rotate[pcur] >> 16) !=  (rotate[pcur] & 0xFFFF))
+				doc.SetPageRotate(pcur, rotate[pcur] & 0xFFFF);
+		}
+		thumb.thumbRestore();
+		m_view.PDFRestoreView();
+		OnPDFPageModified(0);//set modified status.
+	}
+
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -141,7 +185,9 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		if(ms_tran_doc != null)
 		{
 			m_doc = ms_tran_doc;
+			m_path = ms_tran_path;
 			ms_tran_doc = null;
+			ms_tran_path = null;
 			//m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
 			//m_tmp_index++;
 			OpenTask task = new OpenTask(true);
@@ -182,7 +228,8 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 				m_asset_stream = new PDFAssetStream();
 				m_asset_stream.open(getAssets(), pdf_asset);
 				m_doc = new Document();
-				int ret = m_doc.OpenStream(pdf_asset, m_asset_stream, pdf_pswd);
+				m_path = pdf_asset;
+				int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
 				ProcessOpenResult(ret);
 			}
 			else if( pdf_path != null && pdf_path != "" )
@@ -234,7 +281,16 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 		{
 			m_doc = Document.BundleRestore(savedInstanceState);//restore Document object
 			m_view.PDFOpen(m_doc, this);
-			m_controller = new PDFViewController(m_layout, m_view);
+			m_controller = new PDFViewController(m_layout, m_view, m_path,m_asset_stream != null || m_http_stream != null);
+			m_controller.SetPagesListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent();
+					intent.setClass(PDFGLViewAct.this, PDFPagesAct.class);
+					PDFPagesAct.ms_tran_doc = m_doc;
+					startActivityForResult(intent, 10000);
+				}
+			});
 			need_save_doc = true;
 		}
 		m_view.BundleRestorePos(savedInstanceState);
@@ -251,10 +307,8 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 				if (m_controller != null) m_controller.savePDF();
 				if(onBackPressed) super.onBackPressed();
 			} else {
-				TextView txtView = new TextView(this);
-				txtView.setText(R.string.save_msg);
-				new AlertDialog.Builder(this).setTitle(R.string.exiting).setView(
-						txtView).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+				new AlertDialog.Builder(this).setTitle(R.string.exiting)
+						.setMessage(R.string.save_msg).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (m_controller != null) m_controller.savePDF();

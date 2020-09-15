@@ -42,13 +42,13 @@
     <string name="show_password">Show password</string>
     <string name="input_password">Input Password</string>
     <string name="loading_pdf">Loading PDF file…</string>
-    <string name="browse_open_file">Browse And Open File</string>
+    <string name="browse_open_file">Browse And Open File (CPU)</string>
     <string name="view_pager">ViewPager</string>
     <string name="open_asset">Open From Assets (ReadOnly)</string>
     <string name="open_sdcard">Open From sdcard</string>
     <string name="open_http">Open Http Link (INTERNET access)</string>
-    <string name="using_RGB_565">Using RGB_565</string>
-    <string name="using_RGB_4444">Using RGB_4444</string>
+    <string name="using_RGB_565">Using RGB_565 (CPU)</string>
+    <string name="using_RGB_4444">Using RGB_4444 (CPU)</string>
     <string name="simple_open_gl">Simple OpenGL</string>
     <string name="curl_pages">Curl Pages</string>
     <string name="advance">Advance</string>
@@ -84,6 +84,7 @@
     <string name="bookmark_error">Error: Cannot add bookmark</string>
     <string name="bookmark_remove_error">Error: Cannot delete bookmark</string>
     <string name="bookmark_success">Bookmark (%1$s) added successfully.</string>
+    <string name="pages_list">Pages List</string>
     <string name="bookmark_add">Add to Bookmarks</string>
     <string name="bookmark_show">Show Bookmarks</string>
     <string name="bookmarks">Bookmarks</string>
@@ -96,5 +97,21 @@
     <string name="saved_message">Document saved</string>
     <string name="delete_signature_message">A signature is already present, do you want to delete it?</string>
     <string name="warning">Warning</string>
+    <string name="no_search_reflow">Search not supported in Reflow mode!</string>
+
+    <string name="annot_perform">Perform</string>
+    <string name="annot_edit">poptext</string>
+    <string name="annot_remove">remove</string>
+    <string name="annot_property">property</string>
+    <string name="line_width">Line width</string>
+    <string name="line_style">Line style</string>
+    <string name="line_color">Line color</string>
+    <string name="line_start">Line start</string>
+    <string name="line_end">Line end</string>
+    <string name="fill_color">Fill color</string>
+    <string name="annot_color">Color</string>
+    <string name="icon">icon</string>
+    <string name="annot_lock">Lock</string>
+    <string name="alpha">Alpha</string>
 
 </resources>

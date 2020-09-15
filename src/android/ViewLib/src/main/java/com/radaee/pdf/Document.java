@@ -112,7 +112,7 @@ public class Document
 		 */
 		public int tell();
 	}
-	public class ImportContext
+	static public class ImportContext
 	{
 		protected ImportContext(Document doc, long value)
 		{
@@ -133,14 +133,13 @@ public class Document
 	public class Outline
 	{
 		protected long hand;
-		protected Document doc;
 		/**
 		 * get label of Outline
 		 * @return title string
 		 */
 		public String GetTitle()
 		{
-			return Document.getOutlineTitle(doc.hand_val, hand);
+			return Document.getOutlineTitle(hand_val, hand);
 		}
 		/**
 		 * set label of Outline.<br/>
@@ -150,7 +149,7 @@ public class Document
 		 */
 		public boolean SetTitle(String title)
 		{
-			return Document.setOutlineTitle(doc.hand_val, hand, title);
+			return Document.setOutlineTitle(hand_val, hand, title);
 		}
 		/**
 		 * get next
@@ -158,11 +157,10 @@ public class Document
 		 */
 		public Outline GetNext()
 		{
-			long ret =  Document.getOutlineNext(doc.hand_val, hand);
+			long ret =  Document.getOutlineNext(hand_val, hand);
 			if( ret == 0 ) return null;
 			Outline ol = new Outline();
 			ol.hand = ret;
-			ol.doc = doc;
 			return ol;
 		}
 		/**
@@ -171,11 +169,10 @@ public class Document
 		 */
 		public Outline GetChild()
 		{
-			long ret =  Document.getOutlineChild(doc.hand_val, hand);
+			long ret =  Document.getOutlineChild(hand_val, hand);
 			if( ret == 0 ) return null;
 			Outline ol = new Outline();
 			ol.hand = ret;
-			ol.doc = doc;
 			return ol;
 		}
 		/**
@@ -184,7 +181,7 @@ public class Document
 		 */
 		public int GetDest()
 		{
-			return Document.getOutlineDest(doc.hand_val, hand);
+			return Document.getOutlineDest(hand_val, hand);
 		}
 		/**
 		 * get url string of Outline
@@ -192,7 +189,7 @@ public class Document
 		 */
 		public String GetURI()
 		{
-			return Document.getOutlineURI(doc.hand_val, hand);
+			return Document.getOutlineURI(hand_val, hand);
 		}
 		/**
 		 * get file link path of Outline
@@ -200,7 +197,7 @@ public class Document
 		 */
 		public String GetFileLink()
 		{
-			return Document.getOutlineFileLink(doc.hand_val, hand);
+			return Document.getOutlineFileLink(hand_val, hand);
 		}
 		/**
 		 * insert outline after of this Outline.<br/>
@@ -212,7 +209,7 @@ public class Document
 		 */
 		public boolean AddNext( String label, int pageno, float top )
 		{
-			return Document.addOutlineNext(doc.hand_val, hand, label, pageno, top);
+			return Document.addOutlineNext(hand_val, hand, label, pageno, top);
 		}
 		/**
 		 * insert outline as first child of this Outline.<br/>
@@ -224,7 +221,7 @@ public class Document
 		 */
 		public boolean AddChild( String label, int pageno, float top )
 		{
-			return Document.addOutlineChild(doc.hand_val, hand, label, pageno, top);
+			return Document.addOutlineChild(hand_val, hand, label, pageno, top);
 		}
 		/**
 		 * remove this Outline, and all children of this Outline.<br/>
@@ -234,15 +231,13 @@ public class Document
 		 */
 		public boolean RemoveFromDoc()
 		{
-			boolean ret = Document.removeOutline(doc.hand_val, hand);
+			boolean ret = Document.removeOutline(hand_val, hand);
 			hand = 0;
 			return ret;
 		}
 	}
 	protected long hand_val = 0;
-	private String mDocPath; //Nermeen
-	private String mDocPwd; //Manu
-	private boolean isAsset = false; // Dario
+	private static native void setOpenFlag(int flag);
 	private static native long create( String path );
 	private static native long createForStream( PDFStream stream ) throws Exception;
 	private static native long open( String path, String password ) throws Exception;
@@ -251,7 +246,7 @@ public class Document
 	private static native long openWithCert( String path, String cert_file, String password ) throws Exception;
 	private static native long openMemWithCert( byte[] data, String cert_file, String password ) throws Exception;
 	private static native long openStreamWithCert( PDFStream stream, String cert_file, String password ) throws Exception;
-	private static native long openStreamNoLoadPages( PDFStream stream, String password ) throws Exception;
+	private static native int getLinearizedStatus(long hand);
 	private static native boolean setCache( long hand, String path );
 	private static native boolean runJS(long hand, String js, PDFJSDelegate del) throws Exception;
 	private static native void setFontDel( long hand, PDFFontDelegate del );
@@ -653,9 +648,6 @@ public class Document
 				ret = (int)hand_val;
 				hand_val = 0;
 			}
-			else {
-				mDocPath = path; // Nermeen
-			}
 			return ret;
 		}
 		return 0;
@@ -701,6 +693,18 @@ public class Document
 	}
 
 	/**
+	 * a static method set open flag.<br/>
+	 * the flag is a global setting, which effect all Document.OpenXXX() methods.
+	 * @param flag (flag&1) : load linearzied hint table.<br/>
+	 *             (flag&2) : if bit set, mean all pages considered as same size, and SDK will only read first page object in open time, and set all pages size same to first page.<br/>
+	 *             (flag&2) only works when (flag&1) is set.
+	 */
+	static public void SetOpenFlag(int flag)
+	{
+		setOpenFlag(flag);
+	}
+
+	/**
 	 * open document.<br/>
 	 * first time, SDK try password as user password, and then try password as owner password.
 	 * @param path PDF file to be open.
@@ -715,7 +719,6 @@ public class Document
 	 */
 	public int Open( String path, String password )
 	{
-		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -732,10 +735,6 @@ public class Document
 				ret = (int)hand_val;
 				hand_val = 0;
 			}
-			else {
-				mDocPath = path; // Nermeen
-				isAsset = false;
-			}
 			return ret;
 		}
 		return 0;
@@ -751,7 +750,6 @@ public class Document
 	 */
 	public int Open( String path, String cert_file, String password )
 	{
-		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -767,10 +765,6 @@ public class Document
 			{
 				ret = (int)hand_val;
 				hand_val = 0;
-			}
-			else {
-				mDocPath = path; // Nermeen
-				isAsset = false;
 			}
 			return ret;
 		}
@@ -791,7 +785,6 @@ public class Document
 	 */
 	public int OpenMem( byte[] data, String password )
 	{
-		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -822,7 +815,6 @@ public class Document
 	 */
 	public int OpenMem( byte[] data, String cert_file, String password )
 	{
-		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -858,7 +850,6 @@ public class Document
 	 */
 	public int OpenStream( PDFStream stream, String password )
 	{
-		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
@@ -878,44 +869,13 @@ public class Document
 		return 0;
 	}
 
-	// Method to store the Asset name.
-	// Optionally used to allow the framework to enable Printing feature
-	public int OpenStream( String name, PDFStream stream, String password ) {
-		mDocPath = name;
-		isAsset = true;
-		mDocPwd = password; //Manu
-		return OpenStream(stream, password);
-	}
-
 	public int OpenStream( PDFStream stream, String cert_file, String password )
 	{
-		mDocPwd = password; //Manu
 		if( hand_val == 0 )
 		{
 			int ret = 0;
 			try {
 				hand_val = openStreamWithCert(stream, cert_file, password);
-			}catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-			if( hand_val <= 0 && hand_val >= -10 )//error
-			{
-				ret = (int)hand_val;
-				hand_val = 0;
-			}
-			return ret;
-		}
-		return 0;
-	}
-	public int OpenStreamWithoutLoadingPages( PDFStream stream, String password )
-	{
-		mDocPwd = password; //Manu
-		if( hand_val == 0 )
-		{
-			int ret = 0;
-			try {
-				hand_val = openStreamNoLoadPages(stream, password);
 			}catch (Exception e)
 			{
 				e.printStackTrace();
@@ -1060,6 +1020,16 @@ public class Document
 		hand_val = 0;
 	}
 
+	/**
+	 * get linearizied status.
+	 * @return 0: linearized header not loaded or no linearized header.(if setOpenFlag(0); cause always return 0)<br/>
+	 * 1: there is linearized header, but linearized entry checked as failed.<br/>
+	 * 2: there is linearized header, linearized entry checked succeeded, but hint table is damaged.<br/>
+	 * 3. linearized header loaded succeeded.
+	 */
+	public int GetLinearizedStatus() {
+		return getLinearizedStatus (hand_val);
+	}
 	/**
 	 * fast get first page, used in first page thumbnail generating.<br/>
 	 * do not use this method for other purpose.
@@ -1215,7 +1185,6 @@ public class Document
 		long ret = getOutlineRoot();
 		if( ret == 0 ) return null;
 		Outline ol = new Outline();
-		ol.doc = this;
 		ol.hand = ret;
 		return ol;
 	}
@@ -1586,16 +1555,6 @@ public class Document
 		Close();
 		super.finalize();
 	}
-
-	public String getDocPath() {
-		return mDocPath;
-	}
-
-	public String getDocPwd() {
-		return mDocPwd;
-	}
-
-	public boolean isAsset() { return isAsset; }
 
 	public long CreateVNPage(int pageno, int cw, int ch, Bitmap.Config format)
 	{

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.6.2">
+        id="com.radaee.cordova" version="1.6.4">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -30,6 +30,7 @@
             <activity android:name="com.radaee.reader.PDFGLViewAct" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar"/>
 			<activity android:configChanges="orientation|keyboardHidden|screenSize" android:name="com.radaee.util.PopupEditAct" android:theme="@android:style/Theme.Translucent" />
 			<activity android:name="com.radaee.reader.PDFPagerAct" android:configChanges="orientation|keyboardHidden|screenSize" android:label="@string/app_name" />
+			<activity android:name="com.radaee.reader.PDFPagesAct" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar" />
 			<activity
             android:name="com.radaee.util.CaptureSignature"
             android:theme="@android:style/Theme.DeviceDefault.Dialog"/>
@@ -80,6 +81,7 @@
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/GLView.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFGLLayoutView.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFGLViewAct.java" target-dir="src/com/radaee/reader" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFPagesAct.java" target-dir="src/com/radaee/reader" />
 
         <!-- Radaee source - java.com.radaee.util -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboList.java" target-dir="src/com/radaee/util" />
@@ -103,6 +105,8 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFPageGridAdt.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFPageGridView.java" target-dir="src/com/radaee/util" />
 		
 		<!-- Radaee source - java.com.radaee.view -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
@@ -139,6 +143,25 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VThread.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowBlock.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowCanvas.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual2.java" target-dir="src/com/radaee/view"/>
+		
+		<!-- Annot UI -->
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlg.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgComm.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgIcon.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgLine.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgMarkup.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgPopup.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotMenu.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPop.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopCombo.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopEdit.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIColorButton.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIIconButton.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadButton.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadView.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleButton.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleView.java" target-dir="src/com/radaee/annotui"/>
 
         <!-- Radaee source - java.com.radaee.util -->
 
@@ -177,6 +200,20 @@
 		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/pdf_gllayout.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_popup.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_comm.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_icon.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_line.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_markup.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/item_page.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pdf_pages.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_annot.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_color.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_attach.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_text.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lhead.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lstyle.xml" target-dir="res/layout" />
+		
 
         <!-- Radaee raw -->
         <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
@@ -240,6 +277,8 @@
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_horz.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/save.png" target-dir="res/drawable" />
         <source-file src="src/android/ViewLib/src/main/res/drawable/ic_share.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_btn_menu.xml" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_settings.png" target-dir="res/drawable" />
 
 		<!-- Radaee values -->
 		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
@@ -253,6 +292,8 @@
 		<source-file src="src/android/ViewLib/src/main/res/values-it/strings.xml" target-dir="res/values-it" />
 		<source-file src="src/android/ViewLib/src/main/res/values-sw600dp/bools.xml" target-dir="res/values-sw600dp" />
 		<source-file src="src/android/ViewLib/src/main/res/values-xlarge/bools.xml" target-dir="res/values-xlarge" />
+		<source-file src="src/android/ViewLib/src/main/res/values/colors.xml" target-dir="res/values" />
+		<source-file src="src/android/ViewLib/src/main/res/values/dimens.xml" target-dir="res/values" />
 
 		<!-- Radaee res -->
 		<source-file src="src/android/ViewLib/src/main/res/AMIRI_LICENSE.txt" target-dir="res" />
@@ -365,6 +406,24 @@
             <string name="saved_message">Document saved</string>
             <string name="delete_signature_message">A signature is already present, do you want to delete it?</string>
             <string name="warning">Warning</string>
+			
+			<string name="no_search_reflow">Search not supported in Reflow mode!</string>
+			<string name="pages_list">Pages List</string>
+            <string name="annot_perform">Perform</string>
+            <string name="annot_edit">poptext</string>
+            <string name="annot_remove">remove</string>
+            <string name="annot_property">property</string>
+            <string name="line_width">Line width</string>
+            <string name="line_style">Line style</string>
+            <string name="line_color">Line color</string>
+            <string name="line_start">Line start</string>
+            <string name="line_end">Line end</string>
+            <string name="fill_color">Fill color</string>
+            <string name="annot_color">Color</string>
+            <string name="icon">icon</string>
+            <string name="annot_lock">Lock</string>
+            <string name="alpha">Alpha</string>
+			
 		</config-file>
 
         <!-- Hooks -->

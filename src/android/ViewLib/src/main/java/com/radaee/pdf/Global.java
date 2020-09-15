@@ -16,7 +16,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.53.4
+ * @version 3.53.6
  */
 public class Global
 {
@@ -214,9 +214,17 @@ public class Global
 	 */
 	public static native void hideAnnots(boolean hide);
 
+	/**
+	 * draw icon to Bitmap object
+	 * @param annot_type 1(text note) or 17(file attachment)
+	 * @param icon same as Annotation.GetIcon()
+	 * @param bitmap Bitmap object
+	 * @return true or false.
+	 */
+	public static native boolean drawAnnotIcon(int annot_type, int icon, Bitmap bitmap);
 	private static native void drawScroll(Bitmap bmp, long dib1, long dib2, int x, int y, int style, int back_side_clr);
 	/**
-	 * not used for developer
+	 * deprecated, not used for developer any more, referenced form deprecated class.
 	 */
 	public static void DrawScroll(Bitmap bmp, DIB dib1, DIB dib2, int x, int y, int style, int back_side_clr)
 	{
@@ -252,10 +260,6 @@ public class Global
 	 * width for ink lines.
 	 */
 	public static float inkWidth = 4;
-	/**
-	 * color for rect annotation.
-	 */
-	public static int rectColor = 0x80C00000;
 	/**
 	 * selection color.
 	 */
@@ -372,7 +376,7 @@ public class Global
      * enables or disable cache during rendering
      */
     public static boolean cacheEnabled = true;
-	public static boolean trustAllHttpsHosts = false;
+	//public static boolean trustAllHttpsHosts = false; removed as it causes a security vulnerability.
     public static int highlight_color = 0xFFFFFF00;//yellow
     public static int underline_color = 0xFF0000C0;//black blue
     public static int strikeout_color = 0xFFC00000;//black red

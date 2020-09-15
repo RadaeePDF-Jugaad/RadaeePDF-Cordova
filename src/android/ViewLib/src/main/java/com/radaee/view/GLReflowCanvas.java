@@ -70,7 +70,10 @@ public class GLReflowCanvas
             m_blks[blk_cur] = null;
         }
         m_blks = null;
+        if(m_page != null) {
+            m_page.Close();
         m_page = null;
+        }
     }
     public int getWidth() {return m_w;}
     public int getHeight() {return m_h;}

@@ -68,7 +68,23 @@ module.exports = function (ctx) {
 		{filePath: prefix + 'com/radaee/util/RadaeePDFManager.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: prefix + 'com/radaee/util/BookmarkHandler.java', importStatement: 'com.radaee.viewlib.R'},
 		{filePath: prefix + 'com/radaee/util/CaptureSignature.java', importStatement: 'com.radaee.viewlib.R'},
-		{filePath: prefix + 'com/radaee/util/PDFThumbGrid.java', importStatement: 'com.radaee.viewlib.R'}
+		{filePath: prefix + 'com/radaee/util/PDFThumbGrid.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotMenu.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotDlgComm.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotDlgIcon.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotDlgLine.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotDlgMarkup.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotDlgPopup.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotPopCombo.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIAnnotPopEdit.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIColorButton.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UIIconButton.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UILHeadButton.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/annotui/UILStyleButton.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/reader/PDFPagesAct.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/PDFPageGridAdt.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/view/GLLayoutReflow.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/reader/PDFPagerAct.java', importStatement: 'com.radaee.viewlib.R'}
     ];
 
 

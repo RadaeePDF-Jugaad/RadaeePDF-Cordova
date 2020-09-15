@@ -3,7 +3,8 @@
     android:id="@+id/dlg_show_note"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+	android:padding="10dp">
 
     <RadioGroup
         android:id="@+id/rad_group"

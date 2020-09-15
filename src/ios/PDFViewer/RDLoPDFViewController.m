@@ -2620,7 +2620,8 @@
     toolBar.backgroundColor = toolBar.bar.barTintColor = m_searchBar.barTintColor = drawToolbar.barTintColor = [self getBarColor];
     
     if (@available(iOS 13.0, *)) {
-        
+        UITextField *t = [m_searchBar valueForKey:@"searchField"];
+        t.textColor = [self getTintColor];
     } else {
         UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
         

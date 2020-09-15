@@ -171,6 +171,15 @@ public interface ILayoutView {
      * 2: cancel Stamp status
      */
     void PDFSetStamp(int code);
+
+    /**
+     * set editbox status.
+     * @param code <br/>
+     * 0: set to Editbox status<br/>
+     * 1: end and confirm Editbox status<br/>
+     * 2: cancel Editbox status
+     */
+    void PDFSetEditbox(int code);
     boolean PDFSetAttachment(String attachmentPath);
     void PDFCancelAnnot();
     void PDFRemoveAnnot();
@@ -194,4 +203,9 @@ public interface ILayoutView {
     void PDFUpdateCurrPage();
     int PDFGetCurrPage();
     void PDFAddAnnotRect(float x, float y, float width, float height, int p);
+
+
+    int GetScreenX(float pdfX, int pageno);
+    int GetScreenY(float pdfY, int pageno);
+
 }

@@ -1,17 +1,10 @@
 package com.radaee.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.opengl.GLUtils;
-import android.util.Log;
+import android.widget.Toast;
 
-import com.radaee.pdf.BMP;
-import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
+import com.radaee.viewlib.R;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -179,6 +172,11 @@ public class GLLayoutReflow extends GLLayout
     public boolean vCanSave()
     {
         return false;
+    }
+    public void vFindStart( String key, boolean match_case, boolean whole_word )
+    {
+        Toast.makeText(m_ctx, R.string.no_search_reflow, Toast.LENGTH_LONG).show();
+        m_finder.find_end();
     }
     public void gl_zoom_start(GL10 gl10)
     {

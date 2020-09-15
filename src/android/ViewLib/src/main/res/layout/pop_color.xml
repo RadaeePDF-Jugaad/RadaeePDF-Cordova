@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_btn_menu"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/txt_clr_r"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="#80000000"
+        android:text=" R:" />
+
+    <SeekBar
+        android:id="@+id/seek_clr_r"
+        android:layout_width="100dp"
+        android:layout_height="28dp"
+        android:layout_toRightOf="@id/txt_clr_r" />
+
+    <TextView
+        android:id="@+id/txt_clr_g"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_clr_r"
+        android:layout_marginTop="8dp"
+        android:background="#80000000"
+        android:text=" G:" />
+
+    <SeekBar
+        android:id="@+id/seek_clr_g"
+        android:layout_width="100dp"
+        android:layout_height="28dp"
+        android:layout_below="@id/txt_clr_r"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@id/txt_clr_g" />
+
+    <TextView
+        android:id="@+id/txt_clr_b"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_clr_g"
+        android:layout_marginTop="8dp"
+        android:background="#80000000"
+        android:text=" B:" />
+
+    <SeekBar
+        android:id="@+id/seek_clr_b"
+        android:layout_width="100dp"
+        android:layout_height="28dp"
+        android:layout_below="@id/txt_clr_g"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@id/txt_clr_b" />
+
+    <TextView
+        android:id="@+id/txt_enable"
+        android:background="#80000000"
+        android:text=" Enable:"
+        android:layout_marginTop="4dp"
+        android:layout_below="@id/seek_clr_b"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"/>
+
+    <Switch
+        android:id="@+id/tog_enable"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seek_clr_b"
+        android:layout_toRightOf="@id/txt_enable"/>
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="70dp"
+        android:layout_height="35dp"
+        android:layout_below="@id/tog_enable"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/btn_ok"
+        android:layout_width="50dp"
+        android:layout_height="35dp"
+        android:layout_below="@id/tog_enable"
+        android:layout_toRightOf="@id/btn_cancel"
+        android:gravity="center"
+        android:text="@string/ok"
+        android:textSize="10sp" />
+
+</RelativeLayout>

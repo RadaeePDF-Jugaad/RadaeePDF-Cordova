@@ -62,6 +62,10 @@ public class PDFGridItem extends LinearLayout
 	{
 		return (String) m_name.getText();
 	}
+	public String get_path()
+	{
+		return m_path;
+	}
 	protected synchronized void page_set()
 	{
 		this.removeAllViews();
@@ -129,67 +133,70 @@ public class PDFGridItem extends LinearLayout
 	{
 		if( m_cancel ) return false;
 		String thumbName = null;
-        Bitmap bmp = null;
+		Bitmap bmp = null;
 		if(Global.save_thumb_in_cache)
-        {
-            thumbName = CommonUtil.getThumbName(m_path);
-            if(thumbName != null)
-            {
+		{
+			thumbName = CommonUtil.getThumbName(m_path);
+			if(thumbName != null)
+			{
 				bmp = CommonUtil.loadThumb(CommonUtil.getOutputMediaFile(getContext(), thumbName));
-                if (bmp != null)//if found cache, return immediately.
-                {
-                    set_page(null, bmp);
-                    return true;
-                }
-            }
+				if (bmp != null)//if found cache, return immediately.
+				{
+					set_page(null, bmp);
+					return true;
+				}
+			}
 		}
 
 		lock_file();
-        Document doc = new Document();
-        if( doc.Open(m_path, null) == 0 )
-        {
-            int iw = m_bmp.getWidth();
-            int ih = m_bmp.getHeight();
-            Page page = doc.GetPage0();
-            set_page( page, null );
-            try
-            {
-                bmp = Bitmap.createBitmap( iw, ih, Bitmap.Config.ARGB_8888 );
-                bmp.eraseColor(0);
-                if( !page.RenderThumb(bmp) )
-                {
-                    float w = doc.GetPageWidth(0);
-                    float h = doc.GetPageHeight(0);
-                    float ratiox = iw/w;
-                    float ratioy = ih/h;
-                    if( ratiox > ratioy ) ratiox = ratioy;
-                    Canvas canvas = new Canvas(bmp);
-                    Paint paint = new Paint();
-                    paint.setARGB(255, 255, 255, 255);
-                    canvas.drawRect((iw - w * ratiox)/2, (ih - h * ratiox)/2,
-                            (iw + w * ratiox)/2, (ih + h * ratiox)/2, paint);
-                    Matrix mat = new Matrix( ratiox, -ratiox, (iw - w * ratiox)/2, (ih + h * ratiox)/2 );
+		Document doc = new Document();
+		Document.SetOpenFlag(3);
+		int iret = doc.Open(m_path, null);
+		Document.SetOpenFlag(1);
+		if( iret == 0 )
+		{
+			int iw = m_bmp.getWidth();
+			int ih = m_bmp.getHeight();
+			Page page = doc.GetPage0();
+			set_page( page, null );
+			try
+			{
+				bmp = Bitmap.createBitmap( iw, ih, Bitmap.Config.ARGB_8888 );
+				bmp.eraseColor(0);
+				if( !page.RenderThumb(bmp) )
+				{
+					float w = doc.GetPageWidth(0);
+					float h = doc.GetPageHeight(0);
+					float ratiox = iw/w;
+					float ratioy = ih/h;
+					if( ratiox > ratioy ) ratiox = ratioy;
+					Canvas canvas = new Canvas(bmp);
+					Paint paint = new Paint();
+					paint.setARGB(255, 255, 255, 255);
+					canvas.drawRect((iw - w * ratiox)/2, (ih - h * ratiox)/2,
+							(iw + w * ratiox)/2, (ih + h * ratiox)/2, paint);
+					Matrix mat = new Matrix( ratiox, -ratiox, (iw - w * ratiox)/2, (ih + h * ratiox)/2 );
 					page.RenderPrepare((Bitmap)null);
-                    page.RenderToBmp(bmp, mat);
-                    mat.Destroy();
-                    if( !m_page.RenderIsFinished() )
-                    {
-                        bmp.recycle();
-                        bmp = null;
-                    }
-                    else if(Global.save_thumb_in_cache) {
+					page.RenderToBmp(bmp, mat);
+					mat.Destroy();
+					if( !m_page.RenderIsFinished() )
+					{
+						bmp.recycle();
+						bmp = null;
+					}
+					else if(Global.save_thumb_in_cache) {
 						CommonUtil.saveThumb(bmp, CommonUtil.getOutputMediaFile(getContext(), thumbName));
-                    }
-                }
-                set_page( null, bmp );
-            }
-            catch(Exception e)
-            { e.getMessage(); }
-            page.Close();
-            doc.Close();
+					}
+				}
+				set_page( null, bmp );
+			}
+			catch(Exception e)
+			{ e.getMessage(); }
+			page.Close();
+			doc.Close();
 		}
-        unlock_file();
-        return bmp != null;
+		unlock_file();
+		return bmp != null;
 	}
 	private boolean is_notified = false;
 	private boolean is_waitting = false;

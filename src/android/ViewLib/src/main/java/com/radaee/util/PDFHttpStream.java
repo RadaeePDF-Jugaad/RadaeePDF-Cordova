@@ -5,25 +5,14 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Locale;
 
-import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
 import com.radaee.pdf.Document.PDFStream;
-import com.radaee.pdf.Global;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * a class for HttpURLConnection.<br/>
@@ -137,8 +126,8 @@ public class PDFHttpStream implements PDFStream
 				URL url = new URL(m_url);
 				HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 
-				if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
-					trustAllHosts();
+				/*if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
+					trustAllHosts();*/
 
 				conn.setRequestMethod("GET");
 				conn.setRequestProperty("Connection", "Keep-Alive");
@@ -315,8 +304,8 @@ public class PDFHttpStream implements PDFStream
 		{
 			URL url = new URL(m_url);
 
-			if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
-				trustAllHosts();
+			/*if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
+				trustAllHosts();*/
 
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("GET");
@@ -361,8 +350,8 @@ public class PDFHttpStream implements PDFStream
 			long time1 = System.currentTimeMillis();
 			URL url = new URL(m_url);
 
-			if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
-				trustAllHosts();
+			/*if(Global.trustAllHttpsHosts && url.getProtocol().equalsIgnoreCase("https"))
+				trustAllHosts();*/
 
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("GET");
@@ -490,6 +479,7 @@ public class PDFHttpStream implements PDFStream
         super.finalize();
     }
 
+	/* //This code is only for example, as it is resulting in a security vulnerability.
 	@SuppressLint("TrustAllX509TrustManager")
 	private void trustAllHosts() {
 		try {
@@ -512,5 +502,5 @@ public class PDFHttpStream implements PDFStream
 		public boolean verify(String hostname, SSLSession session) {
 			return true;
 		}
-	}
+	}*/
 }
