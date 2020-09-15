@@ -102,6 +102,9 @@
     
     actionManger = [[ActionStackManager alloc] init];
     
+    if (coverPage) {
+        GLOBAL.g_render_mode = 4;
+    }
     
     bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
     self.backgroundColor = (GLOBAL.g_readerview_bg_color != 0) ? UIColorFromRGB(GLOBAL.g_readerview_bg_color) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
@@ -131,7 +134,6 @@
                     horzs[i] = true;
                 }
             }
-            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
             break;
         case 5:// Double Page (RTOL, paging enabled)

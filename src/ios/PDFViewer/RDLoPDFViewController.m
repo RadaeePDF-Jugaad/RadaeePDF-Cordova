@@ -182,6 +182,12 @@
 {
     return YES;
 }
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
+
 - (void)pageNumLabelInit:(int)pageno
 {
     if (pageNumLabel) {
@@ -325,6 +331,7 @@
     
     m_view = [[PDFLayoutView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height)];
     [m_view setReadOnly:readOnlyEnabled];
+    [m_view setFirstPageCover:firstPageCover];
     readOnly = readOnlyEnabled;
     BOOL res = [m_view PDFOpen:m_doc :4 :self];
     [self.view addSubview:m_view];

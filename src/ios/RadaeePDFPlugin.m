@@ -423,7 +423,7 @@
         [self setPagingEnabled:NO];
         [self setDoublePageEnabled:YES];
         
-        [m_pdf setFirstPageCover:firstPageCover];
+        [m_pdf setFirstPageCover:!firstPageCover];
         [m_pdf setDoubleTapZoomMode:2];
         [m_pdf setImmersive:NO];
         
