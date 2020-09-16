@@ -134,6 +134,7 @@
                     horzs[i] = true;
                 }
             }
+            GLOBAL.g_paging_enabled = YES;
             m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
             break;
         case 5:// Double Page (RTOL, paging enabled)
