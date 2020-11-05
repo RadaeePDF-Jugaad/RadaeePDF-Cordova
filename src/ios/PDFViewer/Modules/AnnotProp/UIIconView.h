@@ -6,9 +6,10 @@
 //  Copyright © 2020 Radaee. All rights reserved.
 //
 #import <UIKit/UIKit.h>
-#import "PDFObjc.h"
+@class PDFDIB;
 typedef void(^func_icon)(int);
 @class PDFPopupCtrl;
+@class PDFAnnot;
 @interface UIIconBtn : UIImageView
 {
     int m_atype;

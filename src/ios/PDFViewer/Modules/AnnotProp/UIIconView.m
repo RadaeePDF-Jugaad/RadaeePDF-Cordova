@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "UIIconView.h"
 #import "PDFPopupCtrl.h"
+#import "PDFObjc.h"
 
 const char *g_note_icon_names[] =
 {

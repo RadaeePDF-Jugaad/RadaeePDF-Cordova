@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "PopOutline.h"
+#import "PDFObjc.h"
 @implementation PopOutlineItem
 -(id)init:(CGFloat)y :(PDFOutline *)outline
 {

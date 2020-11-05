@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DlgAnnotPropComm.h"
+#import "PDFObjc.h"
 @implementation DlgAnnotPropComm
 
 -(id)initWithFrame:(CGRect)frame

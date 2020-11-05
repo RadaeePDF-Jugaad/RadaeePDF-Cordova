@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "DlgAnnotPopText.h"
+#import "PDFObjc.h"
+
 @implementation DlgAnnotPopText
 -(id)initWithFrame:(CGRect)frame
 {

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DlgAnnotPropLine.h"
+#import "PDFObjc.h"
 @implementation DlgAnnotPropLine
 
 -(id)initWithFrame:(CGRect)frame

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DlgAnnotPropMarkup.h"
+#import "PDFObjc.h"
 @implementation DlgAnnotPropMarkup
 -(id)initWithFrame:(CGRect)frame
 {

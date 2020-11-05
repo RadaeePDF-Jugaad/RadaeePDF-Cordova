@@ -6,8 +6,8 @@
 //  Copyright © 2020 Radaee. All rights reserved.
 //
 
-#import "PDFObjc.h"
 #import "UIColorBtn.h"
+@class PDFAnnot;
 @interface DlgAnnotPropMarkup : UIView
 {
     PDFAnnot *m_annot;

@@ -8,9 +8,9 @@
 
 #pragma once
 #import <UIKit/UIKit.h>
-#import "PDFObjc.h"
 #import "UILStyleView.h"
 #import "UIColorBtn.h"
+@class PDFAnnot;
 @interface DlgAnnotPropComm : UIView
 {
     PDFAnnot *m_annot;

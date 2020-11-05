@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DlgAnnotPropIcon.h"
+#import "PDFObjc.h"
 @implementation DlgAnnotPropIcon
 
 -(id)initWithFrame:(CGRect)frame

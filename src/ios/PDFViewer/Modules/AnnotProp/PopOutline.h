@@ -8,7 +8,8 @@
 
 #pragma once
 #import <UIKit/UIKit.h>
-#import "PDFObjc.h"
+@class PDFOutline;
+@class PDFDoc;
 @interface PopOutlineItem : UIView
 {
     UILabel *m_label;
