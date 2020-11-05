@@ -16,8 +16,8 @@
     if( self = [super init] )
     {
 		m_doc = doc;
+        m_page = nil;
 		m_pageno = pageno;
-        m_page = [doc page:pageno];
 		m_caches = NULL;
 		m_x = 0;
 		m_y = 0;
@@ -55,9 +55,13 @@
     [m_layer removeFromSuperlayer];
     m_layer = nil;
 }
-- (PDFPage *)GetPage {
+
+- (PDFPage *)GetPage
+{
+    if(!m_page) m_page = [m_doc page:m_pageno];
     return m_page;
 }
+
 -(int)GetX
 {
     return m_x;
@@ -246,6 +250,9 @@
 -(void)vEndPage :(RDVThread *) thread
 {
     [self vZoomEnd :thread];
+    PDFPage *page = m_page;
+    m_page = nil;
+    [thread end_page:page];
 	if (!m_caches) return;
 	int xcur = 0;
 	int ycur = 0;

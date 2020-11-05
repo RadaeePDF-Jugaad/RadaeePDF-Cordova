@@ -29,12 +29,14 @@
 - (void)performAnnot;
 - (void)deleteAnnot;
 - (void)annotCancel;
+- (void)annotProperties;
 
 @end
 
 @interface RDToolBar : UIView
 
 @property (nonatomic, strong) UIToolbar *bar;
+@property (nonatomic, strong) UIBarButtonItem *selectTextButton;
 @property (nonatomic, strong) UIBarButtonItem *moreButton;
 @property (nonatomic, strong) UIBarButtonItem *searchButton;
 @property (nonatomic,weak) id<RDToolBarDelegate> m_delegate;

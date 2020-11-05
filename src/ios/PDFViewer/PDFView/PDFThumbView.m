@@ -189,7 +189,7 @@
         // Add the page number
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         [paragraphStyle setAlignment:NSTextAlignmentCenter];
-        [[NSString stringWithFormat:@"%i", start+1] drawInRect:rect withAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"Helvetica" size:scale * (vpage.h/5)], NSForegroundColorAttributeName: [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:1.0f], NSParagraphStyleAttributeName: paragraphStyle}];
+        [[NSString stringWithFormat:@"%i", start+1] drawInRect:rect withAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"Helvetica" size:scale * (vpage.h/5)], NSForegroundColorAttributeName: UIColorFromRGB(GLOBAL.g_thumbview_label_color), NSParagraphStyleAttributeName: paragraphStyle}];
         
         start++;
     }

@@ -34,6 +34,26 @@ extern uint annotStrikeoutColor;
 {
 	return Sign_getVersion(m_sign);
 }
+-(NSString *)name
+{
+	return Sign_getName(m_sign);
+}
+-(NSString *)reason
+{
+	return Sign_getReason(m_sign);
+}
+-(NSString *)location
+{
+	return Sign_getLocation(m_sign);
+}
+-(NSString *)contact
+{
+	return Sign_getContact(m_sign);
+}
+-(NSString *)modTime
+{
+	return Sign_getModDT(m_sign);
+}
 @end
 
 @implementation PDFDIB
@@ -354,17 +374,15 @@ extern uint annotStrikeoutColor;
 {
     return Document_getOutlineLabel(m_doc, m_handle);
 }
-
 -(NSString *)fileLink
 {
-	return Document_getOutlineFileLink(m_doc, m_handle);
+    return Document_getOutlineFileLink(m_doc, m_handle);
 }
 
 -(NSString *)url
 {
-	return Document_getOutlineURI(m_doc, m_handle);
+    return Document_getOutlineURI(m_doc, m_handle);
 }
-
 -(bool)removeFromDoc
 {
 	return Document_removeOutline( m_doc, m_handle );
@@ -437,6 +455,7 @@ extern uint annotStrikeoutColor;
 {
 	return Document_setGStateFillAlpha( m_doc, m_handle, alpha );
 }
+
 -(bool)setStrokeDash:(const float *)dash :(int)dash_cnt :(float)phase
 {
 	return Document_setGStateStrokeDash( m_doc, m_handle, dash, dash_cnt, phase );
@@ -820,9 +839,9 @@ extern uint annotStrikeoutColor;
 {
 	return Page_exportAnnot(m_page, m_handle, buf, len);
 }
--(int)signField:(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact
+-(int)signField :(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
 {
-	return Page_signAnnotField(m_page, m_handle, [appearence handle], [cert_file UTF8String], [pswd UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
+	return Page_signAnnotField(m_page, m_handle, [appearence handle], [cert_file UTF8String], [pswd UTF8String], [name UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
 }
 
 -(int)fieldType
@@ -867,7 +886,7 @@ extern uint annotStrikeoutColor;
 }
 -(void)setLocked:(bool)lock
 {
-	Page_setAnnotLock( m_page, m_handle, lock );
+    Page_setAnnotLock( m_page, m_handle, lock );
 }
 -(NSString *)getName
 {
@@ -970,6 +989,16 @@ extern uint annotStrikeoutColor;
 	return Page_setAnnotPolylinePath( m_page, m_handle, [path handle] );
 }
 
+-(int)getLineStyle
+{
+    return Page_getAnnotLineStyle(m_page, m_handle);
+}
+
+-(bool)setLineStyle:(int)style
+{
+    return Page_setAnnotLineStyle(m_page, m_handle, style);
+}
+
 
 -(int)getFillColor
 {
@@ -995,6 +1024,10 @@ extern uint annotStrikeoutColor;
 {
 	return Page_setAnnotStrokeWidth( m_page, m_handle, width );
 }
+-(int)getStrokeDash:(float*)dashs : (int)dashs_max
+{
+	return Page_getAnnotStrokeDash(m_page, m_handle, dashs, dashs_max);
+}
 -(bool)setStrokeDash:(float *)dash : (int)cnt
 {
 	return Page_setAnnotStrokeDash( m_page, m_handle, dash, cnt );
@@ -1018,7 +1051,7 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getURI
 {
-	return Page_getAnnotURI( m_page, m_handle);
+	return Page_getAnnotURI( m_page, m_handle );
 }
 -(NSString *)getJS
 {
@@ -1120,15 +1153,15 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getPopupSubject
 {
-	return Page_getAnnotPopupSubject( m_page, m_handle );
+    return Page_getAnnotPopupSubject( m_page, m_handle );
 }
 -(NSString *)getPopupText
 {
-	return Page_getAnnotPopupText( m_page, m_handle );
+    return Page_getAnnotPopupText( m_page, m_handle );
 }
 -(NSString *)getPopupLabel
 {
-	return Page_getAnnotPopupLabel( m_page, m_handle );
+    return Page_getAnnotPopupLabel( m_page, m_handle );
 }
 -(bool)setPopupOpen :(bool)open
 {
@@ -1162,14 +1195,22 @@ extern uint annotStrikeoutColor;
 {
 	return Page_setAnnotEditTextSize( m_page, m_handle, fsize );
 }
+-(int)getEditTextAlign
+{
+	return Page_getAnnotEditTextAlign( m_page, m_handle );
+}
+-(bool)setEditTextAlign:(int)align
+{
+	return Page_setAnnotEditTextAlign( m_page, m_handle, align );
+}
 -(NSString *)getEditText
 {
-	return Page_getAnnotEditText( m_page, m_handle );
+    return Page_getAnnotEditText( m_page, m_handle );
 }
 
 -(NSString *)getFieldJS:(int)idx
 {
-	return Page_getAnnotFieldJS( m_page, m_handle, idx );
+    return Page_getAnnotFieldJS( m_page, m_handle, idx );
 }
 
 -(bool)setEditText:(NSString *)val
@@ -1197,11 +1238,11 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getComboItem:(int)index
 {
-	return Page_getAnnotComboItem( m_page, m_handle, index );
+    return Page_getAnnotComboItem( m_page, m_handle, index );
 }
 -(NSString *)getComboItemVal:(int)index
 {
-	return Page_getAnnotComboItemVal( m_page, m_handle, index );
+    return Page_getAnnotComboItemVal( m_page, m_handle, index );
 }
 -(int)getComboSel
 {
@@ -1221,11 +1262,11 @@ extern uint annotStrikeoutColor;
 }
 -(NSString *)getListItem:(int)index
 {
-	return Page_getAnnotListItem( m_page, m_handle, index );
+    return Page_getAnnotListItem( m_page, m_handle, index );
 }
 -(NSString *)getListItemVal:(int)index
 {
-	return Page_getAnnotListItemVal( m_page, m_handle, index );
+    return Page_getAnnotListItemVal( m_page, m_handle, index );
 }
 -(int)getListSels:(int *)sels :(int)sels_max
 {
@@ -1273,6 +1314,13 @@ extern uint annotStrikeoutColor;
 	m_page = NULL;
 	return ret;
 }
+-(bool)flateFromPage
+{
+	bool ret = Page_flateAnnot( m_page, m_handle );
+	m_handle = NULL;
+	m_page = NULL;
+	return ret;
+}
 -(int)getSignStatus
 {
 	return Page_getAnnotSignStatus( m_page, m_handle );
@@ -1296,7 +1344,7 @@ extern uint annotStrikeoutColor;
 
 - (BOOL)isAnnotLocked
 {
-    if ([self isLocked])
+    if (GLOBAL.g_annot_lock && [self isLocked])
         return YES;
     
     return NO;
@@ -1385,9 +1433,9 @@ extern uint annotStrikeoutColor;
 	return Page_flate(m_page);
 }
 
--(int)sign:(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact
+-(int)sign:(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)name :(NSString *)reason :(NSString *)location :(NSString *)contact
 {
-	return Page_sign(m_page, [appearence handle], box, [cert_file UTF8String], [pswd UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
+	return Page_sign(m_page, [appearence handle], box, [cert_file UTF8String], [pswd UTF8String], [name UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
 }
 
 -(void)objsStart
@@ -1453,9 +1501,9 @@ extern uint annotStrikeoutColor;
 {
 	return Page_copyAnnot( m_page, [annot handle], rect );
 }
--(bool)addAnnot:(PDF_OBJ_REF)ref
+-(bool)addAnnot:(PDF_OBJ_REF)ref :(int)index
 {
-	return Page_addAnnot(m_page, ref);
+	return Page_addAnnot2(m_page, ref, index);
 }
 
 -(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open
@@ -1543,11 +1591,11 @@ extern uint annotStrikeoutColor;
 }
 -(bool)addContent:(PDFPageContent *)content :(bool)flush
 {
-	return Page_addContent( m_page, content.handle, flush );
+    return Page_addContent( m_page, content.handle, flush );
 }
 - (bool)addAnnotEditText:(const PDF_RECT *)rect
 {
-return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF000000);
+    return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF000000);
 }
 -(void)dealloc
 {
@@ -1578,7 +1626,7 @@ return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF00
 }
 -(bool)import:(int)src_no :(int)dst_no;
 {
-	return Document_importPage(m_doc, m_handle, src_no, dst_no );
+    return Document_importPage(m_doc, m_handle, src_no, dst_no );
 }
 -(void)importEnd
 {
@@ -1604,6 +1652,11 @@ return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF00
     }
     return self;
 }
++(void)setOpenFlag:(int)flag
+{
+	Document_setOpenFlag(flag);
+}
+
 -(int)open:(NSString *)path : (NSString *)password
 {
     PDF_ERR err;
@@ -1662,6 +1715,11 @@ return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF00
     PDF_ERR err;
     m_doc = Document_openStreamWithCert(stream, [cert_file UTF8String], [password UTF8String], &err);
     return err;
+}
+
+-(int)getLinearizedStatus
+{
+	return Document_getLinearizedStatus(m_doc);
 }
 
 -(int)create:(NSString *)path
@@ -1788,8 +1846,7 @@ return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF00
 
 -(NSString *)meta:(NSString *)tag
 {
-    const char *stag = [tag UTF8String];
-	return Document_getMeta(m_doc, stag);
+    return Document_getMeta(m_doc, [tag UTF8String]);
 }
 
 -(bool)setMeta:(NSString *)tag :(NSString *)val
@@ -1916,3 +1973,9 @@ return Page_addAnnotEditbox2(m_page, rect, 0xFF000000, 1, 0xFFFFFFFF, 10, 0xFF00
 }
 
 @end
+
+
+
+
+
+

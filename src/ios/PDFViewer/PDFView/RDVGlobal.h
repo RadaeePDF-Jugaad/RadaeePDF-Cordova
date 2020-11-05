@@ -53,6 +53,7 @@
 @property (nonatomic) uint g_find_primary_color;
 @property (nonatomic) uint g_readerview_bg_color;
 @property (nonatomic) uint g_thumbview_bg_color;
+@property (nonatomic) uint g_thumbview_label_color;
 
 @property (nonatomic) float g_ink_width;
 @property (nonatomic) float g_rect_width;

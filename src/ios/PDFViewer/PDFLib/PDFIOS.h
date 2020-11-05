@@ -147,7 +147,7 @@ bool Global_setCMYKProfile(const char *path);
 /**
  *	@brief	create font list
  */
-void Global_fontfileListStart();
+void Global_fontfileListStart(void);
 /**
  *	@brief	add font file to list.
  *
@@ -157,7 +157,7 @@ void Global_fontfileListAdd( const char *font_file );
 /**
  *	@brief		submit font list to PDF library.
  */
-void Global_fontfileListEnd();
+void Global_fontfileListEnd(void);
 /**
  *	@brief	Set default font. the default font may be used when PDF has font not embed.
  this function valid after Global_fontfileListEnd() invoked.
@@ -192,7 +192,7 @@ void Global_setAnnotTransparency( int color );
  *
  *	@return	face count
  */
-int Global_getFaceCount();
+int Global_getFaceCount(void);
 /**
  *	@brief	get face name by index.
             this function valid after Global_fontfileListEnd() invoked.
@@ -276,6 +276,7 @@ void Global_toPDFRect( PDF_MATRIX matrix, const PDF_RECT *drect, PDF_RECT *prect
  *	@brief	not used for developer
  */
 void Global_drawScroll( PDF_DIB dst, PDF_DIB dib1, PDF_DIB dib2, int x, int y, int style, unsigned int back_side_clr );
+bool Global_drawAnnotIcon(int annot_type, int icon, PDF_DIB dib);
 /**
  *	@brief	create a Matrix object
  *
@@ -311,6 +312,8 @@ void Matrix_transformPoint( PDF_MATRIX matrix, PDF_POINT *point );
  *	@param 	matrix 	matrix	Matrix object returned from Matrix_create or Matrix_createScale
  */
 void Matrix_destroy( PDF_MATRIX matrix );
+
+void Document_setOpenFlag(int flag);
 /**
  *	@brief	open document and return Document object.
  *
@@ -338,6 +341,7 @@ PDF_DOC Document_openMem( void *data, int data_size, const char *password, PDF_E
 @required
 -(bool)seek:(unsigned long long)pos;
 @end
+
 PDF_DOC Document_openStream( id<PDFStream> stream, const char *password, PDF_ERR *err );
 PDF_DOC Document_openWithCert(const char *path, const char *cert_file, const char *password, PDF_ERR *err);
 PDF_DOC Document_openMemWithCert(void *data, int data_size, const char *cert_file, const char *password, PDF_ERR *err);
@@ -407,12 +411,10 @@ bool Document_canSave( PDF_DOC doc );
  *
  *	@param 	doc 	        Document object returned from Document_open
  *	@param 	outlinenode 	Outline Item returned from Document_getOutlineChild or Document_getOutlineNext
- *	@param 	label 	        output value: label text ot outline item.
- *	@param 	len 	        buffer length.
  *
- *	@return	length of label.
+ *	@return	label string.
  */
-NSString* Document_getOutlineLabel(PDF_DOC doc, PDF_OUTLINE outlinenode);
+NSString *Document_getOutlineLabel(PDF_DOC doc, PDF_OUTLINE outlinenode);
 /**
  *	@brief	Get destination of Outline item.
  *
@@ -485,10 +487,9 @@ bool Document_removeOutline(PDF_DOC doc, PDF_OUTLINE outlinenode);
  *
  *	@param 	doc 	Document object returned from Document_open
  *	@param 	tag 	Predefined values:"Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate","ModDate".
- *
- *	@return	length of meta data.
+ *	@return	String value.
  */
-NSString* Document_getMeta(PDF_DOC doc, const char* tag);
+NSString *Document_getMeta( PDF_DOC doc, const char *tag );
 bool Document_setMeta( PDF_DOC doc, const char *tag, const char *meta );
 
 bool Document_getID(PDF_DOC doc, unsigned char *fid);
@@ -579,6 +580,7 @@ NSString *Document_exportForm( PDF_DOC doc );
  *	@param 	doc 	Document object returned from Document_open
  */
 void Document_close( PDF_DOC doc );
+int Document_getLinearizedStatus(PDF_DOC doc);
 /**
  *	@brief	get page object by page NO.
  *
@@ -758,8 +760,13 @@ PDF_DOC_IMAGE Document_newImageJPX( PDF_DOC doc, const char *path );
 NSString *Sign_getIssue(PDF_SIGN sign);
 NSString *Sign_getSubject(PDF_SIGN sign);
 long Sign_getVersion(PDF_SIGN sign);
+NSString* Sign_getName(PDF_SIGN sign);
+NSString *Sign_getLocation(PDF_SIGN sign);
+NSString *Sign_getReason(PDF_SIGN sign);
+NSString *Sign_getContact(PDF_SIGN sign);
+NSString *Sign_getModDT(PDF_SIGN sign);
 
-int Page_sign(PDF_PAGE page, PDF_DOC_FORM appearence, const PDF_RECT *box, const char *cert_file, const char *pswd, const char *reason, const char *location, const char *contact);
+int Page_sign(PDF_PAGE page, PDF_DOC_FORM appearence, const PDF_RECT *box, const char *cert_file, const char *pswd, const char *name, const char *reason, const char *location, const char *contact);
 bool Page_getCropBox( PDF_PAGE page, PDF_RECT *box );
 bool Page_getMediaBox( PDF_PAGE page, PDF_RECT *box );
 /**
@@ -805,6 +812,7 @@ void Page_renderCancel( PDF_PAGE page );
 bool Page_renderIsFinished( PDF_PAGE page );
 int Page_getRotate(PDF_PAGE page);
 bool Page_flate(PDF_PAGE page);
+bool Page_flateAnnot(PDF_PAGE page, PDF_ANNOT annot);
 /**
  *	@brief	load all objects in page.
  *
@@ -826,10 +834,8 @@ int Page_objsGetCharCount( PDF_PAGE page );
  *	@param 	page 	returned from Document_getPage
  *	@param 	from 	from index, range: [0, Page_objsGetCharCount() - 1]
  *	@param 	to 	    to index, range: [0, Page_objsGetCharCount() - 1]
- *	@param 	buf 	output value: string value
- *	@param 	len 	buffer length.
  *
- *	@return	count of chars.
+ *	@return	String value.
  */
 NSString *Page_objsGetString( PDF_PAGE page, int from, int to );
 /**
@@ -980,7 +986,7 @@ bool Page_isAnnotHide( PDF_PAGE page, PDF_ANNOT annot );
  *	@param 	hide 	true or false
  */
 void Page_setAnnotHide( PDF_PAGE page, PDF_ANNOT annot, bool hide );
-NSString* Page_getAnnotName(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotName(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_setAnnotName(PDF_PAGE page, PDF_ANNOT annot, const char *name);
 
 PDF_ANNOT Page_getAnnotByName(PDF_PAGE page, const char *name);
@@ -1022,7 +1028,7 @@ PDF_ANNOT Page_getAnnotByName(PDF_PAGE page, const char *name);
  *          26: rich media
  */
 int Page_getAnnotType( PDF_PAGE page, PDF_ANNOT annot );
-int Page_signAnnotField(PDF_PAGE page, PDF_ANNOT annot, PDF_DOC_FORM appearence, const char *cert_file, const char *pswd, const char *reason, const char *location, const char *contact);
+int Page_signAnnotField(PDF_PAGE page, PDF_ANNOT annot, PDF_DOC_FORM appearence, const char *cert_file, const char *pswd, const char *name, const char *reason, const char *location, const char *contact);
 
 /**
  *	@brief	get annotation field type in acroForm.
@@ -1076,7 +1082,7 @@ int Page_getAnnotFieldFullName( PDF_PAGE page, PDF_ANNOT annot, char *buf, int b
  *	@return	name of this annotation, like: "form1[0].EditBox1[0]"
  */
 int Page_getAnnotFieldFullName2( PDF_PAGE page, PDF_ANNOT annot, char *buf, int buf_size );
-NSString* Page_getAnnotFieldJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
+NSString *Page_getAnnotFieldJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
 
 bool Page_renderAnnot(PDF_PAGE page, PDF_ANNOT annot, PDF_DIB dib);
 /**
@@ -1105,6 +1111,9 @@ PDF_PATH Page_getAnnotPolygonPath( PDF_PAGE page, PDF_ANNOT annot );
 bool Page_setAnnotPolygonPath( PDF_PAGE page, PDF_ANNOT annot, PDF_PATH path );
 PDF_PATH Page_getAnnotPolylinePath( PDF_PAGE page, PDF_ANNOT annot );
 bool Page_setAnnotPolylinePath( PDF_PAGE page, PDF_ANNOT annot, PDF_PATH path );
+bool Page_getAnnotLinePoint(PDF_PAGE page, PDF_ANNOT annot, int idx, PDF_POINT* pt);
+int Page_getAnnotLineStyle(PDF_PAGE page, PDF_ANNOT annot);
+bool Page_setAnnotLineStyle(PDF_PAGE page, PDF_ANNOT annot, int style);
 
 /**
  *	@brief	get annotation fill color
@@ -1163,6 +1172,7 @@ float Page_getAnnotStrokeWidth( PDF_PAGE page, PDF_ANNOT annot );
  *	@return	true or false
  */
 bool Page_setAnnotStrokeWidth( PDF_PAGE page, PDF_ANNOT annot, float width );
+int Page_getAnnotStrokeDash(PDF_PAGE page, PDF_ANNOT annot, float* dash, int max);
 bool Page_setAnnotStrokeDash(PDF_PAGE page, PDF_ANNOT annot, const float *dash, int cnt);
 /**
  *	@brief	set icon for sticky text note/file attachment annotation.
@@ -1287,12 +1297,10 @@ int Page_getAnnotDest( PDF_PAGE page, PDF_ANNOT annot );
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	uri 	output value: uri buffer to recieve uri address
- *	@param 	len 	buffer length.
  *
- *	@return	length of uri, or 0.
+ *	@return	String value for uri or null.
  */
-NSString* Page_getAnnotURI(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotURI( PDF_PAGE page, PDF_ANNOT annot );
 NSString *Page_getAnnotJS(PDF_PAGE page, PDF_ANNOT annot);
 NSString *Page_getAnnotAdditionalJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
 /**
@@ -1301,12 +1309,10 @@ NSString *Page_getAnnotAdditionalJS(PDF_PAGE page, PDF_ANNOT annot, int idx);
             this function valid in professional or premium license.
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	f3d 	file name of 3d data, must in ".u3d" format.
- *	@param 	len 	buffer length.
  *
- *	@return	length of f3d, or 0.
+ *	@return	String value for 3D name or null.
  */
-NSString* Page_getAnnot3D(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnot3D( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	get annotation's movie play action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1314,12 +1320,10 @@ NSString* Page_getAnnot3D(PDF_PAGE page, PDF_ANNOT annot);
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	mov 	file name of movie data.
- *	@param 	len 	buffer length.
  *
- *	@return	length of mov, or 0.
+ *	@return	String value for Movie name or null.
  */
-NSString* Page_getAnnotMovie(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotMovie( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	get annotation's audio play action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1327,12 +1331,10 @@ NSString* Page_getAnnotMovie(PDF_PAGE page, PDF_ANNOT annot);
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	snd 	file name of audio data.
- *	@param 	len 	buffer length.
  *
- *	@return	length of snd, or 0.
+ *	@return	String value for Sound Name or null.
  */
-NSString* Page_getAnnotSound(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotSound( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	get annotation's attachment open action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1340,12 +1342,10 @@ NSString* Page_getAnnotSound(PDF_PAGE page, PDF_ANNOT annot);
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	att 	file name of attachment data.
- *	@param 	len 	buffer length.
  *
- *	@return	length of att, or 0.
+ *	@return	String value for attachment name or null.
  */
-NSString* Page_getAnnotAttachment(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotAttachment( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	get data of annotation's 3D open action.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1417,12 +1417,10 @@ bool Page_setAnnotPopupOpen(PDF_PAGE page, PDF_ANNOT annot, bool open);
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	subj 	output value: subject string buffer.
- *	@param 	len 	buffer length.
  *
- *	@return	true or false.
+ *	@return	String value of subject or null.
  */
-NSString* Page_getAnnotPopupSubject(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotPopupSubject( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	set subject of popup text annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1442,12 +1440,10 @@ bool Page_setAnnotPopupSubject( PDF_PAGE page, PDF_ANNOT annot, const char *subj
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	text 	output value: text string buffer.
- *	@param 	len 	buffer length.
  *
- *	@return	true or false.
+ *	@return	String value of text or null.
  */
-NSString* Page_getAnnotPopupText(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotPopupText( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	set text of popup text annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1467,12 +1463,10 @@ bool Page_setAnnotPopupText( PDF_PAGE page, PDF_ANNOT annot, const char *text );
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	text 	output value: text string buffer.
- *	@param 	len 	buffer length.
  *
- *	@return	true or false.
+ *	@return	String value of label or null.
  */
-NSString* Page_getAnnotPopupLabel(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotPopupLabel( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	set text of popup label annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1524,6 +1518,8 @@ bool Page_getAnnotEditTextRect( PDF_PAGE page, PDF_ANNOT annot, PDF_RECT *rect )
  */
 float Page_getAnnotEditTextSize( PDF_PAGE page, PDF_ANNOT annot );
 bool Page_setAnnotEditTextSize(PDF_PAGE page, PDF_ANNOT annot, float fsize);
+int Page_getAnnotEditTextAlign(PDF_PAGE page, PDF_ANNOT annot);
+bool Page_setAnnotEditTextAlign(PDF_PAGE page, PDF_ANNOT annot, int align);
 
 /**
  *	@brief	get text of edit-box, may either for free-text annotation and widget annotation.
@@ -1532,12 +1528,10 @@ bool Page_setAnnotEditTextSize(PDF_PAGE page, PDF_ANNOT annot, float fsize);
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	text 	output value: text string buffer
- *	@param 	len 	buffer length
  *
- *	@return	true or false
+ *	@return	String value of Edit text or null
  */
-NSString* Page_getAnnotEditText(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotEditText( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	set text of edit-box, may either for free-text annotation and widget annotation.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1559,6 +1553,7 @@ int Page_exportAnnot(PDF_PAGE page, PDF_ANNOT annot, unsigned char *data, int da
 bool Page_importAnnot(PDF_PAGE page, const PDF_RECT *rect, const unsigned char *data, int data_len);
 PDF_OBJ_REF Page_getAnnotRef(PDF_PAGE page, PDF_ANNOT annot);
 bool Page_addAnnot(PDF_PAGE page, PDF_OBJ_REF ref);
+bool Page_addAnnot2(PDF_PAGE page, PDF_OBJ_REF ref, int index);
 
 /**
  *	@brief	add an edit-box.
@@ -1571,7 +1566,7 @@ bool Page_addAnnot(PDF_PAGE page, PDF_OBJ_REF ref);
  *	@param	line_w border width of editbox.
  *	@param	fill_clr background of editbox.
  *	@param 	tsize 	text size of the editbox.
- *	@param 	color_clr text color.
+ *	@param 	text_clr text color.
  *
  *	@return	true or false
  */
@@ -1589,7 +1584,7 @@ bool Page_addAnnotEditbox2( PDF_PAGE page, const PDF_RECT *rect, int line_clr, f
  *	@param	line_w border width of editbox.
  *	@param	fill_clr background of editbox.
  *	@param 	tsize 	text size of the editbox.
- *	@param 	color_clr text color.
+ *	@param 	text_clr text color.
  *
  *	@return	true or false
  */
@@ -1613,13 +1608,11 @@ int Page_getAnnotComboItemCount( PDF_PAGE page, PDF_ANNOT annot );
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
  *	@param 	item 	0 based item index, range: [0, Page_getAnnotComboItemCount() - 1]
- *	@param 	val 	output buffer: text string buffer
- *	@param 	len 	buffer length
  *
- *	@return	true or false
+ *	@return	String value or null
  */
-NSString* Page_getAnnotComboItem(PDF_PAGE page, PDF_ANNOT annot, int item);
-NSString* Page_getAnnotComboItemVal(PDF_PAGE page, PDF_ANNOT annot, int item);
+NSString *Page_getAnnotComboItem( PDF_PAGE page, PDF_ANNOT annot, int item );
+NSString *Page_getAnnotComboItemVal(PDF_PAGE page, PDF_ANNOT annot, int item);
 /**
  *	@brief	get index of selected item.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1666,13 +1659,11 @@ bool Page_isAnnotListMultiSel(PDF_PAGE page, PDF_ANNOT annot);
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
  *	@param 	item 	0 based item index, range: [0, Page_getAnnotListItemCount() - 1]
- *	@param 	buf 	output buffer: text string buffer
- *	@param 	buf_len	buffer length
  *
- *	@return	true or false
+ *	@return	String value or null.
  */
-NSString* Page_getAnnotListItem(PDF_PAGE page, PDF_ANNOT annot, int item);
-NSString* Page_getAnnotListItemVal(PDF_PAGE page, PDF_ANNOT annot, int item);
+NSString *Page_getAnnotListItem( PDF_PAGE page, PDF_ANNOT annot, int item );
+NSString *Page_getAnnotListItemVal(PDF_PAGE page, PDF_ANNOT annot, int item);
 /**
  *	@brief	get selected items of list-box.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -1770,13 +1761,10 @@ bool Page_setAnnotReset( PDF_PAGE page, PDF_ANNOT annot );
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	annot 	annotation object returned from Page_getAnnot or Page_getAnnotFromPoint
- *	@param 	tar 	output value: target string buffer.
-                    may either formatted in: "mailto:..." or "http://...".
- *	@param 	len 	buffer length.
  *
- *	@return	true or false.
+ *	@return	String value or null.
  */
-NSString* Page_getAnnotSubmitTarget(PDF_PAGE page, PDF_ANNOT annot);
+NSString *Page_getAnnotSubmitTarget( PDF_PAGE page, PDF_ANNOT annot );
 /**
  *	@brief	get submit parameters.
             to invoke this function, developers should call Page_objsStart or Page_render before.
@@ -2052,8 +2040,7 @@ bool Page_addAnnotText2( PDF_PAGE page, float x, float y );
  *
  *	@param 	page 	returned from Document_getPage
  *	@param 	matrix 	Matrix object passed to Page_render
- *	@param 	bitmap 	bitmap data, must be in RGBA color space.
- *	@param 	has_alpha 	need generate alpha values for bitmap?
+ *	@param 	dimg 	bitmap data, must be in RGBA color space.
  *	@param 	rect 	rect in PDF coordinate.
  *
  *	@return	true or false
@@ -2205,7 +2192,7 @@ int Ink_getNode( PDF_INK hand, int index, PDF_POINT *pt );
  *
  *	@return	PDF_PATH object
  */
-PDF_PATH Path_create();
+PDF_PATH Path_create(void);
 /**
  *	@brief	move to operation
  *
@@ -2275,7 +2262,7 @@ int Path_getNode( PDF_PATH path, int index, PDF_POINT *pt );
  *
  *	@return	PDF_PAGECONTENT object
  */
-PDF_PAGECONTENT PageContent_create();
+PDF_PAGECONTENT PageContent_create(void);
 /**
  *	@brief	PDF operator: gs_save, save current GraphicState
  *
@@ -2547,8 +2534,8 @@ float Obj_getReal(PDF_OBJ hand);
 void Obj_setReal(PDF_OBJ hand, float v);
 const char *Obj_getName(PDF_OBJ hand);
 void Obj_setName(PDF_OBJ hand, const char *v);
-NSString* Obj_getAsciiString(PDF_OBJ hand);
-NSString* Obj_getTextString(PDF_OBJ hand);
+NSString *Obj_getAsciiString(PDF_OBJ hand);
+NSString *Obj_getTextString(PDF_OBJ hand);
 unsigned char *Obj_getHexString(PDF_OBJ hand, int *len);
 void Obj_setAsciiString(PDF_OBJ hand, const char *v);
 void Obj_setTextString(PDF_OBJ hand, const char *v);

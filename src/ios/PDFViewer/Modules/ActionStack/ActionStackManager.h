@@ -18,7 +18,7 @@
 - (instancetype)initWithPage:(int)pgno index:(int)idx;
 - (void)undo:(PDFDoc *)doc;
 - (void)redo:(PDFDoc *)doc;
-
+- (int)pageno:(int)idx;
 @end
 
 @interface ASDel : ASItem
@@ -56,7 +56,7 @@
 
 - (ASItem *)undo;
 - (ASItem *)redo;
-
+- (int)cur;
 - (void)orderIndexes:(ASItem *)item;
 - (void)orderOnDel:(ASItem *)item;
 

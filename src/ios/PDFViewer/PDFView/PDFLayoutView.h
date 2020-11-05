@@ -27,7 +27,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnSelStart:(float)x :(float)y;
 - (void)OnSelEnd:(float)x1 :(float)y1 :(float)x2 :(float)y2;
 //enter annotation status.
-- (void)OnAnnotClicked:(PDFAnnot *)annot :(float)x :(float)y;
+- (void)OnAnnotClicked:(PDFAnnot *)annot :(CGRect)annotRect :(float)x :(float)y;
 //notified when annotation status end.
 - (void)OnAnnotEnd;
 //this mehod fired only when vAnnotPerform method invoked.
@@ -40,12 +40,11 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotMovie:(NSString *)fileName;
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotSound:(NSString *)fileName;
-- (void)OnAnnotEditBox :(CGRect)annotRect :(NSString *)editText :(float)textSize;
-- (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index;
-- (void)OnAnnotList:(PDFAnnot *)annot items :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
+- (void)OnAnnotEditBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize;
+- (void)OnAnnotCommboBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index;
+- (void)OnAnnotList:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
 - (void)OnAnnotSignature:(PDFAnnot *)annot;
-- (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
-
+- (void)OnAnnotTapped:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
 @end
 
 @interface PDFLayoutView : UIScrollView <UIScrollViewDelegate, PDFOffScreenDelegate, RDVLayoutDelegate>
@@ -80,6 +79,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     float m_ty;
     float m_px;
     float m_py;
+    int m_page_gap;
     
     int m_w;
     int m_h;
@@ -94,6 +94,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     PDFAnnot *m_annot;
     RDVPos m_annot_pos;
     PDF_RECT m_annot_rect;
+    
+    int m_note_cur;
     
     PDF_POINT *m_lines;
     int m_lines_cnt;
@@ -138,6 +140,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(id)initWithFrame:(CGRect)frame;
 -(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;
 -(void)PDFClose;
+-(void)PDFSetVMode:(int)vmode;
 
 //start find.
 -(bool)vFindStart:(NSString *)pat :(bool)match_case :(bool)whole_word;
@@ -160,6 +163,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(bool)vNoteStart;
 //end text note annotation status, and add note to page.
 -(void)vNoteEnd;
+-(void)vNoteCancel;
 
 
 //enter ink annotation status.
@@ -239,6 +243,9 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (void)refreshCurrentPage;
 - (void)refreshCachedPages;
+- (void)vUpdateAnnotPage;
+- (CGFloat)vGetScale;
+- (CGFloat)vGetPixSize;
 
 - (BOOL)isModified;
 - (void)setModified:(BOOL)modified force:(BOOL)force;
@@ -263,10 +270,12 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (BOOL)pagingAvailable;
 
+- (void)OnDoubleTapOnPoint:(CGPoint)point;
+
 - (NSString *)getImageFromRect:(int)top :(int)right :(int)left :(int)bottom :(int)pageNum;
 - (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect;
-
-- (void)OnDoubleTapOnPoint:(CGPoint)point;
+- (CGPoint)screenPointsFromPdfPoints:(float)x :(float)y :(int)pageNum;
+- (CGRect)screenRectFromPdfRect:(float)left :(float)top :(float)right :(float)bottom :(int)pageNum;
 
 @end
 

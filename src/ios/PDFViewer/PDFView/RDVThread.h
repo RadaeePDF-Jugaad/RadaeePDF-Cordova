@@ -25,6 +25,7 @@ struct RDVThreadBack
 -(void)start_render:(RDVCache *)cache;
 -(void)end_render:(RDVCache *)cache;
 -(void)start_find:(RDVFinder *)finder;
+-(void)end_page:(PDFPage *)page;
 
 -(void)notify_render:(RDVCache *)cache;
 -(void)notify_dealloc:(RDVCache *)cache;

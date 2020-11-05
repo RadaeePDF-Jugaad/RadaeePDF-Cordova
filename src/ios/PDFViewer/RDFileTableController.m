@@ -7,11 +7,10 @@
 //
 
 #import "RDFileTableController.h"
-#define testUrlPath @"http://www.radaee.com/files/test.pdf"
+#define testUrlPath @"https://www.radaeepdf.com/documentation/MRBrochoure.pdf"
 
-NSMutableString *pdfName;
-NSMutableString *pdfPath;
-NSString *pdfFullPath;
+//NSMutableString *pdfName;
+//NSMutableString *pdfPath;
 
 @interface RDFileTableController ()
 
@@ -79,6 +78,20 @@ NSString *pdfFullPath;
 }
 @end
 
+@implementation RDFileItem
+-(id)init:(NSString *)help :(NSString *)path :(int)level
+{
+    self = [super init];
+    if(self)
+    {
+        _help = help;
+        _path = path;
+        _level = level;
+        _locker = [[RDVLocker alloc] init];
+    }
+    return self;
+}
+@end
 
 @implementation RDFileTableController
 
@@ -101,7 +114,6 @@ NSString *pdfFullPath;
     {
         BOOL dir;
         NSString *dst = [path stringByAppendingFormat:@"%@",fName];
-        pdfPath = (NSMutableString *)path;
         if( [fm fileExistsAtPath:dst isDirectory:&dir] )
         {
             if( dir )
@@ -111,10 +123,8 @@ NSString *pdfFullPath;
             else if( [dst hasSuffix:@".pdf"] )
             {
                 NSString *dis = [subdir stringByAppendingFormat:@"%@",fName];//display name
-                
-                //add to list
-                NSArray *arr = [[NSArray alloc] initWithObjects:dis,dst,level, nil];
-                [m_files addObject:arr];
+                RDFileItem *item = [[RDFileItem alloc] init:dis :dst :level];
+                [m_files addObject:item];
             }
         }
     }
@@ -138,10 +148,8 @@ NSString *pdfFullPath;
             else if( [dst hasSuffix:@".pdf"] )
             {
                 NSString *dis = [subdir stringByAppendingFormat:@"%@",fName];//display name
-                
-                NSArray *arr = [[NSArray alloc] initWithObjects:dis,dst,level, nil];
-                
-                [m_files addObject:arr];
+                RDFileItem *item = [[RDFileItem alloc] init:dis :dst :level];
+                [m_files addObject:item];
             }
         }
     }
@@ -156,8 +164,8 @@ NSString *pdfFullPath;
         temporaryBarButtonItem.title = @"";
         self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
     }
-    NSArray *paths=NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *dpath=[paths objectAtIndex:0];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *dpath = [paths objectAtIndex:0];
     NSFileManager *fm = [NSFileManager defaultManager];
     m_files = [[NSMutableArray alloc] init];
     [self addPDFs:dpath :@"" :fm :0];
@@ -169,12 +177,11 @@ NSString *pdfFullPath;
     self.tabBarItem =item;
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
     
-    [self initSettingWithUserDefault:dpath];
+    [self copyDocumentsFromAssets:dpath];
+    
     //test demo for PDFMemOpen or PDFStreamOpen or HTTPPDFStream，click right button
-    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd  target:self action:@selector(selectRightAction)];
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"Url" style:UIBarButtonItemStylePlain target:self action:@selector(selectRightAction)];
     self.navigationItem.rightBarButtonItem = rightButton;
-    
-    
 }
 -(void)selectRightAction
 {
@@ -252,72 +259,44 @@ NSString *pdfFullPath;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-    static NSString *CellIdentifier = @"FileCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FileCell"];
     UILabel *label = nil;
-    //get  ios version
-    if([[[UIDevice currentDevice]systemVersion] floatValue]>=7.0)
+    if(!cell)
     {
-        //above ios7
-        if( cell == nil )
+        CGRect rc = self.view.frame;
+        CGRect rect = CGRectMake(0, 0, rc.size.width, 25);
+        cell = [[UITableViewCell alloc] initWithFrame:rect];
+        //get  ios version
+        if([[[UIDevice currentDevice]systemVersion] floatValue]>=7.0)
         {
-            CGRect rc = self.view.frame;
-            CGRect rect = CGRectMake(0, 0, rc.size.width, 25);
-            
-            cell = [[UITableViewCell alloc] initWithFrame:rect];
+            //above ios7
             rect.origin.x += 70;
             rect.origin.y += 15;
             rect.size.width -= 4;
             rect.size.height -= 4;
-            label = [[UILabel alloc] initWithFrame:rect];
-            label.tag = 1;
-            label.font = [UIFont systemFontOfSize:rect.size.height - 4];
-            [cell.contentView addSubview:label];
-            cell.accessoryType = UITableViewCellAccessoryNone;
         }
-        if( label == nil )
-            label = (UILabel *)[cell.contentView viewWithTag:1];
-        
-        NSUInteger row = [indexPath row];
-        NSArray *arr = [m_files objectAtIndex:row];
-        cell.textLabel.numberOfLines = 0;
-        UIImage *image = [UIImage imageNamed:@"encrypt.png"];
-        cell.imageView.image = image;
-        label.text = [arr objectAtIndex:0];
-        return cell;
-    }
-    else
-    {
-        if( cell == nil )
+        else
         {
-            CGRect rc = self.view.frame;
-            CGRect rect = CGRectMake(0, 0, rc.size.width, 25);
-            
-            cell = [[UITableViewCell alloc] initWithFrame:rect];
             rect.origin.x += 60;
             rect.origin.y += 15;
             rect.size.width -= 4;
             rect.size.height -= 4;
-            label = [[UILabel alloc] initWithFrame:rect];
-            label.tag = 1;
-            label.font = [UIFont systemFontOfSize:rect.size.height - 4];
-            [cell.contentView addSubview:label];
-            cell.accessoryType = UITableViewCellAccessoryNone;
         }
-        if( label == nil )
-            label = (UILabel *)[cell.contentView viewWithTag:1];
-        
-        NSUInteger row = [indexPath row];
-        NSArray *arr = [m_files objectAtIndex:row];
-        cell.textLabel.numberOfLines = 0;
-        UIImage *image = [UIImage imageNamed:@"encrypt.png"];
-        cell.imageView.image = image;
-        label.text = [arr objectAtIndex:0];
-        return cell;
-        
+        label = [[UILabel alloc] initWithFrame:rect];
+        label.tag = 1;
+        label.font = [UIFont systemFontOfSize:rect.size.height - 4];
+        [cell.contentView addSubview:label];
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.backgroundColor = [[UIColor alloc] initWithWhite:1 alpha:0];
     }
-    
+    else label = (UILabel *)[cell.contentView viewWithTag:1];
+    NSUInteger row = [indexPath row];
+    RDFileItem *item = [m_files objectAtIndex:row];
+    cell.textLabel.numberOfLines = 0;
+    UIImage *image = [UIImage imageNamed:@"encrypt"];
+    cell.imageView.image = image;
+    label.text = item.help;
+    return cell;
 }
 
 // Override to support conditional editing of the table view.
@@ -331,7 +310,6 @@ NSString *pdfFullPath;
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
     NSUInteger row = [indexPath row];
     
     if( m_pdf == nil )
@@ -339,48 +317,73 @@ NSString *pdfFullPath;
         m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
     }
     
-    NSArray *row_item = [m_files objectAtIndex:indexPath.row];
-    NSString *path = [row_item objectAtIndex:1];
+    RDFileItem *item = [m_files objectAtIndex:indexPath.row];
+    NSString *path = item.path;
+    [item.locker lock];
     NSFileManager *fm = [NSFileManager defaultManager];
     [fm removeItemAtPath:path error:nil];
     [m_files removeObjectAtIndex:row];
     [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    
+    [item.locker unlock];
 }
 
-#pragma mark - Table view delegate
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)pdf_open_path:(RDFileItem *)item :(NSString *)pswd
 {
-    
-    //GEAR
-    [self loadSettingsWithDefaults];
-    //END
-    NSArray *row_item = [m_files objectAtIndex:indexPath.row];
-    NSString *path = [row_item objectAtIndex:1];
-    
-    pdfName = (NSMutableString *)[path substringFromIndex:pdfPath.length];
-    pdfFullPath = path;
-    
-    if (GLOBAL.g_render_mode == 2) {
-        m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
+    if( m_pdf == nil )
+        {
+            m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
+            m_pdf.view.frame = self.view.frame;
+        }
         
         NSLock *theLock = [[NSLock alloc] init];
+                    
         if ([theLock tryLock])
         {
-            NSString *pwd = NULL;
-            
-            //Set PDF file
-            int result = [m_pdfP PDFOpenAtPath:pdfFullPath withPwd:pwd];
+            //Open PDF file
+            int result = [m_pdf PDFOpen:item.path :pswd];
 
             if(result == 1)
             {
-                m_pdfP.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:m_pdfP animated:YES];
+                m_pdf.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:m_pdf animated:YES];
             }
             //return value is encryption document
             else if(result == 2)
             {
-                [self presentPwdAlertControllerWithTitle:NSLocalizedString(@"Please Enter PassWord", @"Localizable") message:nil];
+                NSString *title = NSLocalizedString(@"Please Enter PassWord", @"Localizable");
+                UIAlertController *pwdAlert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
+                [pwdAlert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.placeholder = NSLocalizedString(@"PassWord", @"Localizable");
+                    textField.secureTextEntry = YES;
+                }];
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+                    UITextField *password = pwdAlert.textFields.firstObject;
+                    if (![password.text isEqualToString:@""]) {
+                        int result = [self->m_pdf PDFOpen:item.path :password.text];
+                            if(result == 1)
+                            {
+                                UINavigationController *nav = self.navigationController;
+                                self->m_pdf.hidesBottomBarWhenPushed = YES;
+                                nav.hidesBottomBarWhenPushed =NO;
+                                [nav pushViewController:self->m_pdf animated:YES];
+                            }
+                            else if(result == 2)
+                            {
+                                NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+                                NSString *str2=NSLocalizedString(@"Error PassWord", @"Localizable");
+                                [self presentPwdAlertControllerWithTitle:str1 message:str2];
+                            }
+                    }
+                    else
+                    {
+                        [self presentViewController:pwdAlert animated:YES completion:nil];
+                    }
+                }];
+                UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Localizable")  style:UIAlertActionStyleCancel handler:nil];
+                
+                [pwdAlert addAction:okAction];
+                [pwdAlert addAction:cancel];
+                [self presentViewController:pwdAlert animated:YES completion:nil];
             }
             else if (result == 0)
             {
@@ -396,241 +399,132 @@ NSString *pdfFullPath;
             }
             [theLock unlock];
         }
-        
-    } else {
-        if( m_pdf == nil )
-            {
-                m_pdf = [[RDLoPDFViewController alloc] initWithNibName:@"RDLoPDFViewController" bundle:nil];
-                m_pdf.view.frame = self.view.frame;
-            }
-            
-            NSLock *theLock = [[NSLock alloc] init];
-            
-            if(GLOBAL.g_render_mode == 5) {
-                m_pdfR = [[RDPDFReflowViewController alloc] initWithNibName:@"RDPDFReflowViewController" bundle:nil];
-                [m_pdfR PDFOpen:pdfFullPath];
-                
-                m_pdfR.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:m_pdfR animated:YES];
-                return;
-            }
-            
-            if ([theLock tryLock])
-            {
-                NSString *pwd = NULL;
-                
-                //Open PDF file
-                int result = [m_pdf PDFOpen:pdfFullPath :pwd];
-
-                if(result == 1)
-                {
-                    m_pdf.hidesBottomBarWhenPushed = YES;
-                    [self.navigationController pushViewController:m_pdf animated:YES];
-                }
-                //return value is encryption document
-                else if(result == 2)
-                {
-                    [self presentPwdAlertControllerWithTitle:NSLocalizedString(@"Please Enter PassWord", @"Localizable") message:nil];
-                }
-                else if (result == 0)
-                {
-                    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-                    NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
-                    NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-                    UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
-                                               message:str2
-                                               preferredStyle:UIAlertControllerStyleAlert];
-                    UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
-                    [alert addAction:okAction];
-                    [self presentViewController:alert animated:YES completion:nil];
-                }
-                [theLock unlock];
-            }
-        }
-    }
-    
-/*
-- (void)alertView:(UIAlertView *)pwdDlg clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    int result;
-    NSString *pwd;
-    if ([[[UIDevice currentDevice] systemVersion] floatValue]>=7.0)
-    {
-        UITextField *tf = [pwdDlg textFieldAtIndex:0];
-        pwd = tf.text;
-    }
-    if(buttonIndex == 0)
-    {
-        result = [m_pdf PDFOpen:pdfFullPath :pwd];
-
-        if(result == 1)
-        {
-            UINavigationController *nav = self.navigationController;
-            m_pdf.hidesBottomBarWhenPushed = YES;
-            nav.hidesBottomBarWhenPushed =NO;
-            [nav pushViewController:m_pdf animated:YES];
-        }
-        else if(result == 2)
-        {
-            NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-            NSString *str2=NSLocalizedString(@"Error PassWord", @"Localizable");
-            NSString *str3=NSLocalizedString(@"OK", @"Localizable");
-            UIAlertView *alter = [[UIAlertView alloc]initWithTitle:str1 message:str2 delegate:nil cancelButtonTitle:str3 otherButtonTitles:nil,nil];
-            [alter show];
-        }
-    }
-    
 }
- */
 
+- (void)openPageMode:(RDFileItem *)item :(NSString *)pswd
+{
+    //Open PDF file
+    m_pdfP = [[RDPageViewController alloc] initWithNibName:@"RDPageViewController" bundle:nil];
+    [item.locker lock];
+    int result = [m_pdfP PDFOpenAtPath:item.path withPwd:pswd];
+    [item.locker unlock];
+    if(result == 1)//succeeded
+    {
+        m_pdfP.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:m_pdfP animated:YES];
+    }
+    else if(result == 2)//require password
+    {
+        NSString *title = NSLocalizedString(@"Please Enter PassWord", @"Localizable");
+        UIAlertController *pwdAlert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
+        [pwdAlert addTextFieldWithConfigurationHandler:^(UITextField *textField)
+        {
+            textField.placeholder = NSLocalizedString(@"PassWord", @"Localizable");
+            textField.secureTextEntry = YES;
+        }];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+            UITextField *password = pwdAlert.textFields.firstObject;
+            [self openPageMode:item :password.text];
+        }];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Localizable")  style:UIAlertActionStyleCancel handler:nil];
+        
+        [pwdAlert addAction:okAction];
+        [pwdAlert addAction:cancel];
+        [self presentViewController:pwdAlert animated:YES completion:nil];
+    }
+    else//error
+    {
+        NSString *str1 = NSLocalizedString(@"Alert", @"Localizable");
+        NSString *str2 = NSLocalizedString(@"Error Document,Can't open", @"Localizable");
+        NSString *str3 = NSLocalizedString(@"OK", @"Localizable");
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1
+                                                                       message:str2
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+}
+
+- (void)openReflowMode:(RDFileItem *)item :(NSString *)pswd
+{
+    //Open PDF file
+    m_pdfR = [[RDPDFReflowViewController alloc] initWithNibName:@"RDPDFReflowViewController" bundle:nil];
+    [item.locker lock];
+    int result = [m_pdfR PDFOpen:item.path :pswd];
+    [item.locker unlock];
+    if(result == 1)//succeeded
+    {
+        m_pdfR.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:m_pdfR animated:YES];
+    }
+    else if(result == 2)//require password
+    {
+        NSString *title = NSLocalizedString(@"Please Enter PassWord", @"Localizable");
+        UIAlertController *pwdAlert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleAlert];
+        [pwdAlert addTextFieldWithConfigurationHandler:^(UITextField *textField)
+         {
+             textField.placeholder = NSLocalizedString(@"PassWord", @"Localizable");
+             textField.secureTextEntry = YES;
+         }];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+            UITextField *password = pwdAlert.textFields.firstObject;
+            [self openReflowMode:item :password.text];
+        }];
+        UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Localizable")  style:UIAlertActionStyleCancel handler:nil];
+        
+        [pwdAlert addAction:okAction];
+        [pwdAlert addAction:cancel];
+        [self presentViewController:pwdAlert animated:YES completion:nil];
+    }
+    else//error
+    {
+        NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
+        NSString *str2=NSLocalizedString(@"Error Document,Can't open", @"Localizable");
+        NSString *str3=NSLocalizedString(@"OK", @"Localizable");
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:str1 message:str2 preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:str3 style:UIAlertActionStyleDefault handler:nil];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+}
+
+#pragma mark - Table view delegate
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    RDFileItem *item = [m_files objectAtIndex:indexPath.row];
+    if (GLOBAL.g_render_mode == 2)
+        [self openPageMode:item :nil];
+    else if(GLOBAL.g_render_mode == 5)
+        [self openReflowMode:item :nil];
+    else
+        [self pdf_open_path:item :nil];
+}
+    
 - (void)presentPwdAlertControllerWithTitle:(NSString *)title message:(NSString *)message
 {
-    UIAlertController *pwdAlert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [pwdAlert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = NSLocalizedString(@"PassWord", @"Localizable");
-        textField.secureTextEntry = YES;
-    }];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"Localizable") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        UITextField *password = pwdAlert.textFields.firstObject;
-        if (![password.text isEqualToString:@""]) {
-            int result = [self->m_pdf PDFOpen:pdfFullPath :password.text];
-                if(result == 1)
-                {
-                    UINavigationController *nav = self.navigationController;
-                    self->m_pdf.hidesBottomBarWhenPushed = YES;
-                    nav.hidesBottomBarWhenPushed =NO;
-                    [nav pushViewController:self->m_pdf animated:YES];
-                }
-                else if(result == 2)
-                {
-                    NSString *str1=NSLocalizedString(@"Alert", @"Localizable");
-                    NSString *str2=NSLocalizedString(@"Error PassWord", @"Localizable");
-                    [self presentPwdAlertControllerWithTitle:str1 message:str2];
-                }
-        }
-        else
-        {
-            [self presentViewController:pwdAlert animated:YES completion:nil];
-        }
-    }];
-    UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Localizable")  style:UIAlertActionStyleCancel handler:nil];
     
-    [pwdAlert addAction:okAction];
-    [pwdAlert addAction:cancel];
-    [self presentViewController:pwdAlert animated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
 }
 
-- (void)loadSettingsWithDefaults
+- (void)copyDocumentsFromAssets:(NSString *)dpath
 {
-    GLOBAL.g_case_sensitive = [[NSUserDefaults standardUserDefaults] boolForKey:@"CaseSensitive"];
-    GLOBAL.g_match_whole_word = [[NSUserDefaults standardUserDefaults] boolForKey:@"MatchWholeWord"];
-    
-    GLOBAL.g_screen_awake = [[NSUserDefaults standardUserDefaults] boolForKey:@"KeepScreenAwake"];
-    [[UIApplication sharedApplication] setIdleTimerDisabled:GLOBAL.g_screen_awake];
-    
-    GLOBAL.g_render_quality = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RenderQuality"];
-    if(GLOBAL.g_render_quality == 0)
-    {
-        GLOBAL.g_render_quality =1;
-    }
-    
-    GLOBAL.g_render_mode =  (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ViewMode"];
-    
-    //for curl mode
-    GLOBAL.g_curl_enabled = (GLOBAL.g_render_mode == 2);
-    
-    GLOBAL.g_ink_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"InkColor"];
-    if(GLOBAL.g_ink_color == 0)
-    {
-        GLOBAL.g_ink_color = 0xFF0000FF;
-    }
-    
-    GLOBAL.g_ink_width = [[NSUserDefaults standardUserDefaults] floatForKey:@"InkWidth"];
-    if (GLOBAL.g_ink_width == 0) {
-        GLOBAL.g_ink_width = 2.0f;
-    }
-    
-    GLOBAL.g_rect_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RectColor"];
-    if(GLOBAL.g_rect_color==0)
-    {
-        GLOBAL.g_rect_color =0xFF0000FF;
-    }
-    
-    GLOBAL.g_annot_underline_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UnderlineColor"];
-    if (GLOBAL.g_annot_underline_clr == 0) {
-        GLOBAL.g_annot_underline_clr = 0xFF0000FF;
-    }
-    GLOBAL.g_annot_strikeout_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"StrikeoutColor"];
-    if (GLOBAL.g_annot_strikeout_clr == 0) {
-        GLOBAL.g_annot_strikeout_clr = 0xFFFF0000;
-    }
-    GLOBAL.g_annot_highlight_clr = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"HighlightColor"];
-    if(GLOBAL.g_annot_highlight_clr ==0)
-    {
-        GLOBAL.g_annot_highlight_clr =0xFFFFFF00;
-    }
-    GLOBAL.g_oval_color = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"OvalColor"];
-    if(GLOBAL.g_oval_color ==0)
-    {
-        GLOBAL.g_oval_color =0xFFFFFF00;
-    }
-}
-
-- (void)initSettingWithUserDefault :(NSString *)dpath
-{
-    NSString *hf = [[NSBundle mainBundle]pathForResource:@"help" ofType:@"pdf" inDirectory:@"fdat"];
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    bool b_helpfile = [userDefaults boolForKey:@"helpfileLoaded"];
-    if (!b_helpfile)
-    {
-        //[m_files addObject:[NSArray arrayWithObjects:helpfile, hf, 0, nil]];
-        NSString *helpfile = [hf substringFromIndex:hf.length-8];
-        
-        NSString *documentPath = [dpath stringByAppendingString: [NSString stringWithFormat:@"/%@",helpfile]];
-        
-        [[NSFileManager defaultManager] copyItemAtPath:hf toPath:documentPath error:nil];
-        
-        [m_files addObject:[NSArray arrayWithObjects:helpfile,documentPath,0,nil]];
-        [[NSUserDefaults standardUserDefaults]  setBool:true forKey:@"helpfileLoaded"];
-        [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:@"CaseSensitive"];
-        GLOBAL.g_case_sensitive = FALSE;
-        
-        [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:@"MatchWholeWord"];
-        GLOBAL.g_match_whole_word = FALSE;
-        
-        [[NSUserDefaults standardUserDefaults] setFloat:0.1f forKey:@"SwipeSpeed"];
-        GLOBAL.g_swipe_speed = 0.15f;
-        
-        
-        [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RenderQuality"];
-        GLOBAL.g_render_quality =1;
-        
-        GLOBAL.g_swipe_distance = 1.0f;
-        [[NSUserDefaults standardUserDefaults] setFloat:GLOBAL.g_swipe_distance forKey:@"SwipeDistance"];
-        
-        [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"ViewMode"];
-        GLOBAL.g_render_mode =0;
-        
-        [[NSUserDefaults standardUserDefaults]  setBool:FALSE forKey:@"SelectTextRight"];
-        GLOBAL.g_sel_right = FALSE;
-        
-        [[NSUserDefaults standardUserDefaults]  setBool:FALSE forKey:@"KeepScreenAwake"];
-        GLOBAL.g_screen_awake = FALSE;
-        [[UIApplication sharedApplication] setIdleTimerDisabled:GLOBAL.g_screen_awake];
-        
-        [[NSUserDefaults standardUserDefaults]  setInteger:0xFF000000 forKey:@"InkColor"];
-        GLOBAL.g_ink_color = 0xFF000000;
-        [[NSUserDefaults standardUserDefaults]  setInteger:0xFF000000 forKey:@"RectColor"];
-        GLOBAL.g_rect_color = 0xFF000000;
-        [[NSUserDefaults standardUserDefaults]  setInteger:0xFF000000 forKey:@"OvalColor"];
-        GLOBAL.g_oval_color = 0xFF000000;
-        GLOBAL.g_ink_width = 2.0f;
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
+    NSString *hf = [[NSBundle mainBundle] pathForResource:@"fdat" ofType:nil];
+    for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:hf error:nil]) {
+        if([fpath.pathExtension isEqualToString:@"pdf"] || [fpath.pathExtension isEqualToString:@"PDF"]) {
+            
+            NSString *documentPath = [hf stringByAppendingPathComponent:fpath];
+            NSString *destPath = [dpath stringByAppendingPathComponent:fpath];
+            
+            if(![[NSFileManager defaultManager] fileExistsAtPath:destPath]) {
+                [[NSFileManager defaultManager] copyItemAtPath:documentPath toPath:destPath error:nil];
+                RDFileItem *item = [[RDFileItem alloc] init:[fpath stringByDeletingPathExtension] :destPath :0];
+                [m_files addObject:item];
+            }
+        }
     }
 }
 
@@ -646,25 +540,29 @@ NSString *pdfFullPath;
 
 - (void)updateImageForCellAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSArray *row_item = [m_files objectAtIndex:indexPath.row];
-    NSString *path = [row_item objectAtIndex:1];
+    RDFileItem *item = [m_files objectAtIndex:indexPath.row];
+    NSString *path = item.path;
     CGImageRef img_ref = nil;
-    @synchronized (self) {
-        const char *cpath = [path UTF8String];
-        PDF_ERR err;
-        PDF_DOC m_docThumb = Document_open(cpath,nil, &err);
-        int result = 1;
-        if( m_docThumb == NULL )
+
+    const char *cpath = [path UTF8String];
+    [item.locker lock];
+    PDF_ERR err;
+    PDF_DOC m_docThumb = Document_open(cpath,nil, &err);
+    int result = 1;
+    if( m_docThumb == NULL )
+    {
+        switch( err )
         {
-            switch( err )
-            {
-                case err_password:
-                    result = 2;
-                    break;
-                default: result = 0;
-            }
+            case err_password:
+                result = 2;
+                break;
+            default:
+                result = 0;
+                break;
         }
-        
+    }
+    else
+    {
         PDF_PAGE page = Document_getPage(m_docThumb, 0);
         float w = Document_getPageWidth(m_docThumb,0);
         float h = Document_getPageHeight(m_docThumb,0);
@@ -685,9 +583,7 @@ NSString *pdfFullPath;
         Page_render(page, bmp, mat,false,1);
         Matrix_destroy(mat);
         Page_close(page);
-        
-        if(m_docThumb) Document_close(m_docThumb);
-        
+        Document_close(m_docThumb);
         void *data = Global_dibGetData(bmp);
         CGDataProviderRef provider = CGDataProviderCreateWithData( NULL, data, iw * ih * 4, NULL );
         CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
@@ -695,7 +591,8 @@ NSString *pdfFullPath;
         CGColorSpaceRelease(cs);
         CGDataProviderRelease( provider );
     }
-    
+    [item.locker unlock];
+    if(!img_ref) return;
     UIImage *img= [UIImage imageWithCGImage:img_ref];
     dispatch_async(dispatch_get_main_queue(), ^{
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];

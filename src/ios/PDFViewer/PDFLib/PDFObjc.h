@@ -20,6 +20,11 @@
 -(NSString *)issue;
 -(NSString *)subject;
 -(long)version;
+-(NSString *)name;
+-(NSString *)reason;
+-(NSString *)location;
+-(NSString *)contact;
+-(NSString *)modTime;
 @end
 
 @interface PDFDIB : NSObject
@@ -407,7 +412,7 @@
 /**
  * @brief draw text
  *
- * @param img text to draw
+ * @param text text to draw
  */
 -(void)drawText:(NSString *)text;
 /**
@@ -479,7 +484,7 @@
 -(void)textSetLeading:(float) leading;
 /**
  * @brief PDF operator: set text rise
- * @param rise
+ * @param rise rise value
  */
 -(void)textSetRise:(float) rise;
 /**
@@ -591,7 +596,7 @@
  */
 -(int)type;
 -(int)export :(unsigned char *)buf : (int)len;
--(int)signField:(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact;
+-(int)signField :(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
 /**
  * @brief	get annotation field type in acroForm.
  *			this method valid in premium version
@@ -680,6 +685,8 @@
 -(bool)setPolygonPath:(PDFPath *)path;
 -(PDFPath *)getPolylinePath;
 -(bool)setPolylinePath:(PDFPath *)path;
+-(int)getLineStyle;
+-(bool)setLineStyle:(int)style;
 
 /**
  * @brief get fill color of square/circle/highlight/line/ploygon/polyline/sticky text/free text annotation.
@@ -725,6 +732,7 @@
  * @return true or false
  */
 -(bool)setStrokeWidth:(float)width;
+-(int)getStrokeDash:(float*)dashs : (int)dashs_max;
 -(bool)setStrokeDash:(float *)dash : (int)cnt;
 /**
  * @brief get icon value for sticky text note/file attachment annotation.
@@ -962,6 +970,13 @@
 -(float)getEditTextSize;
 -(bool)setEditTextSize:(float)fsize;
 /**
+ * @brief get text align of edit-box.
+ * this method valid in premium version
+ * @return align of text, 0:left, 1:center, 2:right.
+ */
+-(int)getEditTextAlign;
+-(bool)setEditTextAlign:(int)align;
+/**
  * @brief get contents of edit-box.
  * this method valid in premium version
  * @return content in edit-box
@@ -971,7 +986,7 @@
  * @brief set contents of edit-box.
  * you should re-render page to display modified data.
  * this method valid in premium version
- * @param text contents to be set.in MultiLine mode: '\r' or '\n' means change line.in password mode the edit box always display "*". 
+ * @param val contents to be set.in MultiLine mode: '\r' or '\n' means change line.in password mode the edit box always display "*".
  * @return true or false.
  */
 -(bool)setEditText:(NSString *)val;
@@ -988,7 +1003,7 @@
 /**
  * @brief get an item of combo-box.
  * this method valid in premium version
- * @param item 0 based item index. range:[0, getComboItemCount()-1]
+ * @param index 0 based item index. range:[0, getComboItemCount()-1]
  * @return null if this is not combo-box, "" if no item selected, otherwise the item selected.
  */
 -(NSString *)getComboItem :(int)index;
@@ -1003,7 +1018,7 @@
  * @brief set current selected.
  * you should re-render page to display modified data.
  * this method valid in premium version
- * @param item 0 based item index to set.
+ * @param index 0 based item index to set.
  * @return true or false.
  */
 -(bool)setComboSel:(int)index;
@@ -1017,7 +1032,7 @@
 /**
  * @brief get an item of list-box.
  * this method valid in premium version
- * @param item 0 based item index. range:[0, getListItemCount()-1]
+ * @param index 0 based item index. range:[0, getListItemCount()-1]
  * @return null if this is not list-box, "" if no item selected, otherwise the item selected.
  */
 -(NSString *)getListItem:(int)index;
@@ -1094,6 +1109,7 @@
  * @return true or false
  */
 -(bool)removeFromPage;
+-(bool)flateFromPage;
 -(int)getSignStatus;
 -(PDFSign *)getSign;
 -(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect;
@@ -1147,7 +1163,7 @@
 -(bool)reflow:(PDFDIB *)dib :(float)orgx :(float)orgy;
 -(int)getRotate;
 -(bool)flatAnnots;
--(int)sign :(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)reason :(NSString *)location :(NSString *)contact;
+-(int)sign :(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
 /**
  * @brief get text objects to memory.
  * a standard license is required for this method
@@ -1168,7 +1184,7 @@
 -(NSString *)objsString:(int)from :(int)to;
 /**
  * @brief get index aligned by word. this can be invoked after ObjsStart
- * @param from 0 based unicode index.
+ * @param index 0 based unicode index.
  * @param dir if dir < 0,  get start index of the word. otherwise get last index of the word.
  * @return new index value.
  */
@@ -1176,18 +1192,19 @@
 /**
  * @brief get char's box in PDF coordinate system, this can be invoked after ObjsStart
  * @param index 0 based unicode index.
- * @param vals return 4 elements for PDF rectangle.
+ * @param rect return 4 elements for PDF rectangle.
  */
 -(void)objsCharRect:(int)index :(PDF_RECT *)rect;
 /**
  * @brief get char index nearest to point
- * @param pt point as [x,y] in PDF coordinate.
+ * @param x point as [x,y] in PDF coordinate.
+ * @param y point as [x,y] in PDF coordinate.
  * @return char index or -1 failed.
  */
 -(int)objsGetCharIndex:(float)x :(float)y;
 /**
  * @brief create a find session. this can be invoked after ObjsStart
- * @param str key string to find.
+ * @param key key string to find.
  * @param match_case match case?
  * @param whole_word match whole word?
  * @return handle of find session, or 0 if no found.
@@ -1220,7 +1237,7 @@
 -(PDFAnnot *)annotAtPoint:(float)x :(float)y;
 -(PDFAnnot *)annotByName:(NSString *)name;
 -(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect;
--(bool)addAnnot:(PDF_OBJ_REF)ref;
+-(bool)addAnnot:(PDF_OBJ_REF)ref :(int)index;
 
 -(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open;
 /**
@@ -1302,7 +1319,7 @@
  * @param rect 4 elements for left, top, right, bottom in PDF coordinate system
  * @param width line width in PDF coordinate.
  * @param color rectangle color, formated as 0xAARRGGBB
- * @param fill_color fill color in rectangle, formated as 0xAARRGGBB, if alpha channel is 0, means no fill operation, otherwise alpha channel are ignored.
+ * @param icolor fill color in rectangle, formated as 0xAARRGGBB, if alpha channel is 0, means no fill operation, otherwise alpha channel are ignored.
  * @return true or false
  */
 -(bool)addAnnotRect:(const PDF_RECT *)rect :(float) width :(int) color :(int) icolor;
@@ -1314,7 +1331,7 @@
  * @param rect 4 elements for left, top, right, bottom in PDF coordinate system
  * @param width line width in PDF coordinate
  * @param color ellipse color, formated as 0xAARRGGBB
- * @param fill_color fill color in ellipse, formated as 0xAARRGGBB, if alpha channel is 0, means no fill operation, otherwise alpha channel are ignored.
+ * @param icolor fill color in ellipse, formated as 0xAARRGGBB, if alpha channel is 0, means no fill operation, otherwise alpha channel are ignored.
  * @return true or false
  */
 -(bool)addAnnotEllipse:(const PDF_RECT *)rect :(float) width :(int) color :(int) icolor;
@@ -1411,6 +1428,7 @@
  * @return true or false.
  */
 -(bool)addContent:(PDFPageContent *)content :(bool)flush;
+-(bool)addAnnotEditText:(const PDF_RECT *)rect;
 @end
 
 @interface PDFImportCtx : NSObject
@@ -1422,8 +1440,8 @@
 /**
  * @brief import a page to dest document.
  * a premium license is required for this method.
- * @param srcno 0 based page NO. from source Document that passed to ImportStart.
- * @param dstno 0 based page NO. to insert in dest document object.
+ * @param src_no 0 based page NO. from source Document that passed to ImportStart.
+ * @param dst_no 0 based page NO. to insert in dest document object.
  * @return true or false.
  */
 -(bool)import:(int)src_no :(int)dst_no;
@@ -1434,6 +1452,7 @@
     PDF_DOC m_doc;
 }
 @property (readonly) PDF_DOC handle;
++(void)setOpenFlag:(int)flag;
 /**
  * @brief open document.
  * first time, SDK try password as user password, and then try password as owner password.
@@ -1453,6 +1472,7 @@
 -(int)openWithCert:(NSString *)path :(NSString *)cert_file :(NSString *)password;
 -(int)openMemWithCert:(void *)data :(int)data_size : (NSString *)cert_file :(NSString *)password;
 -(int)openStreamWithCert:(id<PDFStream>)stream : (NSString *)cert_file :(NSString *)password;
+-(int)getLinearizedStatus;
 /**
  * @brief create a empty PDF document
  * @param path path to create
@@ -1503,7 +1523,7 @@
 /**
  * @brief save as the document to another file. it remove any security information.
  * this always return false, if no license actived or standard license actived.
- * @param path path to save.
+ * @param dst path to save.
  * @param rem_sec to remove security handler.
  * @return true or false.
  */
@@ -1568,7 +1588,7 @@
 /**
  * @brief create a font object, used to write texts.
  * a premium license is required for this method.
- * @param font_name
+ * @param name
  *		font name exists in font list.
  *		using Global.getFaceCount(), Global.getFaceName() to enumerate fonts.
  * @param style
@@ -1601,7 +1621,7 @@
  * @brief Start import operations, import page from src
  * a premium license is required for this method.
  * you shall maintenance the source Document object until all pages are imported and ImportContext.Destroy() invoked. 
- * @param src source Document object that opened.
+ * @param src_doc source Document object that opened.
  * @return a context object used in ImportPage. 
  */
 -(PDFImportCtx *)newImportCtx:(PDFDoc *)src_doc;
