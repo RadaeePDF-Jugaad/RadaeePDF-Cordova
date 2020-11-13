@@ -25,7 +25,7 @@
 @property (strong ,nonatomic)UIToolbar *toolBar;
 @property (strong,nonatomic)UIImageView *imageView;
 
--(int)PDFOpen:(NSString *)path;
+-(int)PDFOpen:(NSString *)path :(NSString *)pswd;
 //-(int)PDFOpenPage:(NSString *)path :(int)pageno : (float)x :(float)y :(NSString *)pwd;
 //-(BOOL)PDFGoto:(int)pageno;
 - (BOOL)isPortrait;

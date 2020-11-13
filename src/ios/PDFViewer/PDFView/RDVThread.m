@@ -79,4 +79,13 @@
         [self notify_find:finder];
     });
 }
+-(void)end_page:(PDFPage *)page
+{
+    __block PDFPage *pg = page;
+    page = nil;
+    dispatch_async(m_queue, ^{
+        pg = nil;//free in backing thread.
+    });
+}
+
 @end

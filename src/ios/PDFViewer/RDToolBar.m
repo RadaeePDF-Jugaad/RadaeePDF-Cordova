@@ -48,8 +48,8 @@
     drawButton.width = ICON_WIDTH;
     
     UIImage *selectImg = (_selectImage) ? _selectImage : [UIImage imageNamed:@"btn_select"];
-    UIBarButtonItem *selectText = [[UIBarButtonItem alloc] initWithImage:selectImg style:UIBarButtonItemStylePlain target:self action:@selector(selectClick)];
-    selectText.width = ICON_WIDTH;
+    _selectTextButton= [[UIBarButtonItem alloc] initWithImage:selectImg style:UIBarButtonItemStylePlain target:self action:@selector(selectClick)];
+    _selectTextButton.width = ICON_WIDTH;
     
     UIImage *undoImg = (_undoImage) ? _undoImage : [UIImage imageNamed:@"btn_undo"];
     UIBarButtonItem *undoButton = [[UIBarButtonItem alloc]initWithImage:undoImg style:UIBarButtonItemStylePlain target:self action:@selector(undoClick)];
@@ -65,7 +65,7 @@
     
     UIImage *moreImg = (_moreImage) ? _moreImage : [UIImage imageNamed:@"btn_more"];
     _moreButton = [[UIBarButtonItem alloc] initWithImage:moreImg style:UIBarButtonItemStylePlain target:self action:@selector(moreClick)];
-    normalToolBarArray = [[NSMutableArray alloc] initWithObjects:_searchButton,drawButton,selectText,undoButton,redoButton,gridButton, [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil], _moreButton,nil];
+    normalToolBarArray = [[NSMutableArray alloc] initWithObjects:_searchButton,drawButton,_selectTextButton,undoButton,redoButton,gridButton, [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil], _moreButton,nil];
     
     UIImage *rightImg = (_nextImage) ? _nextImage : [UIImage imageNamed:@"btn_right"];
     UIBarButtonItem *nextbutton=[[UIBarButtonItem alloc]initWithImage:rightImg style:UIBarButtonItemStylePlain target:self action:@selector(nextword)];
@@ -91,8 +91,12 @@
     UIImage *cancelImg = (_removeImage) ? _removeImage : [UIImage imageNamed:@"btn_annot_remove"];
     UIBarButtonItem *cancelbtn=[[UIBarButtonItem alloc]initWithImage:cancelImg style:UIBarButtonItemStylePlain target:self action:@selector(annotCancel)];
     cancelbtn.width = ICON_WIDTH;
-    performToolBarArray = [[NSArray alloc]initWithObjects:playbutton,deletebutton,cancelbtn,nil];
     
+    UIImage *propImg = (_removeImage) ? _removeImage : [UIImage imageNamed:@"btn_prop"];
+    UIBarButtonItem *propbutton=[[UIBarButtonItem alloc]initWithImage:propImg style:UIBarButtonItemStylePlain target:self action:@selector(annotProperties)];
+    propbutton.width = ICON_WIDTH;
+    
+    performToolBarArray = [[NSArray alloc]initWithObjects:playbutton,deletebutton,propbutton,cancelbtn,nil];
     
     NSMutableArray *hiddenItems = [NSMutableArray arrayWithObjects: [NSNumber numberWithBool:_hideSearchImage], [NSNumber numberWithBool:_hideDrawImage], [NSNumber numberWithBool:_hideSelImage], [NSNumber numberWithBool:_hideUndoImage], [NSNumber numberWithBool:_hideRedoImage], [NSNumber numberWithBool:_hideGridImage], [NSNumber numberWithBool:NO], [NSNumber numberWithBool:_hideMoreImage], nil];
     
@@ -212,6 +216,13 @@
 {
     if (self.m_delegate) {
         [_m_delegate annotCancel];
+    }
+}
+
+- (void)annotProperties
+{
+    if (self.m_delegate) {
+        [_m_delegate annotProperties];
     }
 }
 

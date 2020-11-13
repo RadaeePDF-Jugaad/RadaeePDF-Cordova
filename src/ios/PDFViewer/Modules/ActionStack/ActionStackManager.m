@@ -22,6 +22,10 @@
 
 - (void)redo:(PDFDoc *)doc
 {}
+- (int)pageno:(int)idx
+{
+    return _m_pageno;
+}
 
 @end
 
@@ -40,8 +44,8 @@
 {
     PDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
-    [page addAnnot:self.hand];
-    self.m_idx = [page annotCount] - 1;
+    self.m_idx = [page annotCount];
+    [page addAnnot:self.hand :self.m_idx];
     page = nil;
 }
 
@@ -80,8 +84,8 @@
 {
     PDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
-    [page addAnnot:self.hand];
-    self.m_idx = [page annotCount] - 1;
+    self.m_idx = [page annotCount];
+    [page addAnnot:self.hand :self.m_idx];
     page = nil;
 }
 
@@ -150,6 +154,13 @@
         page0 = nil;
         page1 = nil;
     }
+}
+- (int)pageno:(int)idx
+{
+    if(idx == 0)
+        return _m_pageno0;
+    else
+        return _m_pageno1;
 }
 
 @end
@@ -228,7 +239,10 @@
     
     return item;
 }
-
+- (int)cur
+{
+    return m_pos;
+}
 - (void)orderIndexes:(ASItem *)item
 {
     [self orderAll:item];

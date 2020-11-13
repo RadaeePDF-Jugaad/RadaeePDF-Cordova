@@ -28,6 +28,14 @@
 -(bool)seek:(unsigned long long)pos;
 @end
 
+@interface RDFileItem : NSObject
+-(id)init:(NSString *)help :(NSString *)path :(int)level;
+@property NSString *help;
+@property NSString *path;
+@property int level;
+@property RDVLocker *locker;
+@end
+
 @interface RDFileTableController : UITableViewController <UIApplicationDelegate>
 {
     RDLoPDFViewController *m_pdf;

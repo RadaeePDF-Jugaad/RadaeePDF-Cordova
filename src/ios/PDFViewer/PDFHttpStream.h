@@ -10,18 +10,24 @@
 #import "PDFIOS.h"
 #import "RDVGlobal.h"
 
-#define BLOCK_SIZE 8192
-#define testUrlPath @"http://www.radaee.com/files/test.pdf"
-
-@interface PDFHttpStream : NSObject <PDFStream>
+#define BLOCK_SIZE 4096
+#define testUrlPath @"https://www.radaeepdf.com/documentation/MRBrochoure.pdf"
+@interface PDFHttpStream : NSObject <PDFStream, NSURLSessionDelegate>
 {
     int m_total;
     int m_pos;
     int m_block_cnt;
+    int m_block_pos;
     unsigned char *m_block_flags;
     NSString *m_cache_path;
     FILE *m_file;
     NSURL *m_url;
+    dispatch_semaphore_t m_event;
+
+    NSURLSessionDataTask *m_stask;
+    NSOperationQueue *m_queue;
+    unsigned char m_buf[BLOCK_SIZE];
+    int m_buf_pos;
 }
 -(id)init;
 -(BOOL)open :(NSString *)url :(NSString *)cache_file;

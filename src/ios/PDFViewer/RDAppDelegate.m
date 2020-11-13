@@ -41,35 +41,13 @@
     self.window.backgroundColor = [UIColor whiteColor];
     NSMutableArray *localControllesArray = [[NSMutableArray alloc]initWithCapacity:4];
     RDFileTableController *ctl = [[RDFileTableController alloc] initWithNibName:@"RDFileTableController" bundle:nil];
-     navController = [[UINavigationController alloc] initWithRootViewController:ctl];
+    navController = [[UINavigationController alloc] initWithRootViewController:ctl];
     navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     [localControllesArray addObject:navController];
-    
-    BookMarkViewController *bmctl=[[BookMarkViewController alloc]initWithNibName:@"BookMarkViewController" bundle:nil];
-    navController = [[UINavigationController alloc]initWithRootViewController:bmctl];
-    navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    NSString *title1 =[[NSString alloc]initWithFormat:NSLocalizedString(@"Marks", @"Localizable")];
-    
-    UITabBarItem *item1 = [[UITabBarItem alloc]initWithTitle:title1 image:[UIImage imageNamed:@"manage_mark.png"] tag:1 ];
-    bmctl.tabBarItem = item1;
-    [localControllesArray addObject:navController];
-    
-    SettingViewController *settingCtl = [[SettingViewController alloc]initWithNibName:@"SettingViewController" bundle:nil];
-    navController = [[UINavigationController alloc]initWithRootViewController:settingCtl];
-    navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    
-    NSString *title2 =[[NSString alloc]initWithFormat:NSLocalizedString(@"Setting", @"Localizable")];
-    
-    UITabBarItem *item2 = [[UITabBarItem alloc]initWithTitle:title2 image:[UIImage imageNamed:@"view_settings_page.png"] tag:2 ];
-    settingCtl.tabBarItem = item2;
-    [localControllesArray addObject:navController];
-    
     
     NSString *title4 =[[NSString alloc]initWithFormat:NSLocalizedString(@"More", @"Localizable")];
     // Do any additional setup after loading the view from its nib.
    
-   
-    
     MoreViewController *moreCtl = [[MoreViewController alloc]initWithNibName:@"MoreViewController" bundle:nil];
     navController = [[UINavigationController alloc]initWithRootViewController:moreCtl];
     navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -79,16 +57,6 @@
     
     tabBarController = [[UITabBarController alloc]init];
     tabBarController.viewControllers =localControllesArray;
-    
-    /*
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    {
-        self.viewController = [[RDFileTableController alloc] initWithNibName:@"RDFileTableController" bundle:nil];
-    } else
-    {
-        self.viewController = [[RDFileTableController alloc] initWithNibName:@"RDFileTableController" bundle:nil];
-    }
-     */
     
     // Preloads keyboard so there's no lag on initial keyboard appearance.
     UITextField *lagFreeField = [[UITextField alloc] init];

@@ -96,21 +96,42 @@
     
     m_doc = doc;
     self.m_del = del;
+    m_page_gap = page_gap * m_scale_pix;
     
     // Set meta tag UUID with the pdf id
     [self setUUIDMeta];
     
     actionManger = [[ActionStackManager alloc] init];
-    
-    if (coverPage) {
-        GLOBAL.g_render_mode = 4;
-    }
-    
-    bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
-    self.backgroundColor = (GLOBAL.g_readerview_bg_color != 0) ? UIColorFromRGB(GLOBAL.g_readerview_bg_color) : [UIColor colorWithRed:0.7f green:0.7f blue:0.7f alpha:1.0f];
+    self.backgroundColor = (GLOBAL.g_readerview_bg_color != 0) ? UIColorFromRGB(GLOBAL.g_readerview_bg_color) : [UIColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:1.0f];
     m_child.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0];
 
-    switch (GLOBAL.g_render_mode) {
+    [self PDFSetVMode:GLOBAL.g_render_mode];
+    
+    m_timer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(ProOnTimer:) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
+   return TRUE;
+}
+
+-(void)PDFSetVMode:(int)vmode
+{
+    RDVPos pos;
+    pos.pageno = -1;
+    pos.pdfx = 0;
+    pos.pdfy = 0;
+    if(m_layout)
+    {
+        [m_layout vGetPos:[m_layout vw] /2 :[m_layout vh] /2 :&pos];
+        [m_layout vClose];
+    }
+    m_layout = nil;
+    m_sel = nil;
+    m_cur_page = -1;
+    m_status = sta_none;
+    m_zoom = 1;
+    self.zoomScale = 1;
+
+    bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
+    switch (vmode) {
         case 1:// Horizontal LTOR
             doublePage = NO;
             GLOBAL.g_paging_enabled = NO;
@@ -126,7 +147,7 @@
             doublePage = NO;
             GLOBAL.g_paging_enabled = YES;
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
+            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
             break;
         case 4: // Double Page first page single (paging enabled)
             for (int i = 0; i < m_doc.pageCount; i++) {
@@ -135,17 +156,18 @@
                 }
             }
             GLOBAL.g_paging_enabled = YES;
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
+            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
+            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
             break;
         case 5:// Double Page (RTOL, paging enabled)
             GLOBAL.g_paging_enabled = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :true :NULL :0 :horzs :[doc pageCount]];
+            m_layout = [[RDVLayoutDual alloc] init:self :true :NULL :0 :horzs :[m_doc pageCount]];
             break;
         case 6:// Double Page (LTOR, paging enabled)
             GLOBAL.g_paging_enabled = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[doc pageCount]];
+            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
             break;
         case 7:// Horizontal RTOL
             doublePage = NO;
@@ -153,20 +175,20 @@
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutHorz alloc] init:self :true];
             break;
-            default:// 0: Vertical
-                GLOBAL.g_paging_enabled = NO;
-                m_layout = [[RDVLayoutVert alloc] init : self];
-                break;
-        }
-        free( horzs );
-        if ([self pagingAvailable]) {
-            self.pagingEnabled = GLOBAL.g_paging_enabled;
-        }
-        if (GLOBAL.g_render_mode == 2) {
-            [(RDVLayoutSingle *)m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer :(int)_pageViewNo];
-        } else {
-            [m_layout vOpen :m_doc :page_gap * m_scale_pix :self.layer];
-        }
+        default:// 0: Vertical
+            GLOBAL.g_paging_enabled = NO;
+            m_layout = [[RDVLayoutVert alloc] init : self];
+            break;
+    }
+    free( horzs );
+    if ([self pagingAvailable]) {
+        self.pagingEnabled = GLOBAL.g_paging_enabled;
+    }
+    if (GLOBAL.g_render_mode == 2) {
+        [(RDVLayoutSingle *)m_layout vOpen :m_doc :m_page_gap :self.layer :(int)_pageViewNo];
+    } else {
+        [m_layout vOpen :m_doc :m_page_gap :self.layer];
+    }
     [self bringSubviewToFront:m_child];
     m_status = sta_none;
     m_zoom = 1;
@@ -174,20 +196,18 @@
     CGRect rect = self.frame;
     CGSize size = rect.size;
     [m_layout vResize:size.width * m_scale_pix :size.height * m_scale_pix];
-
-    if([m_layout isKindOfClass:[RDVLayoutVert class]]){
-        self.contentSize = CGSizeMake(0, [m_layout doch]/m_scale_pix);
-    }else{
-        self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, 0);
+    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
+    if(pos.pageno >= 0)
+    {
+        [m_layout vSetPos:[m_layout vw] /2 :[m_layout vh] /2 :&pos];
+        CGPoint pt;
+        pt.x = [m_layout docx] / m_scale_pix;
+        pt.y = [m_layout docy] / m_scale_pix;
+        self.contentOffset = pt;
     }
-
     [self setNeedsDisplay];
-    m_timer = [NSTimer scheduledTimerWithTimeInterval:0.3
-                                               target:self selector:@selector(ProOnTimer:)
-                                             userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
-   return TRUE;
 }
+
 -(BOOL)isModified
 {
 	return m_modified;
@@ -435,7 +455,10 @@
 -(void)ProUpdatePage:(int) pageno
 {
     [m_layout vRenderSync:pageno];
-    [self.m_del OnPageUpdated:pageno];
+    
+    if(self.m_del){
+        [self.m_del OnPageUpdated:pageno];
+    }
 }
 
 - (void)RDVOnPageRendered:(int)pageno
@@ -800,8 +823,8 @@
         [self setNeedsDisplay];
         //NSLog(@"ZPOS4:%f,%f", self.contentOffset.x, self.contentOffset.y);
     }
-    CGRect rect = CGRectMake( self.contentOffset.x, self.contentOffset.y, self.frame.size.width, self.frame.size.height );
-    m_child.frame = rect;
+    
+    m_child.frame = CGRectMake( self.contentOffset.x, self.contentOffset.y, self.frame.size.width, self.frame.size.height );
     [self ProRedrawOS];
 }
 
@@ -832,24 +855,11 @@
 
 - (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view
 {
+    if( m_status != sta_none ) return;
     self.pagingEnabled = NO;
-    
-    if( m_status == sta_none )
-    {
-        [self zoomStartAtPoint:[scrollView.pinchGestureRecognizer locationInView:self.window]];
-    }
-}
-
-- (void)scrollViewDidZoom:(UIScrollView *)scrollView
-{
-    if( m_status == sta_zoom )
-    {
-        [self zoomToScale:self.zoomScale atPoint:[scrollView.pinchGestureRecognizer locationInView:self.window]];
-    }
-}
-
-- (void)initZoomWithPoint:(CGPoint)point
-{
+    CGPoint point = [scrollView.pinchGestureRecognizer locationInView:self.window];
+    [m_layout vZoomStart];
+    m_status = sta_zoom;
     if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0 && [[[UIDevice currentDevice] systemVersion] floatValue] > 6.0 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
     {
         CGFloat buffer = point.y;
@@ -857,34 +867,17 @@
         point.x = [m_layout vw]/m_scale_pix - buffer;
     }
     
-    zoomPoint = CGPointMake((point.x - ([m_layout vw]/m_scale_pix/2)), (point.y - ([m_layout vh]/m_scale_pix/2)));
+    zoomPoint = CGPointMake((point.x - ([m_layout vw]/(m_scale_pix * 2))), (point.y - ([m_layout vh]/(m_scale_pix * 2))));
     zoomPoint.x = (zoomPoint.x < 0) ? (zoomPoint.x * -1) : zoomPoint.x;
     zoomPoint.y = (zoomPoint.y < 0) ? (zoomPoint.y * -1) : zoomPoint.y;
     [m_layout vGetPos :(point.x - (zoomPoint.x * self.zoomScale)) * m_scale_pix :(point.y - (zoomPoint.y * self.zoomScale)) * m_scale_pix :&m_zoom_pos];
 }
 
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView
 {
-    if( m_status == sta_zoom )
-    {
-        [self zoomConfirmToScale:scale];
-    }
-}
-
-- (void)zoomPageToScale:(CGFloat)scale atPoint:(CGPoint)point {
-    [self zoomStartAtPoint:point];
-    [self zoomToScale:scale atPoint:point];
-    [self zoomConfirmToScale:scale];
-}
-
-- (void)zoomStartAtPoint:(CGPoint)point {
-    [m_layout vZoomStart];
-    m_status = sta_zoom;
-    [self initZoomWithPoint:point];
-}
-
-- (void)zoomToScale:(CGFloat)scale atPoint:(CGPoint)point
-{
+    if( m_status != sta_zoom ) return;
+    m_zoom = self.zoomScale;
+    CGPoint point = [scrollView.pinchGestureRecognizer locationInView:self.window];
     if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.0 && [[[UIDevice currentDevice] systemVersion] floatValue] > 6.0 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
     {
         CGFloat buffer = point.y;
@@ -892,15 +885,16 @@
         point.x = [m_layout vw]/m_scale_pix - buffer;
     }
     
-    self.zoomScale = scale;
-    [m_layout vZooming:self.zoomScale];
+    [m_layout vZooming:m_zoom];
     self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
-    [m_layout vSetPos:(point.x - (zoomPoint.x * self.zoomScale)) * m_scale_pix :(point.y - (zoomPoint.y * self.zoomScale)) * m_scale_pix :&m_zoom_pos];
+    [m_layout vSetPos:(point.x - (zoomPoint.x * m_zoom)) * m_scale_pix :(point.y - (zoomPoint.y * m_zoom)) * m_scale_pix :&m_zoom_pos];
     self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
     [self refresh];
 }
 
-- (void)zoomConfirmToScale:(CGFloat)scale {
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
+{
+    if( m_status != sta_zoom ) return;
     m_zoom = scale;
     [m_layout vZooming:m_zoom];
     [m_layout vZoomConfirm];
@@ -913,11 +907,38 @@
     if (self.zoomScale <= 1 && m_status != sta_annot)
     {
         [self vGoto:m_cur_page];
-     
+        
         if (self.zoomScale <= 1 && [self pagingAvailable]) {
             self.pagingEnabled = GLOBAL.g_paging_enabled;
         }
     }
+}
+
+- (void)zoomPageToScale:(CGFloat)scale atPoint:(CGPoint)point {
+    [m_layout vZoomStart];
+    m_status = sta_zoom;
+    CGPoint pt;
+    pt.x = point.x * m_scale_pix;
+    pt.y = point.y * m_scale_pix;
+    [m_layout vGetPos:pt.x :pt.y :&m_zoom_pos];
+    [m_layout vZooming:scale];
+    self.zoomScale = scale;
+    m_zoom = scale;
+    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
+    [m_layout vSetPos:pt.x :pt.y :&m_zoom_pos];
+    self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
+    [m_layout vZoomConfirm];
+    
+    m_status = sta_none;
+    [self refresh];
+    
+    if(m_zoom == 1) {
+        [self vGoto:m_cur_page];
+    }
+
+    //[self zoomStartAtPoint:point];
+    //[self zoomToScale:scale atPoint:point];
+    //[self zoomConfirmToScale:scale];
 }
 
 - (void)refresh
@@ -1087,7 +1108,7 @@
 
 - (void)delayedOnSingleTapping:(NSArray *)a
 {
-    if (!isDoubleTapping && a) {
+    if (!isDoubleTapping && a && self.m_del) {
         CGPoint point = CGPointMake([[a objectAtIndex:0] floatValue], [[a objectAtIndex:1] floatValue]);
         [self.m_del OnSingleTapped:point.x:point.y];
     }
@@ -1100,7 +1121,7 @@
 
 - (void)resetZoomLevel
 {
-    enum LAYOUT_STATUS m_status_buf = m_status;
+    enum LAYOUT_STATUS save_status = m_status;
     [self zoomPageToScale:1.0 atPoint:CGPointMake([m_layout vw] / 2, [m_layout vh] / 2)];
     
     if ([imgAnnot isDescendantOfView:self]) {
@@ -1109,21 +1130,19 @@
         center.y += self.contentOffset.y;
         imgAnnot.center = center;
     }
-    
-    m_status = m_status_buf;
+    m_status = save_status;
 }
 
 - (void)defaultZoom:(CGPoint )point
 {
-    //[self zoomPageToScale:2.0 atPoint:point];
-
     if (self.zoomScale == GLOBAL.g_zoom_level && GLOBAL.g_zoom_step > 0) {
         GLOBAL.g_zoom_step *= -1;
     } else if (self.zoomScale <= self.minimumZoomScale && GLOBAL.g_zoom_step) {
         GLOBAL.g_zoom_step = 1;
     }
-    
-    [self zoomPageToScale:(self.zoomScale + GLOBAL.g_zoom_step > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : self.zoomScale + GLOBAL.g_zoom_step atPoint:point];
+    if (self.zoomScale > GLOBAL.g_zoom_level) m_zoom = 1;
+    else m_zoom = (self.zoomScale + GLOBAL.g_zoom_step > GLOBAL.g_zoom_level) ? GLOBAL.g_zoom_level : self.zoomScale + GLOBAL.g_zoom_step;
+    [self zoomPageToScale:m_zoom atPoint:point];
 }
 
 -(void)OnSingleTap:(float)x :(float)y
@@ -1146,9 +1165,9 @@
         {
             m_annot_idx = [m_annot getIndex];
             
-            if(self.m_del && [self.m_del respondsToSelector:@selector(didTapAnnot:atPage:atPoint:)])
+            if(self.m_del && [self.m_del respondsToSelector:@selector(OnAnnotTapped:atPage:atPoint:)])
             {
-                [self.m_del didTapAnnot:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
+                [self.m_del OnAnnotTapped:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
             }
             
             if (![self canSaveDocument] && m_annot.type != 1) {
@@ -1208,7 +1227,7 @@
                 [self executeAnnotJS];
                 
                 if (self.m_del){
-                    [self.m_del OnAnnotCommboBox:arr selected:[m_annot getComboSel]];
+                    [self.m_del OnAnnotCommboBox :m_annot :[self annotRect] :arr selected:[m_annot getComboSel]];
                 }
                 return ;
             }
@@ -1238,25 +1257,21 @@
                 }
                 
                 if (self.m_del){
-                    [self.m_del OnAnnotList:m_annot items:arr selectedIndexes:selected_items]; // Modified method
+                    [self.m_del OnAnnotList:m_annot :[self annotRect] :arr selectedIndexes:selected_items]; // Modified method
                 }
+                
                 return;
             }
             
-            NSString *nuri = [m_annot getEditText];
-            if (nuri) {
+            int type = [m_annot getEditType];
+            if (type > 0) {
                 if (self.m_del) {
-                    CGRect annotRect;
-                    annotRect.origin.x = m_annot_rect.left / m_scale_pix;
-                    annotRect.origin.y = m_annot_rect.top / m_scale_pix;
-                    annotRect.size.width = (m_annot_rect.right - m_annot_rect.left)/m_scale_pix;
-                    annotRect.size.height = (m_annot_rect.bottom - m_annot_rect.top)/m_scale_pix;
-                    [self.m_del OnAnnotEditBox:annotRect :nuri :([m_annot getEditTextSize] / m_scale_pix) * (m_zoom * [m_layout vGetScaleMin:m_cur_page])];
+                    [self.m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * (m_zoom * [m_layout vGetScaleMin:m_cur_page])];
                 }
                 return ;
             }
             
-            nuri = [m_annot getURI];
+            NSString *nuri = [m_annot getURI];
             if(nuri)//open url
             {
                 if( self.m_del && GLOBAL.g_auto_launch_link)
@@ -1267,7 +1282,7 @@
                 }
             }
             
-            if(self.m_del) [self.m_del OnAnnotClicked:m_annot:x:y];
+            if(self.m_del) [self.m_del OnAnnotClicked:m_annot :[self annotRect] :x :y];
         }
         else
         {
@@ -1307,7 +1322,7 @@
 -(bool)OnSelTouchEnd:(CGPoint)point
 {
     if( m_status != sta_sel ) return false;
-
+    
     if( self.m_del )
         [self.m_del OnSelEnd :m_tx/m_scale_pix :m_ty/m_scale_pix :point.x :point.y];
     return true;
@@ -2118,6 +2133,23 @@
     }
 }
 
+- (void)vUpdateAnnotPage
+{
+    [self ProUpdatePage:m_annot_pos.pageno];
+    [self setNeedsDisplay];
+    [m_child setNeedsDisplay];
+}
+
+- (CGFloat)vGetScale
+{
+    return [[m_layout vGetPage:m_cur_page] scale];
+}
+
+- (CGFloat)vGetPixSize
+{
+    return m_scale_pix;
+}
+
 - (BOOL)pagingAvailable
 {
     return (GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 4 || GLOBAL.g_render_mode == 6);
@@ -2389,6 +2421,7 @@
     if( m_status == sta_none )
     {
         self.scrollEnabled = false;
+        m_note_cur = actionManger.cur;
         m_status = sta_note;
     }
     return true;
@@ -2401,6 +2434,42 @@
     {
         self.scrollEnabled = true;
         m_status = sta_none;
+        [self setNeedsDisplay];
+    }
+}
+
+int NotePageFind(const int *pages, int pages_cnt, int pageno)
+{
+    const int *cur = pages;
+    const int *end = pages + pages_cnt;
+    while(cur < end)
+    {
+        if(*cur++ == pageno) return (int)(cur - pages - 1);
+    }
+    return -1;
+}
+
+-(void)vNoteCancel
+{
+    [self setModified:YES force:NO];
+    if( m_status == sta_note )
+    {
+        self.scrollEnabled = true;
+        m_status = sta_none;
+        int pages[128];
+        int pages_cnt = 0;
+        int cur = actionManger.cur;
+        while(cur > m_note_cur)
+        {
+            ASItem *item = [actionManger undo];
+            if(NotePageFind(pages, pages_cnt, item.m_pageno) < 0)
+                pages[pages_cnt++] = item.m_pageno;
+            [item undo:m_doc];
+            cur--;
+        }
+        const int *pcur = pages;
+        const int *pend = pages + pages_cnt;
+        while(pcur < pend) [m_layout vRenderAsync:*pcur++];
         [self setNeedsDisplay];
     }
 }
@@ -2785,7 +2854,7 @@
         m_status = sta_image;
         
         if(!imgAnnot)
-            imgAnnot = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"btn_add"]];
+            imgAnnot = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"pdf_custom_stamp"]];
         
         if (![imgAnnot isDescendantOfView:self]) {
             
@@ -2881,53 +2950,6 @@
 
 -(void)vGoto:(int)pageno
 {
-    /*
-    if (pageno < 0 || pageno >= m_doc.pageCount) {
-        pageno = 0;
-    }
-    
-    if (doublePage) {
-        if (GLOBAL.g_paging_enabled && GLOBAL.g_render_mode == 4 && pageno > 0 && (pageno + 1) < m_doc.pageCount && (pageno % 2 == 0) && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
-            pageno++;
-        }
-        
-        BOOL checkMod = (coverPage) ? (pageno % 2 == 0) : (pageno % 2 != 0);
-        
-        if (GLOBAL.g_paging_enabled && GLOBAL.g_render_mode == 4 && pageno > 0 && checkMod && !UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
-            pageno--;
-        }
-    }
-    
-    RDVPos pos;
-    
-    pos.pdfx = 0;
-    pos.pdfy = [m_doc pageHeight:pageno];
-    pos.pageno = pageno;
-    int pages = (!UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]) && doublePage && m_doc.pageCount > 1 && !(coverPage && (pageno < 1 || ((pageno % 2 != 0) && pageno == (m_doc.pageCount - 1))))) ? 2 : 1;
-    float gapX;
-    
-    if (pages > 1 && (pageno + 1) < m_doc.pageCount) {
-        gapX = ([m_layout vw] - (([m_doc pageWidth:pageno] * [m_layout zoomMin]) + ([m_doc pageWidth:pageno + 1]  * [m_layout zoomMin]))) / 2;
-    } else {
-        gapX = ([m_layout vw] - ([m_doc pageWidth:pageno] * [m_layout zoomMin])) / 2;
-    }
-    
-    float gapY = ([m_layout vh] - ([m_doc pageHeight:pageno]*[m_layout zoomMin])) / 2;
-    
-    if (GLOBAL.g_render_mode > 1)
-        [m_layout vSetPos:gapX :gapY :&pos];
-    else
-        [m_layout vSetPos:0 :0 :&pos];
-    
-    CGPoint pt;
-    pt.x = [m_layout docx]/m_scale_pix;
-    pt.y = [m_layout docy]/m_scale_pix;
-    
-    self.contentOffset = pt;
-    
-    [self refresh];
-    */
-    
     [m_layout vGotoPage:pageno];
     CGPoint pt;
     pt.x = m_layout.docx/m_scale_pix;
@@ -2945,49 +2967,86 @@
 - (void)vUndo
 {
     ASItem *item = [actionManger undo];
-    if (item) {
-        [item undo:m_doc];
-        
-        // Re-order indexes in case of annot remove
-        if ([item isKindOfClass:[ASAdd class]] || item.reorder) {
-            if ([item isKindOfClass:[ASMove class]]) {
-                item.m_pageno = [(ASMove *)item m_pageno1];
-            }
-            
-            [actionManger orderOnDel:item];
-            
-            if ([item isKindOfClass:[ASMove class]]) {
-                item.m_pageno = [(ASMove *)item m_pageno0];
-            }
+    if (!item) return;
+    [item undo:m_doc];
+    int pg0 = [item pageno:0];
+    int pg1 = [item pageno:1];
+   
+    // Re-order indexes in case of annot remove
+    if ([item isKindOfClass:[ASAdd class]] || item.reorder) {
+        if ([item isKindOfClass:[ASMove class]]) {
+            item.m_pageno = [(ASMove *)item m_pageno1];
         }
-        
-        [actionManger orderIndexes:item];
-        [self refreshCurrentPage];
+        [actionManger orderOnDel:item];
+     
+        if ([item isKindOfClass:[ASMove class]]) {
+            item.m_pageno = [(ASMove *)item m_pageno0];
+        }
+    }
+    
+    [actionManger orderIndexes:item];
+    //[self refreshCurrentPage];
+    
+    // call update delegate method
+    if(pg0 == pg1)
+    {
+        [self ProUpdatePage:pg0];
+        if(self.m_del)
+            [self.m_del OnPageUpdated:pg0];
+    }
+    else
+    {
+        [self ProUpdatePage:pg1];
+        [self ProUpdatePage:pg0];
+        if(self.m_del)
+        {
+            [self.m_del OnPageUpdated:pg1];
+            [self.m_del OnPageUpdated:pg0];
+        }
     }
 }
 
 - (void)vRedo
 {
     ASItem *item = [actionManger redo];
-    if (item) {
-        [item redo:m_doc];
-        
-        // Re-order indexes in case of annot remove
-        if ([item isKindOfClass:[ASDel class]] || item.reorder) {
-            
-            if ([item isKindOfClass:[ASMove class]]) {
-                item.m_pageno = [(ASMove *)item m_pageno0];
-            }
-            
-            [actionManger orderOnDel:item];
-            
-            if ([item isKindOfClass:[ASMove class]]) {
-                item.m_pageno = [(ASMove *)item m_pageno1];
-            }
+    if (!item) return;
+    [item redo:m_doc];
+    int pg0 = [item pageno:0];
+    int pg1 = [item pageno:1];
+    
+    // Re-order indexes in case of annot remove
+    if ([item isKindOfClass:[ASDel class]] || item.reorder) {
+     
+        if ([item isKindOfClass:[ASMove class]]) {
+            item.m_pageno = [(ASMove *)item m_pageno0];
         }
-        
-        [actionManger orderIndexes:item];
-        [self refreshCurrentPage];
+     
+        [actionManger orderOnDel:item];
+     
+        if ([item isKindOfClass:[ASMove class]]) {
+            item.m_pageno = [(ASMove *)item m_pageno1];
+        }
+    }
+    
+    [actionManger orderIndexes:item];
+    //[self refreshCurrentPage];
+    
+    // call update delegate method
+    if(pg0 == pg1)
+    {
+        [self ProUpdatePage:pg0];
+        if(self.m_del)
+            [self.m_del OnPageUpdated:pg0];
+    }
+    else
+    {
+        [self ProUpdatePage:pg0];
+        [self ProUpdatePage:pg1];
+        if(self.m_del)
+        {
+            [self.m_del OnPageUpdated:pg0];
+            [self.m_del OnPageUpdated:pg1];
+        }
     }
 }
 
@@ -3059,8 +3118,8 @@
     RDVPos pos1;
     RDVPos pos2;
     
-    [m_layout vGetPos:(screenRect.origin.x - self.contentOffset.x) * m_scale_pix * m_zoom :(screenRect.origin.y - self.contentOffset.y) * m_scale_pix * m_zoom: &pos1];
-    [m_layout vGetPos:(screenRect.origin.x - self.contentOffset.x + screenRect.size.width) * m_scale_pix * m_zoom :(screenRect.origin.y - self.contentOffset.y + screenRect.size.height) * m_scale_pix * m_zoom :&pos2];
+    [m_layout vGetPos:(screenRect.origin.x - self.contentOffset.x) * m_scale_pix :(screenRect.origin.y - self.contentOffset.y) * m_scale_pix: &pos1];
+    [m_layout vGetPos:(screenRect.origin.x - self.contentOffset.x + screenRect.size.width) * m_scale_pix :(screenRect.origin.y - self.contentOffset.y + screenRect.size.height) * m_scale_pix :&pos2];
     
     PDF_RECT pdfRect;
     
@@ -3070,6 +3129,53 @@
     pdfRect.bottom = pos1.pdfy;
     
     return pdfRect;
+}
+
+- (CGRect)annotRect {
+    CGRect annotRect;
+    annotRect.origin.x = m_annot_rect.left / m_scale_pix;
+    annotRect.origin.y = m_annot_rect.top / m_scale_pix;
+    annotRect.size.width = (m_annot_rect.right - m_annot_rect.left)/m_scale_pix;
+    annotRect.size.height = (m_annot_rect.bottom - m_annot_rect.top)/m_scale_pix;
+    return annotRect;
+}
+
+- (CGRect)screenRectFromPdfRect:(float)left :(float)top :(float)right :(float)bottom :(int)pageNum
+{
+    RDVPage *vpage = [m_layout vGetPage:pageNum];
+    
+    if (vpage == nil) {
+        return CGRectMake(0, 0, 0, 0);
+    }
+    
+    left = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:left];
+    right = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:right];
+    float tmp = top;
+    top = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:bottom];
+    bottom = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:tmp];
+    
+    CGRect screenRect;
+    screenRect.origin.x = left / m_scale_pix;
+    screenRect.origin.y = top / m_scale_pix;
+    screenRect.size.width = (right - left) / m_scale_pix;
+    screenRect.size.height = (bottom - top) / m_scale_pix;
+    
+    return screenRect;
+}
+
+- (CGPoint)screenPointsFromPdfPoints:(float)x :(float)y :(int)pageNum
+{
+    RDVPage *vpage = [m_layout vGetPage:pageNum];
+    
+    if (vpage == nil) {
+        return CGPointMake(0, 0);
+    }
+    
+    CGPoint screenPoints;
+    screenPoints.x = ([vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:x]) / m_scale_pix;
+    screenPoints.y = ([vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:y]) / m_scale_pix;
+    
+    return screenPoints;
 }
 
 @end

@@ -78,6 +78,7 @@
 @property (strong, nonatomic) UIImage *drawImage;
 @property (strong, nonatomic) UIImage *selectImage;
 @property (strong, nonatomic) UIImage *saveImage;
+@property (strong, nonatomic) UIImage *metaImage;
 
 @property (nonatomic) BOOL hideSearchImage;
 @property (nonatomic) BOOL hideDrawImage;
@@ -127,5 +128,10 @@
 - (NSString *)getJSONFormFields;
 - (NSString *)getJSONFormFieldsAtPage:(int)page;
 - (NSString *)setFormFieldWithJSON:(NSString *)json;
+
+- (CGPoint)pdfPointsFromScreenPoints:(int)x :(int)y;
+- (CGPoint)screenPointsFromPdfPoints:(float)x :(float)y :(int)pageNum;
+- (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect;
+- (CGRect)screenRectFromPdfRect:(float)top :(float)left :(float)right :(float)bottom :(int)pageNum;
 @end
 

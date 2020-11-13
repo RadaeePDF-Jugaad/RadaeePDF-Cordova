@@ -169,25 +169,19 @@
     
     Global_setCMapsPath([cmaps_path UTF8String], [umaps_path UTF8String]);
     Global_setCMYKProfile([cmyk_path UTF8String]);
-    
-    // Add Standard Resources
-    NSString *stdResFolder = [[NSBundle mainBundle] pathForResource:@"fdat/stdRes" ofType:nil];
-    int i = 0;
-    for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stdResFolder error:nil]) {
-        NSLog(@"%@", [stdResFolder stringByAppendingPathComponent:fpath]);
-        Global_loadStdFont(i, [[stdResFolder stringByAppendingPathComponent:fpath] UTF8String]);
-        i++;
-    }
-    
+
     // Add Standard Fonts
     Global_fontfileListStart();
     NSString *stdFontFolder = [[NSBundle mainBundle] pathForResource:@"fdat/stdFont" ofType:nil];
     for (NSString *fpath in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:stdFontFolder error:nil]) {
-        NSLog(@"%@", [stdFontFolder stringByAppendingPathComponent:fpath]);
-        Global_fontfileListAdd([[stdFontFolder stringByAppendingPathComponent:fpath] UTF8String]);
+        if([fpath.pathExtension isEqualToString:@"ttf"] || [fpath.pathExtension isEqualToString:@"otf"] || [fpath.pathExtension isEqualToString:@"ttc"]) {
+            Global_fontfileListAdd([[stdFontFolder stringByAppendingPathComponent:fpath] UTF8String]);
+        }
     }
-    
     Global_fontfileListEnd();
+    
+    Global_loadStdFont(8, [[stdFontFolder stringByAppendingPathComponent:@"rdf008.dat"] UTF8String]);
+    Global_loadStdFont(13, [[stdFontFolder stringByAppendingPathComponent:@"rdf013.dat"] UTF8String]);
     
     Global_fontfileMapping("Arial",                        "Arimo");
     Global_fontfileMapping("Arial Bold",                   "Arimo Bold");
@@ -295,23 +289,24 @@
     Global_fontfileMapping("CourierNew-Italic",            "Cousine Italic");
     
     bool ret;
-    ret = Global_setDefaultFont(NULL, "BousungEG-Light-GB", false);
-    ret = Global_setDefaultFont(NULL, "BousungEG-Light-GB", true);
+    ret = Global_setDefaultFont(NULL, "Arial", false);
+    ret = Global_setDefaultFont(NULL, "Arial", true);
+    /*
     ret = Global_setDefaultFont("GB1", "BousungEG-Light-GB", false);
     ret = Global_setDefaultFont("GB1", "BousungEG-Light-GB", true);
     ret = Global_setDefaultFont("CNS1", "BousungEG-Light-GB", false);
     ret = Global_setDefaultFont("CNS1", "BousungEG-Light-GB", true);
-    //radaee don't know which font should used in Japan or Korea, so use "BousungEG"
-    //developers may need modify codes below:
-    Global_setDefaultFont("Japan1", "BousungEG-Light-GB", false);
-    Global_setDefaultFont("Japan1", "BousungEG-Light-GB", true);
-    Global_setDefaultFont("Korea1", "BousungEG-Light-GB", false);
-    Global_setDefaultFont("Korea1", "BousungEG-Light-GB", true);
-    Global_setAnnotFont( "Helvetica" );//Global_setAnnotFont( "BousungEG-Light-GB" );
+    ret = Global_setDefaultFont("Japan1", "BousungEG-Light-GB", false);
+    ret = Global_setDefaultFont("Japan1", "BousungEG-Light-GB", true);
+    ret = Global_setDefaultFont("Korea1", "BousungEG-Light-GB", false);
+    ret = Global_setDefaultFont("Korea1", "BousungEG-Light-GB", true);
+    ret = Global_setAnnotFont( "BousungEG-Light-GB" );
+     */
+    Global_setAnnotFont("Helvetica");
     
     
     Global_setAnnotTransparency(0x200040FF);
-    [[RDVGlobal sharedInstance] setup];
+    [[RDVGlobal sharedInstance] setup]; 
 }
 
 - (void)setup {
@@ -342,6 +337,7 @@
     _g_annot_underline_clr = 0xFF0000FF;
     _g_annot_strikeout_clr = 0xFFFF0000;
     _g_annot_squiggly_clr = 0xFF00FF00;
+    _g_thumbview_label_color = 0xFFFF0000;
     
     _g_line_annot_style1 = 0;
     _g_line_annot_style2 = 1;

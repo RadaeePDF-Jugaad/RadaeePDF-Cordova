@@ -66,7 +66,7 @@
 
 }
 
--(int)PDFOpen:(NSString *)path
+-(int)PDFOpen:(NSString *)path :(NSString *)pswd
 {
     CGRect rect = [UIScreen mainScreen].bounds;
     if([[[UIDevice currentDevice] systemVersion]integerValue]>=7)
@@ -83,7 +83,7 @@
     [m_view setContentOffset:offset];
     
     m_doc = [[PDFDoc alloc] init];
-    [m_doc open:path :NULL];
+    [m_doc open:path :pswd];
     [m_view vOpen:m_doc :path];
    // [m_view vOpen:m_doc :nil];
     

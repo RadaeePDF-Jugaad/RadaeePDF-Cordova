@@ -23,6 +23,17 @@
 #import "RDExtendedSearch.h"
 #import "SearchResultTableViewController.h"
 
+#import "MenuAnnotOp.h"
+#import "MenuCombo.h"
+#import "PDFPopupCtrl.h"
+#import "PDFDialog.h"
+#import "DlgMeta.h"
+#import "DlgAnnotPopText.h"
+#import "DlgAnnotPropComm.h"
+#import "DlgAnnotPropMarkup.h"
+#import "DlgAnnotPropLine.h"
+#import "DlgAnnotPropIcon.h"
+
 #define SYS_VERSION [[[UIDevice currentDevice]systemVersion] floatValue]
 #define THUMB_HEIGHT 99
 
@@ -77,6 +88,10 @@
     UIColor *toolbarTintColor;
     
     UILabel *sliderLabel;
+    
+    PDFAnnot *selectedAnnot;
+    
+    MenuAnnotOp *m_menu_op;
 }
 @end
 
@@ -331,7 +346,6 @@
     
     m_view = [[PDFLayoutView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, rect.size.height)];
     [m_view setReadOnly:readOnlyEnabled];
-    [m_view setFirstPageCover:firstPageCover];
     readOnly = readOnlyEnabled;
     BOOL res = [m_view PDFOpen:m_doc :4 :self];
     [self.view addSubview:m_view];
@@ -561,6 +575,10 @@
     [toolBar changeToNormalToolBar];
     [m_view vAnnotEnd];
 }
+- (void)annotProperties
+{
+    [self OnAnnotProp:selectedAnnot];
+}
 #pragma mark - press annot method
 - (void)OnPageChanged :(int)pageno
 {
@@ -712,19 +730,142 @@
     }
 }
 //enter annotation status.
-- (void)OnAnnotClicked:(PDFAnnot *)annot :(float)x :(float)y
+- (void)OnAnnotClicked:(PDFAnnot *)annot :(CGRect)annotRect :(float)x :(float)y
 {
     [m_searchBar setHidden:NO];
     
     b_outline = false;
     m_bSel = false;
     
-    [toolBar changeToPerformToolBar];
-    [self showBars];
+    selectedAnnot = annot;
+    CGFloat scale_pix = [m_view vGetPixSize];
+    
+    if(selectedAnnot.type != 3 && selectedAnnot.type != 20)
+    {
+        m_menu_op = [[MenuAnnotOp alloc] init :annot :annotRect.origin :^(int opt){
+            switch(opt)
+            {
+                case 0://perform
+                    [self performAnnot];
+                    break;
+                case 1://edit
+                    [self performAnnot];
+                    break;
+                case 2://remove
+                    [self deleteAnnot];
+                    break;
+                case 3://property
+                    [self annotProperties];
+                    break;
+            }
+            if(self->m_menu_op)
+            {
+                [self->m_menu_op removeFromSuperview];
+                self->m_menu_op = nil;
+            }
+        }];
+        [self.view addSubview:m_menu_op];
+    }
+    
+    //[toolBar changeToPerformToolBar];
+    //[self showBars];
 }
+
+-(void)OnAnnotProp:(PDFAnnot *)annot
+{
+    int atype = [annot type];
+    if(atype == 4 || atype == 8)//line and polyline
+    {
+        NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgAnnotPropLine" owner:self options:nil];
+        DlgAnnotPropLine *view = [views lastObject];
+        [view setBackgroundColor:[UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1]];
+        
+        PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, 200, 293) :YES :^(BOOL is_ok){
+            if (is_ok)
+            {
+                [view updateAnnot];
+                [self->m_view vAnnotEnd];
+                [self->m_view vUpdateAnnotPage];
+                [self->m_view setModified:YES force:NO];
+            }
+            else
+                [self->m_view vAnnotEnd];
+        }];
+        [view setAnnot:annot :dlg];
+        [self presentViewController:dlg animated:NO completion:nil];
+    }
+    else if(atype >= 9 && atype <= 12)//markup
+    {
+        NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgAnnotPropMarkup" owner:self options:nil];
+        DlgAnnotPropMarkup *view = [views lastObject];
+        [view setBackgroundColor:[UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1]];
+        
+        PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, 200, 123) :YES :^(BOOL is_ok)
+        {
+            if (is_ok)
+            {
+                [view updateAnnot];
+                [self->m_view vAnnotEnd];
+                [self->m_view vUpdateAnnotPage];
+                [self->m_view setModified:YES force:NO];
+            }
+            else
+                [self->m_view vAnnotEnd];
+        }];
+        [view setAnnot:annot :dlg];
+        [self presentViewController:dlg animated:NO completion:nil];
+    }
+    else if(atype == 1 || atype == 17)//sticky note and file attachment.
+    {
+        NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgAnnotPropIcon" owner:self options:nil];
+        DlgAnnotPropIcon *view = [views lastObject];
+        [view setBackgroundColor:[UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1]];
+        
+        PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, 200, 229) :YES :^(BOOL is_ok){
+            if (is_ok)
+            {
+                [view updateAnnot];
+                [self->m_view vAnnotEnd];
+                [m_view vUpdateAnnotPage];
+                [self->m_view setModified:YES force:NO];
+            }
+            else
+                [self->m_view vAnnotEnd];
+        }];
+        [view setAnnot:annot :dlg];
+        [self presentViewController:dlg animated:NO completion:nil];
+    }
+    else
+    {
+        NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgAnnotPropComm" owner:self options:nil];
+        DlgAnnotPropComm *view = [views lastObject];
+        [view setBackgroundColor:[UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1]];
+        [view hasFill:(atype != 15)];
+
+        PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, 200, 229) :YES :^(BOOL is_ok){
+            if (is_ok)
+            {
+                [view updateAnnot];
+                [self->m_view vAnnotEnd];
+                [self->m_view vUpdateAnnotPage];
+                [self->m_view setModified:YES force:NO];
+            }
+            else
+                [self->m_view vAnnotEnd];
+        }];
+        [view setAnnot:annot :dlg];
+        [self presentViewController:dlg animated:NO completion:nil];
+    }
+}
+
 //notified when annotation status end.
 - (void)OnAnnotEnd
 {
+    if(m_menu_op)
+    {
+        [m_menu_op removeFromSuperview];
+        m_menu_op = nil;
+    }
     if (!pickerView.hidden) {
         pickerView.hidden = YES;
         confirmPickerBtn.hidden = YES;
@@ -733,6 +874,7 @@
         [textFd resignFirstResponder];
         textFd.hidden = YES;
     }
+    selectedAnnot = nil;
     [toolBar changeToNormalToolBar];
 }
 //this mehod fired only when vAnnotPerform method invoked.
@@ -762,21 +904,26 @@
     }
 }
 
-- (void)OnAnnotList:(PDFAnnot *)annot items:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
+- (void)OnAnnotList:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
 {
-    NSLog(@"list sels");
+    MenuCombo *view = [[MenuCombo alloc] init];
+    PDFPopupCtrl *pop = [[PDFPopupCtrl alloc] init:view];
+    [pop setDismiss:^{
+        [self->m_view vAnnotEnd];
+    }];
+    CGFloat fsize = [m_view vGetScale] * 12 / [m_view vGetPixSize];
+    CGRect rect = [self.view convertRect:annotRect toView: pop.view];
     
-    annotListTV = [[RDAnnotListViewController alloc] init];
-    BOOL isMultiSel;
-    isMultiSel = [annot isMultiSel];
-    annotListTV.delegate = self;
-    annotListTV.annotList = dataArray;
-    annotListTV.multiSel = isMultiSel;
-    annotListTV.annotSelected = [NSMutableArray arrayWithArray:indexes];
-    annotListTV.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    annotListTV.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    b_outline = TRUE;
-    [self presentViewController:annotListTV animated:YES completion:nil];
+    view.frame = rect;
+    [view setPara:rect.size.width :fsize :dataArray :^(int idx){
+        int sels[1] = {idx};
+        [annot setListSels:sels :1];
+        [self->m_view vUpdateAnnotPage];
+        [self->m_view vAnnotEnd];
+        [self->m_view setModified:YES force:NO];
+        [pop dismiss];
+    }];
+    [self presentViewController:pop animated:NO completion:nil];
 }
 
 - (void)OnAnnotSignature:(PDFAnnot *)annot {
@@ -805,7 +952,7 @@
     }
 }
 
-- (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
+- (void)OnAnnotTapped:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
 {
     if (_delegate && [_delegate respondsToSelector:@selector(didTapOnAnnotationOfType:atPage:atPoint:)]) {
         [_delegate didTapOnAnnotationOfType:annot.type atPage:page atPoint:point];
@@ -865,24 +1012,65 @@
 {
     [tempfiles addObject:fileName];
 }
-- (void)OnAnnotEditBox:(CGRect)annotRect :(NSString *)editText :(float)textSize
+- (void)OnAnnotEditBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize
 {
-    textFd.hidden = NO;
-    textFd.frame = annotRect;
-    textFd.text = editText;
-    textFd.backgroundColor = [UIColor whiteColor];
-    textFd.font = [UIFont systemFontOfSize:textSize];
-    [self.view bringSubviewToFront:textFd];
-    [textFd becomeFirstResponder];
+    PDFPopupCtrl *pop;
+    if([annot getEditType] == 3)//multi-line
+    {
+        UITextView *text = [[UITextView alloc] init];
+        pop = [[PDFPopupCtrl alloc] init:text];
+        CGRect rect = [self.view convertRect:annotRect toView: pop.view];
+        text.frame = rect;
+        text.text = editText;
+        text.backgroundColor = [UIColor whiteColor];
+        text.font = [UIFont systemFontOfSize:textSize];
+        [pop setDismiss:^{
+            [annot setEditText:text.text];
+            [self->m_view vUpdateAnnotPage];
+            [self->m_view vAnnotEnd];
+            [self->m_view setModified:YES force:NO];
+        }];
+    }
+    else
+    {
+        UITextField *text = [[UITextField alloc] init];
+        pop = [[PDFPopupCtrl alloc] init:text];
+        CGRect rect = [self.view convertRect:annotRect toView: pop.view];
+        text.frame = rect;
+        text.text = editText;
+        text.backgroundColor = [UIColor whiteColor];
+        text.font = [UIFont systemFontOfSize:textSize];
+        [pop setDismiss:^{
+            [annot setEditText:text.text];
+            [self->m_view vUpdateAnnotPage];
+            [self->m_view vAnnotEnd];
+            [self->m_view setModified:YES force:NO];
+        }];
+    }
+    [self presentViewController:pop animated:NO completion:nil];
 }
-- (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index
+- (void)OnAnnotCommboBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index
 {
-    pickViewArr = dataArray;
-    pickerView.hidden = NO;
-    confirmPickerBtn.hidden = NO;
-    [self.view bringSubviewToFront:confirmPickerBtn];
-    [self.view bringSubviewToFront:pickerView];
-    [pickerView reloadAllComponents];
+    MenuCombo *view = [[MenuCombo alloc] init];
+    PDFPopupCtrl *pop = [[PDFPopupCtrl alloc] init:view];
+    [pop setDismiss:^{
+        [self->m_view vAnnotEnd];
+    }];
+    CGFloat fsize = [m_view vGetScale] * 12 / [m_view vGetPixSize];
+    CGRect rect = [self.view convertRect:annotRect toView: pop.view];
+    int max_cnt = (dataArray.count > 5) ? 5 : (int)dataArray.count;//max 5 items height for scrollView
+    rect.origin.y += rect.size.height;
+    rect.size.height = (fsize + 2) * max_cnt;
+    
+    view.frame = rect;
+    [view setPara:rect.size.width :fsize :dataArray :^(int idx){
+        [annot setComboSel:idx];
+        [self->m_view vUpdateAnnotPage];
+        [self->m_view vAnnotEnd];
+        [self->m_view setModified:YES force:NO];
+        [pop dismiss];
+    }];
+    [self presentViewController:pop animated:NO completion:nil];
 }
 
 #pragma mark - PickerView DataSource and Delegate
@@ -1071,6 +1259,11 @@
                                         [self viewMenu];
                                     }];
         
+        UIAlertAction *meta =  [UIAlertAction actionWithTitle:NSLocalizedString(@"Meta", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
+                                    {
+                                        [self OnMeta];
+                                    }];
+        
         UIAlertAction *savePDF = [UIAlertAction actionWithTitle:NSLocalizedString(@"Save", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
                                   {
                                       [self savePdf];
@@ -1094,6 +1287,7 @@
         [addBookMark setValue:[(_addBookmarkImage) ? _addBookmarkImage : [UIImage imageNamed:@"btn_add"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
         [bookMarkList setValue:[(_bookmarkImage) ? _bookmarkImage : [UIImage imageNamed:@"btn_show"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
         [viewMenu setValue:[(_outlineImage) ? _outlineImage : [UIImage imageNamed:@"btn_outline"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
+        [meta setValue:[(_metaImage) ? _metaImage : [UIImage imageNamed:@"btn_meta"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
         [savePDF setValue:[(_saveImage) ? _saveImage : [UIImage imageNamed:@"btn_save"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
         [printPDF setValue:[(_printImage) ? _printImage : [UIImage imageNamed:@"btn_print"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
         [sharePDF setValue:[(_shareImage) ? _shareImage : [UIImage imageNamed:@"btn_share"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
@@ -1102,6 +1296,7 @@
         [moreItemsContainer addAction:addBookMark];
         [moreItemsContainer addAction:bookMarkList];
         [moreItemsContainer addAction:viewMenu];
+        [moreItemsContainer addAction:meta];
         [moreItemsContainer addAction:savePDF];
         [moreItemsContainer addAction:printPDF];
         [moreItemsContainer addAction:sharePDF];
@@ -1120,6 +1315,7 @@
         moreTVContainer.addBookmarkImage = _addBookmarkImage;
         moreTVContainer.bookmarkImage = _bookmarkImage;
         moreTVContainer.outlineImage = _outlineImage;
+        moreTVContainer.metaImage = _metaImage;
         moreTVContainer.saveImage = _saveImage;
         moreTVContainer.printImage = _printImage;
         moreTVContainer.shareImage = _shareImage;
@@ -1150,12 +1346,15 @@
             [self viewMenu];
             break;
         case 4:
-            [self savePdf];
+            [self OnMeta];
             break;
         case 5:
-            [self printPdf];
+            [self savePdf];
             break;
         case 6:
+            [self printPdf];
+            break;
+        case 7:
             [self sharePDF];
             
         default:
@@ -1357,6 +1556,38 @@
         [outlineView setJump:self];
         [nav pushViewController:outlineView animated:YES];
     }
+}
+
+#pragma mark - Meta
+-(void)OnMeta
+{
+    CGRect rect = m_view.frame;
+    NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgMeta" owner:self options:nil];
+    DlgMeta *view = [views lastObject];
+    //rect = view.frame;
+    //"Title",
+    //"Author",
+    //"Subject",
+    //"Keywords",
+    //"Creator",
+    //"Producer",
+    //"CreationDate",
+    //"ModDate"
+    [view setTitle:[m_doc meta:@"Title"]];
+    [view setAuthor:[m_doc meta:@"Author"]];
+    [view setSubject:[m_doc meta:@"Subject"]];
+    [view setKeywords:[m_doc meta:@"Keywords"]];
+
+    [view setBackgroundColor:[UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1]];
+    PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, rect.size.width * 0.8, 244) :YES :^(BOOL is_ok){
+        if (!is_ok) return;//ok button pressed?
+        [self->m_doc setMeta:@"Title" :view.title];
+        [self->m_doc setMeta:@"Author" :view.author];
+        [self->m_doc setMeta:@"Subject" :view.subject];
+        [self->m_doc setMeta:@"Keywords" :view.keywords];
+        [self->m_view setModified:YES force:NO];
+    }];
+    [self presentViewController:dlg animated:NO completion:nil];
 }
 
 #pragma mark - Save
@@ -2168,7 +2399,7 @@
 #pragma mark - Popup Menu Method
 -(void)selectIsStarting
 {
-    UIBarButtonItem *item = [toolBar.bar.items objectAtIndex:3]; // Selection button
+    UIBarButtonItem *item = toolBar.selectTextButton; // Selection button
     
     if (alreadySelected)
     {
@@ -2620,8 +2851,7 @@
     toolBar.backgroundColor = toolBar.bar.barTintColor = m_searchBar.barTintColor = drawToolbar.barTintColor = [self getBarColor];
     
     if (@available(iOS 13.0, *)) {
-        UITextField *t = [m_searchBar valueForKey:@"searchField"];
-        t.textColor = [self getTintColor];
+        
     } else {
         UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
         
@@ -2664,6 +2894,32 @@
 {
     [m_view refreshCurrentPage];
 }
+
+- (CGPoint)pdfPointsFromScreenPoints:(int)x :(int)y
+{
+    RDVPos pos;
+    [m_view vGetPos:&pos x:x y:y];
+    CGPoint pdfPoints;
+    pdfPoints.x = pos.pdfx;
+    pdfPoints.y = pos.pdfy;
+    return pdfPoints;
+}
+
+- (CGPoint)screenPointsFromPdfPoints:(float)x :(float)y :(int)pageNum
+{
+    return [m_view screenPointsFromPdfPoints:x :y :pageNum];
+}
+
+- (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect
+{
+    return [m_view pdfRectFromScreenRect:screenRect];
+}
+
+- (CGRect)screenRectFromPdfRect:(float)top :(float)left :(float)right :(float)bottom :(int)pageNum
+{
+    return [m_view screenRectFromPdfRect:top :left :right :bottom :pageNum];
+}
+
 
 
 @end

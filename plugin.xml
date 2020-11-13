@@ -466,8 +466,8 @@
         <header-file src="src/ios/RadaeePDFPlugin.h" />
         <source-file src="src/ios/PDFViewer/RDLoPDFViewController.m" />
         <header-file src="src/ios/PDFViewer/RDLoPDFViewController.h" />
-        <source-file src="src/ios/PDFViewer/PDFOffScreenView.m" />
-        <header-file src="src/ios/PDFViewer/PDFOffScreenView.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/PDFOffScreenView.m" />
+        <header-file src="src/ios/PDFViewer/PDFView/PDFOffScreenView.h" />
         <source-file src="src/ios/PDFViewer/BookmarkTableViewController.m" />
         <header-file src="src/ios/PDFViewer/BookmarkTableViewController.h" />
         <source-file src="src/ios/PDFViewer/OUTLINE_ITEM.m" />
@@ -510,6 +510,46 @@
         <header-file src="src/ios/PDFViewer/PDFLib/PDFObjc.h" />
         <header-file src="src/ios/PDFViewer/PDFLib/PDFIOS.h" />
         <source-file src="src/ios/PDFViewer/PDFLib/libRDPDFLib.a" framework="true" />
+        
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPopText.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPopText.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropComm.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropComm.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropIcon.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropIcon.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropLine.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropLine.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropMarkup.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropMarkup.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuAnnotOp.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuAnnotOp.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuCombo.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuCombo.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UIColorBtn.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UIColorBtn.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UIIconView.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UIIconView.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UILHeadView.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UILHeadView.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UILStyleView.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UILStyleView.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgMeta.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgMeta.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PopColor.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PopColor.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PopOutline.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PopOutline.h"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/PopColor.xib"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/PopOutline.xib"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgMeta.xib"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPopText.xib"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropComm.xib"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropIcon.xib"/>
+        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropMarkup.xib"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFDialog.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFDialog.h"/>
+        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFPopupCtrl.m"/>
+        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFPopupCtrl.h"/>
 
         <!-- Radaee sources -->
         <source-file src="src/ios/PDFViewer/RDMoreTableViewController.m" />
