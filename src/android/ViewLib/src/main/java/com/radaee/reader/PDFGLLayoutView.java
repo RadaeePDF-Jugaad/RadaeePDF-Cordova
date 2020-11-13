@@ -52,6 +52,16 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetInk(code);
     }
 
+    @Override
+    public void PDFSetPolygon(int code) {
+        m_view.PDFSetPolygon(code);
+    }
+
+    @Override
+    public void PDFSetPolyline(int code) {
+        m_view.PDFSetPolyline(code);
+    }
+
     public void PDFSetRect(int code) {
         m_view.PDFSetRect(code);
     }

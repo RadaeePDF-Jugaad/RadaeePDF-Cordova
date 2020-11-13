@@ -31,6 +31,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.radaee.annotui.UIAnnotDlgSign;
+import com.radaee.annotui.UIAnnotDlgSignProp;
 import com.radaee.annotui.UIAnnotMenu;
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
@@ -38,17 +40,10 @@ import com.radaee.pdf.Ink;
 import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
-import com.radaee.util.CaptureSignature;
+import com.radaee.pdf.Path;
 import com.radaee.util.ComboList;
 import com.radaee.util.CommonUtil;
 import com.radaee.util.PopupEditAct;
-import com.radaee.view.GLLayout;
-import com.radaee.view.GLLayoutCurl;
-import com.radaee.view.GLLayoutDual;
-import com.radaee.view.GLLayoutDual2;
-import com.radaee.view.GLLayoutHorz;
-import com.radaee.view.GLLayoutReflow;
-import com.radaee.view.GLLayoutVert;
 import com.radaee.view.ILayoutView;
 import com.radaee.view.PDFLayout;
 import com.radaee.view.PDFLayout.LayoutListener;
@@ -63,6 +58,8 @@ import com.radaee.viewlib.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.radaee.util.CommonUtil.dp2px;
+
 public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     static final protected int STA_NONE = 0;
@@ -74,6 +71,9 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     static final protected int STA_NOTE = 6;
     static final protected int STA_LINE = 7;
     static final protected int STA_STAMP = 8;
+    static final public int STA_EDITBOX = 9;
+    static final public int STA_POLYGON = 10;
+    static final public int STA_POLYLINE = 11;
     static final protected int STA_ANNOT = 100;
     protected Bitmap.Config m_bmp_format = Bitmap.Config.ALPHA_8;
     protected PDFLayout m_layout;
@@ -94,6 +94,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     private boolean mReadOnly = false;
     private Ink m_ink = null;
+    private Path m_polygon;
     private Bitmap m_icon = null;
     private Document.DocImage m_dicon = null;
     private float m_rects[];
@@ -156,40 +157,6 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
         @Override
         public void onShowPress(MotionEvent e) {
-        }
-
-        private void onEditAnnot() {
-            try {
-                int[] location = new int[2];
-                getLocationOnScreen(location);
-                Intent intent = new Intent(getContext(), PopupEditAct.class);
-                intent.putExtra("txt", m_annot.GetEditText());
-                intent.putExtra("x", m_annot_rect[0] + location[0]);
-                intent.putExtra("y", m_annot_rect[1] + location[1]);
-                intent.putExtra("w", m_annot_rect[2] - m_annot_rect[0]);
-                intent.putExtra("h", m_annot_rect[3] - m_annot_rect[1]);
-                intent.putExtra("type", m_annot.GetEditType());
-                intent.putExtra("max", m_annot.GetEditMaxlen());
-                intent.putExtra("size", m_annot.GetEditTextSize() * m_layout.vGetScale());
-                m_edit_type = 1;
-                PopupEditAct.ms_listener = new PopupEditAct.ActRetListener() {
-                    @Override
-                    public void OnEditValue(String val) {
-                        if (m_annot != null) {
-                            m_annot.SetEditText(val);
-                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
-                            if (m_annot != null && Global.sExecuteAnnotJS)
-                                executeAnnotJS();
-                            m_layout.vRenderSync(m_annot_page);
-                            if (m_listener != null)
-                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                            PDFEndAnnot();
-                            m_edit_type = 0;
-                        }
-                    }
-                };
-                getContext().startActivity(intent);
-            } catch (Exception e) { e.getMessage();  }
         }
 
         boolean[] mCheckedItems;
@@ -280,9 +247,10 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                     m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
                     m_status = STA_ANNOT;
                     int check = m_annot.GetCheckStatus();
-                    if(Global.g_annot_readonly && m_annot.IsReadOnly()) {
+                    if (Global.g_annot_readonly && m_annot.IsReadOnly()) {
                         Toast.makeText(getContext(), "Readonly annotation", Toast.LENGTH_SHORT).show();
-                        if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
+                        if (m_listener != null)
+                            m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
                     } else if (PDFCanSave() && check >= 0) {
                         switch (check) {
                             case 0:
@@ -365,9 +333,9 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                         }
                     } else if (PDFCanSave() && m_annot.GetListItemCount() >= 0)  //if list choice
                         onListAnnot();
-                    else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
+                    else if (PDFCanSave() && m_annot.GetFieldType() == 4 && Global.sEnableGraphicalSignature)  //signature field
                         handleSignatureField();
-                    else if(m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
+                    else if (m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
                         m_listener.OnPDFOpenURI(m_annot.GetURI());
                         PDFEndAnnot();
                     } else if (m_listener != null) {
@@ -413,27 +381,48 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         }
 
         private void handleSignatureField() {
-            if (CommonUtil.isFieldGraphicallySigned(m_annot)) {
-                new AlertDialog.Builder(getContext()).setTitle(R.string.warning).setMessage(R.string.delete_signature_message)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                updateSignature(null, true);
-                            }
-                        })
-                        .setNegativeButton(R.string.no, null)
-                        .show();
-            } else {
-                CaptureSignature.CaptureSignatureListener.setListener(new CaptureSignature.CaptureSignatureListener.OnSignatureCapturedListener() {
+            if (m_annot.GetSignStatus() == 1) {
+                UIAnnotDlgSignProp dlg = new UIAnnotDlgSignProp(getContext());
+                dlg.show(m_annot, m_doc, new UIAnnotMenu.IMemnuCallback() {
                     @Override
-                    public void OnSignatureCaptured(Bitmap signature) {
-                        updateSignature(signature, false);
+                    public void onUpdate() {
+                    }
+
+                    @Override
+                    public void onRemove() {
+                    }
+
+                    @Override
+                    public void onPerform() {
+                    }
+
+                    @Override
+                    public void onCancel() { PDFEndAnnot(); }
+                });
+            } else {
+                UIAnnotDlgSign dlg = new UIAnnotDlgSign(getContext());
+                dlg.show(m_annot, m_doc, new UIAnnotMenu.IMemnuCallback() {
+                    @Override
+                    public void onUpdate() {
+                        m_layout.vRenderSync(m_annot_page);
+                        if (m_listener != null)
+                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        PDFEndAnnot();
+                    }
+
+                    @Override
+                    public void onRemove() {
+                    }
+
+                    @Override
+                    public void onPerform() {
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        PDFEndAnnot();
                     }
                 });
-                Intent intent = new Intent(getContext(), CaptureSignature.class);
-                intent.putExtra(CaptureSignature.SIGNATURE_PAD_DESCR, Global.sSignPadDescr);
-                intent.putExtra(CaptureSignature.FIT_SIGNATURE_BITMAP, Global.sFitSignatureToField);
-                getContext().startActivity(intent);
             }
         }
 
@@ -477,6 +466,42 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
         VPage pages[];
         int pages_cnt;
+    }
+
+    private void onEditAnnot() {
+        try {
+            int[] location = new int[2];
+            getLocationOnScreen(location);
+            Intent intent = new Intent(getContext(), PopupEditAct.class);
+            intent.putExtra("txt", m_annot.GetEditText());
+            intent.putExtra("x", m_annot_rect[0] + location[0]);
+            intent.putExtra("y", m_annot_rect[1] + location[1]);
+            intent.putExtra("w", m_annot_rect[2] - m_annot_rect[0]);
+            intent.putExtra("h", m_annot_rect[3] - m_annot_rect[1]);
+            intent.putExtra("type", m_annot.GetEditType());
+            intent.putExtra("max", m_annot.GetEditMaxlen());
+            intent.putExtra("size", m_annot.GetEditTextSize() * m_layout.vGetScale());
+            m_edit_type = 1;
+            PopupEditAct.ms_listener = new PopupEditAct.ActRetListener() {
+                @Override
+                public void OnEditValue(String val) {
+                    if (m_annot != null) {
+                        m_annot.SetEditText(val);
+                        m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                        if (m_annot != null && Global.sExecuteAnnotJS)
+                            executeAnnotJS();
+                        m_layout.vRenderSync(m_annot_page);
+                        if (m_listener != null)
+                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        PDFEndAnnot();
+                        m_edit_type = 0;
+                    }
+                }
+            };
+            getContext().startActivity(intent);
+        } catch (Exception e) {
+            e.getMessage();
+        }
     }
 
     private ActivityManager m_amgr;
@@ -680,6 +705,67 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         }
     }
 
+    private void onDrawEditbox(Canvas canvas) {
+        if (m_status == STA_EDITBOX && m_rects != null) {
+            int len = m_rects.length;
+            int cur;
+            Paint paint1 = new Paint();
+            paint1.setStyle(Paint.Style.STROKE);
+            paint1.setStrokeWidth(3);
+            paint1.setARGB(0x80, 0xFF, 0, 0);
+            for (cur = 0; cur < len; cur += 4) {
+                float rect[] = new float[4];
+                if (m_rects[cur] > m_rects[cur + 2]) {
+                    rect[0] = m_rects[cur + 2];
+                    rect[2] = m_rects[cur];
+                } else {
+                    rect[0] = m_rects[cur];
+                    rect[2] = m_rects[cur + 2];
+                }
+                if (m_rects[cur + 1] > m_rects[cur + 3]) {
+                    rect[1] = m_rects[cur + 3];
+                    rect[3] = m_rects[cur + 1];
+                } else {
+                    rect[1] = m_rects[cur + 1];
+                    rect[3] = m_rects[cur + 3];
+                }
+                canvas.drawRect(rect[0], rect[1], rect[2], rect[3], paint1);
+            }
+        }
+    }
+
+    private void onDrawPolygon(Canvas canvas) {
+        if (m_status != STA_POLYGON || m_polygon == null) return;
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Global.line_annot_color);
+        paint.setStrokeWidth(Global.line_annot_width);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStrokeJoin(Paint.Join.BEVEL);
+        m_polygon.OnDraw(canvas, 0, 0, paint);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Global.line_annot_fill_color);
+        if (m_polygon.GetNodeCount() > 2)
+            m_polygon.OnDraw(canvas, 0, 0, paint);
+        m_polygon.onDrawPoint(canvas, 0, 0, dp2px(getContext(), 4), paint);
+    }
+
+    private void onDrawPolyline(Canvas canvas) {
+        if(m_status != STA_POLYLINE || m_polygon == null) return;
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Global.line_annot_color);
+        paint.setStrokeWidth(Global.line_annot_width);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStrokeJoin(Paint.Join.BEVEL);
+        m_polygon.OnDraw(canvas, 0, 0, paint);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Global.line_annot_fill_color);
+        m_polygon.onDrawPoint(canvas, 0, 0, dp2px(getContext(), 4), paint);
+    }
+
     /**
      * the draw function invoke onDraw and then call dispatchDraw. so we override only to draw on Canvas to reduce drawing time.
      *
@@ -696,6 +782,9 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             onDrawAnnot(canvas);
             onDrawLine(canvas);
             onDrawStamp(canvas);
+            onDrawEditbox(canvas);
+            onDrawPolygon(canvas);
+            onDrawPolyline(canvas);
             if (m_status == STA_INK && m_ink != null) {
                 m_ink.OnDraw(canvas, 0, 0);
             }
@@ -1109,6 +1198,90 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         return true;
     }
 
+    private boolean onTouchEditbox(MotionEvent event) {
+        if (m_status != STA_EDITBOX) return false;
+        int len = 0;
+        if (m_rects != null) len = m_rects.length;
+        int cur = 0;
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                float rects[] = new float[len + 4];
+                for (cur = 0; cur < len; cur++)
+                    rects[cur] = m_rects[cur];
+                len += 4;
+                rects[cur + 0] = event.getX();
+                rects[cur + 1] = event.getY();
+                rects[cur + 2] = event.getX();
+                rects[cur + 3] = event.getY();
+                m_rects = rects;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                m_rects[len - 2] = event.getX();
+                m_rects[len - 1] = event.getY();
+                break;
+            case MotionEvent.ACTION_UP://when touch up, it shall popup editbox on page
+            case MotionEvent.ACTION_CANCEL:
+                m_rects[len - 2] = event.getX();
+                m_rects[len - 1] = event.getY();
+                m_annot_pos = m_layout.vGetPos((int) m_rects[0], (int) m_rects[1]);
+                m_annot_page = m_layout.vGetPage(m_annot_pos.pageno);
+                PDFSetEditbox(1);//end editbox.
+
+                Page page = m_doc.GetPage(m_annot_page.GetPageNo());
+                page.ObjsStart();
+                m_annot = page.GetAnnot(page.GetAnnotCount() - 1);
+                m_annot_rect = m_annot.GetRect();
+                float tmp = m_annot_rect[1];
+                m_annot_rect[0] = m_annot_page.GetVX(m_annot_rect[0]) - m_layout.vGetX();
+                m_annot_rect[1] = m_annot_page.GetVY(m_annot_rect[3]) - m_layout.vGetY();
+                m_annot_rect[2] = m_annot_page.GetVX(m_annot_rect[2]) - m_layout.vGetX();
+                m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
+                m_status = STA_ANNOT;
+                onEditAnnot();
+                break;
+        }
+        invalidate();
+        return true;
+    }
+
+    private boolean onTouchPolygon(MotionEvent event) {
+        if (m_status != STA_POLYGON) return false;
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (m_annot_page == null) {
+                    PDFPos pos = m_layout.vGetPos((int) event.getX(), (int) event.getY());
+                    m_annot_page = m_layout.vGetPage(pos.pageno);
+                }
+                if (m_polygon.GetNodeCount() < 1)
+                    m_polygon.MoveTo(event.getX(), event.getY());
+                else
+                    m_polygon.LineTo(event.getX(), event.getY());
+                break;
+        }
+        invalidate();
+        return true;
+    }
+
+    private boolean onTouchPolyline(MotionEvent event) {
+        if (m_status != STA_POLYLINE) return false;
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (m_annot_page == null) {
+                    PDFPos pos = m_layout.vGetPos((int) event.getX(), (int) event.getY());
+                    m_annot_page = m_layout.vGetPage(pos.pageno);
+                }
+                if (m_polygon.GetNodeCount() < 1)
+                    m_polygon.MoveTo(event.getX(), event.getY());
+                else
+                    m_polygon.LineTo(event.getX(), event.getY());
+                break;
+        }
+        invalidate();
+        return true;
+    }
+
     private void onAnnotCreated(Annotation annot) {
         if (annot != null) {
             annot.SetModifyDate(CommonUtil.getCurrentDate());
@@ -1129,6 +1302,9 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         if (onTouchNote(event)) return true;
         if (onTouchLine(event)) return true;
         if (onTouchStamp(event)) return true;
+        if (onTouchEditbox(event)) return true;
+        if (onTouchPolygon(event)) return true;
+        if (onTouchPolyline(event)) return true;
         if (onTouchAnnot(event)) return true;
         return true;
     }
@@ -1198,7 +1374,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 m_goto_pos = null;
                 invalidate();
             } else if (pos != null) {
-                if(style == 3 || style == 4 || style == 6)
+                if (style == 3 || style == 4 || style == 6)
                     m_layout.vGotoPage(pos.pageno);
                 else
                     m_layout.vSetPos(0, 0, pos);
@@ -1207,10 +1383,11 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         }
         invalidate();
     }
+
     private int m_view_mode;
     private PDFLayout.PDFPos m_save_pos;
-    public void PDFSaveView()
-    {
+
+    public void PDFSaveView() {
         int w = getWidth();
         int h = getHeight();
         if (m_layout != null) m_save_pos = m_layout.vGetPos(w >> 1, h >> 1);
@@ -1222,8 +1399,8 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             layout.vClose();
         }
     }
-    public void PDFRestoreView()
-    {
+
+    public void PDFRestoreView() {
         //reset stack.
         m_opstack = new PDFLayoutOPStack();
         switch (m_view_mode) {
@@ -1278,7 +1455,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 m_goto_pos = null;
                 invalidate();
             } else if (m_save_pos != null) {
-                if(m_view_mode == 3 || m_view_mode == 4 || m_view_mode == 6)
+                if (m_view_mode == 3 || m_view_mode == 4 || m_view_mode == 6)
                     m_layout.vGotoPage(m_save_pos.pageno);
                 else
                     m_layout.vSetPos(0, 0, m_save_pos);
@@ -1320,8 +1497,8 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             invalidate();
         }
     }
-    public void PDFScrolltoPage(int pageno)
-    {
+
+    public void PDFScrolltoPage(int pageno) {
         if (m_layout == null) return;
         if (m_layout.vGetHeight() <= 0 || m_layout.vGetWidth() <= 0) {
             m_goto_pos = m_layout.new PDFPos();
@@ -1432,6 +1609,88 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             m_status = STA_NONE;
             m_ink.Destroy();
             m_ink = null;
+            m_annot_page = null;
+            invalidate();
+        }
+    }
+
+    @Override
+    public void PDFSetPolygon(int code) {
+        if (code == 0)//start
+        {
+            m_status = STA_POLYGON;
+            m_polygon = new Path();
+        } else if (code == 1)//end
+        {
+            m_status = STA_NONE;
+            if (m_annot_page != null) {
+                Page page = m_doc.GetPage(m_annot_page.GetPageNo());
+                if (page != null && m_polygon.GetNodeCount() > 2) {
+                    page.ObjsStart();
+                    Matrix mat = m_annot_page.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
+                    mat.TransformPath(m_polygon);
+                    page.AddAnnotPolygon(m_polygon, Global.line_annot_color, Global.line_annot_fill_color, m_annot_page.ToPDFSize(Global.line_annot_width));
+                    mat.Destroy();
+                    int aidx = page.GetAnnotCount() - 1;
+                    onAnnotCreated(page.GetAnnot(aidx));
+                    //add to redo/undo stack.
+                    m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, aidx));
+                    m_layout.vRenderSync(m_annot_page);
+                    page.Close();
+                    if (m_listener != null)
+                        m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                }
+            }
+            if (m_polygon != null) m_polygon.Destroy();
+            m_polygon = null;
+            m_annot_page = null;
+            invalidate();
+        } else//cancel
+        {
+            m_status = STA_NONE;
+            m_polygon.Destroy();
+            m_polygon = null;
+            m_annot_page = null;
+            invalidate();
+        }
+    }
+
+    @Override
+    public void PDFSetPolyline(int code) {
+        if (code == 0)//start
+        {
+            m_status = STA_POLYLINE;
+            m_polygon = new Path();
+        } else if (code == 1)//end
+        {
+            m_status = STA_NONE;
+            if (m_annot_page != null) {
+                Page page = m_doc.GetPage(m_annot_page.GetPageNo());
+                if (page != null && m_polygon.GetNodeCount() > 1) {
+                    page.ObjsStart();
+                    Matrix mat = m_annot_page.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
+                    mat.TransformPath(m_polygon);
+                    page.AddAnnotPolyline(m_polygon, 0, 0, Global.line_annot_color, Global.line_annot_fill_color, m_annot_page.ToPDFSize(Global.line_annot_width));
+                    mat.Destroy();
+                    int aidx = page.GetAnnotCount() - 1;
+                    onAnnotCreated(page.GetAnnot(aidx));
+                    //add to redo/undo stack.
+                    m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, aidx));
+                    m_layout.vRenderSync(m_annot_page);
+                    page.Close();
+                    if (m_listener != null)
+                        m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                }
+            }
+            if (m_polygon != null) m_polygon.Destroy();
+            m_polygon = null;
+            m_annot_page = null;
+            invalidate();
+        } else//cancel
+        {
+            m_status = STA_NONE;
+            m_polygon.Destroy();
+            m_polygon = null;
             m_annot_page = null;
             invalidate();
         }
@@ -1748,8 +2007,64 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         }
     }
 
-    public void PDFSetEditbox(int code)
-    {
+    public void PDFSetEditbox(int code) {
+        if (code == 0)//start
+        {
+            m_status = STA_EDITBOX;
+        } else if (code == 1)//end
+        {
+            if (m_rects != null) {
+                int len = m_rects.length;
+                int cur;
+                PDFVPageSet pset = new PDFVPageSet(len);
+                for (cur = 0; cur < len; cur += 4) {
+                    PDFPos pos = m_layout.vGetPos((int) m_rects[cur], (int) m_rects[cur + 1]);
+                    VPage vpage = m_layout.vGetPage(pos.pageno);
+                    Page page = m_doc.GetPage(vpage.GetPageNo());
+                    if (page != null) {
+                        page.ObjsStart();
+                        Matrix mat = vpage.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
+                        float rect[] = new float[4];
+                        if (m_rects[cur] > m_rects[cur + 2]) {
+                            rect[0] = m_rects[cur + 2];
+                            rect[2] = m_rects[cur];
+                        } else {
+                            rect[0] = m_rects[cur];
+                            rect[2] = m_rects[cur + 2];
+                        }
+                        if (m_rects[cur + 1] > m_rects[cur + 3]) {
+                            rect[1] = m_rects[cur + 3];
+                            rect[3] = m_rects[cur + 1];
+                        } else {
+                            rect[1] = m_rects[cur + 1];
+                            rect[3] = m_rects[cur + 3];
+                        }
+                        mat.TransformRect(rect);
+                        if (rect[2] - rect[0] < 80) rect[2] = rect[0] + 80;
+                        if (rect[3] - rect[1] < 16) rect[1] = rect[3] - 16;
+                        page.AddAnnotEditbox(rect, 0xFFFF0000, vpage.ToPDFSize(3), 0, 12, 0xFFFF0000);
+                        mat.Destroy();
+                        //add to redo/undo stack.
+                        m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
+                        pset.Insert(vpage);
+                        page.Close();
+                    }
+                }
+                for (cur = 0; cur < pset.pages_cnt; cur++) {
+                    VPage vpage = pset.pages[cur];
+                    m_layout.vRenderSync(vpage);
+                    if (m_listener != null)
+                        m_listener.OnPDFPageModified(vpage.GetPageNo());
+                }
+            }
+            m_status = STA_NONE;
+            m_rects = null;
+            invalidate();
+        } else { //cancel
+            m_status = STA_NONE;
+            m_rects = null;
+            invalidate();
+        }
     }
 
     public void PDFCancelAnnot() {
@@ -1759,13 +2074,16 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         if (m_status == STA_LINE) PDFSetLine(2);
         if (m_status == STA_STAMP) PDFSetStamp(2);
         if (m_status == STA_ELLIPSE) PDFSetEllipse(2);
+        if (m_status == STA_EDITBOX) PDFSetEditbox(2);
+        if (m_status == STA_POLYGON) PDFSetPolygon(2);
+        if (m_status == STA_POLYLINE) PDFSetPolyline(2);
         if (m_status == STA_ANNOT) PDFEndAnnot();
         invalidate();
     }
 
     public void PDFRemoveAnnot() {
         if (m_status != STA_ANNOT) return;
-        if(!PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
+        if (!PDFCanSave() || (Global.g_annot_readonly && m_annot.IsReadOnly())
                 || (Global.g_annot_lock && m_annot.IsLocked())) {
             Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
             PDFEndAnnot();
@@ -1795,12 +2113,14 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         m_status = STA_NONE;
         try {
             if (m_pCombo != null && m_pCombo.isShowing()) m_pCombo.dismiss();
-        } catch (Exception e) { e.getMessage(); }
+        } catch (Exception e) {
+            e.getMessage();
+        }
     }
 
     public void PDFEditAnnot() {
         if (m_status != STA_ANNOT) return;
-        if(!PDFCanSave()) {
+        if (!PDFCanSave()) {
             Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
             PDFEndAnnot();
             return;
@@ -2073,7 +2393,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     }
 
     public void PDFSetZoom(int vx, int vy, PDFPos pos, float zoom) {
-        if(m_layout != null) m_layout.vZoomSet(vx, vy, pos, zoom);
+        if (m_layout != null) m_layout.vZoomSet(vx, vy, pos, zoom);
     }
 
     public float PDFGetZoom() {
@@ -2081,7 +2401,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     }
 
     public float[] toPDFRect(float[] viewRect) {
-        if(m_layout != null) {
+        if (m_layout != null) {
             VPage vpage = m_layout.vGetPage(PDFGetCurrPage());
             Matrix mat = vpage.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
             mat.TransformRect(viewRect);
@@ -2134,8 +2454,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     }
 
     @Override
-    public void PDFAddAnnotRect(float x, float y, float width, float height, int p)
-    {
+    public void PDFAddAnnotRect(float x, float y, float width, float height, int p) {
         // init the page
         VPage vpage = m_layout.vGetPage(p);
         Page page = m_doc.GetPage(p);

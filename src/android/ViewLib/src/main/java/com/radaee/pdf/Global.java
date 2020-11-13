@@ -16,7 +16,7 @@ import java.io.InputStream;
  * class for Global setting.
  * 
  * @author Radaee
- * @version 3.53.6
+ * @version 3.54
  */
 public class Global
 {
@@ -309,9 +309,9 @@ public class Global
 	 * 1:horizontal<br/>
 	 * 2:scroll<br/>
 	 * 3:single<br/>
-	 * 4:SingleEx<br/>
+	 * 4:Dual<br/>
 	 * 5:ReFlow<br/>
-	 * 6:2 page in landscape
+	 * 6:Dual with cover(1st page single) in landscape
 	 */
 	public static int def_view = 0;
 	/**
@@ -384,8 +384,6 @@ public class Global
 	public static String sAnnotAuthor; //if valorized, will be used to set the annotation author while its creation
 
 	public static boolean sEnableGraphicalSignature = true;
-	public static boolean sFitSignatureToField = true; //if true, the blank space will be trimmed from the signature bitmap
-	public static String sSignPadDescr = "Sign Here";
 
 	public static boolean sExecuteAnnotJS = true;
 
@@ -417,6 +415,8 @@ public class Global
     public static int line_annot_style2 = 0;
     public static int line_annot_color = 0x80FF0000;
     public static int line_annot_fill_color = 0x800000FF;
+
+	public static int g_thumbview_label_color = 0x800000FF;
 
     //true: calculate scale of each page, false: calculate scale based on the dimensions of the largest page
 	public static boolean fit_different_page_size = false;
@@ -822,8 +822,7 @@ public class Global
 		fling_dis = 1.0f;// 0.5-2
         fling_speed = 0.1f;// 0.05 - 0.2
 		def_view = 0;// 0,1,2,3,4,5,6 0:vertical 1:horizon 2:curl effect 3:single
-						// 4:SingleEx 5:Reflow, 6:show 2 page as 1 page in land
-						// scape mode
+						// 4:Dual 5:Reflow, 6:Dual with cover(1st page single) in landscape
 		render_mode = recommandedRenderMode();// 0,1,2 0:draft 1:normal 2:best with over print support.
 		dark_mode = false;// dark mode
 		zoomLevel = 3;

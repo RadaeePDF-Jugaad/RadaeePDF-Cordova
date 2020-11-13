@@ -166,7 +166,7 @@ public class PDFThumbView extends View implements PDFViewListener {
     private Paint m_paint = new Paint();
 
     public void OnPDFPageDisplayed(Canvas canvas, PDFVPage vpage) {
-        m_paint.setColor(0x800000FF);
+        m_paint.setColor(Global.g_thumbview_label_color);
         int top = vpage.GetVY(m_thumb.vGetY());
         int bottom = top + vpage.GetHeight();
         int left = vpage.GetVX(m_thumb.vGetX());

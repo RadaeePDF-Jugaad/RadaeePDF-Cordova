@@ -107,9 +107,9 @@ public interface ILayoutView {
      * 1:horizon<br/>
      * 2:curl effect(opengl only)<br/>
      * 3:single<br/>
-     * 4:SingleEx<br/>
+     * 4:Dual<br/>
      * 5:Reflow(opengl only)<br/>
-     * 6:show 2 page as 1 page in land scape mode
+     * 6:Dual with cover(1st page single) in landscape mode
      */
     void PDFSetView(int vmode);
 
@@ -121,6 +121,24 @@ public interface ILayoutView {
      * 2: cancel Ink status
      */
     void PDFSetInk(int code);
+
+    /**
+     * set Polygon status.
+     * @param code <br/>
+     * 0: set to Polygon status<br/>
+     * 1: end and confirm Polygon status<br/>
+     * 2: cancel Polygon status
+     */
+    void PDFSetPolygon(int code);
+
+    /**
+     * set Polyline status.
+     * @param code <br/>
+     * 0: set to Polyline status<br/>
+     * 1: end and confirm Polyline status<br/>
+     * 2: cancel Polyline status
+     */
+    void PDFSetPolyline(int code);
 
     /**
      * set Rect status.
@@ -204,8 +222,6 @@ public interface ILayoutView {
     int PDFGetCurrPage();
     void PDFAddAnnotRect(float x, float y, float width, float height, int p);
 
-
     int GetScreenX(float pdfX, int pageno);
     int GetScreenY(float pdfY, int pageno);
-
 }

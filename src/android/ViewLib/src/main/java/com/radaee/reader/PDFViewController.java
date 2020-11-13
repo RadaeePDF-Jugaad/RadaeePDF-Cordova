@@ -101,6 +101,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     private ImageView btn_annot_stamp;
     private ImageView btn_annot_note;
     private ImageView btn_annot_editbox;
+    private ImageView btn_annot_polygon;
+    private ImageView btn_annot_polyline;
     private EditText edit_find;
     private SeekBar seek_page;
     private TextView lab_page;
@@ -140,6 +142,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         layout = (RelativeLayout) m_bar_annot.BarGetView();
         btn_annot_back = (ImageView) layout.findViewById(R.id.btn_back);
         btn_annot_ink = (ImageView) layout.findViewById(R.id.btn_annot_ink);
+        btn_annot_polygon = (ImageView) layout.findViewById(R.id.btn_annot_polygon);
+        btn_annot_polyline = (ImageView) layout.findViewById(R.id.btn_annot_polyline);
         btn_annot_line = (ImageView) layout.findViewById(R.id.btn_annot_line);
         btn_annot_rect = (ImageView) layout.findViewById(R.id.btn_annot_rect);
         btn_annot_oval = (ImageView) layout.findViewById(R.id.btn_annot_oval);
@@ -177,6 +181,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_find_next.setOnClickListener(this);
         btn_annot_back.setOnClickListener(this);
         btn_annot_ink.setOnClickListener(this);
+        btn_annot_polygon.setOnClickListener(this);
+        btn_annot_polyline.setOnClickListener(this);
         btn_annot_line.setOnClickListener(this);
         btn_annot_rect.setOnClickListener(this);
         btn_annot_oval.setOnClickListener(this);
@@ -442,13 +448,16 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 if (m_set) {
                     m_view.PDFCancelAnnot();
                     m_set = false;
-                    SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
-                    SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
-                    SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
-                    SetBtnEnabled(btn_annot_oval, m_view.PDFCanSave());
-                    SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
-                    SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
-                    SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
+                    boolean can_save = m_view.PDFCanSave();
+                    SetBtnEnabled(btn_annot_ink, can_save);
+                    SetBtnEnabled(btn_annot_polygon, can_save);
+                    SetBtnEnabled(btn_annot_polyline, can_save);
+                    SetBtnEnabled(btn_annot_line, can_save);
+                    SetBtnEnabled(btn_annot_rect, can_save);
+                    SetBtnEnabled(btn_annot_oval, can_save);
+                    SetBtnEnabled(btn_annot_stamp, can_save);
+                    SetBtnEnabled(btn_annot_note, can_save);
+                    SetBtnEnabled(btn_annot_editbox, can_save);
                 }
                 m_bar_annot.BarHide();
                 m_bar_status = BAR_NONE;
@@ -527,6 +536,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_ink) {
             if (m_set) {
                 m_view.PDFSetInk(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnChecked(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -536,7 +547,57 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
             } else {
                 m_view.PDFSetInk(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnChecked(btn_annot_ink, true);
+                SetBtnEnabled(btn_annot_line, false);
+                SetBtnEnabled(btn_annot_rect, false);
+                SetBtnEnabled(btn_annot_oval, false);
+                SetBtnEnabled(btn_annot_stamp, false);
+                SetBtnEnabled(btn_annot_note, false);
+                SetBtnEnabled(btn_annot_editbox, false);
+            }
+        } else if (arg0 == btn_annot_polygon) {
+            if (m_set) {
+                m_view.PDFSetPolygon(1);
+                SetBtnChecked(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_oval, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
+            } else {
+                m_view.PDFSetPolygon(0);
+                SetBtnChecked(btn_annot_polygon, true);
+                SetBtnEnabled(btn_annot_polyline, false);
+                SetBtnEnabled(btn_annot_ink, false);
+                SetBtnEnabled(btn_annot_line, false);
+                SetBtnEnabled(btn_annot_rect, false);
+                SetBtnEnabled(btn_annot_oval, false);
+                SetBtnEnabled(btn_annot_stamp, false);
+                SetBtnEnabled(btn_annot_note, false);
+                SetBtnEnabled(btn_annot_editbox, false);
+            }
+        } else if (arg0 == btn_annot_polyline) {
+            if (m_set) {
+                m_view.PDFSetPolyline(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnChecked(btn_annot_polyline, false);
+                SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_oval, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
+            } else {
+                m_view.PDFSetPolyline(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnChecked(btn_annot_polyline, true);
+                SetBtnEnabled(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, false);
                 SetBtnEnabled(btn_annot_rect, false);
                 SetBtnEnabled(btn_annot_oval, false);
@@ -547,6 +608,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_line) {
             if (m_set) {
                 m_view.PDFSetLine(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
                 SetBtnChecked(btn_annot_line, false);
                 SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -556,6 +619,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
             } else {
                 m_view.PDFSetLine(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnEnabled(btn_annot_ink, false);
                 SetBtnChecked(btn_annot_line, true);
                 SetBtnEnabled(btn_annot_rect, false);
@@ -567,6 +632,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_rect) {
             if (m_set) {
                 m_view.PDFSetRect(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
                 SetBtnChecked(btn_annot_rect, false);
@@ -576,6 +643,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
             } else {
                 m_view.PDFSetRect(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnEnabled(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, false);
                 SetBtnChecked(btn_annot_rect, true);
@@ -587,6 +656,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_oval) {
             if (m_set) {
                 m_view.PDFSetEllipse(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -596,6 +667,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
             } else {
                 m_view.PDFSetEllipse(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnEnabled(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, false);
                 SetBtnEnabled(btn_annot_rect, false);
@@ -607,6 +680,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_stamp) {
             if (m_set) {
                 m_view.PDFSetStamp(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -616,6 +691,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
             } else {
                 m_view.PDFSetStamp(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnEnabled(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, false);
                 SetBtnEnabled(btn_annot_rect, false);
@@ -627,6 +704,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_note) {
             if (m_set) {
                 m_view.PDFSetNote(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -636,6 +715,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
             } else {
                 m_view.PDFSetNote(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnEnabled(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, false);
                 SetBtnEnabled(btn_annot_rect, false);
@@ -647,6 +728,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_editbox) {
             if (m_set) {
                 m_view.PDFSetEditbox(1);
+                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
                 SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -656,6 +739,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnChecked(btn_annot_editbox, false);
             } else {
                 m_view.PDFSetEditbox(0);
+                SetBtnEnabled(btn_annot_polygon, false);
+                SetBtnEnabled(btn_annot_polyline, false);
                 SetBtnEnabled(btn_annot_ink, false);
                 SetBtnEnabled(btn_annot_line, false);
                 SetBtnEnabled(btn_annot_rect, false);
@@ -667,6 +752,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_back) {
             m_view.PDFCancelAnnot();
             m_set = false;
+            SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+            SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
             SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
             SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
             SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
@@ -902,6 +989,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 btn_redo.setColorFilter(color);
                 btn_more.setColorFilter(color);
                 btn_annot_back.setColorFilter(color);
+                btn_annot_polygon.setColorFilter(color);
+                btn_annot_polyline.setColorFilter(color);
                 btn_annot_ink.setColorFilter(color);
                 btn_annot_line.setColorFilter(color);
                 btn_annot_rect.setColorFilter(color);
@@ -969,6 +1058,8 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                     }
                     break;
                 case BAR_ANNOT:
+                    SetBtnChecked(btn_annot_polygon, false);
+                    SetBtnChecked(btn_annot_polyline, false);
                     SetBtnChecked(btn_annot_ink, false);
                     SetBtnChecked(btn_annot_line, false);
                     SetBtnChecked(btn_annot_rect, false);
