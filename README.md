@@ -138,8 +138,8 @@ For more examples, check demo/js/index.js
 - iOS: CALayer based tiled rendering.
 
 RadaeePDF library version included:
-- Android: v3.53.1
-- iOS: v3.58
+- Android: v3.54
+- iOS: v3.73
 
 Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
