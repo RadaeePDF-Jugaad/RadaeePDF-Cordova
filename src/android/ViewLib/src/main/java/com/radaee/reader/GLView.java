@@ -2238,6 +2238,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         boolean result = false;
         Page page = m_doc.GetPage(0);
         if (page != null) {
+			page.ObjsStart();
             result = page.AddAnnotAttachment(attachmentPath, 0, new float[]{0, 0, 0, 0});
             if (result && m_listener != null) m_listener.OnPDFPageModified(0);
             page.Close();
