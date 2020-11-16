@@ -91,8 +91,8 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetEditbox(code);
     }
     @Override
-    public boolean PDFSetAttachment(String attachmentPath) { //TODO
-        return false;
+    public boolean PDFSetAttachment(String attachmentPath) {
+        return m_view.PDFSetAttachment(attachmentPath);
     }
 
     public void PDFCancelAnnot() {

@@ -2233,6 +2233,17 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             if (m_canvas != null) m_canvas.invalidate();
         }
     }
+	
+	public boolean PDFSetAttachment(String attachmentPath) {
+        boolean result = false;
+        Page page = m_doc.GetPage(0);
+        if (page != null) {
+            result = page.AddAnnotAttachment(attachmentPath, 0, new float[]{0, 0, 0, 0});
+            if (result && m_listener != null) m_listener.OnPDFPageModified(0);
+            page.Close();
+        }
+        return result;
+    }
 
     public void PDFCancelAnnot() {
         if (m_status == STA_NOTE) PDFSetNote(2);
