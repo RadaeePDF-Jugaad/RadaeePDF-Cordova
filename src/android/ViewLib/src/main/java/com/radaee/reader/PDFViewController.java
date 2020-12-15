@@ -1180,10 +1180,9 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             Page ppage = m_view.PDFGetDoc().GetPage(page);
             if (ppage != null) {
                 boolean res = ppage.FlatAnnots();
-                if (res && page == m_view.PDFGetCurrPage()) {
+                if (res && page == m_view.PDFGetCurrPage())
                     m_view.PDFUpdateCurrPage();
-                    return true;
-                }
+                return res;
             }
             return false;
         }
