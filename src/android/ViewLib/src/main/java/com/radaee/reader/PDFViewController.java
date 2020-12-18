@@ -27,6 +27,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
@@ -1173,25 +1174,41 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             return CommonUtil.renderAnnotToFile(m_view.PDFGetDoc(), page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
         }
 
-        @Override
-        public boolean flatAnnotAtPage(int page) {
-            if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
-            if (page >= m_view.PDFGetDoc().GetPageCount()) return false;
-            Page ppage = m_view.PDFGetDoc().GetPage(page);
-            if (ppage != null) {
-                boolean res = ppage.FlatAnnots();
-                if (res && page == m_view.PDFGetCurrPage())
-                    m_view.PDFUpdateCurrPage();
-                return res;
+        private boolean flatAnnotsAtPage(Document document, int pageNo) {
+            if(document == null || !document.IsOpened()) return false;
+            if (pageNo < 0 || pageNo >= document.GetPageCount()) return false;
+            Page page = document.GetPage(pageNo);
+            if (page != null) {
+                page.ObjsStart();
+                if(page.FlatAnnots()) {
+                    if (m_view != null && pageNo == m_view.PDFGetCurrPage())
+                        m_view.PDFUpdateCurrPage();
+                    return document.Save();
+                }
             }
             return false;
         }
 
         @Override
+        public boolean flatAnnotAtPage(int page) {
+            Document document = m_view.PDFGetDoc();
+            if (m_view.PDFGetDoc() == null && !TextUtils.isEmpty(m_docPath)) { //try to re-open the document
+                document = new Document();
+                document.Open(m_docPath, "");
+            }
+            return flatAnnotsAtPage(document, page);
+        }
+
+        @Override
         public boolean flatAnnots() {
-            if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
-            for (int i = 0; i < m_view.PDFGetDoc().GetPageCount(); i++) {
-                if (!this.flatAnnotAtPage(i))
+            Document document = m_view.PDFGetDoc();
+            if (m_view.PDFGetDoc() == null && !TextUtils.isEmpty(m_docPath)) { //try to re-open the document
+                document = new Document();
+                document.Open(m_docPath, "");
+            }
+            if(document == null || !document.IsOpened()) return false;
+            for (int i = 0; i < document.GetPageCount(); i++) {
+                if (!flatAnnotsAtPage(document, i))
                     return false;
             }
             return true;
