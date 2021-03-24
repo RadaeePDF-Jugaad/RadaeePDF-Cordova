@@ -13,8 +13,8 @@ This plugin is released under the Apache 2.0 license
 **Only the plugin source code is under the license Apache 2.0, the library included in the plugin follow the license of his owner, please check it on:**
 http://www.radaeepdf.com/ecommerce/technical-specification
 
-GEAR.it and Radaee Studio distribute the plugin as-is for free.
-GEAR.it is the maintainer of the plug-in project.
+Jugaar s.r.l. and Radaee Studio distribute the plugin as-is for free.
+Jugaar s.r.l. is the maintainer of the plug-in project.
 
 If you, as user and developer need new features or fixes you shall submit them here on GitHub.
 
@@ -142,8 +142,10 @@ RadaeePDF library version included:
 - iOS: v3.73
 
 Original development: 
+- Based on the original Xamarin module from GEAR.it.
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
    www.paolomessina.it, email: paolo.messina.it@gmail.com
 
 More information about RadaeePDF SDK on http://www.radaeepdf.com.  
 For guide please check [Knowledge Base articles](http://www.radaeepdf.com/support/knowledge-base?view=kb&catid=4)
+
