@@ -1,6 +1,6 @@
 # RadaeePDF-Cordova Plugin
 
-The repository has been moved to https://github.com/gearit/RadaeePDF-Cordova
+The repository has been moved to https://github.com/RadaeePDF-Jugaad/RadaeePDF-Cordova
 
 The new one contains sources for both Android and iOS.
 
