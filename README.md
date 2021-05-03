@@ -138,7 +138,7 @@ For more examples, check demo/js/index.js
 - iOS: CALayer based tiled rendering.
 
 RadaeePDF library version included:
-- Android: v3.54
+- Android: v3.55 - 03/May/2021
 - iOS: v3.73
 
 Original development: 
