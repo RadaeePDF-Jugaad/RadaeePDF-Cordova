@@ -429,8 +429,8 @@
     int ret = [m_finder find_prepare:dir];
     if( ret == 1 )
     {
-        //[m_del OnFound:m_finder];
-        //[self vFindGoto];
+        [m_del RDVOnFound:m_finder];
+        [self vFindGoto];
         return 0;//succeeded
     }
     if( ret == 0 )
