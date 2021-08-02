@@ -660,7 +660,7 @@
     
     if( !found )
     {
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Waring"
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Warning"
                                    message:@"Find Over"
                                    preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
@@ -2192,7 +2192,7 @@
     }
     else
     {
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Waring", nil)
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Warning", nil)
                                                                        message:NSLocalizedString(@"Error", nil)
                                                                 preferredStyle:UIAlertControllerStyleAlert];
         
