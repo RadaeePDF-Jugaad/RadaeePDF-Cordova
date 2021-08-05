@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "PDFIOS.h"
-//#import "RDVGlobal.h"
+#import "RDVGlobal.h"
 #pragma once
 
 typedef struct _PDF_TEXT_RET_
