@@ -40,7 +40,7 @@
     
     //  self.partitationTableView = [[UITableView alloc]initWithFrame:self.view.frame style:UITableViewStyleGrouped];
     self.partitationTableView = [[UITableView alloc]initWithFrame:CGRectMake(0,0,cwidth, cheight-100) style:UITableViewStyleGrouped];
-    
+    self.partitationTableView.backgroundColor = [RDUtils radaeeWhiteColor];
     self.partitationTableView.delegate =self;
     self.partitationTableView.dataSource = self;
     self.partitationTableView.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;

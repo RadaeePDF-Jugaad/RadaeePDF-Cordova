@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Pages Ctrl-->
+        <scene sceneID="XXu-WG-FR1">
+            <objects>
+                <viewController storyboardIdentifier="rdpdfpages" id="HaK-f9-fBe" customClass="PDFPagesCtrl" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="4Ey-rN-dq8">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FPj-IA-O55">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="n0L-vE-zWE"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem systemItem="stop" id="gaq-8t-kER">
+                                        <connections>
+                                            <action selector="OnBtnBack:" destination="HaK-f9-fBe" id="3kv-eE-q6e"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="N6B-6z-JBe"/>
+                                    <barButtonItem title="Item" image="btn_done" id="S1E-FA-Dm9">
+                                        <connections>
+                                            <action selector="OnBtnDone:" destination="HaK-f9-fBe" id="GOr-zc-Y6N"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O8s-jE-pI1" customClass="PDFPagesView">
+                                <rect key="frame" x="0.0" y="44" width="375" height="623"/>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="O8s-jE-pI1" firstAttribute="top" secondItem="FPj-IA-O55" secondAttribute="bottom" id="5z9-MG-Nvn"/>
+                            <constraint firstItem="FPj-IA-O55" firstAttribute="trailing" secondItem="hWN-Rk-7zQ" secondAttribute="trailing" id="N5j-uz-dJB"/>
+                            <constraint firstItem="O8s-jE-pI1" firstAttribute="leading" secondItem="hWN-Rk-7zQ" secondAttribute="leading" id="UXh-fa-BiW"/>
+                            <constraint firstItem="FPj-IA-O55" firstAttribute="leading" secondItem="hWN-Rk-7zQ" secondAttribute="leading" id="Vpv-vs-wF4"/>
+                            <constraint firstItem="FPj-IA-O55" firstAttribute="top" secondItem="hWN-Rk-7zQ" secondAttribute="top" id="eVP-Nz-d9P"/>
+                            <constraint firstItem="O8s-jE-pI1" firstAttribute="bottom" secondItem="hWN-Rk-7zQ" secondAttribute="bottom" id="q9c-Zc-M9h"/>
+                            <constraint firstItem="O8s-jE-pI1" firstAttribute="trailing" secondItem="4Ey-rN-dq8" secondAttribute="trailing" id="xGL-MF-TMc"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="hWN-Rk-7zQ"/>
+                    </view>
+                    <connections>
+                        <outlet property="mPages" destination="O8s-jE-pI1" id="F1C-Ha-GvM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NuB-oH-HdW" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="37.600000000000001" y="25.637181409295355"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="btn_done" width="32" height="32"/>
+    </resources>
+</document>

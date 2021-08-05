@@ -448,142 +448,167 @@
         <!-- Radaee sources -->
         <source-file src="src/ios/RadaeePDFPlugin.m" />
         <header-file src="src/ios/RadaeePDFPlugin.h" />
-        <source-file src="src/ios/PDFViewer/RDLoPDFViewController.m" />
-        <header-file src="src/ios/PDFViewer/RDLoPDFViewController.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/PDFOffScreenView.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/PDFOffScreenView.h" />
-        <source-file src="src/ios/PDFViewer/BookmarkTableViewController.m" />
-        <header-file src="src/ios/PDFViewer/BookmarkTableViewController.h" />
-        <source-file src="src/ios/PDFViewer/OUTLINE_ITEM.m" />
-        <header-file src="src/ios/PDFViewer/OUTLINE_ITEM.h" />
-        <source-file src="src/ios/PDFViewer/OutLineViewController.m" />
-        <header-file src="src/ios/PDFViewer/OutLineViewController.h" />
-        <source-file src="src/ios/PDFViewer/TextAnnotViewController.m" />
-        <header-file src="src/ios/PDFViewer/TextAnnotViewController.h" />
-        <source-file src="src/ios/PDFViewer/ViewModeTableViewController.m" />
-        <header-file src="src/ios/PDFViewer/ViewModeTableViewController.h" />
-        <source-file src="src/ios/PDFViewer/PDFReflowView.m" />
-        <header-file src="src/ios/PDFViewer/PDFReflowView.h" />
-        <header-file src="src/ios/PDFViewer/PDFView/PDFGridView.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/PDFGridView.m" />
-        <source-file src="src/ios/PDFViewer/PDFView/PDFThumbView.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/PDFThumbView.h" />
-        <source-file src="src/ios/PDFViewer/PDFHttpStream.m" />
-        <header-file src="src/ios/PDFViewer/PDFHttpStream.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVLayout.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVLayout.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVCanvas.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVCanvas.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVCache.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVCache.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVFinder.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVFinder.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVGlobal.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVGlobal.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVSel.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVSel.h" />
-        <header-file src="src/ios/PDFViewer/RDToolBar.h" />
-        <source-file src="src/ios/PDFViewer/RDToolBar.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVPage.h" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVPage.m" />
-        <source-file src="src/ios/PDFViewer/PDFView/RDVThread.m" />
-        <header-file src="src/ios/PDFViewer/PDFView/RDVThread.h" />
-        <source-file src="src/ios/PDFViewer/PDFLib/PDFObjc.m" />
-        <header-file src="src/ios/PDFViewer/PDFLib/PDFObjc.h" />
-        <header-file src="src/ios/PDFViewer/PDFLib/PDFIOS.h" />
-        <source-file src="src/ios/PDFViewer/PDFLib/libRDPDFLib.a" framework="true" />
         
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPopText.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPopText.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropComm.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropComm.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropIcon.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropIcon.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropLine.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropLine.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropMarkup.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropMarkup.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuAnnotOp.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuAnnotOp.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuCombo.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/MenuCombo.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UIColorBtn.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UIColorBtn.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UIIconView.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UIIconView.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UILHeadView.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UILHeadView.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/UILStyleView.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/UILStyleView.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgMeta.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgMeta.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PopColor.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PopColor.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PopOutline.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PopOutline.h"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/PopColor.xib"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/PopOutline.xib"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgMeta.xib"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPopText.xib"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropComm.xib"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropIcon.xib"/>
-        <resource-file src="src/ios/PDFViewer/Modules/AnnotProp/DlgAnnotPropMarkup.xib"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFDialog.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFDialog.h"/>
-        <source-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFPopupCtrl.m"/>
-        <header-file src="src/ios/PDFViewer/Modules/AnnotProp/PDFPopupCtrl.h"/>
-
-        <!-- Radaee sources -->
-        <source-file src="src/ios/PDFViewer/RDMoreTableViewController.m" />
-        <header-file src="src/ios/PDFViewer/RDMoreTableViewController.h" />
-        <resource-file src="src/ios/PDFViewer/RDMoreTableViewController.xib" />
-        <source-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.m" />
-        <header-file src="src/ios/PDFViewer/Modules/ListBox/RDAnnotListViewController.h" />
-        <source-file src="src/ios/PDFViewer/Modules/DrawMode/DrawModeTableViewController.m" />
-        <header-file src="src/ios/PDFViewer/Modules/DrawMode/DrawModeTableViewController.h" />
-
-
-        <!-- Radaee Modules -->
-        <source-file src="src/ios/PDFViewer/Modules/ReaderHandler/ReaderHandler.m" />
-        <header-file src="src/ios/PDFViewer/Modules/ReaderHandler/ReaderHandler.h" />
+        <header-file src="src/ios/PDFViewer/RDToolBar.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/RDToolBar.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/RDMenu.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/RDMenu.m" target-dir="ios/PDFViewer" />
+        <header-file src="src/ios/PDFViewer/UILElement.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/UILElement.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/UILShadowView.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/UILShadowView.m" target-dir="ios/PDFViewer"/>
+        <header-file src="src/ios/PDFViewer/UINavigationController+autoRotate.h" target-dir="ios/PDFViewer"/>
+        <source-file src="src/ios/PDFViewer/UINavigationController+autoRotate.m" target-dir="ios/PDFViewer"/>
         
-        <source-file src="src/ios/PDFViewer/Modules/SearchList/RDExtendedSearch.m" />
-        <header-file src="src/ios/PDFViewer/Modules/SearchList/RDExtendedSearch.h" />
-        <source-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.m" />
-        <header-file src="src/ios/PDFViewer/Modules/SearchList/SearchResultTableViewController.h" />
+        <source-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropIcon.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropIcon.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropLine.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropLine.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropMarkup.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropMarkup.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuAnnot.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuAnnot.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuAnnotOp.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuAnnotOp.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuCombo.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuCombo.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuSearch.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuSearch.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuTool.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuTool.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/MenuVMode.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/MenuVMode.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDAnnotPickerViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDAnnotPickerViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDExtendedSearch.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDExtendedSearch.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDMetaDataViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDMetaDataViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDPageViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDPageViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDSinglePageViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDSinglePageViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UIColorBtn.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UIColorBtn.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UIIconView.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UIIconView.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UILHeadView.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UILHeadView.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/UILStyleView.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/UILStyleView.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropIcon.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropMarkup.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.storyboard" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDAnnotPickerViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDMetaDataViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDPageViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
         
-        <source-file src="src/ios/PDFViewer/Modules/FormManager/RDFormManager.m" />
-        <header-file src="src/ios/PDFViewer/Modules/FormManager/RDFormManager.h" />
+        <source-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <header-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <source-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeTableViewCell.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <header-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeTableViewCell.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <source-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <header-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
+        <resource-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.xib" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
         
-        <source-file src="src/ios/PDFViewer/Modules/Utils/RDUtils.m" />
-        <header-file src="src/ios/PDFViewer/Modules/Utils/RDUtils.h" />
+        <source-file src="src/ios/PDFViewer/PDFView/ActionStackManager.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/ActionStackManager.h" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFDelegate.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFDialog.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFDialog.h" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFGridView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFGridView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFLayoutView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFPopupCtrl.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFPopupCtrl.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFReflowView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFReflowView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/PDFThumbView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/PDFThumbView.h" target-dir="ios/PDFViewer/PDFView"/>
+        <source-file src="src/ios/PDFViewer/PDFView/RDPDFView.m" target-dir="ios/PDFViewer/PDFView"/>
+        <header-file src="src/ios/PDFViewer/PDFView/RDPDFView.h" target-dir="ios/PDFViewer/PDFView"/>
         
-        <source-file src="src/ios/PDFViewer/Modules/ActionStack/ActionStackManager.m" />
-        <header-file src="src/ios/PDFViewer/Modules/ActionStack/ActionStackManager.h" />
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDUtils.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDUtils.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVLayout.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVLayout.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVCanvas.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVCanvas.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVCache.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVCache.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVFinder.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVFinder.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVGlobal.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVGlobal.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVPage.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVPage.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVThread.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVThread.h" target-dir="ios/PDFViewer/PDFLayout"/>
+        <source-file src="src/ios/PDFViewer/PDFLayout/RDVSel.m" target-dir="ios/PDFViewer/PDFLayout"/>
+        <header-file src="src/ios/PDFViewer/PDFLayout/RDVSel.h" target-dir="ios/PDFViewer/PDFLayout"/>
         
-        <source-file src="src/ios/PDFViewer/Modules/Signature/SignatureViewController.m" />
-        <header-file src="src/ios/PDFViewer/Modules/Signature/SignatureViewController.h" />
-        <source-file src="src/ios/PDFViewer/Modules/Signature/UviSignatureView.m" />
-        <header-file src="src/ios/PDFViewer/Modules/Signature/UviSignatureView.h" />
-
+        <source-file src="src/ios/PDFViewer/PDFLib/PDFHttpStream.m" target-dir="ios/PDFViewer/PDFLib"/>
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFHttpStream.h" target-dir="ios/PDFViewer/PDFLib"/>
+        <source-file src="src/ios/PDFViewer/PDFLib/PDFObjc.m" target-dir="ios/PDFViewer/PDFLib"/>
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFObjc.h" target-dir="ios/PDFViewer/PDFLib"/>
+        <header-file src="src/ios/PDFViewer/PDFLib/PDFIOS.h" target-dir="ios/PDFViewer/PDFLib"/>
+        <source-file src="src/ios/PDFViewer/PDFLib/libRDPDFLib.a" framework="true" target-dir="ios/PDFViewer/PDFLib"/>
         
-        <!-- Radaee Page Curling -->
-        <header-file src="src/ios/PDFViewer/RDPageView/RDPageViewController.h" />
-        <source-file src="src/ios/PDFViewer/RDPageView/RDPageViewController.m" />
-        <resource-file src="src/ios/PDFViewer/RDPageView/RDPageViewController.xib" />
-        <header-file src="src/ios/PDFViewer/RDPageView/RDSinglePageViewController.h"/>
-        <source-file src="src/ios/PDFViewer/RDPageView/RDSinglePageViewController.m"/>
+        <source-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.m" target-dir="ios/PDFViewer/PDFPages"/>
+        <header-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.h" target-dir="ios/PDFViewer/PDFPages"/>
+        <source-file src="src/ios/PDFViewer/PDFPages/PDFPagesView.m" target-dir="ios/PDFViewer/PDFPages"/>
+        <header-file src="src/ios/PDFViewer/PDFPages/PDFPagesView.h" target-dir="ios/PDFViewer/PDFPages"/>
+        <source-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.m" target-dir="ios/PDFViewer/PDFPages"/>
+        <header-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.h" target-dir="ios/PDFViewer/PDFPages"/>
+        <resource-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.storyboard" target-dir="ios/PDFViewer/PDFPages"/>
+        <resource-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.xib" target-dir="ios/PDFViewer/PDFPages"/>
         
-        <!-- Radaee resources -->
+        <source-file src="src/ios/PDFViewer/RDPlugin/RDFormManager.m" target-dir="ios/PDFViewer/RDPlugin"/>
+        <header-file src="src/ios/PDFViewer/RDPlugin/RDFormManager.h" target-dir="ios/PDFViewer/RDPlugin"/>
+        
+        <source-file src="src/ios/PDFViewer/RDSignature/SignatureViewController.m" target-dir="ios/PDFViewer/RDSignature"/>
+        <header-file src="src/ios/PDFViewer/RDSignature/SignatureViewController.h" target-dir="ios/PDFViewer/RDSignature"/>
+        <source-file src="src/ios/PDFViewer/RDSignature/UviSignatureView.m" target-dir="ios/PDFViewer/RDSignature"/>
+        <header-file src="src/ios/PDFViewer/RDSignature/UviSignatureView.h" target-dir="ios/PDFViewer/RDSignature"/>
         <!--
-        <resource-file src="src/ios/PDFViewer/cmaps/cmaps.dat" target-dir="cmaps"/>
-        <resource-file src="src/ios/PDFViewer/cmaps/umaps.dat" target-dir="cmaps"/>
-        <resource-file src="src/ios/PDFViewer/cmaps/cmyk_rgb.dat" target-dir="cmaps"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIAuthenticationDialog.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIAuthenticationDialog.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASICacheDelegate.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDataCompressor.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDataCompressor.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDownloadCache.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIDownloadCache.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIFormDataRequest.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIFormDataRequest.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequest.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequest.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequestConfig.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIHTTPRequestDelegate.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASIInputStream.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIInputStream.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/ASINetworkQueue.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASINetworkQueue.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/ASIProgressDelegate.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>>
+        <source-file src="src/ios/PDFViewer/ASIHttpRequest/Reachability.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
+        <header-file src="src/ios/PDFViewer/ASIHttpRequest/Reachability.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
         -->
-        <resource-file src="src/ios/PDFViewer/cmaps" target-dir="cmaps"/>
-        <resource-file src="src/ios/PDFViewer/fdat" target-dir="fdat"/>
+        
+        <resource-file src="src/ios/PDFViewer/PDFRes" target-dir="ios/PDFViewer"/>
 
         <!-- fonts -->
         <resource-file src="fonts/Roboto-Black.ttf" />

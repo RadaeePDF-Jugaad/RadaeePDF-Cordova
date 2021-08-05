@@ -235,6 +235,77 @@ RadaeePDFPlugin.prototype.setGlobal = function (params, successCallback, errorCa
        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'setGlobal', [params]);
 };
 
+
+RadaeePDFPlugin.prototype.refreshCurrentPage = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'refreshCurrentPage', [params]);
+};
+
+RadaeePDFPlugin.prototype.getTextAnnotationDetails = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getTextAnnotationDetails', [params]);
+};
+
+RadaeePDFPlugin.prototype.getMarkupAnnotationDetails = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getMarkupAnnotationDetails', [params]);
+};
+
+RadaeePDFPlugin.prototype.addTextAnnotation = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'addTextAnnotation', [params]);
+};
+
+RadaeePDFPlugin.prototype.getCharIndex = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getCharIndex', [params]);
+};
+
+RadaeePDFPlugin.prototype.addMarkupAnnotation = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'addMarkupAnnotation', [params]);
+};
+
+RadaeePDFPlugin.prototype.getPDFCoordinates = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getPDFCoordinates', [params]);
+};
+
+RadaeePDFPlugin.prototype.getScreenCoordinates = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getScreenCoordinates', [params]);
+};
+
+RadaeePDFPlugin.prototype.getPDFRect = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getPDFRect', [params]);
+};
+
+RadaeePDFPlugin.prototype.getScreenRect = function (params, successCallback, errorCallback) {
+    //iOS only
+        params = params || {};
+
+        exec(successCallback, errorCallback, 'RadaeePDFPlugin', 'getScreenRect', [params]);
+};
+
 // Callbacks
                
 RadaeePDFPlugin.prototype.willShowReaderCallback = function (successCallback) {

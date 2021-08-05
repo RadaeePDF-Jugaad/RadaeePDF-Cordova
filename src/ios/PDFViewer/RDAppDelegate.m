@@ -19,16 +19,19 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"Radaee" forKey:@"actCompany"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"radaee_com@yahoo.cn" forKey:@"actEmail"];
-    [[NSUserDefaults standardUserDefaults] setObject:@"89WG9I-HCL62K-H3CRUZ-WAJQ9H-FADG6Z-XEBCAO" forKey:@"actSerial"];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"actActivationType"];
+    [[UIBarButtonItem appearance] setTintColor:[UIColor systemOrangeColor]];
+    [[UIButton appearance] setTintColor:[UIColor systemOrangeColor]];
+    [[UIButton appearance] setTitleColor:[UIColor systemBlueColor] forState:UIControlStateNormal];
+    [[UIImageView appearance] setTintColor:[UIColor systemOrangeColor]];
+    [[UITableViewCell appearance] setTintColor:[UIColor systemOrangeColor]];
     
-    [[NSUserDefaults standardUserDefaults] synchronize];
     
+    g_id = [[NSBundle mainBundle] bundleIdentifier];
+    g_company = @"radaee";
+    g_mail = @"radaeepdf@gmail.com";
+    g_serial = @"OBT5ZN-9SJHWQ-9ZOU9E-OQ31K2-5R5V9L-KM0Y1L";
     [RDVGlobal Init];
-    
+
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     if ([self isPortrait]) {
         NSLog(@"portrait");
@@ -38,20 +41,19 @@
         NSLog(@"landscape");
     }
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+    self.window.backgroundColor = [RDUtils radaeeWhiteColor];
     NSMutableArray *localControllesArray = [[NSMutableArray alloc]initWithCapacity:4];
-    RDFileTableController *ctl = [[RDFileTableController alloc] initWithNibName:@"RDFileTableController" bundle:nil];
+    RDFileCollectionViewController *ctl = [[RDFileCollectionViewController alloc] initWithNibName:@"RDFileCollectionViewController" bundle:nil];
     navController = [[UINavigationController alloc] initWithRootViewController:ctl];
     navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     [localControllesArray addObject:navController];
     
     NSString *title4 =[[NSString alloc]initWithFormat:NSLocalizedString(@"More", @"Localizable")];
     // Do any additional setup after loading the view from its nib.
-   
     MoreViewController *moreCtl = [[MoreViewController alloc]initWithNibName:@"MoreViewController" bundle:nil];
-    navController = [[UINavigationController alloc]initWithRootViewController:moreCtl];
+    navController = [[UINavigationController alloc] initWithRootViewController:moreCtl];
     navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    UITabBarItem *item3 = [[UITabBarItem alloc]initWithTitle:title4 image:[UIImage imageNamed:@"view_about.png"] tag:3 ];
+    UITabBarItem *item3 = [[UITabBarItem alloc] initWithTitle:title4 image:[UIImage imageNamed:@"btn_info"] tag:3 ];
     moreCtl.tabBarItem = item3;
     [localControllesArray addObject:navController];
     
@@ -77,6 +79,7 @@
     [[UINavigationBar appearance] setTintColor:[UIColor orangeColor]];
     [[UITabBar appearance] setTintColor:[UIColor orangeColor]];
     [[UIToolbar appearance] setTintColor:[UIColor orangeColor]];
+    [[UISwitch appearance] setTintColor:[UIColor orangeColor]];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

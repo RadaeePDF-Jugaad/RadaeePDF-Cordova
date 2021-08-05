@@ -9,7 +9,7 @@
 #import "PDFObjc.h"
 #import "RDVLayout.h"
 #import "RDVFinder.h"
-#import "PDFOffScreenView.h"
+#import "PDFDelegate.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0x00FF0000) >> 16))/255.0 \
@@ -33,8 +33,6 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotGoto:(int)pageno;
 //this mehod fired only when vAnnotPerform method invoked.
-- (void)OnAnnotPopup:(PDFAnnot *)annot;
-//this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotOpenURL:(NSString *)url;
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotMovie:(NSString *)fileName;
@@ -45,9 +43,11 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotList:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
 - (void)OnAnnotSignature:(PDFAnnot *)annot;
 - (void)OnAnnotTapped:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
+- (void)OnEditboxOK;
 @end
 
-@interface PDFLayoutView : UIScrollView <UIScrollViewDelegate, PDFOffScreenDelegate, RDVLayoutDelegate>
+@class RDPDFCanvas;
+@interface PDFLayoutView : UIScrollView <UIScrollViewDelegate, PDFOffScreenDelegate, RDVLayoutDelegate, PDFJSDelegate>
 {
     PDFDoc *m_doc;
     RDVLayout *m_layout;
@@ -63,15 +63,17 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         sta_rect,
         sta_ellipse,
         sta_line,
-        sta_image
+        sta_image,
+        sta_editbox
     };
     enum LAYOUT_STATUS m_status;
     float m_scale_pix;
     float m_zoom;
     RDVPos m_zoom_pos;
     CGPoint zoomPoint;
-    PDFOffScreenView *m_child;
-    
+    UIView *m_child;
+    RDPDFCanvas *m_canvas;
+    id<PDFLayoutDelegate> m_del;
     bool m_modified;
     NSTimeInterval m_tstamp;
     NSTimeInterval m_tstamp_tap;
@@ -129,18 +131,17 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     PDFPage *tappedPage;
     
     bool isDoubleTapping;
-#ifdef FTS_ENABLED
-    FTSOccurrence *currentOccurrence;
-#endif
 }
 
 @property (nonatomic) NSUInteger pageViewNo;
-@property (nonatomic, weak) id<PDFLayoutDelegate> m_del;
 
 -(id)initWithFrame:(CGRect)frame;
--(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;
+- (id)initWithCoder:(NSCoder *)aDecoder;
+-(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del;
 -(void)PDFClose;
 -(void)PDFSetVMode:(int)vmode;
+-(void)PDFSaveView;
+-(void)PDFRestoreView;
 
 //start find.
 -(bool)vFindStart:(NSString *)pat :(bool)match_case :(bool)whole_word;
@@ -155,7 +156,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 //you should invoke this method in select mode.
 -(NSString *)vSelGetText;
 //you should invoke this method in select mode.
--(BOOL)vSelMarkup:(int)color :(int)type;
+-(BOOL)vSelMarkup :(int)type;
 //invoke this method to leave select mode
 -(void)vSelEnd;
 
@@ -199,6 +200,14 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)vImageEnd;
 - (BOOL)useTempImage;
 
+//enter editbox annotation status.
+-(bool)vEditboxStart;
+//end editbox annotation status.
+-(void)vEditboxCancel;
+//end editbox annotation status, and add rect to page.
+-(void)vEditboxEnd;
+
+
 //perform annotation actions, and end annotation status.
 -(void)vAnnotPerform;
 //remove annotation, and end annotation status.
@@ -225,12 +234,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)vRedo;
 
 - (int)vGetCurrentPage;
-- (void)resetZoomLevel;
 
-- (void)setCommboItem :(int)item;
-- (void)setEditBoxWithText :(NSString *)text;
-
-- (void)setReaderBackgroundColor:(int)color;
+- (void)PDFSetGBColor:(int)color;
 - (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
 
@@ -250,7 +255,6 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (BOOL)isModified;
 - (void)setModified:(BOOL)modified force:(BOOL)force;
 
-- (void)selectListBoxItems:(NSArray *)items;
 - (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum;
 
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
@@ -264,13 +268,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (BOOL)canSaveDocument;
 - (void)setReadOnly:(BOOL)enabled;
 
-#ifdef FTS_ENABLED
-- (void)applyFTSOccurrence:(FTSOccurrence *)occurrence;
-#endif
-
 - (BOOL)pagingAvailable;
-
-- (void)OnDoubleTapOnPoint:(CGPoint)point;
 
 - (NSString *)getImageFromRect:(int)top :(int)right :(int)left :(int)bottom :(int)pageNum;
 - (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect;
