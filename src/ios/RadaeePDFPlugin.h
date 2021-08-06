@@ -97,6 +97,7 @@
 - (void)setTitleBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setIconsBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setThumbHeight:(CDVInvokedUrlCommand*)command;
+- (void)setBarButtonVisibility:(CDVInvokedUrlCommand*)command;
 - (void)setFirstPageCover:(CDVInvokedUrlCommand*)command;
 - (void)setDoubleTapZoomMode:(CDVInvokedUrlCommand*)command;
 - (void)setImmersive:(CDVInvokedUrlCommand*)command;

@@ -88,11 +88,9 @@
 
 @property (nonatomic) BOOL hideSearchImage;
 @property (nonatomic) BOOL hideDrawImage;
-@property (nonatomic) BOOL hideSelImage;
-@property (nonatomic) BOOL hideUndoImage;
-@property (nonatomic) BOOL hideRedoImage;
+@property (nonatomic) BOOL hideViewImage;
+@property (nonatomic) BOOL hideThumbImage;
 @property (nonatomic) BOOL hideMoreImage;
-@property (nonatomic) BOOL hideGridImage;
 
 @property (strong, nonatomic) IBOutlet RDPDFView *mView;
 @property (strong, nonatomic) IBOutlet RDPDFThumb *mThumb;
@@ -121,6 +119,9 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *mBarNoneBottomWidthConstraint;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *searchItem;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *annotItem;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *viewItem;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *thumbItem;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *moreItem;
 
 - (void)setDoc:(PDFDoc *)doc;
 - (void)setDoc:(PDFDoc *)doc :(int)pageno :(BOOL)readonly;

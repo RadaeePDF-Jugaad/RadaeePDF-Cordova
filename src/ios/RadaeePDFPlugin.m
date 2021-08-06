@@ -478,7 +478,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         
         [m_pdf setFirstPageCover:firstPageCover];
         [m_pdf setDoubleTapZoomMode:2];
-        [m_pdf setImmersive:NO];
+        [m_pdf setImmersive:isImmersive];
         
         [m_pdf setViewModeImage:[UIImage imageNamed:@"btn_view.png"]];
         [m_pdf setSearchImage:[UIImage imageNamed:@"btn_search.png"]];
@@ -552,12 +552,10 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         [m_pdf setHideSearchImage:visibility];
     } else if ([code isEqualToString:@"btn_draw"]) {
         [m_pdf setHideDrawImage:visibility];
-    } else if ([code isEqualToString:@"btn_sel"]) {
-        [m_pdf setHideSelImage:visibility];
-    } else if ([code isEqualToString:@"btn_undo"]) {
-        [m_pdf setHideUndoImage:visibility];
-    } else if ([code isEqualToString:@"btn_redo"]) {
-        [m_pdf setHideRedoImage:visibility];;
+    } else if ([code isEqualToString:@"btn_view"]) {
+        [m_pdf setHideViewImage:visibility];
+    } else if ([code isEqualToString:@"btn_thumb"]) {
+        [m_pdf setHideThumbImage:visibility];
     } else if ([code isEqualToString:@"btn_more"]) {
         [m_pdf setHideMoreImage:visibility];
     }

@@ -377,18 +377,7 @@
     
     _mBarNoneBottomWidthConstraint.constant = 250;
     
-    if (_hideSearchImage) {
-        NSMutableArray *noneToolbarItems = [_mBarNoneTop.items mutableCopy];
-        [noneToolbarItems removeObject:_searchItem];
-        [_mBarNoneTop setItems:noneToolbarItems];
-    }
-    
-    if (_hideDrawImage || ![m_doc canSave]) {
-        NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
-        [noneToolbarItems removeObject:_annotItem];
-        [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
-        _mBarNoneBottomWidthConstraint.constant -= _annotItem.image.size.width*2;
-    }
+    [self setBarButtonVisibility]
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -414,6 +403,42 @@
         [self dismissViewControllerAnimated:NO completion:^{
             self->m_popup = nil;
         }];
+    }
+}
+
+- (void)setBarButtonVisibility {
+    if (_hideSearchImage) {
+        NSMutableArray *noneToolbarItems = [_mBarNoneTop.items mutableCopy];
+        [noneToolbarItems removeObject:_searchItem];
+        [_mBarNoneTop setItems:noneToolbarItems];
+    }
+    
+    if (_hideDrawImage || ![m_doc canSave]) {
+        NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
+        [noneToolbarItems removeObject:_annotItem];
+        [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
+        _mBarNoneBottomWidthConstraint.constant -= _annotItem.image.size.width*2;
+    }
+    
+    if (_hideViewImage) {
+        NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
+        [noneToolbarItems removeObject:_viewItem];
+        [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
+        _mBarNoneBottomWidthConstraint.constant -= _viewItem.image.size.width*2;
+    }
+    
+    if (_hideThumbImage) {
+        NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
+        [noneToolbarItems removeObject:_thumbItem];
+        [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
+        _mBarNoneBottomWidthConstraint.constant -= _thumbItem.image.size.width*2;
+    }
+    
+    if (_hideMoreImage) {
+        NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
+        [noneToolbarItems removeObject:_moreItem];
+        [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
+        _mBarNoneBottomWidthConstraint.constant -= _moreItem.image.size.width*2;
     }
 }
 

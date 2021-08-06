@@ -379,13 +379,7 @@
 - (PDFReaderCtrl *)showReader
 {
     [m_pdf setReaderBGColor:readerBackgroundColor];
-    //Set thumbGridView
-    //thumbGridView was not used anymore.
-    //[m_pdf setThumbGridBGColor:gridBackgroundColor];
-    //[m_pdf setThumbGridElementHeight:gridElementHeight];
-    //[m_pdf setThumbGridGap:gridGap];
-    //[m_pdf setThumbGridViewMode:gridMode];
-    
+    [m_pdf setThumbnailBGColor:thumbBackgroundColor];
     m_pdf.hidesBottomBarWhenPushed = YES;
     
     return m_pdf;
