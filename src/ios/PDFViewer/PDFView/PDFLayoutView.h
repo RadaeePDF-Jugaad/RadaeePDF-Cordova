@@ -64,7 +64,9 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         sta_ellipse,
         sta_line,
         sta_image,
-        sta_editbox
+        sta_editbox,
+        sta_polygon,
+        sta_polyline,
     };
     enum LAYOUT_STATUS m_status;
     float m_scale_pix;
@@ -91,6 +93,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     RDVPos m_sel_pos;
     
     PDFInk *m_ink;
+    PDFPath *m_polygon;
     
     int m_annot_idx;
     PDFAnnot *m_annot;
@@ -173,6 +176,20 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(void)vInkCancel;
 //end ink annotation status, and add ink to page.
 -(void)vInkEnd;
+
+//enter ink annotation status.
+-(bool)vPolygonStart;
+//end ink annotation status.
+-(void)vPolygonCancel;
+//end ink annotation status, and add ink to page.
+-(void)vPolygonEnd;
+
+//enter ink annotation status.
+-(bool)vPolylineStart;
+//end ink annotation status.
+-(void)vPolylineCancel;
+//end ink annotation status, and add ink to page.
+-(void)vPolylineEnd;
 
 //enter line annotation status.
 -(bool)vLineStart;

@@ -699,6 +699,135 @@
     }
 }
 
+
+-(void)osDrawPolygon:(CGContextRef)context
+{
+    if( m_status == sta_polygon && m_polygon )
+    {
+        int cnt = [m_polygon nodesCount];
+        int cur;
+        float red;
+        float green;
+        float blue;
+        float alpha;
+        PDF_POINT pt;
+        if(cnt > 1)//can be stroked?
+        {
+            red = ((GLOBAL.g_line_color>>16)&0xFF)/255.0f;
+            green = ((GLOBAL.g_line_color>>8)&0xFF)/255.0f;
+            blue = (GLOBAL.g_line_color&0xFF)/255.0f;
+            alpha = ((GLOBAL.g_line_color>>24)&0xFF)/255.0f;
+            CGContextSetLineWidth(context, GLOBAL.g_line_width);
+            CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
+            CGContextBeginPath( context );
+            for(cur = 0; cur < cnt; cur++)
+            {
+                switch([m_polygon node: cur: &pt])
+                {
+                    case 1:
+                        CGContextAddLineToPoint(context,
+                                                pt.x/m_scale_pix,
+                                                pt.y/m_scale_pix);
+                        break;
+                    default:
+                        CGContextMoveToPoint(context,
+                                             pt.x/m_scale_pix,
+                                             pt.y/m_scale_pix);
+                        break;
+                }
+            }
+            CGContextStrokePath(context);
+        }
+
+        red = ((GLOBAL.g_line_annot_fill_color>>16)&0xFF)/255.0f;
+        green = ((GLOBAL.g_line_annot_fill_color>>8)&0xFF)/255.0f;
+        blue = (GLOBAL.g_line_annot_fill_color&0xFF)/255.0f;
+        alpha = ((GLOBAL.g_line_annot_fill_color>>24)&0xFF)/255.0f;
+        CGContextSetRGBFillColor(context, red, green, blue, alpha);
+        if(cnt > 2)//can be filled?
+        {
+            CGContextBeginPath( context );
+            for(cur = 0; cur < cnt; cur++)
+            {
+                switch([m_polygon node: cur: &pt])
+                {
+                    case 1:
+                        CGContextAddLineToPoint(context,
+                                                pt.x/m_scale_pix,
+                                                pt.y/m_scale_pix);
+                        break;
+                    default:
+                        CGContextMoveToPoint(context,
+                                             pt.x/m_scale_pix,
+                                             pt.y/m_scale_pix);
+                        break;
+                }
+            }
+            CGContextClosePath(context);
+            CGContextFillPath(context);
+        }
+
+        for(cur = 0; cur < cnt; cur++)
+        {
+            [m_polygon node: cur: &pt];
+            CGContextFillEllipseInRect(context, CGRectMake(pt.x/m_scale_pix - 4, pt.y/m_scale_pix - 4, 8, 8));
+        }
+    }
+}
+
+
+-(void)osDrawPolyline:(CGContextRef)context
+{
+    if( m_status == sta_polyline && m_polygon )
+    {
+        int cnt = [m_polygon nodesCount];
+        int cur;
+        float red;
+        float green;
+        float blue;
+        float alpha;
+        PDF_POINT pt;
+        if(cnt > 1)//can be stroked?
+        {
+            red = ((GLOBAL.g_line_color>>16)&0xFF)/255.0f;
+            green = ((GLOBAL.g_line_color>>8)&0xFF)/255.0f;
+            blue = (GLOBAL.g_line_color&0xFF)/255.0f;
+            alpha = ((GLOBAL.g_line_color>>24)&0xFF)/255.0f;
+            CGContextSetLineWidth(context, GLOBAL.g_line_width);
+            CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
+            CGContextBeginPath( context );
+            for(cur = 0; cur < cnt; cur++)
+            {
+                switch([m_polygon node: cur: &pt])
+                {
+                    case 1:
+                        CGContextAddLineToPoint(context,
+                                                pt.x/m_scale_pix,
+                                                pt.y/m_scale_pix);
+                        break;
+                    default:
+                        CGContextMoveToPoint(context,
+                                             pt.x/m_scale_pix,
+                                             pt.y/m_scale_pix);
+                        break;
+                }
+            }
+            CGContextStrokePath(context);
+        }
+
+        red = ((GLOBAL.g_line_annot_fill_color>>16)&0xFF)/255.0f;
+        green = ((GLOBAL.g_line_annot_fill_color>>8)&0xFF)/255.0f;
+        blue = (GLOBAL.g_line_annot_fill_color&0xFF)/255.0f;
+        alpha = ((GLOBAL.g_line_annot_fill_color>>24)&0xFF)/255.0f;
+        CGContextSetRGBFillColor(context, red, green, blue, alpha);
+        for(cur = 0; cur < cnt; cur++)
+        {
+            [m_polygon node: cur: &pt];
+            CGContextFillEllipseInRect(context, CGRectMake(pt.x/m_scale_pix - 4, pt.y/m_scale_pix - 4, 8, 8));
+        }
+    }
+}
+
 -(void)osDrawLines:(CGContextRef)context
 {
     if( m_status == sta_line && (m_lines_cnt || m_lines_drawing) )
@@ -913,6 +1042,8 @@
     [self osDrawRects:ctx];
     [self osDrawEllipse:ctx];
     [self osDrawEditbox:ctx];
+    [self osDrawPolygon:ctx];
+    [self osDrawPolyline:ctx];
 }
 
 -(BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
@@ -1104,6 +1235,8 @@
         if( [self OnAnnotTouchBegin:point] ) return;
         if( [self OnNoteTouchBegin:point] ) return;
         if( [self OnInkTouchBegin:point] ) return;
+        if( [self OnPolygonTouchBegin:point] ) return;
+        if( [self OnPolylineTouchBegin:point] ) return;
         if( [self OnLineTouchBegin:point] ) return;
         if( [self OnRectTouchBegin:point] ) return;
         if( [self OnEllipseTouchBegin:point] ) return;
@@ -1126,6 +1259,8 @@
         if( [self OnAnnotTouchMove:point] ) return;
         if( [self OnNoteTouchMove:point] ) return;
         if( [self OnInkTouchMove:point] ) return;
+        if( [self OnPolygonTouchMove:point] ) return;
+        if( [self OnPolylineTouchMove:point] ) return;
         if( [self OnLineTouchMove:point] ) return;
         if( [self OnRectTouchMove:point] ) return;
         if( [self OnEllipseTouchMove:point] ) return;
@@ -1154,6 +1289,8 @@
             if( [self OnAnnotTouchEnd:point] ) return;
             if( [self OnNoteTouchEnd:point] ) return;
             if( [self OnInkTouchEnd:point] ) return;
+            if( [self OnPolygonTouchEnd:point] ) return;
+            if( [self OnPolylineTouchEnd:point] ) return;
             if( [self OnLineTouchEnd:point] ) return;
             if( [self OnRectTouchEnd:point] ) return;
             if( [self OnEllipseTouchEnd:point] ) return;
@@ -1251,6 +1388,27 @@
         m_annot_idx = -1;
         if( m_annot )
         {
+            PDFPageContent *content = [[PDFPageContent alloc] init];
+            [content gsSave];
+            
+            PDF_RECT rect;
+            [m_annot getRect:&rect];
+            
+            float width = (rect.right - rect.left);
+            float height = (rect.bottom - rect.top);
+            
+            float xTranslation = width / 2.0f;
+            float yTranslation = height / 2.0f;
+            
+            //set the matrix 20x20
+            PDFMatrix *matrix = [[PDFMatrix alloc] init:width :height :xTranslation :yTranslation];
+            [content gsCatMatrix:matrix];
+            matrix = nil;
+            
+            [content drawText:@"Testo di prova" :0 :50.0];
+            [content gsRestore];
+            content = nil;
+            
             m_annot_idx = [m_annot getIndex];
             
             if(m_del && [m_del respondsToSelector:@selector(OnAnnotTapped:atPage:atPoint:)])
@@ -1385,6 +1543,12 @@
                 NSArray *a = [NSArray arrayWithObjects:[NSNumber numberWithFloat:x], [NSNumber numberWithFloat:y], nil];
                 [self performSelector:@selector(delayedOnSingleTapping:) withObject:a afterDelay:0.3];
             }
+            [self vAnnotEnd];
+            m_annot_rect.left = 0;
+            m_annot_rect.top = 0;
+            m_annot_rect.right = 0;
+            m_annot_rect.bottom = 0;
+            m_status = sta_none;
         }
     }
 }
@@ -1632,6 +1796,56 @@
 {
     if( m_status != sta_ink ) return false;
     [m_ink onUp :point.x * m_scale_pix :point.y * m_scale_pix];
+    [self ProRedrawOS];
+    return true;
+}
+
+-(bool)OnPolygonTouchBegin:(CGPoint)point
+{
+    if( m_status != sta_polygon ) return false;
+    return true;
+}
+-(bool)OnPolygonTouchMove:(CGPoint)point
+{
+    if( m_status != sta_polygon ) return false;
+    return true;
+}
+-(bool)OnPolygonTouchEnd:(CGPoint)point
+{
+    if( m_status != sta_polygon ) return false;
+    if (!m_polygon) m_polygon = [[PDFPath alloc] init];
+    if([m_polygon nodesCount] < 1)
+    {
+        m_tx = point.x * m_scale_pix;
+        m_ty = point.y * m_scale_pix;
+        [m_polygon moveTo:m_tx :m_ty];
+    }
+    else [m_polygon lineTo:point.x * m_scale_pix :point.y * m_scale_pix];
+    [self ProRedrawOS];
+    return true;
+}
+
+-(bool)OnPolylineTouchBegin:(CGPoint)point
+{
+    if( m_status != sta_polyline ) return false;
+    return true;
+}
+-(bool)OnPolylineTouchMove:(CGPoint)point
+{
+    if( m_status != sta_polyline ) return false;
+    return true;
+}
+-(bool)OnPolylineTouchEnd:(CGPoint)point
+{
+    if( m_status != sta_polyline ) return false;
+    if (!m_polygon) m_polygon = [[PDFPath alloc] init];
+    if([m_polygon nodesCount] < 1)
+    {
+        m_tx = point.x * m_scale_pix;
+        m_ty = point.y * m_scale_pix;
+        [m_polygon moveTo:m_tx :m_ty];
+    }
+    else [m_polygon lineTo:point.x * m_scale_pix :point.y * m_scale_pix];
     [self ProRedrawOS];
     return true;
 }
@@ -2608,6 +2822,119 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     }
     m_status = sta_none;
     m_ink = nil;
+    [self setNeedsDisplay];
+    [m_canvas setNeedsDisplay];
+    [self autoSave];
+    self.scrollEnabled = true;
+}
+//enter ink annotation status.
+-(bool)vPolygonStart
+{
+    if(![self canSaveDocument]) return false;
+    if( m_status == sta_none )
+    {
+        self.scrollEnabled = false;
+        m_polygon = NULL;
+        m_status = sta_polygon;
+        return true;
+    }
+    return false;
+}
+//end ink annotation status.
+-(void)vPolygonCancel
+{
+    if( m_status == sta_polygon )
+    {
+        [self enableScroll];
+        m_status = sta_none;
+        m_polygon = NULL;
+        [self setNeedsDisplay];
+        [m_canvas setNeedsDisplay];
+    }
+}
+//end ink annotation status, and add ink to page.
+-(void)vPolygonEnd
+{
+    if( !m_polygon ) m_status = sta_none;
+    if( m_status != sta_polygon ) return;
+    RDVPos pos;
+    [m_layout vGetPos :m_tx :m_ty :&pos];
+    if(pos.pageno >= 0)
+    {
+        RDVPage *vpage = [m_layout vGetPage:pos.pageno];
+        PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+                                                  :self.contentOffset.y * m_scale_pix];
+        PDFPage *page = [vpage GetPage];
+        [mat transformPath:m_polygon];
+        [page addAnnotPolygon:m_polygon :GLOBAL.g_line_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_width * m_scale_pix / [vpage scale]];
+        // Set Author and Modify date
+        [self updateLastAnnotInfoAtPage:page];
+        
+        //Action Stack Manger
+        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+        
+        [self ProUpdatePage :pos.pageno];
+        [self setModified:YES force:NO];
+    }
+    m_status = sta_none;
+    m_polygon = nil;
+    [self setNeedsDisplay];
+    [m_canvas setNeedsDisplay];
+    [self autoSave];
+    self.scrollEnabled = true;
+}
+
+//enter ink annotation status.
+-(bool)vPolylineStart
+{
+    if(![self canSaveDocument]) return false;
+    if( m_status == sta_none )
+    {
+        self.scrollEnabled = false;
+        m_polygon = NULL;
+        m_status = sta_polyline;
+        return true;
+    }
+    return false;
+}
+//end ink annotation status.
+-(void)vPolylineCancel
+{
+    if( m_status == sta_polyline )
+    {
+        [self enableScroll];
+        m_status = sta_none;
+        m_polygon = NULL;
+        [self setNeedsDisplay];
+        [m_canvas setNeedsDisplay];
+    }
+}
+//end ink annotation status, and add ink to page.
+-(void)vPolylineEnd
+{
+    if( !m_polygon ) m_status = sta_none;
+    if( m_status != sta_polyline ) return;
+    RDVPos pos;
+    [m_layout vGetPos :m_tx :m_ty :&pos];
+    if(pos.pageno >= 0)
+    {
+        RDVPage *vpage = [m_layout vGetPage:pos.pageno];
+        PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+                                                  :self.contentOffset.y * m_scale_pix];
+        PDFPage *page = [vpage GetPage];
+        [mat transformPath:m_polygon];
+        [page addAnnotPolyline:m_polygon :0 :0 :GLOBAL.g_line_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_width * m_scale_pix / [vpage scale]];
+        // Set Author and Modify date
+        [self updateLastAnnotInfoAtPage:page];
+
+        //Action Stack Manger
+        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+        
+        [self ProUpdatePage :pos.pageno];
+        [self setModified:YES force:NO];
+    }
+    m_status = sta_none;
+    m_polygon = nil;
     [self setNeedsDisplay];
     [m_canvas setNeedsDisplay];
     [self autoSave];
