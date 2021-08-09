@@ -1022,12 +1022,17 @@
 
 - (void)showBookmarksList
 {
-    RDBookmarkViewController *bookmarkViewController = [[RDBookmarkViewController alloc] initWithNibName:@"RDBookmarkViewController" bundle:nil];
-    bookmarkViewController.items = [self loadBookmarkForPdf:GLOBAL.g_pdf_path withPath:YES];
-    bookmarkViewController.delegate = self;
-    bookmarkViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    bookmarkViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [self presentViewController:bookmarkViewController animated:YES completion:nil];
+    NSArray *bookmarks = [self loadBookmarkForPdf:GLOBAL.g_pdf_path withPath:YES];
+    if (bookmarks.count > 0) {
+        RDBookmarkViewController *bookmarkViewController = [[RDBookmarkViewController alloc] initWithNibName:@"RDBookmarkViewController" bundle:nil];
+        bookmarkViewController.items = [self loadBookmarkForPdf:GLOBAL.g_pdf_path withPath:YES];
+        bookmarkViewController.delegate = self;
+        bookmarkViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        bookmarkViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        [self presentViewController:bookmarkViewController animated:YES completion:nil];
+    } else {
+        [self showBaseAlert:@"No bookmark saved."];
+    }
 }
 
 - (void)didSelectBookmarkAtPage:(int)page {

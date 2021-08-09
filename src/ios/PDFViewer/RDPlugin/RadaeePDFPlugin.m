@@ -366,8 +366,6 @@
         [m_pdf setDeleteImage:[UIImage imageNamed:@"btn_remove.png"]];
         
         [m_pdf setDoneImage:[UIImage imageNamed:@"btn_done.png"]];
-        
-        [m_pdf setHideGridImage:YES];
     }
     [self loadSettingsWithDefaults];
 }
