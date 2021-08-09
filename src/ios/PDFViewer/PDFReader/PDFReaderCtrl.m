@@ -27,14 +27,15 @@
 #import "PDFLayoutView.h"
 #import "PDFThumbView.h"
 #import "SignatureViewController.h"
+#import "RDBookmarkViewController.h"
 
-@interface PDFReaderCtrl () <PDFLayoutDelegate, PDFThumbViewDelegate, SearchResultViewControllerDelegate, RDPopupTextViewControllerDelegate, RDTreeViewControllerDelegate, SignatureDelegate>
+@interface PDFReaderCtrl () <UITextFieldDelegate, PDFLayoutDelegate, PDFThumbViewDelegate, SearchResultViewControllerDelegate, RDPopupTextViewControllerDelegate, RDTreeViewControllerDelegate, SignatureDelegate, BookmarkTableViewDelegate>
 @end
 
 @implementation PDFReaderCtrl
-- (void)show_error:(NSString *)msg
+- (void)showBaseAlert:(NSString *)msg
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:msg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Warning" message:msg preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *conform = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }];
     [alert addAction:conform];
@@ -276,6 +277,8 @@
     [_mSearchText becomeFirstResponder];
     [_mSearchText addTarget:self action:@selector(search_forward:) forControlEvents:UIControlEventEditingDidEndOnExit];
     
+    _mSearchText.delegate = self;
+    
     // This could be in an init method.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSearchKeyboardFrameChanged:) name:UIKeyboardDidChangeFrameNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSearchKeyboardHiding:) name:UIKeyboardWillHideNotification object:nil];
@@ -291,6 +294,10 @@
 -(void)dismissKeyboard
 {
     [_mSearchText resignFirstResponder];
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    findStart = NO;
 }
 
 - (void)onSearchKeyboardFrameChanged:(NSNotification*)notification
@@ -552,7 +559,7 @@
 {
     if(!m_doc.rootOutline)
     {
-        [self show_error:@"This PDF file has no outlines!"];
+        [self showBaseAlert:@"This PDF file has no outlines!"];
         return;
     }
     RDTreeViewController *treeViewController = [[RDTreeViewController alloc] initWithNibName:@"RDTreeViewController" bundle:nil];
@@ -623,6 +630,12 @@
                 [thiz OnOutline];
                 break;
             case 5:
+                [thiz showBookmarksList];
+                break;
+            case 6:
+                [thiz addBookmark];
+                break;
+            case 7:
                 if (GLOBAL.g_navigation_mode) {
                     GLOBAL.g_navigation_mode = 0;
                 } else {
@@ -632,7 +645,7 @@
                 [self thumbGoTo:self.PDFCurPage];
                 [self enter_none];
                 break;
-            case 6:
+            case 8:
                 if (GLOBAL.g_dark_mode) {
                     GLOBAL.g_dark_mode = false;
                 } else {
@@ -640,7 +653,7 @@
                 }
                 [self->m_view refreshCurrentPage];
                 break;
-            case 7:
+            case 9:
             {
                 PDFPagesCtrl *pages = [[UIStoryboard storyboardWithName:@"PDFPagesCtrl" bundle:nil] instantiateViewControllerWithIdentifier:@"rdpdfpages"];
                 [pages setCallback:self->m_doc :^(const bool *pages_del, const int *pages_rot)
@@ -681,6 +694,8 @@
     [view updateIcons:_undoImage :_redoImage :_selectImage];
     if (![m_doc canSave]) {
         [view updateVisible:YES :YES :YES];
+    } else {
+        [view updateVisible:_hideUndoImage :_hideRedoImage :_hideSelImage];
     }
     
     if (view.frame.size.height > (self.view.frame.size.height - [[UIApplication sharedApplication] statusBarFrame].size.height - 50 - 50 - 10)) {
@@ -724,6 +739,12 @@
                     break;
                 case 6://editbox
                     [vw vEditboxStart];
+                    break;
+                case 7://polygon
+                    [vw vPolygonStart];
+                    break;
+                case 8://polyline
+                    [vw vPolylineStart];
                     break;
                 case 100:
                     [vw vSelStart];
@@ -774,6 +795,12 @@
         case 6://editbox
             [m_view vEditboxEnd];
             break;
+        case 7://polygon
+            [m_view vPolygonEnd];
+            break;
+        case 8://polyline
+            [m_view vPolylineEnd];
+            break;
         case 100:
             [m_view vSelEnd];
             break;
@@ -804,6 +831,12 @@
             break;
         case 6://editbox
             [m_view vEditboxCancel];
+            break;
+        case 7://polygon
+            [m_view vPolygonCancel];
+            break;
+        case 8://polyline
+            [m_view vPolylineCancel];
             break;
         case 100:
             [m_view vSelEnd];
@@ -843,18 +876,22 @@
 {
     NSString *pat = _mSearchText.text;
     if(!pat || pat.length <= 0) return;
-    if (!m_fstr)
-        [m_view vFindStart:pat :GLOBAL.g_match_whole_word :GLOBAL.g_case_sensitive];
-    [m_view vFind:-1];
+    BOOL mwhole = _mSearchWhole.state == UIControlStateSelected;
+    BOOL mcase = _mSearchCase.state == UIControlStateSelected;
+    GLOBAL.g_match_whole_word = mwhole;
+    GLOBAL.g_case_sensitive = mcase;
+    [self startSearch:pat dir:-1 reset:NO];
 }
 
 - (IBAction)search_forward:(id)sender
 {
-    NSString *pat = _mSearchText.text;
+    NSString *pat =_mSearchText.text;
     if(!pat || pat.length <= 0) return;
-    if (!m_fstr)
-        [m_view vFindStart:pat :GLOBAL.g_match_whole_word :GLOBAL.g_case_sensitive];
-    [m_view vFind:1];
+    BOOL mwhole =_mSearchWhole.state == UIControlStateSelected;
+    BOOL mcase =_mSearchCase.state == UIControlStateSelected;
+    GLOBAL.g_match_whole_word = mwhole;
+    GLOBAL.g_case_sensitive = mcase;
+    [self startSearch:pat dir:1 reset:NO];
 }
 
 - (IBAction)search_tool_pressed:(id)sender
@@ -897,6 +934,104 @@
     [rdMenu addSubview:scrollView];
     
     return rdMenu;
+}
+
+#pragma mark - Bookmark
+
+- (NSMutableArray *)loadBookmarkForPdf:(NSString *)pdfPath withPath:(BOOL)withPath
+{
+    return [self addBookMarks:pdfPath :@"" :[NSFileManager defaultManager] pdfName:[GLOBAL.g_pdf_name stringByDeletingPathExtension] withPath:withPath];
+}
+
+- (NSMutableArray *)addBookMarks:(NSString *)dpath :(NSString *)subdir :(NSFileManager* )fm pdfName:(NSString *)pdfName withPath:(BOOL)withPath
+{
+    NSMutableArray *bookmarks = [NSMutableArray array];
+    
+    NSDirectoryEnumerator *fenum = [fm enumeratorAtPath:dpath];
+    NSString *fName;
+    while(fName = [fenum nextObject])
+    {
+        NSLog(@"%@", [dpath stringByAppendingPathComponent:fName]);
+        NSString *dst = [dpath stringByAppendingPathComponent:fName];
+        NSString *tempString;
+        
+        if(fName.length >10)
+        {
+            tempString = [fName pathExtension];
+        }
+        
+        if( [tempString isEqualToString:@"bookmark"] )
+        {
+            if (pdfName.length > 0 && ![fName containsString:pdfName]) {
+                continue;
+            }
+            
+            //add to list.
+            NSFileHandle *fileHandle =[NSFileHandle fileHandleForReadingAtPath:dst];
+            NSString *content = [[NSString alloc]initWithData:[fileHandle availableData] encoding:NSUTF8StringEncoding];
+            NSArray *myarray =[content componentsSeparatedByString:@","];
+            [myarray objectAtIndex:0];
+            NSArray *arr = [[NSArray alloc] initWithObjects:[myarray objectAtIndex:0],dst,nil];
+            
+            if (withPath) {
+                [bookmarks addObject:arr];
+            } else {
+                [bookmarks addObject:@{@"Page:": [NSNumber numberWithInteger:[[myarray objectAtIndex:0] intValue]], @"Label": @""}];
+            }
+            
+        }
+    }
+    
+    return bookmarks;
+}
+
+
+- (void)addBookmark
+{
+    NSString *pdfpath = [GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name];
+    RDVPos pos;
+    [m_view vGetPos:&pos];
+    int pageno = pos.pageno;
+    NSString *tempName = [[pdfpath lastPathComponent] stringByDeletingPathExtension];
+    NSString *tempFile = [tempName stringByAppendingFormat:@"_%d%@",pageno,@".bookmark"];
+    
+    NSString *fileContent = [NSString stringWithFormat:@"%i",pageno];
+    NSString *BookMarkDir = [pdfpath stringByDeletingLastPathComponent];
+    
+    NSString *bookMarkFile = [BookMarkDir stringByAppendingPathComponent:tempFile];
+    
+    if (![[NSFileManager defaultManager] isWritableFileAtPath:BookMarkDir]) {
+        [self showBaseAlert:@"Cannot add bookmark."];
+    }
+    
+    NSLog(@"%@", bookMarkFile);
+    
+    if(![[NSFileManager defaultManager] fileExistsAtPath:bookMarkFile])
+    {
+        [[NSFileManager defaultManager]createFileAtPath:bookMarkFile contents:nil attributes:nil];
+        NSFileHandle *fileHandle = [NSFileHandle fileHandleForUpdatingAtPath:bookMarkFile];
+        [fileHandle seekToEndOfFile];
+        [fileHandle writeData:[fileContent dataUsingEncoding:NSUTF8StringEncoding]];
+        [fileHandle closeFile];
+        [self showBaseAlert:@"Bookmark added!"];
+    }
+    else {
+        [self showBaseAlert:[NSString stringWithFormat:@"Bookmark already exist at page %i", pageno + 1]];
+    }
+}
+
+- (void)showBookmarksList
+{
+    RDBookmarkViewController *bookmarkViewController = [[RDBookmarkViewController alloc] initWithNibName:@"RDBookmarkViewController" bundle:nil];
+    bookmarkViewController.items = [self loadBookmarkForPdf:GLOBAL.g_pdf_path withPath:YES];
+    bookmarkViewController.delegate = self;
+    bookmarkViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    bookmarkViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    [self presentViewController:bookmarkViewController animated:YES completion:nil];
+}
+
+- (void)didSelectBookmarkAtPage:(int)page {
+    [self PDFGoto:page];
 }
 
 #pragma mark - PDFThumbViewDelegate
@@ -1068,7 +1203,7 @@
     
     if(!found)
     {
-        [self show_error:@"No more found!"];
+        [self showBaseAlert:@"No more found!"];
     }
 }
 
@@ -1390,6 +1525,10 @@
     if (_delegate && [_delegate respondsToSelector:@selector(didTapOnAnnotationOfType:atPage:atPoint:)]) {
         [_delegate didTapOnAnnotationOfType:annot.type atPage:page atPoint:point];
     }
+    NSLog(@"%@", [annot getEditText]);
+    if ([annot type]) {
+
+    }
 }
 
 #pragma mark - Signature
@@ -1473,33 +1612,16 @@
 
 - (void)startSearch:(NSString *)text dir:(int)dir reset:(BOOL)reset
 {
-    NSString *findString;
-    BOOL b_findStart = NO;
-    
     if (reset) {
-        findString = nil;
         [m_view vFindEnd];
-        b_findStart = NO;
+        findStart = NO;
     }
     
-    if (!b_findStart) {
-        findString = text;
+    if (!findStart) {
         [m_view vFindStart:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
-        b_findStart = YES;
+        findStart = YES;
         [m_view vFind:dir];
     } else if (text != nil && text.length > 0) {
-        bool stringCmp = false;
-        if (findString != NULL) {
-            if(GLOBAL.g_case_sensitive)
-                stringCmp = [text compare:findString] == NSOrderedSame;
-            else
-                stringCmp = [text caseInsensitiveCompare:findString] == NSOrderedSame;
-        }
-        if (!stringCmp) {
-            [m_view vFindStart:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
-            findString = text;
-        }
-        
         [m_view vFind:dir];
     }
 }

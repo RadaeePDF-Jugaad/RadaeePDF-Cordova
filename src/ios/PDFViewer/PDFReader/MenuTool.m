@@ -19,16 +19,18 @@
     @{@"Selection": [UIImage imageNamed:@"btn_select"]},
     @{@"Meta": [UIImage imageNamed:@"btn_meta"]},
     @{@"Outlines": [UIImage imageNamed:@"btn_outline"]},
+    @{@"Bookmarks": [UIImage imageNamed:@"btn_bookmark"]},
+    @{@"Add bookmark": [UIImage imageNamed:@"btn_bookmark_add"]},
     @{@"Slider": [UIImage imageNamed:@"btn_slider"]},
     @{@"Night mode": [UIImage imageNamed:@"btn_night_mode"]},
     @{@"Manage pages": [UIImage imageNamed:@"btn_manage_page"]},
                              nil];
     
     if (!GLOBAL.g_navigation_mode) {
-        items[5] = @{@"Thumbnail": [UIImage imageNamed:@"btn_thumb"]};
+        items[9] = @{@"Thumbnail": [UIImage imageNamed:@"btn_thumb"]};
     }
     if (GLOBAL.g_dark_mode) {
-        items[6] = @{@"Light mode": [UIImage imageNamed:@"btn_light_mode"]};
+        items[10] = @{@"Light mode": [UIImage imageNamed:@"btn_light_mode"]};
     }
     
     return [super init:point :callback :items];

@@ -20,6 +20,8 @@
     @{@"Ellipse": [UIImage imageNamed:@"btn_annot_ellipse"]},
     @{@"Stamp": [UIImage imageNamed:@"btn_annot_stamp"]},
     @{@"Editbox": [UIImage imageNamed:@"btn_edit_box"]},
+    @{@"Polygon": [UIImage imageNamed:@"btn_polygon"]},
+    @{@"Polyline": [UIImage imageNamed:@"btn_polyline"]},
     ];
     
     return [super init:point :callback :items];

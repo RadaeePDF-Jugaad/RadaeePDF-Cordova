@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.radaee.cordova" version="1.6.4">
+    id="com.radaee.cordova" version="1.6.6">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -498,6 +498,8 @@
         <header-file src="src/ios/PDFViewer/PDFReader/RDSinglePageViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
         <source-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
         <header-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
+        <source-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.m" target-dir="ios/PDFViewer/PDFReader"/>
+        <header-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.h" target-dir="ios/PDFViewer/PDFReader"/>
         <source-file src="src/ios/PDFViewer/PDFReader/UIColorBtn.m" target-dir="ios/PDFViewer/PDFReader"/>
         <header-file src="src/ios/PDFViewer/PDFReader/UIColorBtn.h" target-dir="ios/PDFViewer/PDFReader"/>
         <source-file src="src/ios/PDFViewer/PDFReader/UIIconView.m" target-dir="ios/PDFViewer/PDFReader"/>
@@ -516,6 +518,7 @@
         <resource-file src="src/ios/PDFViewer/PDFReader/RDPDFReflowViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
         <resource-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
         <resource-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
+        <resource-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
         
         <source-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
         <header-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
