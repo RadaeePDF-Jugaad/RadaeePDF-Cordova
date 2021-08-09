@@ -51,6 +51,7 @@
     BOOL m_whole;
     BOOL m_case;
     BOOL showingThumb;
+    BOOL findStart;
     
     UITapGestureRecognizer *searchTapNone;
     UITapGestureRecognizer *searchTapField;
