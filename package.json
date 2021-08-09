@@ -1,7 +1,7 @@
 {
   "name": "com.radaee.cordova",
-  "version": "1.3.2",
-  "description": "RadaeePDF reader cordova plugin",
+  "version": "1.3.4",
+  "description": "RadaeePDF Classic Reader Cordova plugin",
   "cordova": {
     "platforms": [
       "android"
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gearit/RadaeePDF-Cordova.git"
+    "url": "https://github.com/RadaeePDF-Jugaad/RadaeePDF-Cordova.git"
   },
   "keywords": [
     "cordova",
@@ -23,5 +23,5 @@
       "version": ">=3.0.0"
     }
   ],
-  "author": "Gear.it S.R.L."
+  "author": "Jugaad S.R.L."
 }
