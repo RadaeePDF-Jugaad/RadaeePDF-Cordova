@@ -377,7 +377,7 @@
     
     _mBarNoneBottomWidthConstraint.constant = 250;
     
-    [self setBarButtonVisibility]
+    [self setBarButtonVisibility];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -681,8 +681,6 @@
     [view updateIcons:_undoImage :_redoImage :_selectImage];
     if (![m_doc canSave]) {
         [view updateVisible:YES :YES :YES];
-    } else {
-        [view updateVisible:_hideUndoImage :_hideRedoImage :_hideSelImage];
     }
     
     if (view.frame.size.height > (self.view.frame.size.height - [[UIApplication sharedApplication] statusBarFrame].size.height - 50 - 50 - 10)) {
