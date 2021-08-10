@@ -314,13 +314,13 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "flatAnnotAtPage":
                 params = args.getJSONObject(0);
                 boolean flatResult = mPdfManager.flatAnnotAtPage(params.optInt("page"));
-                if(flatResult) callbackContext.success("Page flattering success");
-                else callbackContext.error("Page flattering error");
+                if(flatResult) callbackContext.success("Page flattening success");
+                else callbackContext.error("Page flattening error");
                 break;
             case "flatAnnots":
                 boolean flatsResult = mPdfManager.flatAnnots();
-                if(flatsResult) callbackContext.success("Document flattering success");
-                else callbackContext.error("Document flattering error");
+                if(flatsResult) callbackContext.success("Document flattening success");
+                else callbackContext.error("Document flattening error");
                 break;
             case "saveDocumentToPath":
                 params = args.getJSONObject(0);

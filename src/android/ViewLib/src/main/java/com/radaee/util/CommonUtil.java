@@ -467,4 +467,8 @@ public class CommonUtil {
 
         return result;
     }
+
+    public static int dp2px(Context context, float dpValue) {
+        return (int)(dpValue * context.getResources().getDisplayMetrics().density);
+    }
 }

@@ -178,7 +178,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * Changes the Reader's view mode
      * Should be called before show, open methods
      *
-     * @param viewMode 0:vertical 3:single 4:dual 6:Dual with cover(1st page single)
+     * @param viewMode 0:vertical 3:single 4:Dual 6:Dual with cover(1st page single)
      */
     public void setReaderViewMode(int viewMode) {
         mViewMode = viewMode;

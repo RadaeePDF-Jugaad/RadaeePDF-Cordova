@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/btn_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/btn_annot_ink"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_back"
@@ -27,8 +27,8 @@
 
     <ImageView
         android:id="@+id/btn_annot_line"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_ink"
@@ -36,8 +36,8 @@
 
     <ImageView
         android:id="@+id/btn_annot_rect"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_line"
@@ -46,8 +46,8 @@
 
     <ImageView
         android:id="@+id/btn_annot_stamp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_oval"
@@ -56,8 +56,8 @@
 
     <ImageView
         android:id="@+id/btn_annot_oval"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_rect"
@@ -66,8 +66,8 @@
 
     <ImageView
         android:id="@+id/btn_annot_note"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_stamp"
@@ -76,12 +76,31 @@
 
     <ImageView
         android:id="@+id/btn_annot_editbox"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
         android:layout_alignParentTop="true"
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_note"
         android:clickable="true"
-        android:src="@drawable/btn_annot_rect" />
+        android:src="@drawable/btn_annot_edit" />
 
+    <ImageView
+        android:id="@+id/btn_annot_polygon"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
+        android:layout_alignParentTop="true"
+        android:layout_margin="2dp"
+        android:layout_toRightOf="@+id/btn_annot_editbox"
+        android:clickable="true"
+        android:src="@drawable/btn_annot_polygon"/>
+
+    <ImageView
+        android:id="@+id/btn_annot_polyline"
+        android:layout_width="@dimen/bar_annot_btn_width"
+        android:layout_height="@dimen/bar_annot_btn_height"
+        android:layout_alignParentTop="true"
+        android:layout_margin="2dp"
+        android:layout_toRightOf="@+id/btn_annot_polygon"
+        android:clickable="true"
+        android:src="@drawable/btn_annot_polyline" />
 </RelativeLayout>

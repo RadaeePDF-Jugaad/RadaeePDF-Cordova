@@ -3,5 +3,7 @@
 
     <dimen name="annot_menu_btn_size">35dp</dimen>
     <dimen name="annot_menu_bar_margin">10dp</dimen>
+    <dimen name="bar_annot_btn_width">32dp</dimen>
+    <dimen name="bar_annot_btn_height">40dp</dimen>
 
 </resources>
