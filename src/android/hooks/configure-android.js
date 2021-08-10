@@ -1,5 +1,7 @@
 /**
  * Created by p.messina on 14/10/2015.
+ * edited L. Fieramosca
+ * maintained D. Finardi, Jugaad s.r.l.
  */
 
 module.exports = function (ctx) {
