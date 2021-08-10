@@ -33,7 +33,7 @@ If you, as user and developer need new features or fixes you shall submit them h
 	`cordova platform add android@latest --save` and/or `cordova platform add ios --save`
 	
 3. Add the plugin.  
-   `cordova plugin add https://github.com/gearit/RadaeePDF-Cordova.git --save`
+   `cordova plugin add https://github.com/RadaeePDF-Jugaad/RadaeePDF-Cordova.git --save`
 	
 4. Build the app.  
    `cordova build`	
