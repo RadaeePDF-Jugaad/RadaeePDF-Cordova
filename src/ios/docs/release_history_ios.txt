@@ -1,22 +1,64 @@
 PDFViewer SDK for iOS - Release notes
 
-3.74
+4.4
 - FIX render issue
+- Adapted classes for modules compatibility
 - FIX set/get popup text/subject issue
+- FIX bad linearized header loading issue
+- FIX specific editbox crash
+- Minor fixes
 
-3.73
+4.3
 - NEW method to get name of signer
 - EDIT SignField method: add a parameter to set name of signer
 
-3.72
+4.2
 - NEW PDFSign features
 - getFieldName methods will return original name without remove blanks
 - CHANGE libjpeg marco JDCT_DEFAULT from JDCT_ISLOW to JDCT_IFAST
 - ADD thumbview label's color global
 - FIX OOM issue for special condition
 
+4.1
+- ADD create edit box feature
+- NEW static method to set open flag, relate to linearized PDF
+- NEW method to get linearized pdf status
+- FIX issue loop all page objects in layout time
+- ENHANCED PDFHttpStream class, removed all deprecated ios class
+- ENHANCED PDFHttpStream class, fix http issue
+- ADD get pdf/screen point feature
+- ADD get pdf/screen rect feature
+- ADD signature annot management
+- FIX crash issue on field just signed
+
+4.0
+- NEW UI
+- NEW reader controller class PDFReaderCtrl
+- NEW Storyboard-based reader controller
+- NEW menu classes (search, annot, view mode, more)
+- REMOVED bookmarks and setting view controllers
+- REMOVED Modules folder
+- ADD lock/unlock feature in annot's menu operations
+- ADD case/whole search features in search mode
+- NEW file collection view
+- NEW imageset
+- NEW toolbars UI
+- NEW toolbars' feature (switch and show thumb/slider, night mode, meta)
+- NEW color picker
+- NEW search mode UI
+- NEW full text search feature
+- NEW popup text view UI
+- NEW outline view UI
+- NEW annots' properties UI
+- ADD support for dark mode
+- FIX minor UI issues
+- FIX crash issue when linerazed data damaged
+- FIX open from url issue
+- FIX specific pdf crash issue
+- ADD edit pages feature
+
 3.71
-- FIX issue for ImportAnnot when page is rotated page
+- FIX issue for ImportAnnot when page is rotated
 - FIX ink annotation import
 - FIX OverPrint when issue
 - CalRGB colorspace enhanced
@@ -26,17 +68,6 @@ PDFViewer SDK for iOS - Release notes
 - CHANGE iOS build option "iOS Deployment Target" to "iOS 8.0".
 - SetInkPath will calculate annotation area automatically
 - FIX square and circle annotation issue on setRect
-- FIX crash issue when linerazed data damaged
-- FIX crash issue for special PDF file
-- NEW addAnnotEditText feature
-- NEW static method to set open flag, relate to linearized PDF
-- NEW method to get linearized pdf status
-- FIX issue loop all page objects in layout time
-- ENHANCED PDFHttpStream class, removed all deprecated ios class
-- ENHANCED PDFHttpStream class, fix http issue
-- ADD get pdf/screen point feature
-- ADD get pdf/screen rect feature
-- FIX crash issue on field just signed
 
 3.70
 - NEW annots' properties feature

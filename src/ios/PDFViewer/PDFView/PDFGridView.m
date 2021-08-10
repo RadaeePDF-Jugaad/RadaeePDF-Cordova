@@ -22,6 +22,10 @@
     }
     return self;
 }
+-(void)ProOnTimer:(NSTimer *)sender
+{
+    [self setNeedsDisplay];
+}
 
 -(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFThumbViewDelegate>)del
 {
@@ -29,7 +33,7 @@
     m_zoom = 1;
     m_doc = doc;
     m_delegate = del;
-    self.m_del = nil;
+    m_del = nil;
     page_gap = 1;
     m_sel_pno = -1;
     m_layout = [[RDVLayoutGrid alloc] init:self :100 :5];

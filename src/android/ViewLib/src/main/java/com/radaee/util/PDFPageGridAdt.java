@@ -27,7 +27,7 @@ public class PDFPageGridAdt extends BaseAdapter {
             float scale2 = m_h / ph;
             if(scale1 > scale2) scale1 = scale2;
             int iw = (int)(pw * scale1);
-            int ih = (int)(ph * scale1);
+            int ih = (int)(ph * scale2);
             Bitmap bmp = Bitmap.createBitmap(iw, ih, Bitmap.Config.ARGB_8888);
             bmp.eraseColor(-1);
             Page page = m_doc.GetPage(m_pageno);

@@ -1044,14 +1044,6 @@ public class Page
 		{
 			return Page.getAnnotSignStatus(page.hand, hand);
 		}
-		final public Sign GetSign()
-		{
-			long hret = Page.getAnnotSign(page.hand, hand);
-			if(hret == 0) return null;
-			Sign ret = new Sign();
-			ret.m_hand = hret;
-			return ret;
-		}
 		/**
 		 * check if the annotation is reset button?<br/>
 		 * this method require premium license
@@ -1432,16 +1424,11 @@ public class Page
 		 * @param reason sign reason will write to signature.
 		 * @param location signature location will write to signature.
 		 * @param contact contact info will write to signature.
-		 * @return 0 mean OK<br/>
-		 * -1: generate parameters error.<br/>
-		 * -2: it is not signature field, or field has already signed.<br/>
-		 * -3: invalid annotation data.<br/>
-		 * -4: save PDF file failed.<br/>
-		 * -5: cert file open failed.
+		 * @return 0 mean OK, others are failed.
 		 */
-		final public int SignField(DocForm form, String cert_file, String pswd, String name, String reason, String location, String contact)
+		final public int SignField(DocForm form, String cert_file, String pswd, String reason, String location, String contact)
 		{
-			return signAnnotField(page.hand, hand, form.hand, cert_file, pswd, name, reason, location, contact);
+			return signAnnotField(page.hand, hand, form.hand, cert_file, pswd, reason, location, contact);
 		}
 	}
 	public class Finder
@@ -1494,8 +1481,8 @@ public class Page
     static private native boolean addAnnot(long page, long annot_ref);
 	static private native boolean addAnnot2(long page, long annot_ref, int index);
 
-	static private native int sign(long hand, long form, float[] box, String cert_file, String pswd, String name, String reason, String location, String contact);
-	static private native int signAnnotField(long hand, long annot, long form, String cert_file, String pswd, String name, String reason, String location, String contact);
+	static private native int sign(long hand, long form, float[] box, String cert_file, String pswd, String reason, String location, String contact);
+	static private native int signAnnotField(long hand, long annot, long form, String cert_file, String pswd, String reason, String location, String contact);
 
     static private native float[] getCropBox( long hand );
 	static private native float[] getMediaBox( long hand );
@@ -1634,7 +1621,6 @@ public class Page
 	static private native boolean setAnnotCheckValue( long hand, long annot, boolean check );
 	static private native boolean setAnnotRadio( long hand, long annot );
 	static private native int getAnnotSignStatus( long hand, long annot );
-	static private native long getAnnotSign(long hand, long annot);
 	static private native boolean getAnnotReset( long hand, long annot );
 	static private native boolean setAnnotReset( long hand, long annot );
 	static private native String getAnnotSubmitTarget( long hand, long annot );
@@ -1751,21 +1737,15 @@ public class Page
 	 * @param rect rectangle for sign field
 	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
 	 * @param pswd password to open cert file.
-	 * @param name signer name.
 	 * @param reason sign reason will write to signature.
 	 * @param location signature location will write to signature.
 	 * @param contact contact info will write to signature.
-	 * @return 0 mean OK<br/>
-	 * -1: generate parameters error.<br/>
-	 * -2: it is not signature field, or field has already signed.<br/>
-	 * -3: invalid annotation data.<br/>
-	 * -4: save PDF file failed.<br/>
-	 * -5: cert file open failed.
+	 * @return 0 mean OK, others are failed.
 	 */
-    public int Sign(Document.DocForm form, float[] rect, String cert_file, String pswd, String name, String reason, String location, String contact)
+    public int Sign(Document.DocForm form, float[] rect, String cert_file, String pswd, String reason, String location, String contact)
 	{
 		//int sign(long hand, long form, float[] box, String cert_file, String pswd, String reason, String location, String contact);
-		return sign(hand, form.hand, rect, cert_file, pswd, name, reason, location, contact);
+		return sign(hand, form.hand, rect, cert_file, pswd, reason, location, contact);
 	}
 	/**
 	 * Close page object and free memory.

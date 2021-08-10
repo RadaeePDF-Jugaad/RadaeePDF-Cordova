@@ -724,6 +724,18 @@ extern uint annotStrikeoutColor;
 {
 	PageContent_drawText( m_handle, [text UTF8String] );
 }
+-(int)drawText:(NSString *)text :(int)align :(float)width
+{
+	return PageContent_drawText2(m_handle, [text UTF8String], align, width);
+}
+-(PDF_TEXT_RET)drawText:(NSString *)text :(int)align :(float)width :(int)max_lines
+{
+	int val = PageContent_drawText3(m_handle, [text UTF8String], align, width, max_lines);
+	PDF_TEXT_RET ret;
+	ret.num_unicodes = val & ((1<<20) - 1);
+	ret.num_lines = val >> 20;
+	return ret;
+}
 -(void)strokePath:(PDFPath *) path
 {
 	PageContent_strokePath( m_handle, path.handle );

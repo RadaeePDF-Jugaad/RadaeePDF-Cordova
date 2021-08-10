@@ -203,7 +203,7 @@ var app = {
 
         RadaeePDFPlugin.open(
             {
-		url: "https://www.radaeepdf.com/documentation/readeula/eula/eula.pdf",
+                url: "http://www.radaeepdf.com/documentation/MRBrochoure.pdf",
                 password: "" //password if needed
             },
             function(message) {

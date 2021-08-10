@@ -234,7 +234,6 @@ public class PDFGLViewAct extends Activity implements ILayoutView.PDFLayoutListe
 			}
 			else if( pdf_path != null && pdf_path != "" )
 			{
-				m_path = pdf_path;
 				m_doc = new Document();
 				int ret = m_doc.Open(pdf_path, pdf_pswd);
 				//m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.

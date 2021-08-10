@@ -1,8 +1,5 @@
 package com.radaee.pdf;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-
 /**
  * class for Path
  * @author radaee<br/>
@@ -92,53 +89,6 @@ public class Path
 	public final int GetNode( int index, float pt[] )
 	{
 		return getNode( m_hand, index, pt );
-	}
-	private android.graphics.Path toSysPath(int cnt, float orgx, float orgy)
-	{
-		int index = 0;
-		float pt1[] = new float[2];
-		android.graphics.Path path = new android.graphics.Path();
-		while( index < cnt )
-		{
-			int op = getNode( m_hand, index, pt1 );
-			switch( op )
-			{
-				case 1:
-					path.lineTo(pt1[0] + orgx, pt1[1] + orgy);
-					break;
-				default:
-					path.moveTo(pt1[0] + orgx, pt1[1] + orgy);
-					break;
-			}
-			index++;
-		}
-		return path;
-	}
-	public void OnDraw(Canvas canvas, float orgx, float orgy, Paint paint)
-	{
-		if(canvas == null) return;
-		int cnt = getNodeCount(m_hand);
-		boolean is_fill = (paint.getStyle() == Paint.Style.FILL) || (paint.getStyle() == Paint.Style.FILL_AND_STROKE);
-		if (is_fill && cnt < 3) return;
-		else if (cnt < 2) return;
-		android.graphics.Path path = toSysPath(cnt, orgx, orgy);
-		if(is_fill) path.close();
-		canvas.drawPath(path, paint);
-	}
-	public void onDrawPoint(Canvas canvas, float orgx, float orgy, int rad, Paint paint)
-	{
-		if(canvas == null) return;
-		int cnt = getNodeCount(m_hand);
-		int index = 0;
-		float pt1[] = new float[2];
-		android.graphics.Path path = new android.graphics.Path();
-		while( index < cnt )
-		{
-			int op = getNode( m_hand, index, pt1 );
-			path.addCircle(pt1[0] + orgx, pt1[1] + orgy, rad, android.graphics.Path.Direction.CW);
-			index++;
-		}
-		canvas.drawPath(path, paint);
 	}
     @Override
     protected void finalize() throws Throwable

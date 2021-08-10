@@ -52,16 +52,6 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetInk(code);
     }
 
-    @Override
-    public void PDFSetPolygon(int code) {
-        m_view.PDFSetPolygon(code);
-    }
-
-    @Override
-    public void PDFSetPolyline(int code) {
-        m_view.PDFSetPolyline(code);
-    }
-
     public void PDFSetRect(int code) {
         m_view.PDFSetRect(code);
     }
@@ -91,8 +81,8 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetEditbox(code);
     }
     @Override
-    public boolean PDFSetAttachment(String attachmentPath) {
-        return m_view.PDFSetAttachment(attachmentPath);
+    public boolean PDFSetAttachment(String attachmentPath) { //TODO
+        return false;
     }
 
     public void PDFCancelAnnot() {

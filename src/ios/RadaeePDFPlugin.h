@@ -1,6 +1,6 @@
 #import <Cordova/CDV.h>
 
-@class RDLoPDFViewController;
+@class PDFReaderCtrl;
 @class RDPageViewController;
 
 // define the protocol for the delegate
@@ -19,7 +19,7 @@
 
 @interface RadaeePDFPlugin : CDVPlugin{
     CDVInvokedUrlCommand* cdv_command;
-    RDLoPDFViewController *m_pdf;
+    PDFReaderCtrl *m_pdf;
     RDPageViewController *m_pdfP;
     
     NSURLConnection *pdfConn;
@@ -97,6 +97,7 @@
 - (void)setTitleBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setIconsBGColor:(CDVInvokedUrlCommand*)command;
 - (void)setThumbHeight:(CDVInvokedUrlCommand*)command;
+- (void)setBarButtonVisibility:(CDVInvokedUrlCommand*)command;
 - (void)setFirstPageCover:(CDVInvokedUrlCommand*)command;
 - (void)setDoubleTapZoomMode:(CDVInvokedUrlCommand*)command;
 - (void)setImmersive:(CDVInvokedUrlCommand*)command;
@@ -155,5 +156,24 @@
 - (void)didLongPressOnPageCallback:(CDVInvokedUrlCommand *)command;
 - (void)didTapOnAnnotationOfTypeCallback:(CDVInvokedUrlCommand *)command;
 - (void)onAnnotExportedCallback:(CDVInvokedUrlCommand *)command;
+
+- (void)refreshCurrentPage;
+
+//get text & markup annot details
+- (void)getTextAnnotationDetails:(CDVInvokedUrlCommand *)command;//(int)pageNum;
+- (void)getMarkupAnnotationDetails:(CDVInvokedUrlCommand *)command;//(int)pageNum;
+
+//add text annot
+- (void)addTextAnnotation:(CDVInvokedUrlCommand *)command;//(int)pageNum :(float)x :(float)y :(NSString *)text :(NSString *)subject;
+
+//get char indexes and add markup annot
+- (void)getCharIndex:(CDVInvokedUrlCommand *)command;//(int)pageNum :(float)x :(float)y;
+- (void)addMarkupAnnotation:(CDVInvokedUrlCommand *)command;//(int)pageNum :(int)type :(int)index1 :(int)index2;
+
+//get screen points from pdf points
+- (void)getPDFCoordinates:(CDVInvokedUrlCommand *)command;//(int)x :(int)y;
+- (void)getScreenCoordinates:(CDVInvokedUrlCommand *)command;//(int)x :(int)y :(int)pageNum;
+- (void)getPDFRect:(CDVInvokedUrlCommand *)command;//(float)x :(float)y :(float)width :(float)height;
+- (void)getScreenRect:(CDVInvokedUrlCommand *)command;//(float)left :(float)top :(float)right :(float)bottom :(int)pageNum;
 
 @end

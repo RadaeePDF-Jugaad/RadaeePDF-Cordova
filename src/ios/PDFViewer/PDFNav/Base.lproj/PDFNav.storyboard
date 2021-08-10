@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment version="2048" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Nav Ctrl-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="PDFNavCtrl" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="8sa-dg-JLM"/>
+                        <viewControllerLayoutGuide type="bottom" id="ELH-Hb-7jg"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="pzL-Wa-Fgc">
+                                <rect key="frame" x="0.0" y="20" width="375" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="28" id="LEv-R9-KOl"/>
+                                </constraints>
+                                <segments>
+                                    <segment title="Document"/>
+                                    <segment title="Resouces"/>
+                                </segments>
+                                <connections>
+                                    <action selector="OnUpdate:" destination="BYZ-38-t0r" eventType="valueChanged" id="yYC-Uc-c5f"/>
+                                </connections>
+                            </segmentedControl>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" restorationIdentifier="m_nav∫" translatesAutoresizingMaskIntoConstraints="NO" id="vZ0-Wh-yFU" customClass="PDFNavThumb">
+                                <rect key="frame" x="0.0" y="48" width="375" height="653"/>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="vZ0-Wh-yFU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="UDl-IB-DiL"/>
+                            <constraint firstItem="vZ0-Wh-yFU" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="VQK-Ju-GT5"/>
+                            <constraint firstItem="pzL-Wa-Fgc" firstAttribute="top" secondItem="8sa-dg-JLM" secondAttribute="bottom" id="VSn-cf-tgO"/>
+                            <constraint firstItem="pzL-Wa-Fgc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="XbR-F3-5o4"/>
+                            <constraint firstItem="vZ0-Wh-yFU" firstAttribute="bottom" secondItem="ELH-Hb-7jg" secondAttribute="top" constant="34" id="c9G-iP-HEK"/>
+                            <constraint firstItem="pzL-Wa-Fgc" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="o8C-ze-1lT"/>
+                            <constraint firstItem="vZ0-Wh-yFU" firstAttribute="top" secondItem="pzL-Wa-Fgc" secondAttribute="bottom" id="xwh-fU-WbG"/>
+                        </constraints>
+                    </view>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <connections>
+                        <outlet property="mNav" destination="vZ0-Wh-yFU" id="5aM-SX-ZBd"/>
+                        <outlet property="mTab" destination="pzL-Wa-Fgc" id="eiC-Ng-hNB"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="34.782608695652179" y="18.75"/>
+        </scene>
+    </scenes>
+</document>

@@ -13,7 +13,6 @@ import com.radaee.pdf.Global;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.view.PDFViewPager;
-import com.radaee.viewlib.R;
 
 import java.util.Locale;
 

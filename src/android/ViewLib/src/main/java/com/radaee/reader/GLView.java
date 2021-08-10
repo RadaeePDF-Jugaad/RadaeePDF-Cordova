@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,23 +12,30 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.radaee.annotui.UIAnnotDlgSign;
-import com.radaee.annotui.UIAnnotDlgSignProp;
 import com.radaee.annotui.UIAnnotMenu;
 import com.radaee.annotui.UIAnnotPopCombo;
 import com.radaee.annotui.UIAnnotPopEdit;
@@ -36,8 +44,10 @@ import com.radaee.pdf.Global;
 import com.radaee.pdf.Ink;
 import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
-import com.radaee.pdf.Path;
+import com.radaee.util.CaptureSignature;
+import com.radaee.util.ComboList;
 import com.radaee.util.CommonUtil;
+import com.radaee.view.GLBlock;
 import com.radaee.view.GLLayout;
 import com.radaee.view.GLLayoutCurl;
 import com.radaee.view.GLLayoutDual;
@@ -47,6 +57,7 @@ import com.radaee.view.GLLayoutReflow;
 import com.radaee.view.GLLayoutVert;
 import com.radaee.view.GLPage;
 import com.radaee.view.ILayoutView;
+import com.radaee.view.PDFLayout;
 import com.radaee.view.VSel;
 import com.radaee.viewlib.R;
 
@@ -55,8 +66,6 @@ import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-import static com.radaee.util.CommonUtil.dp2px;
 
 public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
     static final public int STA_NONE = 0;
@@ -69,8 +78,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
     static final public int STA_LINE = 7;
     static final public int STA_STAMP = 8;
     static final public int STA_EDITBOX = 9;
-    static final public int STA_POLYGON = 10;
-    static final public int STA_POLYLINE = 11;
     static final public int STA_ANNOT = 100;
     private int m_status = STA_NONE;
     private GLLayout m_layout;
@@ -168,7 +175,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            if (m_layout == null || m_status != STA_NONE && m_status != STA_ANNOT) return false;
+            if (m_status != STA_NONE && m_status != STA_ANNOT) return false;
             switch (m_layout.gl_click((int) e.getX(), (int) e.getY())) {
                 case 1://not annot event fired.
                     if (m_listener != null) m_listener.OnPDFBlankTapped();
@@ -248,7 +255,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                         public void onDismiss() {
                             if (m_annot != null) {
                                 //auto resize:
-                                if (m_annot.GetType() == 3) {
+                                if(m_annot.GetType() == 3) {
                                     float old_pdf_rect[] = m_annot.GetRect();
                                     float new_height = m_pEdit.getContentHeight() / m_annot_page.GetScale();
                                     float new_pdf_rect[] = new float[4];
@@ -313,7 +320,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                     }
                 } else if (PDFCanSave() && m_annot.GetListItemCount() >= 0)  //if list choice
                     onListAnnot();
-                else if (PDFCanSave() && m_annot.GetFieldType() == 4 && Global.sEnableGraphicalSignature)  //signature field
+                else if (PDFCanSave() && m_annot.GetFieldType() == 4 && m_annot.GetSignStatus() == 0 && Global.sEnableGraphicalSignature)  //signature field
                     handleSignatureField();
                 else if (m_annot.GetURI() != null && Global.g_auto_launch_link && m_listener != null) { // launch link automatically
                     m_listener.OnPDFOpenURI(m_annot.GetURI());
@@ -359,48 +366,27 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         }
 
         private void handleSignatureField() {
-            if (m_annot.GetSignStatus() == 1) {
-                UIAnnotDlgSignProp dlg = new UIAnnotDlgSignProp(getContext());
-                dlg.show(m_annot, m_doc, new UIAnnotMenu.IMemnuCallback() {
-                    @Override
-                    public void onUpdate() {
-                    }
-
-                    @Override
-                    public void onRemove() {
-                    }
-
-                    @Override
-                    public void onPerform() {
-                    }
-
-                    @Override
-                    public void onCancel() { PDFEndAnnot(); }
-                });
+            if (CommonUtil.isFieldGraphicallySigned(m_annot)) {
+                new AlertDialog.Builder(getContext()).setTitle(R.string.warning).setMessage(R.string.delete_signature_message)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                updateSignature(null, true);
+                            }
+                        })
+                        .setNegativeButton(R.string.no, null)
+                        .show();
             } else {
-                UIAnnotDlgSign dlg = new UIAnnotDlgSign(getContext());
-                dlg.show(m_annot, m_doc, new UIAnnotMenu.IMemnuCallback() {
+                CaptureSignature.CaptureSignatureListener.setListener(new CaptureSignature.CaptureSignatureListener.OnSignatureCapturedListener() {
                     @Override
-                    public void onUpdate() {
-                        m_layout.gl_render(m_annot_page);
-                        if (m_listener != null)
-                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                        PDFEndAnnot();
-                    }
-
-                    @Override
-                    public void onRemove() {
-                    }
-
-                    @Override
-                    public void onPerform() {
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        PDFEndAnnot();
+                    public void OnSignatureCaptured(Bitmap signature) {
+                        updateSignature(signature, false);
                     }
                 });
+                Intent intent = new Intent(getContext(), CaptureSignature.class);
+                intent.putExtra(CaptureSignature.SIGNATURE_PAD_DESCR, Global.sSignPadDescr);
+                intent.putExtra(CaptureSignature.FIT_SIGNATURE_BITMAP, Global.sFitSignatureToField);
+                getContext().startActivity(intent);
             }
         }
 
@@ -427,7 +413,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         }
 
         boolean[] mCheckedItems;
-
         private void onListAnnot() {
             try {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
@@ -633,7 +618,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
     }
 
     public void setAnnotMenu(UIAnnotMenu aMenu) {
-        m_aMenu = aMenu;
+       m_aMenu = aMenu;
     }
 
     public void PDFOpen(Document doc, ILayoutView.PDFLayoutListener listener, GLCanvas canvas, int page_gap) {
@@ -646,8 +631,8 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
 
     private int m_view_mode;
     private GLLayout.PDFPos m_save_pos;
-
-    public void PDFSaveView() {
+    public void PDFSaveView()
+    {
         if (m_layout != null) m_save_pos = m_layout.vGetPos(m_w >> 1, m_h >> 1);
         else m_save_pos = null;
         PDFSetEditbox(2);//cancel
@@ -671,8 +656,8 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             }
         }
     }
-
-    public void PDFRestoreView() {
+    public void PDFRestoreView()
+    {
         //reset stack.
         m_opstack = new PDFLayoutOPStack();
         queueEvent(new Runnable() {
@@ -752,7 +737,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                     m_layout.gl_surface_create(m_gl10);
                     m_layout.gl_resize(m_w, m_h);
                     if (m_save_pos != null) {
-                        if (m_save_pos.pageno >= m_doc.GetPageCount())//after page deleted, page count may changed.
+                        if(m_save_pos.pageno >= m_doc.GetPageCount())//after page deleted, page count may changed.
                             m_save_pos.pageno = m_doc.GetPageCount() - 1;
                         if (m_view_mode == 3 || m_view_mode == 4 || m_view_mode == 6) {
                             m_layout.vGotoPage(m_save_pos.pageno);
@@ -766,7 +751,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             }
         });
     }
-
     public void PDFSetView(final int view_mode) {
         queueEvent(new Runnable() {
             @Override
@@ -835,7 +819,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                     @Override
                     public void OnFound(boolean found) {
                         if (found) {
-                            if (m_listener != null) m_listener.OnPDFSearchFinished(found);
+                            if (m_listener != null) m_listener.OnPDFSearchFinished(found);                        
                             if (m_canvas != null) invalidate();
                         } else
                             Toast.makeText(getContext(), "no more found", Toast.LENGTH_SHORT).show();
@@ -908,7 +892,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                 m_annot_rect[1] = m_annot_page.GetVY(m_annot_rect[3]) - m_layout.vGetY();
                 m_annot_rect[2] = m_annot_page.GetVX(m_annot_rect[2]) - m_layout.vGetX();
                 m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
-                if (m_listener != null)
+                if(m_listener != null)
                     m_listener.OnPDFAnnotTapped(m_annot_page.GetPageNo(), m_annot);
                 m_status = STA_ANNOT;
                 if (m_pEdit == null) m_pEdit = new UIAnnotPopEdit(GLView.this);
@@ -937,7 +921,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             }
             break;
         }
-        if (m_canvas != null) m_canvas.invalidate();
+        if(m_canvas != null) m_canvas.invalidate();
         return true;
     }
 
@@ -1116,44 +1100,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 m_ink.OnUp(event.getX(), event.getY());
-                break;
-        }
-        if (m_canvas != null) m_canvas.invalidate();
-        return true;
-    }
-
-    private boolean onTouchPolygon(MotionEvent event) {
-        if (m_status != STA_POLYGON) return false;
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if (m_annot_page == null) {
-                    GLLayout.PDFPos pos = m_layout.vGetPos((int) event.getX(), (int) event.getY());
-                    m_annot_page = m_layout.vGetPage(pos.pageno);
-                }
-                if (m_polygon.GetNodeCount() < 1)
-                    m_polygon.MoveTo(event.getX(), event.getY());
-                else
-                    m_polygon.LineTo(event.getX(), event.getY());
-                break;
-        }
-        if (m_canvas != null) m_canvas.invalidate();
-        return true;
-    }
-
-    private boolean onTouchPolyline(MotionEvent event) {
-        if (m_status != STA_POLYLINE) return false;
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if (m_annot_page == null) {
-                    GLLayout.PDFPos pos = m_layout.vGetPos((int) event.getX(), (int) event.getY());
-                    m_annot_page = m_layout.vGetPage(pos.pageno);
-                }
-                if (m_polygon.GetNodeCount() < 1)
-                    m_polygon.MoveTo(event.getX(), event.getY());
-                else
-                    m_polygon.LineTo(event.getX(), event.getY());
                 break;
         }
         if (m_canvas != null) m_canvas.invalidate();
@@ -1450,8 +1396,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         if (onTouchLine(event)) return true;
         if (onTouchStamp(event)) return true;
         if (onTouchEditbox(event)) return true;
-        if (onTouchPolygon(event)) return true;
-        if (onTouchPolyline(event)) return true;
         if (onTouchAnnot(event)) return true;
         return true;
     }
@@ -1635,38 +1579,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         }
     }
 
-    private void onDrawPolygon(Canvas canvas) {
-        if (m_status != STA_POLYGON || m_polygon == null) return;
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Global.line_annot_color);
-        paint.setStrokeWidth(Global.line_annot_width);
-        paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStrokeJoin(Paint.Join.BEVEL);
-        m_polygon.OnDraw(canvas, 0, 0, paint);
-
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Global.line_annot_fill_color);
-        if (m_polygon.GetNodeCount() > 2)
-            m_polygon.OnDraw(canvas, 0, 0, paint);
-        m_polygon.onDrawPoint(canvas, 0, 0, dp2px(getContext(), 4), paint);
-    }
-
-    private void onDrawPolyline(Canvas canvas) {
-        if (m_status != STA_POLYLINE || m_polygon == null) return;
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Global.line_annot_color);
-        paint.setStrokeWidth(Global.line_annot_width);
-        paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStrokeJoin(Paint.Join.BEVEL);
-        m_polygon.OnDraw(canvas, 0, 0, paint);
-
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Global.line_annot_fill_color);
-        m_polygon.onDrawPoint(canvas, 0, 0, dp2px(getContext(), 4), paint);
-    }
-
     private ActivityManager m_amgr;
     private ActivityManager.MemoryInfo m_info = new ActivityManager.MemoryInfo();
     private Paint m_info_paint = new Paint();
@@ -1682,8 +1594,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             onDrawLine(canvas);
             onDrawStamp(canvas);
             onDrawEditbox(canvas);
-            onDrawPolygon(canvas);
-            onDrawPolyline(canvas);
             if (m_status == STA_INK && m_ink != null)
                 m_ink.OnDraw(canvas, 0, 0);
         }
@@ -1701,6 +1611,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             }
         }
     }
+
 
     class PDFGLPageSet {
         PDFGLPageSet(int max_len) {
@@ -1730,7 +1641,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
     private float m_annot_x0;
     private float m_annot_y0;
     private Ink m_ink = null;
-    private Path m_polygon;
     private Bitmap m_icon = null;
     private Document.DocImage m_dicon = null;
     private float m_rects[];
@@ -1761,10 +1671,9 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                     mat.TransformInk(m_ink);
                     page.AddAnnotInk(m_ink);
                     mat.Destroy();
-                    int aidx = page.GetAnnotCount() - 1;
-                    onAnnotCreated(page.GetAnnot(aidx));
+                    onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                     //add to redo/undo stack.
-                    m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, aidx));
+                    m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, page.GetAnnotCount() - 1));
                     m_layout.gl_render(m_annot_page);
                     page.Close();
                     if (m_listener != null)
@@ -1780,86 +1689,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             m_status = STA_NONE;
             m_ink.Destroy();
             m_ink = null;
-            m_annot_page = null;
-            if (m_canvas != null) m_canvas.invalidate();
-        }
-    }
-
-    public void PDFSetPolygon(int code) {
-        if (code == 0)//start
-        {
-            m_status = STA_POLYGON;
-            m_polygon = new Path();
-        } else if (code == 1)//end
-        {
-            m_status = STA_NONE;
-            if (m_annot_page != null) {
-                Page page = m_doc.GetPage(m_annot_page.GetPageNo());
-                if (page != null && m_polygon.GetNodeCount() > 2) {
-                    page.ObjsStart();
-                    Matrix mat = m_annot_page.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
-                    mat.TransformPath(m_polygon);
-                    page.AddAnnotPolygon(m_polygon, Global.line_annot_color, Global.line_annot_fill_color, m_annot_page.ToPDFSize(Global.line_annot_width));
-                    mat.Destroy();
-                    int aidx = page.GetAnnotCount() - 1;
-                    onAnnotCreated(page.GetAnnot(aidx));
-                    //add to redo/undo stack.
-                    m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, aidx));
-                    m_layout.gl_render(m_annot_page);
-                    page.Close();
-                    if (m_listener != null)
-                        m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                }
-            }
-            if (m_polygon != null) m_polygon.Destroy();
-            m_polygon = null;
-            m_annot_page = null;
-            if (m_canvas != null) m_canvas.invalidate();
-        } else//cancel
-        {
-            m_status = STA_NONE;
-            m_polygon.Destroy();
-            m_polygon = null;
-            m_annot_page = null;
-            if (m_canvas != null) m_canvas.invalidate();
-        }
-    }
-
-    public void PDFSetPolyline(int code) {
-        if (code == 0)//start
-        {
-            m_status = STA_POLYLINE;
-            m_polygon = new Path();
-        } else if (code == 1)//end
-        {
-            m_status = STA_NONE;
-            if (m_annot_page != null) {
-                Page page = m_doc.GetPage(m_annot_page.GetPageNo());
-                if (page != null && m_polygon.GetNodeCount() > 1) {
-                    page.ObjsStart();
-                    Matrix mat = m_annot_page.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
-                    mat.TransformPath(m_polygon);
-                    page.AddAnnotPolyline(m_polygon, 0, 0, Global.line_annot_color, Global.line_annot_fill_color, m_annot_page.ToPDFSize(Global.line_annot_width));
-                    mat.Destroy();
-                    int aidx = page.GetAnnotCount() - 1;
-                    onAnnotCreated(page.GetAnnot(aidx));
-                    //add to redo/undo stack.
-                    m_opstack.push(new OPAdd(m_annot_page.GetPageNo(), page, aidx));
-                    m_layout.gl_render(m_annot_page);
-                    page.Close();
-                    if (m_listener != null)
-                        m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                }
-            }
-            if (m_polygon != null) m_polygon.Destroy();
-            m_polygon = null;
-            m_annot_page = null;
-            if (m_canvas != null) m_canvas.invalidate();
-        } else//cancel
-        {
-            m_status = STA_NONE;
-            m_polygon.Destroy();
-            m_polygon = null;
             m_annot_page = null;
             if (m_canvas != null) m_canvas.invalidate();
         }
@@ -1898,7 +1727,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                             rect[3] = m_rects[cur + 3];
                         }
                         mat.TransformRect(rect);
-                        page.AddAnnotRect(rect, vpage.ToPDFSize(3), Global.rect_annot_color, Global.rect_annot_fill_color);
+                        page.AddAnnotRect(rect, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
                         mat.Destroy();
                         onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
@@ -1958,7 +1787,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                             rect[3] = m_rects[cur + 3];
                         }
                         mat.TransformRect(rect);
-                        page.AddAnnotEllipse(rect, vpage.ToPDFSize(3), Global.ellipse_annot_color, Global.ellipse_annot_fill_color);
+                        page.AddAnnotEllipse(rect, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
                         mat.Destroy();
                         onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
@@ -2074,7 +1903,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                         Matrix mat = vpage.CreateInvertMatrix(m_layout.vGetX(), m_layout.vGetY());
                         mat.TransformPoint(pt1);
                         mat.TransformPoint(pt2);
-                        page.AddAnnotLine(pt1, pt2, 1, 0, vpage.ToPDFSize(3), Global.line_annot_color, Global.line_annot_fill_color);
+                        page.AddAnnotLine(pt1, pt2, 1, 0, vpage.ToPDFSize(3), 0x80FF0000, 0x800000FF);
                         mat.Destroy();
                         onAnnotCreated(page.GetAnnot(page.GetAnnotCount() - 1));
                         //add to redo/undo stack.
@@ -2206,8 +2035,8 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
                             rect[3] = m_rects[cur + 3];
                         }
                         mat.TransformRect(rect);
-                        if (rect[2] - rect[0] < 80) rect[2] = rect[0] + 80;
-                        if (rect[3] - rect[1] < 16) rect[1] = rect[3] - 16;
+                        if(rect[2] - rect[0] < 80) rect[2] = rect[0] + 80;
+                        if(rect[3] - rect[1] < 16) rect[1] = rect[3] - 16;
                         page.AddAnnotEditbox(rect, 0xFFFF0000, vpage.ToPDFSize(3), 0, 12, 0xFFFF0000);
                         mat.Destroy();
                         //add to redo/undo stack.
@@ -2225,25 +2054,13 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             }
             m_status = STA_NONE;
             m_rects = null;
-            if (m_canvas != null) m_canvas.invalidate();
+            if(m_canvas != null) m_canvas.invalidate();
         } else//cancel
         {
             m_status = STA_NONE;
             m_rects = null;
-            if (m_canvas != null) m_canvas.invalidate();
+            if(m_canvas != null) m_canvas.invalidate();
         }
-    }
-	
-	public boolean PDFSetAttachment(String attachmentPath) {
-        boolean result = false;
-        Page page = m_doc.GetPage(0);
-        if (page != null) {
-			page.ObjsStart();
-            result = page.AddAnnotAttachment(attachmentPath, 0, new float[]{0, 0, 0, 0});
-            if (result && m_listener != null) m_listener.OnPDFPageModified(0);
-            page.Close();
-        }
-        return result;
     }
 
     public void PDFCancelAnnot() {
@@ -2253,9 +2070,6 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         if (m_status == STA_LINE) PDFSetLine(2);
         if (m_status == STA_STAMP) PDFSetStamp(2);
         if (m_status == STA_ELLIPSE) PDFSetEllipse(2);
-        if (m_status == STA_EDITBOX) PDFSetEditbox(2);
-        if (m_status == STA_POLYGON) PDFSetPolygon(2);
-        if (m_status == STA_POLYLINE) PDFSetPolyline(2);
         if (m_status == STA_ANNOT) PDFEndAnnot();
         if (m_canvas != null) m_canvas.invalidate();
     }
@@ -2530,15 +2344,19 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             item.op_undo(m_doc);
             int pg0 = item.get_pgno(0);
             int pg1 = item.get_pgno(1);
-            if (pg0 == pg1) {
+            if(pg0 == pg1)
+            {
                 PDFGotoPage(item.m_pageno);
                 m_layout.gl_render(m_layout.vGetPage(item.m_pageno));
-                if (m_listener != null) m_listener.OnPDFPageModified(item.m_pageno);
-            } else {
+                if(m_listener != null) m_listener.OnPDFPageModified(item.m_pageno);
+            }
+            else
+            {
                 PDFGotoPage(item.m_pageno);
                 m_layout.gl_render(m_layout.vGetPage(pg0));
                 m_layout.gl_render(m_layout.vGetPage(pg1));
-                if (m_listener != null) {
+                if(m_listener != null)
+                {
                     m_listener.OnPDFPageModified(pg0);
                     m_listener.OnPDFPageModified(pg1);
                 }
@@ -2554,15 +2372,18 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
             item.op_redo(m_doc);
             int pg0 = item.get_pgno(0);
             int pg1 = item.get_pgno(1);
-            if (pg0 == pg1) {
+            if(pg0 == pg1) {
                 PDFGotoPage(item.m_pageno);
                 m_layout.gl_render(m_layout.vGetPage(item.m_pageno));
-                if (m_listener != null) m_listener.OnPDFPageModified(item.m_pageno);
-            } else {
+                if(m_listener != null) m_listener.OnPDFPageModified(item.m_pageno);
+            }
+            else
+            {
                 PDFGotoPage(item.m_pageno);
                 m_layout.gl_render(m_layout.vGetPage(pg0));
                 m_layout.gl_render(m_layout.vGetPage(pg1));
-                if (m_listener != null) {
+                if(m_listener != null)
+                {
                     m_listener.OnPDFPageModified(pg0);
                     m_listener.OnPDFPageModified(pg1);
                 }
@@ -2674,9 +2495,11 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         }
     }
 
+
     public final GLLayout.PDFPos PDFGetPos(int x, int y) {
         if (m_layout != null)
             return m_layout.vGetPos(x, y);
         else return null;
     }
+
 }
