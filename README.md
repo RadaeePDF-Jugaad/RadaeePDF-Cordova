@@ -139,7 +139,7 @@ For more examples, check demo/js/index.js
 
 RadaeePDF library version included:
 - Android: v3.53.1
-- iOS: v3.58
+- iOS: v4.5
 
 Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
