@@ -30,7 +30,7 @@ If you, as user and developer need new features or fixes you shall submit them h
 	
 2. Add the android/iOS platform.  
    `cd RadaeePDF-Cordova`    
-	`cordova platform add android@latest --save` and/or `cordova platform add ios --save`
+	`cordova platform add android@8.0 --save` and/or `cordova platform add ios --save`
 	
 3. Add the plugin.  
    `cordova plugin add https://github.com/RadaeePDF-Jugaad/RadaeePDF-Cordova.git --save`
