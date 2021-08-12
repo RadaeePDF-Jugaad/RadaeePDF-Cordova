@@ -2106,7 +2106,7 @@ public class GLView extends GLSurfaceView implements GLCanvas.CanvasListener {
         {
             m_status = STA_STAMP;
             if (m_dicon == null) {
-                m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.pdf_custom_stamp);
+                m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_custom_stamp);
                 if (m_icon != null) {
                     m_dicon = m_doc.NewImage(m_icon, true);
                 }
