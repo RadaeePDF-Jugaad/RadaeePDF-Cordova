@@ -33,7 +33,7 @@
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_find"
 	    android:clickable="true"
-        android:src="@drawable/btn_ink" />
+        android:src="@drawable/btn_annots" />
 
     <ImageView
         android:id="@+id/btn_select"
@@ -84,7 +84,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:clickable="true"
-        android:src="@drawable/ic_more" />
+        android:src="@drawable/btn_more" />
 
     <!--
     <ImageView
