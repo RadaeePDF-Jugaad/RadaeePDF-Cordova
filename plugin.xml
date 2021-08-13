@@ -89,6 +89,8 @@
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboList.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboListAdt.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CommonUtil.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/FileBrowserAdt.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/FileBrowserView.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/OutlineList.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/OutlineListAdt.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFAESStream.java" target-dir="src/com/radaee/util" />
@@ -100,15 +102,13 @@
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridView.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFHttpStream.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFMemStream.java" target-dir="src/com/radaee/util" />
-        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbView.java" target-dir="src/com/radaee/util" />
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PopupEditAct.java" target-dir="src/com/radaee/util" />
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePluginCallback.java" target-dir="src/com/radaee/util" />
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFPageGridAdt.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFPageGridView.java" target-dir="src/com/radaee/util" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFThumbGrid.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PopupEditAct.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePluginCallback.java" target-dir="src/com/radaee/util" />
 		
 		<!-- Radaee source - java.com.radaee.view -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
