@@ -36,7 +36,7 @@ public class PDFGridItem extends LinearLayout
 	{
 		super(context, attrs);
 		if( m_def_pdf_icon == null )
-			m_def_pdf_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_file);
+			m_def_pdf_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_file);
 		if( m_def_dir_icon == null )
 			m_def_dir_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder0);
 		if( m_def_up_icon == null )

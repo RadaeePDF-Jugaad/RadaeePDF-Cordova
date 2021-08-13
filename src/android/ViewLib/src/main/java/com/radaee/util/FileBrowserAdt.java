@@ -32,13 +32,13 @@ public class FileBrowserAdt extends BaseAdapter {
 		public FileGridItem(Context context, AttributeSet attrs) {
 			super(context, attrs);
 			if (m_def_file_icon == null)
-				m_def_file_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_file);
+				m_def_file_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_file);
 			if (m_def_dir_icon == null)
-				m_def_dir_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_folder);
+				m_def_dir_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder0);
 			if (m_def_up_icon == null)
-				m_def_up_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_go_up);
+				m_def_up_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder1);
 			if (m_def_refresh_icon == null)
-				m_def_refresh_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_refresh);
+				m_def_refresh_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder2);
 			this.setBackgroundColor(0);
 			this.setOrientation(VERTICAL);
 		}
