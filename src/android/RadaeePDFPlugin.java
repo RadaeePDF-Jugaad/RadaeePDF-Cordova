@@ -1,8 +1,8 @@
 /*
 	RadaeePDF-Cordova for Android
-	Jugaad s.r.l. - www.jugaad.digital, http://www.radaeepdf.com
-	Based on work: Nermeen Solaiman, GEAR.it s.r.l.
-	v1.4.3
+	GEAR.it s.r.l., http://www.gear.it, http://www.radaeepdf.com
+	Nermeen Solaiman
+	v1.4
 
 	modified on 09/11/16 -->  added getFileState prototype
 	
