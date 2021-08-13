@@ -52,7 +52,7 @@
         android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_annot_oval"
 	    android:clickable="true"
-        android:src="@drawable/pdf_custom_stamp" />
+        android:src="@drawable/btn_annot_stamp" />
 
     <ImageView
         android:id="@+id/btn_annot_oval"
