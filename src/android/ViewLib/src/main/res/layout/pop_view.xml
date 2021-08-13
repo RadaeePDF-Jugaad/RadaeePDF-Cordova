@@ -11,7 +11,7 @@
         android:layout_alignTop="@+id/actual_content"
         android:layout_alignRight="@+id/actual_content"
         android:layout_alignBottom="@+id/actual_content"
-        android:background="@drawable/menu_back"/>
+        android:background="@drawable/bg_menu"/>
 
 <LinearLayout
     android:id="@+id/actual_content"
