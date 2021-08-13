@@ -15,7 +15,7 @@ import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
-import com.radaee.viewlib.R;
+import com.radaee.reader.R;
 
 import java.io.File;
 
@@ -36,13 +36,13 @@ public class PDFGridItem extends LinearLayout
 	{
 		super(context, attrs);
 		if( m_def_pdf_icon == null )
-			m_def_pdf_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.file03);
+			m_def_pdf_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_file);
 		if( m_def_dir_icon == null )
-			m_def_dir_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.folder0);
+			m_def_dir_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder0);
 		if( m_def_up_icon == null )
-			m_def_up_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.folder1);
+			m_def_up_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder1);
 		if( m_def_refresh_icon == null )
-			m_def_refresh_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.folder2);
+			m_def_refresh_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_grid_folder2);
 		this.setBackgroundColor(0);
 		this.setOrientation(VERTICAL);
 		unlock_file();

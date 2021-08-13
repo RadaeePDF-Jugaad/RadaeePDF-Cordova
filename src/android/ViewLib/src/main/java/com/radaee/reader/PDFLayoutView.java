@@ -53,7 +53,7 @@ import com.radaee.view.PDFLayoutHorz;
 import com.radaee.view.PDFLayoutVert;
 import com.radaee.view.VPage;
 import com.radaee.view.VSel;
-import com.radaee.viewlib.R;
+import com.radaee.reader.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1941,7 +1941,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         {
             m_status = STA_STAMP;
             //if(m_dicon == null) {
-            m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.pdf_custom_stamp);
+            m_icon = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_custom_stamp);
             if (m_icon != null) {
                 m_dicon = m_doc.NewImage(m_icon, true);
             }

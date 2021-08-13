@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.radaee.viewlib.R;
+import com.radaee.reader.R;
 
 import java.io.File;
 import java.util.Vector;
