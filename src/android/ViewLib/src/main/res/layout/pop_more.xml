@@ -12,7 +12,7 @@
         android:layout_alignTop="@+id/actual_content"
         android:layout_alignRight="@+id/actual_content"
         android:layout_alignBottom="@+id/actual_content"
-        android:background="@drawable/bg_background"/>
+        android:background="@drawable/menu_back"/>
 
 
     <LinearLayout
@@ -56,7 +56,7 @@
                 android:id="@+id/add_bookmark_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/btn_add_bookmark"
+                android:src="@drawable/ic_add"
                 tools:ignore="ContentDescription"/>
 
             <TextView
@@ -79,7 +79,7 @@
                 android:id="@+id/show_bookmarks_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/btn_show_bookmarks"
+                android:src="@drawable/ic_bookmarks"
                 tools:ignore="ContentDescription"/>
 
             <TextView
@@ -102,7 +102,7 @@
                 android:id="@+id/save_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/btn_save"
+                android:src="@drawable/save"
                 tools:ignore="ContentDescription"/>
 
             <TextView
@@ -148,7 +148,7 @@
                 android:id="@+id/share_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/btn_share"
+                android:src="@drawable/ic_share"
                 tools:ignore="ContentDescription"/>
 
             <TextView
