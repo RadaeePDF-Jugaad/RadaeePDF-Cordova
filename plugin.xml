@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="com.radaee.cordova" version="1.6.7">
+    id="com.radaee.cordova" version="1.6.8">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -184,40 +184,43 @@
         <source-file src="src/android/ViewLib/src/main/res/layout/bar_cmd.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/bar_find.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/bar_seek.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_note.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_outline.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_pswd.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_text.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/item_outline.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_curl.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_fragment.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_layout.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_nav.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pop_combo.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pop_edit.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pop_view.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/pop_more.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_row.xml" target-dir="res/layout" />
+		
 		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_popup_menu.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
-        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_gllayout.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_row.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_popup.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_comm.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_icon.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_line.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_prop_markup.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_signature.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_signprop.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_browser.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_note.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_outline.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_pswd.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/dlg_text.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_outline.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/item_page.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_curl.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_fragment.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pdf_gllayout.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_layout.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_nav.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pdf_pages.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_annot.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_color.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_attach.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_combo.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_edit.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_attach.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_text.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lhead.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lstyle.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_more.xml" target-dir="res/layout" />		
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_view.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
+		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
 		
-
         <!-- Radaee raw -->
         <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/arimo" target-dir="res/raw" />
