@@ -152,6 +152,8 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgLine.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgMarkup.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgPopup.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSign.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSignProp.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotMenu.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPop.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopCombo.java" target-dir="src/com/radaee/annotui"/>
@@ -162,6 +164,7 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadView.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleButton.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleView.java" target-dir="src/com/radaee/annotui"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UISignView.java" target-dir="src/com/radaee/annotui"/>
 
         <!-- Radaee source - java.com.radaee.util -->
 
