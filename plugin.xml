@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="com.radaee.cordova" version="1.6.6">
+    id="com.radaee.cordova" version="1.6.7">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -16,7 +16,7 @@
         <clobbers target="RadaeePDFPlugin" />
     </js-module>
 
-    <!-- android -->
+    <!-- android -->2
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="RadaeePDFPlugin" >
@@ -239,47 +239,51 @@
         <source-file src="src/android/res/drawable/bar_back_image.png" target-dir="res/drawable" />
 
         <!-- Radaee drawable -->
-        <source-file src="src/android/ViewLib/src/main/res/drawable/bar_back.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_ellipse.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_ink.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_line.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_note.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_rect.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_back.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_cancel.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_done.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_ink.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_left.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_outline.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_perform.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_remove.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_right.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_search.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_select.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_dual.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_single.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_vert.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/file03.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/folder0.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/folder1.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/folder2.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/menu_back.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/pdf_custom_stamp.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/pt_end.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/pt_start.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_redo.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_undo.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_add_bookmark.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_editbox.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_ellipse.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_ink.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_line.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_note.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_polygon.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_polyline.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_rect.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annot_stamp.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_annots.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_back.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_cancel.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_done.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_left.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_more.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_outline.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_perform.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_print.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_add.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_bookmarks.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/ic_more.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_horz.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/save.png" target-dir="res/drawable" />
-        <source-file src="src/android/ViewLib/src/main/res/drawable/ic_share.png" target-dir="res/drawable" />
-		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_btn_menu.xml" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_redo.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_remove.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_right.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_save.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_search.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_select.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_settings.png" target-dir="res/drawable" />
-
+		<source-file src="src/android/ViewLib/src/main/res/drawable/btn_share.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_show_bookmarks.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_undo.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_dual.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_horz.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_single.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/btn_view_vert.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_custom_stamp.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_file.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_folder0.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_folder1.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/ic_grid_folder2.png" target-dir="res/drawable" />
+	    <source-file src="src/android/ViewLib/src/main/res/drawable/pt_end.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/pt_start.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_btn_menu.xml" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_background.png" target-dir="res/drawable" />
+		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_menu.png" target-dir="res/drawable" />
+	    
 		<!-- Radaee values -->
 		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
 		<source-file src="src/android/ViewLib/src/main/res/values/bools.xml" target-dir="res/values" />
