@@ -7,7 +7,7 @@
     </engines>
 
     <name>RadaeePDF-Cordova</name>
-    <author>GEAR.it S.R.L.</author>
+    <author>Jugaad s.r.l.</author>
     <description>RadaeePDF SDK Plugin for Cordova. The best PDF rendering engine with annotation, form, page creation features. Support forum, java and objective-c sources are available on www.radaeepdf.com</description>
     <license>Apache</license>
     <keywords>pdf, open, inapppdf, radaee, cordova, radaeepdf, android, ios</keywords>
@@ -16,7 +16,7 @@
         <clobbers target="RadaeePDFPlugin" />
     </js-module>
 
-    <!-- android -->2
+    <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="RadaeePDFPlugin" >
@@ -84,6 +84,8 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFPagesAct.java" target-dir="src/com/radaee/reader" />
 
         <!-- Radaee source - java.com.radaee.util -->
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/BookmarkHandler.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CaptureSignature.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboList.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/ComboListAdt.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/CommonUtil.java" target-dir="src/com/radaee/util" />
@@ -184,7 +186,6 @@
         <source-file src="src/android/ViewLib/src/main/res/layout/bar_cmd.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/bar_find.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/bar_seek.xml" target-dir="res/layout" />
-		
 		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_popup_menu.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/bookmark_row.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/dlg_annot_popup.xml" target-dir="res/layout" />
