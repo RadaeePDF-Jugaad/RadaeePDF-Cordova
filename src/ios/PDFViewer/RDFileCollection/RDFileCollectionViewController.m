@@ -402,7 +402,7 @@ static NSString * const reuseIdentifier = @"Cell";
     {
         case err_ok: {
                 [doc getLinearizedStatus];
-                [m_pdf setDoc:doc];
+                [m_pdf setDoc:doc :YES];
                 GLOBAL.g_pdf_name = [NSMutableString stringWithFormat:@"%@", [url lastPathComponent]];
                 m_pdf.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:m_pdf animated:YES];

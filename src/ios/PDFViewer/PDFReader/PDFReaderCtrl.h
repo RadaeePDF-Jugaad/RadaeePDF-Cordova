@@ -125,6 +125,7 @@
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *moreItem;
 
 - (void)setDoc:(PDFDoc *)doc;
+- (void)setDoc:(PDFDoc *)doc :(BOOL)readonly;
 - (void)setDoc:(PDFDoc *)doc :(int)pageno :(BOOL)readonly;
 - (PDFDoc *)getDoc;
 - (void)PDFGoto:(int)pageno;

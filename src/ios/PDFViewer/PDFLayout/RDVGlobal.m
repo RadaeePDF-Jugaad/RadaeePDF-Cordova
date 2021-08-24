@@ -330,6 +330,7 @@ NSString *g_serial = @"";
     _g_save_doc = false;
     _g_highlight_annotation = true;
     _g_enable_graphical_signature = true;
+    _g_readonly = false;
     
     _g_author = @"";
     _g_sign_pad_descr = @"Sign here";

@@ -54,6 +54,14 @@
     [self thumbInit];
     [m_view PDFOpen:m_doc :4 :[_mView canvas] :self];
     [m_thumb PDFOpen:m_doc :2 :[_mThumb canvas] :self];
+    if(GLOBAL.g_readonly)
+    {
+        m_readonly = YES;
+    }
+    if(m_readonly)
+    {
+        [m_view setReadOnly:YES];
+    }
     [self enter_none];
 }
 
@@ -62,7 +70,12 @@
     m_doc = doc;
     [self loadPDF];
 }
-
+- (void)setDoc:(PDFDoc *)doc :(BOOL)readonly
+{
+    m_doc = doc;
+    m_readonly = readonly;
+    [self loadPDF];
+}
 - (void)setDoc:(PDFDoc *)doc :(int)pageno :(BOOL)readonly
 {
     m_readonly = readonly;
@@ -420,7 +433,7 @@
         [_mBarNoneTop setItems:noneToolbarItems];
     }
     
-    if (_hideDrawImage || ![m_doc canSave]) {
+    if (_hideDrawImage) {
         NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
         [noneToolbarItems removeObject:_annotItem];
         [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
@@ -472,7 +485,7 @@
 }
 - (IBAction)back_pressed:(id)sender
 {
-    if ([m_view isModified] && !GLOBAL.g_save_doc) {
+    if ([m_view isModified] && !GLOBAL.g_save_doc && !GLOBAL.g_readonly && !m_readonly) {
         
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Exiting", nil)
                                                                        message:NSLocalizedString(@"Document modified.\r\nDo you want to save it?", nil)
@@ -505,6 +518,7 @@
         [self presentViewController:alert animated:YES completion:nil];
     }
     else {
+        [self->m_view setModified:NO force:YES];
         [self PDFClose];
         self.navigationController.navigationBarHidden = NO;
         [self.navigationController popViewControllerAnimated:YES];
@@ -612,28 +626,41 @@
         switch(tool)
         {
             case 0:
-                [vw vUndo];
-                break;
-            case 1:
-                [vw vRedo];
-                break;
-            case 2:
-                if ([self->m_view canSaveDocument]) {
-                    [thiz enter_select];
-                    [vw vSelStart];
+                if(!m_readonly)
+                {
+                    [vw vUndo];
                 }
                 break;
+            case 1:
+                if(!m_readonly)
+                {
+                    [vw vRedo];
+                }
+                break;
+            case 2:
+                [thiz enter_select];
+                [vw vSelStart];
+                break;
             case 3:
-                [thiz OnMeta];
+                if(!m_readonly)
+                {
+                    [thiz OnMeta];
+                }
                 break;
             case 4:
                 [thiz OnOutline];
                 break;
             case 5:
-                [thiz showBookmarksList];
+                if(!m_readonly)
+                {
+                    [thiz showBookmarksList];
+                }
                 break;
             case 6:
-                [thiz addBookmark];
+                if(!m_readonly)
+                {
+                    [thiz addBookmark];
+                }
                 break;
             case 7:
                 if (GLOBAL.g_navigation_mode) {
@@ -655,36 +682,39 @@
                 break;
             case 9:
             {
-                PDFPagesCtrl *pages = [[UIStoryboard storyboardWithName:@"PDFPagesCtrl" bundle:nil] instantiateViewControllerWithIdentifier:@"rdpdfpages"];
-                [pages setCallback:self->m_doc :^(const bool *pages_del, const int *pages_rot)
+                if(!m_readonly)
                 {
-                    [self->m_view PDFSaveView];
-                    [self->m_thumb PDFSaveView];
-                    int pcnt = [self->m_doc pageCount];
-                    int pcur = pcnt;
-                    while(pcur > 0)
+                    PDFPagesCtrl *pages = [[UIStoryboard storyboardWithName:@"PDFPagesCtrl" bundle:nil] instantiateViewControllerWithIdentifier:@"rdpdfpages"];
+                    [pages setCallback:self->m_doc :^(const bool *pages_del, const int *pages_rot)
                     {
-                        pcur--;
-                        if(pages_del[pcur]) [self->m_doc removePage:pcur];
-                        else if((pages_rot[pcur] >> 16) != (pages_rot[pcur] & 0xffff))
+                        [self->m_view PDFSaveView];
+                        [self->m_thumb PDFSaveView];
+                        int pcnt = [self->m_doc pageCount];
+                        int pcur = pcnt;
+                        while(pcur > 0)
                         {
-                            int deg = (pages_rot[pcur] & 0xffff) - (pages_rot[pcur] >> 16);
-                            if(deg < 0) deg += 360;
-                            PDFPage *page = [self->m_doc page:pcur];
-                            int rotate = [page getRotate];
-                            [self->m_doc setPageRotate:pcur :rotate + deg];
+                            pcur--;
+                            if(pages_del[pcur]) [self->m_doc removePage:pcur];
+                            else if((pages_rot[pcur] >> 16) != (pages_rot[pcur] & 0xffff))
+                            {
+                                int deg = (pages_rot[pcur] & 0xffff) - (pages_rot[pcur] >> 16);
+                                if(deg < 0) deg += 360;
+                                PDFPage *page = [self->m_doc page:pcur];
+                                int rotate = [page getRotate];
+                                [self->m_doc setPageRotate:pcur :rotate + deg];
+                            }
                         }
-                    }
-                    [self->m_thumb PDFRestoreView];
-                    [self->m_view PDFRestoreView];
-                }];
-                
-                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-                    pages.modalPresentationStyle = UIModalPresentationFullScreen;
-                else
-                    pages.modalPresentationStyle = UIModalPresentationFormSheet;
-                
-                [self presentViewController:pages animated:YES completion:nil];
+                        [self->m_thumb PDFRestoreView];
+                        [self->m_view PDFRestoreView];
+                    }];
+                    
+                    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+                        pages.modalPresentationStyle = UIModalPresentationFullScreen;
+                    else
+                        pages.modalPresentationStyle = UIModalPresentationFormSheet;
+                    
+                    [self presentViewController:pages animated:YES completion:nil];
+                }
             }
                 break;
             default:
@@ -693,7 +723,7 @@
     }];
     [view updateIcons:_undoImage :_redoImage :_selectImage];
     if (![m_doc canSave]) {
-        [view updateVisible:YES :YES :YES];
+        //[view updateVisible:YES :YES :YES];
     } /* else {
         [view updateVisible:_hideUndoImage :_hideRedoImage :_hideSelImage];
     } */
@@ -1086,14 +1116,24 @@
 
 -(void)initialPopupView
 {
-    UIMenuItem *underline = [[UIMenuItem alloc] initWithTitle:@"UDL" action:@selector(underline:)];
-    UIMenuItem *highline = [[UIMenuItem alloc] initWithTitle:@"HGL" action:@selector(highlight:)];
-    UIMenuItem *strike = [[UIMenuItem alloc] initWithTitle:@"STR" action:@selector(strikeOut:)];
-    UIMenuItem *squiggly = [[UIMenuItem alloc] initWithTitle:@"SQG" action:@selector(squiggly:)];
-    UIMenuItem *copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
-    NSArray *itemsMC = [[NSArray alloc] initWithObjects:underline, highline, strike, squiggly, copyText, nil];
-    selectMenu = [UIMenuController sharedMenuController];
-    [selectMenu setMenuItems:itemsMC];
+    if(!m_readonly)
+    {
+        UIMenuItem *underline = [[UIMenuItem alloc] initWithTitle:@"UDL" action:@selector(underline:)];
+        UIMenuItem *highline = [[UIMenuItem alloc] initWithTitle:@"HGL" action:@selector(highlight:)];
+        UIMenuItem *strike = [[UIMenuItem alloc] initWithTitle:@"STR" action:@selector(strikeOut:)];
+        UIMenuItem *squiggly = [[UIMenuItem alloc] initWithTitle:@"SQG" action:@selector(squiggly:)];
+        UIMenuItem *copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
+        NSArray *itemsMC = [[NSArray alloc] initWithObjects:underline, highline, strike, squiggly, copyText, nil];
+        selectMenu = [UIMenuController sharedMenuController];
+        [selectMenu setMenuItems:itemsMC];
+    }
+    else
+    {
+        UIMenuItem *copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
+        NSArray *itemsMC = [[NSArray alloc] initWithObjects:copyText, nil];
+        selectMenu = [UIMenuController sharedMenuController];
+        [selectMenu setMenuItems:itemsMC];
+    }
 }
 -(void)copyText:(id)sender
 {

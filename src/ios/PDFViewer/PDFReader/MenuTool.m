@@ -27,10 +27,10 @@
                              nil];
     
     if (!GLOBAL.g_navigation_mode) {
-        items[9] = @{@"Thumbnail": [UIImage imageNamed:@"btn_thumb"]};
+        items[7] = @{@"Thumbnail": [UIImage imageNamed:@"btn_thumb"]};
     }
     if (GLOBAL.g_dark_mode) {
-        items[10] = @{@"Light mode": [UIImage imageNamed:@"btn_light_mode"]};
+        items[8] = @{@"Light mode": [UIImage imageNamed:@"btn_light_mode"]};
     }
     
     return [super init:point :callback :items];

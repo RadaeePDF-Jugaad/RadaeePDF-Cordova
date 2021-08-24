@@ -88,6 +88,7 @@ extern NSString *g_serial;
 @property (nonatomic) bool g_auto_launch_link;
 @property (nonatomic) bool g_highlight_annotation;
 @property (nonatomic) bool g_enable_graphical_signature;
+@property (nonatomic) bool g_readonly;
 
 @property (nonatomic) int g_render_quality;
 @property (nonatomic) int g_render_mode;
