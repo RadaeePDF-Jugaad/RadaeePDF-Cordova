@@ -64,7 +64,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         {
             case err_ok: {
                     [doc getLinearizedStatus];
-                    [m_pdf setDoc:doc];
+                [m_pdf setDoc:doc:true];
                     GLOBAL.g_pdf_name = [NSMutableString stringWithFormat:@"%@", [url lastPathComponent]];
                     [self showReader];
                 }
