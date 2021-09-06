@@ -1,6 +1,6 @@
 {
   "name": "com.radaee.cordova",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "RadaeePDF Classic Reader Cordova plugin",
   "cordova": {
     "platforms": [
