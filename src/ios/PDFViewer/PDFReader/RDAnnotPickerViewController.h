@@ -18,7 +18,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 @property (nonatomic) int annotType;
 @property (nonatomic) uint annotColor;
-@property (strong, nonatomic) PDFAnnot *annot;
+@property (strong, nonatomic) RDPDFAnnot *annot;
 
 @property (strong, nonatomic) IBOutlet UIView *pickerView;
 @property (strong, nonatomic) IBOutlet UIView *paletteView;
@@ -36,6 +36,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 @property (strong, nonatomic) IBOutlet UITextField *alphaTextField;
 
 @property (strong, nonatomic) IBOutlet UIButton *dismissButton;
+@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 
 @property (strong, nonatomic) UIColorBtn *colorBtn;
 

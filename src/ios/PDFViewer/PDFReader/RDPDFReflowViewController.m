@@ -47,7 +47,6 @@
 
 -(void)createToolbarItems
 {
-    toolBar.barStyle = UIBarStyleBlackOpaque;
     UIBarButtonItem *fontBigButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"fontBig"] style:UIBarButtonItemStylePlain target:self action:@selector(fontBig)];
     fontBigButton.width =29;
     UIBarButtonItem *fontSmallButton = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"fontSmall"] style:UIBarButtonItemStylePlain target:self action:@selector(fontSmall)];
@@ -68,7 +67,7 @@
 
 -(int)PDFOpen:(NSString *)path :(NSString *)pswd
 {
-    m_doc = [[PDFDoc alloc] init];
+    m_doc = [[RDPDFDoc alloc] init];
     int err_code = [m_doc open:path :pswd];
     switch(err_code)
     {

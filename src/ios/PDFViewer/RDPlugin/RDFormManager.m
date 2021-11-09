@@ -10,7 +10,7 @@
 #import "PDFObjc.h"
 
 @interface RDFormManager() {
-    PDFDoc *currentDoc;
+    RDPDFDoc *currentDoc;
 }
 
 @end
@@ -18,13 +18,13 @@
 @implementation RDFormManager
 
 #pragma mark - Init
-//Init with PDFDoc instance
+//Init with RDPDFDoc instance
 - (instancetype)initWithDoc:(id)doc
 {
     self = [super init];
     
     if (self) {
-        if ([doc isKindOfClass:[PDFDoc class]]) {
+        if ([doc isKindOfClass:[RDPDFDoc class]]) {
             currentDoc = doc;
         }
     }
@@ -38,7 +38,7 @@
 - (void)setInfoWithJson:(NSString *)json error:(NSError **)error
 {
     if (![currentDoc canSave]) {
-        *error = [NSError errorWithDomain:[[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@".ErrorDomain"] code:101 userInfo:@{@"readonly-document": @"The PDFDoc instance is readonly"}];
+        *error = [NSError errorWithDomain:[[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@".ErrorDomain"] code:101 userInfo:@{@"readonly-document": @"The RDPDFDoc instance is readonly"}];
         return;
     }
     
@@ -65,11 +65,11 @@
             NSArray *annots = [page objectForKey:@"Annots"];
             
             if (index >= 0 && index < currentDoc.pageCount) {
-                PDFPage *pdfPage = [currentDoc page:index];
-                [pdfPage objsStart];
+                RDPDFPage *page = [currentDoc page:index];
+                [page objsStart];
                 
                 for (NSDictionary *annot in annots) {
-                    [self parseAnnot:annot atPage:pdfPage error:error];
+                    [self parseAnnot:annot atPage:page error:error];
                 }
             } else {
                 *error = [NSError errorWithDomain:[[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@".ErrorDomain"] code:104 userInfo:@{@"page-attribute": [NSString stringWithFormat:@"\"Page\" index %i is not correct", index]}];
@@ -82,14 +82,14 @@
     }
 }
 
-- (void)parseAnnot:(NSDictionary *)annotDict atPage:(PDFPage *)page error:(NSError **)error
+- (void)parseAnnot:(NSDictionary *)annotDict atPage:(RDPDFPage *)page error:(NSError **)error
 {
     if ([annotDict objectForKey:@"Index"]) {
         //Get annot index
         int index = [[annotDict objectForKey:@"Index"] intValue];
         
         //Check if index is valid
-        PDFAnnot *annot = [page annotAtIndex:index];
+        RDPDFAnnot *annot = [page annotAtIndex:index];
         
         if (annot) {
             switch ([annot type]) {
@@ -126,7 +126,7 @@
 }
 
 // type: 3
-- (void)setText:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setText:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     if ([self isValidEditText:dict]) {
         [annot setEditText:[self getEditTextValue:dict]];
@@ -137,7 +137,7 @@
 }
 
 // type: 20
-- (void)setWidget:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setWidget:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     switch ([annot fieldType]) {
         case 1:
@@ -156,13 +156,13 @@
 }
 
 // type: 20, fieldType: 2
-- (void)setTextField:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setTextField:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     [self setText:annot withDict:dict error:error];
 }
 
 // type: 20, fieldType: 1
-- (void)setButtonField:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setButtonField:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     switch ([annot getCheckStatus]) {
         case 0:
@@ -180,7 +180,7 @@
 }
 
 // type: 20, fieldType: 2
-- (void)setChoiceField:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setChoiceField:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     //is ComboBox
     if ([annot getComboItemCount] > 0) {
@@ -194,7 +194,7 @@
 }
 
 // type: 20, fieldType: 1, radio
-- (void)setRadioButton:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setRadioButton:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     if ([self isValidRadioButton:dict]) {
         if ([self getRadioValue:dict]) {
@@ -207,7 +207,7 @@
 }
 
 // type: 20, fieldType: 1, checkbox
-- (void)setCheckBox:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setCheckBox:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     if ([self isValidCheckBox:dict]) {
         [annot setCheckValue:[self getCheckBoxValue:dict]];
@@ -218,7 +218,7 @@
 }
 
 // type: 20, fieldType: 2, combobox
-- (void)setComboBox:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setComboBox:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     if ([self isValidComboBox:dict annot:annot]) {
         [annot setComboSel:[self getComboBoxValue:dict]];
@@ -229,7 +229,7 @@
 }
 
 // type: 20, fieldType: 2, list //TODO
-- (void)setListSel:(PDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
+- (void)setListSel:(RDPDFAnnot *)annot withDict:(NSDictionary *)dict error:(NSError **)error
 {
     if ([self isValidListSel:dict annot:annot]) {
         //[annot setComboSel:<#(const int *)#> :<#(int)#>
@@ -241,7 +241,7 @@
 
 // readonly
 
-- (void)setAnnot:(PDFAnnot *)annot readOnly:(NSDictionary *)dict {
+- (void)setAnnot:(RDPDFAnnot *)annot readOnly:(NSDictionary *)dict {
     if ([self isValidReadOnly:dict]) {
         [annot setReadonly:[self getReadOnlyValue:dict]];
     }
@@ -249,7 +249,7 @@
 
 // locked
 
-- (void)setAnnot:(PDFAnnot *)annot locked:(NSDictionary *)dict {
+- (void)setAnnot:(RDPDFAnnot *)annot locked:(NSDictionary *)dict {
     if ([self isValidLock:dict]) {
         [annot setLocked:[self getLockValue:dict]];
     }
@@ -260,7 +260,7 @@
 //Get JSON string for a single page
 - (NSString *)jsonInfoForPage:(int)page
 {
-    //Check if PDFDoc instance exist
+    //Check if RDPDFDoc instance exist
     if (!currentDoc) {
         return @"Document not set";
     }
@@ -269,7 +269,7 @@
     
     //Check if the page index exist
     if (page >= 0 && page <= pageCount) {
-        PDFPage *docPage = [currentDoc page:page];
+        RDPDFPage *docPage = [currentDoc page:page];
         NSDictionary *dict = [self infoForPage:docPage number:page];
         
         NSString *jsonString = [self jsonStringFromDict:dict];
@@ -283,7 +283,7 @@
 //Get JSON string for all pages
 - (NSString *)jsonInfoForAllPages
 {
-    //Check if PDFDoc instance exist
+    //Check if RDPDFDoc instance exist
     if (!currentDoc) {
         return @"Document not set";
     }
@@ -300,7 +300,7 @@
     int pageCount = [currentDoc pageCount];
     
     for (int i = 0; i < pageCount; i++) {
-        PDFPage *page = [currentDoc page:i];
+        RDPDFPage *page = [currentDoc page:i];
         [page objsStart];
         if ([page annotCount] > 0) {
             [arr addObject:[self infoForPage:page number:i]];
@@ -311,7 +311,7 @@
 }
 
 //Get annotations info for a single page
-- (NSDictionary *)infoForPage:(PDFPage *)page number:(int)pageNumber
+- (NSDictionary *)infoForPage:(RDPDFPage *)page number:(int)pageNumber
 {
     NSMutableArray *arr = [NSMutableArray array];
     
@@ -329,7 +329,7 @@
 }
 
 //Create the single annotation info dictionary
-- (NSDictionary *)infoForAnnot:(PDFAnnot *)annot
+- (NSDictionary *)infoForAnnot:(RDPDFAnnot *)annot
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     
@@ -406,7 +406,7 @@
     return NO;
 }
 
-- (BOOL)isValidComboBox:(NSDictionary *)dict annot:(PDFAnnot *)annot
+- (BOOL)isValidComboBox:(NSDictionary *)dict annot:(RDPDFAnnot *)annot
 {
     if ([dict objectForKey:@"ComboItemSel"]) {
         int selItem = [[dict objectForKey:@"ComboItemSel"] intValue];
@@ -416,7 +416,7 @@
     return NO;
 }
 
-- (BOOL)isValidListSel:(NSDictionary *)dict annot:(PDFAnnot *)annot
+- (BOOL)isValidListSel:(NSDictionary *)dict annot:(RDPDFAnnot *)annot
 {
     if ([dict objectForKey:@"ComboItemSel"]) {
         int selItem = [[dict objectForKey:@"ComboItemSel"] intValue];
@@ -529,7 +529,7 @@
 }
 
 //Check if the annot is an editText or a Widget
-- (BOOL)canStoreAnnot:(PDFAnnot *)annot
+- (BOOL)canStoreAnnot:(RDPDFAnnot *)annot
 {
     int annotType = [annot type];
     return (annotType == 0 || annotType == 3 || annotType == 20);

@@ -72,7 +72,7 @@
         [httpStream open:url :cacheFile];
         
         [self readerInit];
-        PDFDoc *doc = [[PDFDoc alloc] init];
+        RDPDFDoc *doc = [[RDPDFDoc alloc] init];
         int result = [doc openStream:httpStream :password];
         if(!result) [m_pdf setDoc:doc :page :readOnly];
         
@@ -143,7 +143,7 @@
 
 - (id)openPdf:(NSString *)filePath atPage:(int)page withPassword:(NSString *)password readOnly:(BOOL)readOnly autoSave:(BOOL)autoSave author:(NSString *)author data:(NSData *)data
 {
-    GLOBAL.g_author = (author) ? author : @"";
+    GLOBAL.g_annot_def_author = (author) ? author : @"";
     
     NSLog(@"File Path: %@", filePath);
     if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
@@ -170,7 +170,7 @@
         fclose(file1);
         
         //Open PDF file
-        PDFDoc *doc = [[PDFDoc alloc] init];
+        RDPDFDoc *doc = [[RDPDFDoc alloc] init];
         int result = [doc openMem:buffer :(int)filesize1 :nil];
         if(!result) [m_pdf setDoc:doc :page :readOnly];
     } else if ([self isPageViewController]) {
@@ -182,14 +182,14 @@
             m_pdfP.hidesBottomBarWhenPushed = YES;
         }
     } else {
-        PDFDoc *doc = [[PDFDoc alloc] init];
+        RDPDFDoc *doc = [[RDPDFDoc alloc] init];
         int result = [doc open:filePath :password];
         if(!result)
         {
-            GLOBAL.g_author = author;
+            GLOBAL.g_annot_def_author = author;
             GLOBAL.g_pdf_path = [[filePath stringByDeletingLastPathComponent] mutableCopy];
             GLOBAL.g_pdf_name = [[filePath lastPathComponent] mutableCopy];
-            GLOBAL.g_save_doc = autoSave;
+            GLOBAL.g_auto_save_doc = autoSave;
             [m_pdf setDoc:doc :page :readOnly];
         }
     }
@@ -259,7 +259,7 @@
         return -1;
     }
     
-    return [(PDFDoc *)[m_pdf getDoc] pageCount];
+    return [(RDPDFDoc *)[m_pdf getDoc] pageCount];
 }
 
 - (void)setThumbnailBGColor:(int)color
@@ -341,7 +341,6 @@
         [self setPagingEnabled:NO];
         [self setDoublePageEnabled:YES];
         
-        [m_pdf setFirstPageCover:firstPageCover];
         [m_pdf setDoubleTapZoomMode:2];
         [m_pdf setImmersive:NO];
         
@@ -377,7 +376,13 @@
 - (PDFReaderCtrl *)showReader
 {
     [m_pdf setReaderBGColor:readerBackgroundColor];
-    [m_pdf setThumbnailBGColor:thumbBackgroundColor];
+    //Set thumbGridView
+    //thumbGridView was not used anymore.
+    //[m_pdf setThumbGridBGColor:gridBackgroundColor];
+    //[m_pdf setThumbGridElementHeight:gridElementHeight];
+    //[m_pdf setThumbGridGap:gridGap];
+    //[m_pdf setThumbGridViewMode:gridMode];
+    
     m_pdf.hidesBottomBarWhenPushed = YES;
     
     return m_pdf;
@@ -392,13 +397,13 @@
 
 - (NSString *)extractTextFromPage:(int)pageNum
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return @"";
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     [page objsStart];
     
     return [page objsString:0 :page.objsCount];
@@ -408,7 +413,7 @@
 
 - (BOOL)encryptDocAs:(NSString *)path userPwd:(NSString *)userPwd ownerPwd:(NSString *)ownerPwd permission:(int)permission method:(int)method idString:(NSString *)idString
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return NO;
@@ -421,7 +426,7 @@
 
 - (BOOL)addAnnotAttachment:(NSString *)path
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return NO;
@@ -432,7 +437,7 @@
 
 - (BOOL)renderAnnotToFile:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize)size
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return NO;
@@ -475,13 +480,13 @@
 
 - (BOOL)setReaderViewMode:(int)mode
 {
-    GLOBAL.g_render_mode = mode;
+    GLOBAL.g_view_mode = mode;
     return YES;
 }
 
 - (BOOL)isPageViewController
 {
-    if (GLOBAL.g_render_mode != 2) {
+    if (GLOBAL.g_view_mode != 2) {
         return NO;
     }
     else return YES;
@@ -533,20 +538,20 @@
 {
     [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_case_sensitive forKey:@"CaseSensitive"];
     [[NSUserDefaults standardUserDefaults] setFloat:GLOBAL.g_ink_width forKey:@"InkWidth"];
-    [[NSUserDefaults standardUserDefaults] setFloat:GLOBAL.g_rect_width forKey:@"RectWidth"];
+    [[NSUserDefaults standardUserDefaults] setFloat:GLOBAL.g_rect_annot_width forKey:@"RectWidth"];
     [[NSUserDefaults standardUserDefaults] setFloat:0.15f forKey:@"SwipeSpeed"];
     [[NSUserDefaults standardUserDefaults] setFloat:1.0f forKey:@"SwipeDistance"];
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_quality forKey:@"RenderQuality"];
     [[NSUserDefaults standardUserDefaults] setBool:GLOBAL.g_match_whole_word forKey:@"MatchWholeWord"];
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_ink_color forKey:@"InkColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_rect_color forKey:@"RectColor"];
+    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_rect_annot_color forKey:@"RectColor"];
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_annot_underline_clr forKey:@"UnderlineColor"];
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_annot_strikeout_clr forKey:@"StrikeoutColor"];
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_annot_highlight_clr forKey:@"HighlightColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_oval_color forKey:@"OvalColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_render_mode forKey:@"DefView"];
+    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_oval_annot_color forKey:@"OvalColor"];
+    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_view_mode forKey:@"DefView"];
     [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_sel_color forKey:@"SelColor"];
-    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_line_color forKey:@"ArrowColor"];
+    [[NSUserDefaults standardUserDefaults] setInteger:GLOBAL.g_line_annot_color forKey:@"ArrowColor"];
 
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -774,7 +779,7 @@
 
 - (void)refreshCurrentPage
 {
-    [m_pdf refreshCurrentPage];
+    //[m_pdf updateAllPages];
 }
 
 #pragma mark - Delegate Setting
@@ -821,7 +826,7 @@
 
 - (NSString *)getTextAnnotationDetails:(int)pageNum
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     NSMutableArray *array = [NSMutableArray array];
     NSString *json = @"";
     
@@ -829,7 +834,7 @@
         return nil;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return nil;
@@ -838,7 +843,7 @@
     [page objsStart];
     
     for (int c = 0; c < [page annotCount]; c++) {
-        PDFAnnot *annot = [page annotAtIndex:c];
+        RDPDFAnnot *annot = [page annotAtIndex:c];
         //detect if is annot text
         if (annot.type == 1) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -866,7 +871,7 @@
 
 - (NSString *)getMarkupAnnotationDetails:(int)pageNum
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     NSMutableArray *array = [NSMutableArray array];
     NSString *json = @"";
     
@@ -874,7 +879,7 @@
         return nil;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return nil;
@@ -883,7 +888,7 @@
     [page objsStart];
     
     for (int c = 0; c < [page annotCount]; c++) {
-        PDFAnnot *annot = [page annotAtIndex:c];
+        RDPDFAnnot *annot = [page annotAtIndex:c];
         //detect if is annot text
         if (annot.type >= 9 && annot.type <= 12) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -910,13 +915,13 @@
 
 - (void)addTextAnnotation:(int)pageNum :(float)x :(float)y :(NSString *)text :(NSString *)subject
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return;
@@ -929,13 +934,13 @@
     pt.y = y;
     [page addAnnotNote:&pt];
     
-    PDFAnnot *annot = [page annotAtIndex:[page annotCount]-1];
+    RDPDFAnnot *annot = [page annotAtIndex:[page annotCount]-1];
     [annot setPopupText:text];
     [annot setPopupSubject:subject];
     
     [doc save];
     
-    [m_pdf refreshCurrentPage];
+    [m_pdf updatePage:pageNum];
     
     page = nil;
     doc = nil;
@@ -943,12 +948,12 @@
 
 - (int)getCharIndex:(int)pageNum :(float)x :(float)y
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     if (m_pdf == nil || doc == nil) {
         return 0;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return 0;
@@ -961,13 +966,13 @@
 
 - (void)addMarkupAnnotation:(int)pageNum :(int)type :(int)index1 :(int)index2
 {
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return;
@@ -983,7 +988,7 @@
     
     [doc save];
     
-    [m_pdf refreshCurrentPage];
+    [m_pdf updatePage:pageNum];
     
     page = nil;
     doc = nil;

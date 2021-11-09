@@ -24,7 +24,7 @@
     if(m_callback) m_callback((int)tap.tag);
 }
 
--(id)init:(PDFAnnot *)annot :(CGPoint)position :(func_annotop)callback
+-(id)init:(RDPDFAnnot *)annot :(CGPoint)position :(func_annotop)callback
 {
     //todo: calcute area.
     
@@ -117,7 +117,7 @@
     }
     return self;
 }
--(PDFAnnot *)annot
+-(RDPDFAnnot *)annot
 {
     return m_annot;
 }

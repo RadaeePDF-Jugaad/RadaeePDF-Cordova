@@ -5,7 +5,7 @@
 
 @implementation RDVSel
 @synthesize pageno = m_pgno;
--(id)init:(PDFPage *)page :(int)pgno
+-(id)init:(RDPDFPage *)page :(int)pgno
 {
     if( self = [super init] )
     {
@@ -21,7 +21,7 @@
 {
     [self Clear];
 }
-- (PDFPage *)pdfpage {
+- (RDPDFPage *)page {
     return m_page;
 }
 -(void)Clear

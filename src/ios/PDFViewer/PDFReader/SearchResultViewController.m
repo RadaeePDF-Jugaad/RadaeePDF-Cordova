@@ -229,7 +229,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // PDF Search
-    [self.delegate didSelectSelectSearchResult:[(RDSearchResult *)[items objectAtIndex:indexPath.row] page] - 1];
+    [self.delegate didSelectSelectSearchResult:[(RDSearchResult *)[items objectAtIndex:indexPath.row] page]-1];
 }
 
 - (IBAction)dismissView:(id)sender

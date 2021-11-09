@@ -73,13 +73,13 @@ const char *g_attach_icon_names[] =
 -(void)updateIcon:(int)icon
 {
     m_icon = icon;
-    m_dib = [[PDFDIB alloc] init:48 :48];
+    m_dib = [[RDPDFDIB alloc] init:48 :48];
     [m_dib erase:-1];
     Global_drawAnnotIcon(m_atype, m_icon, [m_dib handle]);
     self.image = [[UIImage alloc] initWithCGImage:[m_dib image]];
 }
 
--(void)setIcon:(PDFAnnot *)annot :(UIViewController *)vc
+-(void)setIcon:(RDPDFAnnot *)annot :(UIViewController *)vc
 {
     m_atype = [annot type];
     m_vc = vc;
@@ -142,7 +142,7 @@ const char *g_attach_icon_names[] =
         {
             lv = [[UIImageView alloc] initWithFrame:CGRectMake(8, 8 + cur * ICON_HEIGHT, ICON_HEIGHT, ICON_HEIGHT)];
             lv.tag = 0;
-            PDFDIB *dib = [[PDFDIB alloc] init:48 :48];
+            RDPDFDIB *dib = [[RDPDFDIB alloc] init:48 :48];
             [dib erase:-1];
             Global_drawAnnotIcon(m_atype, cur, [dib handle]);
             [m_dibs addObject:dib];
@@ -163,7 +163,7 @@ const char *g_attach_icon_names[] =
             lv = [[UIImageView alloc] initWithFrame:CGRectMake(8, 8 + cur * ICON_HEIGHT, ICON_HEIGHT, ICON_HEIGHT)];
             lv.tag = 0;
             lv.clipsToBounds = YES;
-            PDFDIB *dib = [[PDFDIB alloc] init:48 :48];
+            RDPDFDIB *dib = [[RDPDFDIB alloc] init:48 :48];
             [dib erase:-1];
             Global_drawAnnotIcon(m_atype, cur, [dib handle]);
             [m_dibs addObject:dib];

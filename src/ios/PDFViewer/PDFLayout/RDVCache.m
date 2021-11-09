@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RDVCache.h"
+#import "RDVGlobal.h"
 
 @implementation RDVCache
 @synthesize x = m_dibx;
@@ -17,7 +18,7 @@
 @synthesize pageno = m_pageno;
 @synthesize thumbMode = m_thumb;
 
--(id)init:(PDFDoc *)doc :(int)pageno :(float) scale :(int)dibx :(int)diby :(int)dibw :(int)dibh;
+-(id)init:(RDPDFDoc *)doc :(int)pageno :(float) scale :(int)dibx :(int)diby :(int)dibw :(int)dibh;
 {
     if( self = [super init] )
     {
@@ -94,7 +95,7 @@
     PDF_DIB dib = Global_dibGet(NULL, m_dibw, m_dibh);//use PDF_DIB in direct may has better performance.
     //NSString *smsg = [NSString stringWithFormat:@"alloc dib w:%d h:%d", m_dibw, m_dibh];
     //NSLog(smsg);
-    PDFPage *page = [m_doc page :m_pageno];
+    RDPDFPage *page = [m_doc page :m_pageno];
     Page_renderPrepare([page handle], dib);
     if(m_status < 0)
     {

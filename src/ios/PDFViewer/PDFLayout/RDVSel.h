@@ -6,15 +6,15 @@
 
 @interface RDVSel : NSObject
 {
-	PDFPage *m_page;
+	RDPDFPage *m_page;
     int m_pgno;
 	int m_index1;
 	int m_index2;
 	bool m_ok;
 }
 @property(readonly) int pageno;
-@property(strong, nonatomic) PDFPage *pdfpage;
--(id)init:(PDFPage *)page :(int)pgno;
+@property(strong, nonatomic) RDPDFPage *page;
+-(id)init:(RDPDFPage *)page :(int)pgno;
 -(void)Reset;
 -(void)Clear;
 -(void)SetSel:(float)x1 : (float)y1 : (float)x2 : (float)y2;

@@ -16,7 +16,7 @@
     int thumbBackgroundColor;
 }
 - (id)initWithFrame:(CGRect)frame;
-- (BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;
+- (BOOL)PDFOpen :(RDPDFDoc *)doc :(int)page_gap :(id<PDFLayoutDelegate>)del;
 - (void)PDFUpdatePage:(int)pageno;
 - (void)setThumbBackgroundColor:(int)color;
 @end

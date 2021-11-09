@@ -17,10 +17,10 @@
     return self;
 }
 
-- (void)undo:(PDFDoc *)doc
+- (void)undo:(RDPDFDoc *)doc
 {}
 
-- (void)redo:(PDFDoc *)doc
+- (void)redo:(RDPDFDoc *)doc
 {}
 - (int)pageno:(int)idx
 {
@@ -31,7 +31,7 @@
 
 @implementation ASDel
 
-- (instancetype)initWithPage:(int)pgno page:(PDFPage *)page index:(int)idx
+- (instancetype)initWithPage:(int)pgno page:(RDPDFPage *)page index:(int)idx
 {
     self = [super initWithPage:pgno index:idx];
     self.hand = [[page annotAtIndex:idx] getRef];
@@ -40,20 +40,20 @@
 }
 
 #pragma mark - Override
-- (void)undo:(PDFDoc *)doc
+- (void)undo:(RDPDFDoc *)doc
 {
-    PDFPage *page = [doc page:self.m_pageno];
+    RDPDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
     self.m_idx = [page annotCount];
     [page addAnnot:self.hand :self.m_idx];
     page = nil;
 }
 
-- (void)redo:(PDFDoc *)doc
+- (void)redo:(RDPDFDoc *)doc
 {
-    PDFPage *page = [doc page:self.m_pageno];
+    RDPDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
-    PDFAnnot *annot = [page annotAtIndex:self.m_idx];
+    RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
     [annot removeFromPage];
     page = nil;
 }
@@ -62,7 +62,7 @@
 
 @implementation ASAdd
 
-- (instancetype)initWithPage:(int)pgno page:(PDFPage *)page index:(int)idx
+- (instancetype)initWithPage:(int)pgno page:(RDPDFPage *)page index:(int)idx
 {
     self = [super initWithPage:pgno index:idx];
     self.hand = [[page annotAtIndex:idx] getRef];
@@ -71,18 +71,18 @@
 }
 
 #pragma mark - Override
-- (void)undo:(PDFDoc *)doc
+- (void)undo:(RDPDFDoc *)doc
 {
-    PDFPage *page = [doc page:self.m_pageno];
+    RDPDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
-    PDFAnnot *annot = [page annotAtIndex:self.m_idx];
+    RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
     [annot removeFromPage];
     page = nil;
 }
 
-- (void)redo:(PDFDoc *)doc
+- (void)redo:(RDPDFDoc *)doc
 {
-    PDFPage *page = [doc page:self.m_pageno];
+    RDPDFPage *page = [doc page:self.m_pageno];
     [page objsStart];
     self.m_idx = [page annotCount];
     [page addAnnot:self.hand :self.m_idx];
@@ -108,22 +108,22 @@
 }
 
 #pragma mark - Override
-- (void)undo:(PDFDoc *)doc
+- (void)undo:(RDPDFDoc *)doc
 {
     self.reorder = false;
     self.m_pageno = self.m_pageno0;
     if (self.m_pageno == self.m_pageno1) {
-        PDFPage *page = [doc page:self.m_pageno];
+        RDPDFPage *page = [doc page:self.m_pageno];
         [page objsStart];
-        PDFAnnot *annot = [page annotAtIndex:self.m_idx];
+        RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
         [annot setRect:&m_rect0];
         page = nil;
     } else {
-        PDFPage *page0 = [doc page:self.m_pageno0];
-        PDFPage *page1 = [doc page:self.m_pageno1];
+        RDPDFPage *page0 = [doc page:self.m_pageno0];
+        RDPDFPage *page1 = [doc page:self.m_pageno1];
         [page0 objsStart];
         [page1 objsStart];
-        PDFAnnot *annot = [page1 annotAtIndex:self.m_idx];
+        RDPDFAnnot *annot = [page1 annotAtIndex:self.m_idx];
         [annot MoveToPage:page0 :&m_rect0];
         self.m_idx = page0.annotCount - 1;
         self.reorder = true;
@@ -132,22 +132,22 @@
     }
 }
 
-- (void)redo:(PDFDoc *)doc
+- (void)redo:(RDPDFDoc *)doc
 {
     self.reorder = false;
     self.m_pageno = self.m_pageno1;
     if (self.m_pageno == self.m_pageno0) {
-        PDFPage *page = [doc page:self.m_pageno];
+        RDPDFPage *page = [doc page:self.m_pageno];
         [page objsStart];
-        PDFAnnot *annot = [page annotAtIndex:self.m_idx];
+        RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
         [annot setRect:&m_rect1];
         page = nil;
     } else {
-        PDFPage *page0 = [doc page:self.m_pageno0];
-        PDFPage *page1 = [doc page:self.m_pageno1];
+        RDPDFPage *page0 = [doc page:self.m_pageno0];
+        RDPDFPage *page1 = [doc page:self.m_pageno1];
         [page0 objsStart];
         [page1 objsStart];
-        PDFAnnot *annot = [page0 annotAtIndex:self.m_idx];
+        RDPDFAnnot *annot = [page0 annotAtIndex:self.m_idx];
         [annot MoveToPage:page1 :&m_rect1];
         self.m_idx = page1.annotCount - 1;
         self.reorder = true;
@@ -238,6 +238,12 @@
     busy = NO;
     
     return item;
+}
+- (void)clear
+{
+    m_stack = [[NSMutableArray alloc] init];
+    m_pos = -1;
+    busy = NO;
 }
 - (int)cur
 {

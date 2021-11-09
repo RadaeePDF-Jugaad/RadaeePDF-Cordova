@@ -14,7 +14,7 @@
 {
     RDPDFView *mView;
 }
-@property (strong, nonatomic) PDFDoc *doc;
+@property (strong, nonatomic) RDPDFDoc *doc;
 @property (strong, nonatomic) PDFLayoutView *pdfView;
 @property (nonatomic) NSUInteger pageViewNo;
 

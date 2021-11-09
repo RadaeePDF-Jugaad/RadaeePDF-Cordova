@@ -17,7 +17,7 @@
 
 @class PDFLayoutView;
 @class PDFThumbView;
-@class PDFDoc;
+@class RDPDFDoc;
 
 @protocol PDFReaderDelegate<NSObject>
 // define protocol functions that can be used in any class using this delegate
@@ -41,8 +41,9 @@
     PDFLayoutView *m_view;
     PDFThumbView *m_thumb;
     BOOL m_readonly;
+    int m_page_no;
     int m_page_cnt;
-    PDFDoc *m_doc;
+    RDPDFDoc *m_doc;
     PDFPopupCtrl *m_popup;
     MenuAnnotOp *m_menu_op;
     UIMenuController *selectMenu;
@@ -124,23 +125,23 @@
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *thumbItem;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *moreItem;
 
-- (void)setDoc:(PDFDoc *)doc;
-- (void)setDoc:(PDFDoc *)doc :(BOOL)readonly;
-- (void)setDoc:(PDFDoc *)doc :(int)pageno :(BOOL)readonly;
-- (PDFDoc *)getDoc;
+- (void)setDoc:(RDPDFDoc *)doc;
+- (void)setDoc:(RDPDFDoc *)doc :(BOOL)readonly;
+- (void)setDoc:(RDPDFDoc *)doc :(int)pageno :(BOOL)readonly;
+- (RDPDFDoc *)getDoc;
 - (void)PDFGoto:(int)pageno;
 - (int)PDFCurPage;
 - (void)setImmersive:(BOOL)immersive;
-- (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
 - (void)setThumbnailBGColor:(int)color;
 - (void)setReaderBGColor:(int)color;
 - (BOOL)addAttachmentFromPath:(NSString *)path;
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
-+ (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc;
++ (bool)flatAnnotAtPage:(int)page doc:(RDPDFDoc *)doc;
 - (bool)flatAnnots;
 - (bool)saveDocumentToPath:(NSString *)path;
-- (void)refreshCurrentPage;
+//- (void)updateAllPages;
+- (void)updatePage:(int)pageno;
 - (void)viewDidLoad;
 - (void)closeView;
 - (IBAction)back_pressed:(id)sender;

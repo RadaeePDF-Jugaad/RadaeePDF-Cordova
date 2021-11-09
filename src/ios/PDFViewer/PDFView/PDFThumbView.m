@@ -10,6 +10,7 @@
 #import "RDPDFView.h"
 #import "RDVPage.h"
 #import "RDVCanvas.h"
+#import "RDVGlobal.h"
 
 @implementation PDFThumbView
 {
@@ -58,7 +59,7 @@
     [self setNeedsDisplay];
 }
 
--(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFThumbViewDelegate>)del
+-(BOOL)PDFOpen :(RDPDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFThumbViewDelegate>)del
 {
     [self PDFClose];
     m_zoom = 1;
@@ -68,7 +69,7 @@
     //page_gap = 1;
     m_sel_pno = -1;
     m_canvas = canvas;
-    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 7)];
+    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_view_mode == 7)];
     m_save_gap = page_gap;
     [m_layout vOpen:m_doc :page_gap * m_scale_pix :self.layer];
     [self bringSubviewToFront:m_child];
@@ -93,7 +94,7 @@
 }
 - (void)PDFRestoreView
 {
-    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_render_mode == 7)];
+    m_layout = [[RDVLayoutThumb alloc] init :self :(GLOBAL.g_view_mode == 7)];
     [m_layout vOpen:m_doc :m_save_gap * m_scale_pix :self.layer];
     [self bringSubviewToFront:m_child];
     m_status = sta_none;

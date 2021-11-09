@@ -6,7 +6,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@class PDFAnnot;
+@class RDPDFAnnot;
 
 @protocol RDPopupTextViewControllerDelegate <NSObject>
 
@@ -16,13 +16,15 @@
 
 @interface RDPopupTextViewController : UIViewController
 
-@property (strong, nonatomic) PDFAnnot *annot;
+@property (strong, nonatomic) RDPDFAnnot *annot;
 @property (strong, nonatomic) id <RDPopupTextViewControllerDelegate> delegate;
 
 @property (strong, nonatomic) IBOutlet UITextField *subjectTextField;
 @property (strong, nonatomic) IBOutlet UITextView *textView;
 @property (strong, nonatomic) IBOutlet UIButton *dismissButton;
- 
+@property (weak, nonatomic) IBOutlet UILabel *subjectLabel;
+@property (weak, nonatomic) IBOutlet UILabel *textLabel;
+
 - (IBAction)dismissView:(id)sender;
 
 @end

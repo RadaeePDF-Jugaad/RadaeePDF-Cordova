@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -161,7 +162,7 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L0V-JV-1Dj">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L0V-JV-1Dj">
                                     <rect key="frame" x="255" y="0.0" width="100" height="40"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="40" id="ZQA-ut-wZx"/>
@@ -181,7 +182,7 @@
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FKw-B1-Rfj">
                                     <rect key="frame" x="0.0" y="0.0" width="355" height="50"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IGf-AU-Bsv">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IGf-AU-Bsv">
                                             <rect key="frame" x="8" y="5" width="100" height="40"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="2Na-hu-0LS"/>
@@ -190,7 +191,7 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <state key="normal" title="OK"/>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="D6r-BO-z3Q">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="D6r-BO-z3Q">
                                             <rect key="frame" x="255" y="5" width="100" height="40"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="2ha-6J-5cX"/>
@@ -200,7 +201,7 @@
                                             <state key="normal" title="Cancel"/>
                                         </button>
                                     </subviews>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
                                         <constraint firstItem="IGf-AU-Bsv" firstAttribute="leading" secondItem="FKw-B1-Rfj" secondAttribute="leading" constant="8" id="IF3-9r-aVv"/>
                                         <constraint firstItem="D6r-BO-z3Q" firstAttribute="trailing" secondItem="FKw-B1-Rfj" secondAttribute="trailingMargin" constant="8" id="KPT-Wx-GOl"/>
@@ -246,6 +247,13 @@
                 <outlet property="mFColor" destination="BGv-FL-R0k" id="aAn-v0-BZK"/>
                 <outlet property="mLColor" destination="h5m-4U-8bW" id="7Hg-nV-15t"/>
                 <outlet property="mLEnd" destination="f4j-qi-dnn" id="jzQ-7W-vB5"/>
+                <outlet property="mLFColor" destination="V8m-Ak-47s" id="nPv-kE-aAc"/>
+                <outlet property="mLLColor" destination="PPZ-x9-lDs" id="BD7-dm-Knb"/>
+                <outlet property="mLLEnd" destination="y6l-uS-9p6" id="f0v-3M-HMS"/>
+                <outlet property="mLLStart" destination="8Gj-bh-tRb" id="XCm-XS-NNV"/>
+                <outlet property="mLLStyle" destination="3Jz-ax-VTC" id="XJb-qY-O4E"/>
+                <outlet property="mLLWidth" destination="Tiw-EF-8kE" id="1ai-ls-r2l"/>
+                <outlet property="mLLock" destination="wBk-5Y-0bA" id="LML-cK-uOP"/>
                 <outlet property="mLStart" destination="mEb-0f-lwd" id="TCV-xa-KqR"/>
                 <outlet property="mLStyle" destination="5rt-pq-dS1" id="PNQ-39-BZQ"/>
                 <outlet property="mLWidth" destination="9OB-dS-SGL" id="rAn-Ao-s8U"/>
@@ -255,4 +263,9 @@
             <point key="canvasLocation" x="37.600000000000001" y="34.632683658170919"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

@@ -23,7 +23,7 @@
 }
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithCoder:(NSCoder *)aDecoder;
-- (BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFThumbViewDelegate>)del;
+- (BOOL)PDFOpen :(RDPDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFThumbViewDelegate>)del;
 - (void)PDFUpdatePage:(int)pageno;
 - (void)PDFSetBGColor:(int)color;
 - (void)PDFSaveView;

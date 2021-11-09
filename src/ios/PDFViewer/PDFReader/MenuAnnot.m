@@ -13,15 +13,15 @@
 - (id)init:(CGPoint)point :(RDBlock)callback
 {
     NSArray *items = @[
-    @{@"Ink": [UIImage imageNamed:@"btn_annot_ink"]},
-    @{@"Line": [UIImage imageNamed:@"btn_annot_line"]},
-    @{@"Note": [UIImage imageNamed:@"btn_annot_note"]},
-    @{@"Rectangle": [UIImage imageNamed:@"btn_annot_rect"]},
-    @{@"Ellipse": [UIImage imageNamed:@"btn_annot_ellipse"]},
-    @{@"Stamp": [UIImage imageNamed:@"btn_annot_stamp"]},
-    @{@"Editbox": [UIImage imageNamed:@"btn_edit_box"]},
-    @{@"Polygon": [UIImage imageNamed:@"btn_polygon"]},
-    @{@"Polyline": [UIImage imageNamed:@"btn_polyline"]},
+    @{NSLocalizedString(@"Ink", nil): [UIImage imageNamed:@"btn_annot_ink"]},
+    @{NSLocalizedString(@"Line", nil): [UIImage imageNamed:@"btn_annot_line"]},
+    @{NSLocalizedString(@"Note", nil): [UIImage imageNamed:@"btn_annot_note"]},
+    @{NSLocalizedString(@"Rect", nil): [UIImage imageNamed:@"btn_annot_rect"]},
+    @{NSLocalizedString(@"Ellipse", nil): [UIImage imageNamed:@"btn_annot_ellipse"]},
+    @{NSLocalizedString(@"Stamp", nil): [UIImage imageNamed:@"btn_annot_stamp"]},
+    @{NSLocalizedString(@"Editbox", nil): [UIImage imageNamed:@"btn_edit_box"]},
+    @{NSLocalizedString(@"Polygon", nil): [UIImage imageNamed:@"btn_polygon"]},
+    @{NSLocalizedString(@"Polyline", nil): [UIImage imageNamed:@"btn_polyline"]},
     ];
     
     return [super init:point :callback :items];

@@ -79,9 +79,9 @@
         [self notify_find:finder];
     });
 }
--(void)end_page:(PDFPage *)page
+-(void)end_page:(RDPDFPage *)page
 {
-    __block PDFPage *pg = page;
+    __block RDPDFPage *pg = page;
     page = nil;
     dispatch_async(m_queue, ^{
         pg = nil;//free in backing thread.

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -117,7 +118,7 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gol-Y2-ksZ">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gol-Y2-ksZ">
                                     <rect key="frame" x="255" y="0.0" width="100" height="40"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="100" id="Ntm-Af-kHU"/>
@@ -137,7 +138,7 @@
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xLX-Gr-dwe">
                                     <rect key="frame" x="0.0" y="0.0" width="355" height="50"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8Zz-oE-3oY">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8Zz-oE-3oY">
                                             <rect key="frame" x="8" y="5" width="100" height="40"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="40" id="9Ii-Nf-bYk"/>
@@ -146,7 +147,7 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <state key="normal" title="OK"/>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vy3-z4-YGU">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vy3-z4-YGU">
                                             <rect key="frame" x="255" y="5" width="100" height="40"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="100" id="Bef-vj-ZUq"/>
@@ -156,7 +157,7 @@
                                             <state key="normal" title="Cancel"/>
                                         </button>
                                     </subviews>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="50" id="7yA-zZ-ght"/>
                                         <constraint firstItem="8Zz-oE-3oY" firstAttribute="leading" secondItem="xLX-Gr-dwe" secondAttribute="leading" constant="8" id="Fvm-N4-9eu"/>
@@ -194,10 +195,14 @@
             </constraints>
             <connections>
                 <outlet property="buttonView" destination="xLX-Gr-dwe" id="PFU-q0-CTN"/>
-                <outlet property="cancelButton" destination="vy3-z4-YGU" id="v4N-YS-A8c"/>
+                <outlet property="cancelButton" destination="vy3-z4-YGU" id="h4c-5D-w0a"/>
                 <outlet property="mFColor" destination="onb-Xv-Zvu" id="c4x-vK-brJ"/>
                 <outlet property="mLColor" destination="BK3-3n-GAX" id="9gz-M5-A4l"/>
                 <outlet property="mLFColor" destination="pLn-QO-mjS" id="E86-gf-nl0"/>
+                <outlet property="mLLColor" destination="MvC-HX-DRg" id="Qce-c8-59T"/>
+                <outlet property="mLLStyle" destination="Zgj-JP-fig" id="mDZ-7K-Gqk"/>
+                <outlet property="mLLWidth" destination="zsd-4j-EGB" id="o9p-bw-ESf"/>
+                <outlet property="mLLock" destination="Jbz-cu-KLy" id="NIo-XT-OQ9"/>
                 <outlet property="mLStyle" destination="evz-6V-aA3" id="O4o-kg-xx9"/>
                 <outlet property="mLWidth" destination="88D-ZY-4NM" id="WhL-eK-jRs"/>
                 <outlet property="mLocked" destination="gol-Y2-ksZ" id="r90-of-UWr"/>
@@ -206,4 +211,9 @@
             <point key="canvasLocation" x="44" y="121.88905547226388"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

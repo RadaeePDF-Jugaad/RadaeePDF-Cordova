@@ -9,20 +9,20 @@
 #import "../UILShadowView.h"
 typedef void(^func_icon)(int);
 @class PDFPopupCtrl;
-@class PDFAnnot;
-@class PDFDIB;
+@class RDPDFAnnot;
+@class RDPDFDIB;
 @interface UIIconBtn : UIImageView
 {
     int m_atype;
     int m_icon;
     UIViewController *m_vc;
-    PDFDIB *m_dib;
+    RDPDFDIB *m_dib;
     PDFPopupCtrl *m_popup;
     NSMutableArray *m_dibs;
     UIScrollView *m_view;
 }
 -(id)initWithCoder:(NSCoder *)aDecoder;
 -(id)initWithFrame:(CGRect)frame;
--(void)setIcon:(PDFAnnot *)annot :(UIViewController *)vc;
+-(void)setIcon:(RDPDFAnnot *)annot :(UIViewController *)vc;
 -(int)icon;
 @end

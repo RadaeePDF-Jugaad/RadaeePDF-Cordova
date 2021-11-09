@@ -10,8 +10,8 @@
 
 @interface RDVCache : NSObject
 {
-    PDFDoc *m_doc;
-    PDFPage *m_page;
+    RDPDFDoc *m_doc;
+    RDPDFPage *m_page;
     int m_pageno;
     float m_scale_pix;
     float m_scale;
@@ -32,7 +32,7 @@
 @property int pageno;
 @property bool thumbMode;
 
--(id)init:(PDFDoc *)doc :(int)pageno :(float) scale :(int)dibx :(int)diby :(int)dibw :(int)dibh;
+-(id)init:(RDPDFDoc *)doc :(int)pageno :(float) scale :(int)dibx :(int)diby :(int)dibw :(int)dibh;
 -(RDVCache *)vClone;
 -(bool)vStart;
 -(bool)vEnd;

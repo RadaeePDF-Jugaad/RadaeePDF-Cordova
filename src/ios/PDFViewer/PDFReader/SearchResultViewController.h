@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 @class RDExtendedSearch;
-@class PDFDoc;
+@class RDPDFDoc;
 
 @protocol SearchResultViewControllerDelegate <NSObject>
 
@@ -24,7 +24,7 @@
 }
 
 @property (strong, nonatomic) NSString *searchedString;
-@property (strong, nonatomic) PDFDoc *doc;
+@property (strong, nonatomic) RDPDFDoc *doc;
 @property (nonatomic, weak) id <SearchResultViewControllerDelegate> delegate;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 

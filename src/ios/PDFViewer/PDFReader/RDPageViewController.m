@@ -8,10 +8,11 @@
 
 #import "RDPageViewController.h"
 #import "RDSinglePageViewController.h"
+#import "RDVGlobal.h"
 
 @interface RDPageViewController ()
 {
-    PDFDoc *doc;
+    RDPDFDoc *doc;
     BOOL statusBarHidden;
     BOOL isImmersive;
     int pageno;
@@ -41,7 +42,7 @@
 
 - (int)PDFOpenAtPath:(NSString *)path withPwd:(NSString *)pwd
 {
-    doc = [[PDFDoc alloc] init];
+    doc = [[RDPDFDoc alloc] init];
     int err_code = [doc open:path :pwd];
     switch(err_code)
     {
@@ -221,10 +222,6 @@
 {
 }
 
-- (void)setFirstPageCover:(BOOL)cover
-{
-}
-
 - (void)setDoubleTapZoomMode:(int)mode
 {
 }
@@ -256,7 +253,7 @@
 
 #pragma mark - Flat annot
 
-- (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc
+- (bool)flatAnnotAtPage:(int)page doc:(RDPDFDoc *)doc
 {
     return NO;
 }

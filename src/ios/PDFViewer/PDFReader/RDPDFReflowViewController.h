@@ -15,8 +15,8 @@
 @interface RDPDFReflowViewController : UIViewController
 {
     PDFReflowView *m_view;
-    PDFDoc *m_doc;
-    PDFPage *m_page;
+    RDPDFDoc *m_doc;
+    RDPDFPage *m_page;
     CGImageRef m_img;
     int m_cur_page;
     UIImage *img;

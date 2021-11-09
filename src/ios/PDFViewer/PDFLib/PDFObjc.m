@@ -1,5 +1,5 @@
 //
-//  PDFDoc.m
+//  RDPDFDoc.m
 //  PDFViewer
 //
 //  Created by Radaee on 12-9-18.
@@ -7,11 +7,12 @@
 //
 
 #import "PDFObjc.h"
+#import "RDVGlobal.h"
 extern uint annotHighlightColor;
 extern uint annotUnderlineColor;
 extern uint annotStrikeoutColor;
 
-@implementation PDFSign
+@implementation RDPDFSign
 @synthesize handle = m_sign;
 -(id)init:(PDF_SIGN)sign
 {
@@ -56,7 +57,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFDIB
+@implementation RDPDFDIB
 @synthesize handle = m_dib;
 -(id)init
 {
@@ -126,7 +127,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFMatrix
+@implementation RDPDFMatrix
 @synthesize handle = m_mat;
 -(id)init
 {
@@ -156,11 +157,11 @@ extern uint annotStrikeoutColor;
 {
 	Matrix_invert( m_mat );
 }
--(void)transformPath:(PDFPath *)path
+-(void)transformPath:(RDPDFPath *)path
 {
 	Matrix_transformPath( m_mat, path.handle );
 }
--(void)transformInk:(PDFInk *)ink
+-(void)transformInk:(RDPDFInk *)ink
 {
 	Matrix_transformInk( m_mat, ink.handle );
 }
@@ -180,7 +181,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFObj
+@implementation RDPDFObj
 @synthesize handle = m_obj;
 -(id)init:(PDF_OBJ)obj
 {
@@ -279,18 +280,18 @@ extern uint annotStrikeoutColor;
 	if(!tag) return NULL;
 	return [NSString stringWithUTF8String:tag];
 }
--(PDFObj *)dictGetItemByIndex:(int)index
+-(RDPDFObj *)dictGetItemByIndex:(int)index
 {
 	PDF_OBJ obj = Obj_dictGetItemByIndex(m_obj, index);
 	if(!obj) return NULL;
-	return [[PDFObj alloc] init:obj];
+	return [[RDPDFObj alloc] init:obj];
 }
--(PDFObj *)dictGetItemByTag:(NSString *)tag
+-(RDPDFObj *)dictGetItemByTag:(NSString *)tag
 {
 	if(!tag) return NULL;
 	PDF_OBJ obj = Obj_dictGetItemByName(m_obj, [tag UTF8String]);
 	if(!obj) return NULL;
-	return [[PDFObj alloc] init:obj];
+	return [[RDPDFObj alloc] init:obj];
 }
 -(void)dictSetItem:(NSString *)tag
 {
@@ -310,11 +311,11 @@ extern uint annotStrikeoutColor;
 {
 	return Obj_arrayGetItemCount(m_obj);
 }
--(PDFObj *)arrayGetItem:(int)index
+-(RDPDFObj *)arrayGetItem:(int)index
 {
 	PDF_OBJ obj = Obj_arrayGetItem(m_obj, index);
 	if(!obj) return NULL;
-	return [[PDFObj alloc] init:obj];
+	return [[RDPDFObj alloc] init:obj];
 }
 -(void)arrayAppendItem
 {
@@ -334,7 +335,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFOutline
+@implementation RDPDFOutline
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -354,17 +355,17 @@ extern uint annotStrikeoutColor;
     }
     return self;
 }
--(PDFOutline *)next
+-(RDPDFOutline *)next
 {
     PDF_OUTLINE outline = Document_getOutlineNext(m_doc, m_handle);
     if( !outline ) return NULL;
-    return [[PDFOutline alloc] init:m_doc:outline];
+    return [[RDPDFOutline alloc] init:m_doc:outline];
 }
--(PDFOutline *)child
+-(RDPDFOutline *)child
 {
     PDF_OUTLINE outline = Document_getOutlineChild(m_doc, m_handle);
     if( !outline ) return NULL;
-    return [[PDFOutline alloc] init:m_doc:outline];
+    return [[RDPDFOutline alloc] init:m_doc:outline];
 }
 -(int)dest
 {
@@ -397,7 +398,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFDocFont
+@implementation RDPDFDocFont
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -427,7 +428,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFDocGState
+@implementation RDPDFDocGState
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -468,7 +469,7 @@ extern uint annotStrikeoutColor;
 
 @end
 
-@implementation PDFDocImage
+@implementation RDPDFDocImage
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -490,7 +491,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFDocForm
+@implementation RDPDFDocForm
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -519,23 +520,23 @@ extern uint annotStrikeoutColor;
 		m_doc = NULL;
 	}
 }
--(PDF_PAGE_FONT)addResFont :(PDFDocFont *)font
+-(PDF_PAGE_FONT)addResFont :(RDPDFDocFont *)font
 {
 	return Document_addFormResFont(m_doc, m_handle, font.handle);
 }
--(PDF_PAGE_IMAGE)addResImage :(PDFDocImage *)img
+-(PDF_PAGE_IMAGE)addResImage :(RDPDFDocImage *)img
 {
 	return Document_addFormResImage(m_doc, m_handle, img.handle);
 }
--(PDF_PAGE_GSTATE)addResGState : (PDFDocGState *)gs
+-(PDF_PAGE_GSTATE)addResGState : (RDPDFDocGState *)gs
 {
 	return Document_addFormResGState(m_doc, m_handle, gs.handle);
 }
--(PDF_PAGE_FORM)addResForm : (PDFDocForm *)form
+-(PDF_PAGE_FORM)addResForm : (RDPDFDocForm *)form
 {
 	return Document_addFormResForm(m_doc, m_handle, form.handle);
 }
--(void)setContent : (float)x : (float)y : (float)w : (float)h : (PDFPageContent *)content
+-(void)setContent : (float)x : (float)y : (float)w : (float)h : (RDPDFPageContent *)content
 {
 	Document_setFormContent(m_doc, m_handle, x, y, w, h, content.handle);
 }
@@ -545,7 +546,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFFinder
+@implementation RDPDFFinder
 -(id)init
 {
     if( self = [super init] )
@@ -582,7 +583,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFPath
+@implementation RDPDFPath
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -633,7 +634,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFInk
+@implementation RDPDFInk
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -678,7 +679,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFPageContent
+@implementation RDPDFPageContent
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -700,7 +701,7 @@ extern uint annotStrikeoutColor;
 {
 	PageContent_gsSet( m_handle, gs );
 }
--(void)gsCatMatrix:(PDFMatrix *) mat
+-(void)gsCatMatrix:(RDPDFMatrix *) mat
 {
 	PageContent_gsSetMatrix( m_handle, mat.handle );
 }
@@ -736,15 +737,15 @@ extern uint annotStrikeoutColor;
 	ret.num_lines = val >> 20;
 	return ret;
 }
--(void)strokePath:(PDFPath *) path
+-(void)strokePath:(RDPDFPath *) path
 {
 	PageContent_strokePath( m_handle, path.handle );
 }
--(void)fillPath:(PDFPath *)path :(bool) winding
+-(void)fillPath:(RDPDFPath *)path :(bool) winding
 {
 	PageContent_fillPath( m_handle, path.handle, winding );
 }
--(void)clipPath:(PDFPath *)path :(bool) winding
+-(void)clipPath:(RDPDFPath *)path :(bool) winding
 {
 	PageContent_clipPath( m_handle, path.handle, winding );
 }
@@ -815,7 +816,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFAnnot
+@implementation RDPDFAnnot
 @synthesize handle = m_handle;
 -(id)init
 {
@@ -851,7 +852,7 @@ extern uint annotStrikeoutColor;
 {
 	return Page_exportAnnot(m_page, m_handle, buf, len);
 }
--(int)signField :(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
+-(int)signField :(RDPDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
 {
 	return Page_signAnnotField(m_page, m_handle, [appearence handle], [cert_file UTF8String], [pswd UTF8String], [name UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
 }
@@ -926,7 +927,7 @@ extern uint annotStrikeoutColor;
 	Page_setAnnotHide( m_page, m_handle, hide );
 	return true;
 }
--(bool)render:(PDFDIB *)dib :(int)back_color
+-(bool)render:(RDPDFDIB *)dib :(int)back_color
 {
 	[dib erase:back_color];
 	return Page_renderAnnot(m_page, m_handle, [dib handle]);
@@ -968,35 +969,35 @@ extern uint annotStrikeoutColor;
 	}
 	return -1;
 }
--(PDFPath *)getInkPath
+-(RDPDFPath *)getInkPath
 {
 	PDF_PATH path = Page_getAnnotInkPath( m_page, m_handle );
 	if( !path ) return NULL;
-	return [[PDFPath alloc] init: path];
+	return [[RDPDFPath alloc] init: path];
 }
--(bool)setInkPath:(PDFPath *)path
+-(bool)setInkPath:(RDPDFPath *)path
 {
 	return Page_setAnnotInkPath( m_page, m_handle, [path handle] );
 }
 
--(PDFPath *)getPolygonPath
+-(RDPDFPath *)getPolygonPath
 {
 	PDF_PATH path = Page_getAnnotPolygonPath( m_page, m_handle );
 	if( !path ) return NULL;
-	return [[PDFPath alloc] init: path];
+	return [[RDPDFPath alloc] init: path];
 }
--(bool)setPolygonPath:(PDFPath *)path
+-(bool)setPolygonPath:(RDPDFPath *)path
 {
 	return Page_setAnnotPolygonPath( m_page, m_handle, [path handle] );
 }
 
--(PDFPath *)getPolylinePath
+-(RDPDFPath *)getPolylinePath
 {
 	PDF_PATH path = Page_getAnnotPolylinePath( m_page, m_handle );
 	if( !path ) return NULL;
-	return [[PDFPath alloc] init: path];
+	return [[RDPDFPath alloc] init: path];
 }
--(bool)setPolylinePath:(PDFPath *)path
+-(bool)setPolylinePath:(RDPDFPath *)path
 {
 	return Page_setAnnotPolylinePath( m_page, m_handle, [path handle] );
 }
@@ -1052,7 +1053,7 @@ extern uint annotStrikeoutColor;
 {
 	return Page_setAnnotIcon(m_page, m_handle, icon);
 }
--(bool)setIcon2:(NSString *)icon_name :(PDFDocForm *)icon
+-(bool)setIcon2:(NSString *)icon_name :(RDPDFDocForm *)icon
 {
 	return Page_setAnnotIcon2(m_page, m_handle, [icon_name UTF8String], [icon handle]);
 }
@@ -1152,11 +1153,11 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotFileLink(m_page, m_handle);
 }
--(PDFAnnot *)getPopup
+-(RDPDFAnnot *)getPopup
 {
     PDF_ANNOT annot = Page_getAnnotPopup(m_page, m_handle);
     if(!annot) return nil;
-    return [[PDFAnnot alloc] init:m_page :annot];
+    return [[RDPDFAnnot alloc] init:m_page :annot];
 }
 
 -(bool)getPopupOpen
@@ -1229,7 +1230,7 @@ extern uint annotStrikeoutColor;
 {
 	return Page_setAnnotEditText( m_page, m_handle, [val UTF8String] );
 }
--(bool)setEditFont:(PDFDocFont *)font
+-(bool)setEditFont:(RDPDFDocFont *)font
 {
 	if(!font) return false;
 	return Page_setAnnotEditFont( m_page, m_handle, font.handle );
@@ -1337,14 +1338,14 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotSignStatus( m_page, m_handle );
 }
--(PDFSign *)getSign
+-(RDPDFSign *)getSign
 {
 	PDF_SIGN sign = Page_getAnnotSign(m_page, m_handle);
 	if(!sign) return NULL;
-	return [[PDFSign alloc] init:sign];
+	return [[RDPDFSign alloc] init:sign];
 }
 
--(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect
+-(bool)MoveToPage:(RDPDFPage *)page :(const PDF_RECT *)rect
 {
     return Page_moveAnnot(m_page, [page handle], m_handle, rect);
 }
@@ -1356,7 +1357,7 @@ extern uint annotStrikeoutColor;
 
 - (BOOL)isAnnotLocked
 {
-    if (GLOBAL.g_annot_lock && [self isLocked])
+    if ([self isLocked])
         return YES;
     
     return NO;
@@ -1376,7 +1377,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFPage
+@implementation RDPDFPage
 @synthesize handle = m_page;
 -(id)init;
 {
@@ -1407,16 +1408,16 @@ extern uint annotStrikeoutColor;
 	return Page_importAnnot(m_page, rect, dat, dat_len);
 }
 
--(bool)renderThumb:(PDFDIB *)dib
+-(bool)renderThumb:(RDPDFDIB *)dib
 {
 	return Page_renderThumb(m_page, [dib handle]);
 }
 
--(void)renderPrepare:(PDFDIB *)dib
+-(void)renderPrepare:(RDPDFDIB *)dib
 {
     Page_renderPrepare(m_page, [dib handle]);
 }
--(bool)render:(PDFDIB *)dib :(PDFMatrix *)mat :(int)quality
+-(bool)render:(RDPDFDIB *)dib :(RDPDFMatrix *)mat :(int)quality
 {
     return Page_render(m_page, [dib handle], [mat handle], true, quality);
 }
@@ -1432,7 +1433,7 @@ extern uint annotStrikeoutColor;
 {
     return Page_reflowStart( m_page, width,  scale );
 }
--(bool)reflow:(PDFDIB *)dib :(float)orgx :(float)orgy
+-(bool)reflow:(RDPDFDIB *)dib :(float)orgx :(float)orgy
 {
     return Page_reflow( m_page, [dib handle], orgx, orgy );
 }
@@ -1445,14 +1446,14 @@ extern uint annotStrikeoutColor;
 	return Page_flate(m_page);
 }
 
--(int)sign:(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)name :(NSString *)reason :(NSString *)location :(NSString *)contact
+-(int)sign:(RDPDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString *)name :(NSString *)reason :(NSString *)location :(NSString *)contact
 {
 	return Page_sign(m_page, [appearence handle], box, [cert_file UTF8String], [pswd UTF8String], [name UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
 }
 
 -(void)objsStart
 {
-    Page_objsStart(m_page);
+    Page_objsStart(m_page, GLOBAL.g_sel_rtol);
 }
 -(int)objsCount
 {
@@ -1474,42 +1475,42 @@ extern uint annotStrikeoutColor;
 {
     return Page_objsGetCharIndex(m_page, x, y);
 }
--(PDFFinder *)find:(NSString *)key :(bool)match_case :(bool)whole_word
+-(RDPDFFinder *)find:(NSString *)key :(bool)match_case :(bool)whole_word
 {
 	PDF_FINDER hand = Page_findOpen( m_page, [key UTF8String], match_case, whole_word );
 	if( !hand ) return NULL;
-	return [[PDFFinder alloc] init:hand];
+	return [[RDPDFFinder alloc] init:hand];
 }
--(PDFFinder *)find2:(NSString *)key :(bool)match_case :(bool)whole_word :(bool)skip_blanks
+-(RDPDFFinder *)find2:(NSString *)key :(bool)match_case :(bool)whole_word :(bool)skip_blanks
 {
 	PDF_FINDER hand = Page_findOpen2( m_page, [key UTF8String], match_case, whole_word, skip_blanks );
 	if( !hand ) return NULL;
-	return [[PDFFinder alloc] init:hand];
+	return [[RDPDFFinder alloc] init:hand];
 }
 -(int)annotCount
 {
 	return Page_getAnnotCount( m_page );
 }
--(PDFAnnot *)annotAtIndex:(int)index
+-(RDPDFAnnot *)annotAtIndex:(int)index
 {
 	PDF_ANNOT hand = Page_getAnnot( m_page, index );
 	if( !hand ) return NULL;
-	return [[PDFAnnot alloc] init:m_page:hand];
+	return [[RDPDFAnnot alloc] init:m_page:hand];
 }
--(PDFAnnot *)annotAtPoint : (float)x : (float)y
+-(RDPDFAnnot *)annotAtPoint : (float)x : (float)y
 {
 	PDF_ANNOT hand = Page_getAnnotFromPoint( m_page, x, y );
 	if( !hand ) return NULL;
-	return [[PDFAnnot alloc] init:m_page:hand];
+	return [[RDPDFAnnot alloc] init:m_page:hand];
 }
--(PDFAnnot *)annotByName:(NSString *)name
+-(RDPDFAnnot *)annotByName:(NSString *)name
 {
 	if(!name) return NULL;
 	PDF_ANNOT hand = Page_getAnnotByName(m_page, [name UTF8String]);
 	if( !hand ) return NULL;
-	return [[PDFAnnot alloc] init:m_page:hand];
+	return [[RDPDFAnnot alloc] init:m_page:hand];
 }
--(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect
+-(bool)copyAnnot:(RDPDFAnnot *)annot :(const PDF_RECT *)rect
 {
 	return Page_copyAnnot( m_page, [annot handle], rect );
 }
@@ -1518,7 +1519,7 @@ extern uint annotStrikeoutColor;
 	return Page_addAnnot2(m_page, ref, index);
 }
 
--(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open
+-(bool)addAnnotPopup:(RDPDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open
 {
 	return Page_addAnnotPopup( m_page, [parent handle], rect, open);
 }
@@ -1527,7 +1528,7 @@ extern uint annotStrikeoutColor;
 {
     return Page_addAnnotMarkup2(m_page, index1, index2, color, type);
 }
--(bool)addAnnotInk:(PDFInk *)ink
+-(bool)addAnnotInk:(RDPDFInk *)ink
 {
 	return Page_addAnnotInk2( m_page, ink.handle );
 }
@@ -1551,11 +1552,11 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotEllipse2( m_page, rect, width, color, icolor );
 }
--(bool)addAnnotPolygon:(PDFPath *)path :(int) color :(int) fill_color :(float) width
+-(bool)addAnnotPolygon:(RDPDFPath *)path :(int) color :(int) fill_color :(float) width
 {
 	return Page_addAnnotPolygon(m_page, [path handle], color, fill_color, width);
 }
--(bool)addAnnotPolyline:(PDFPath *)path :(int) style1 :(int) style2 :(int) color :(int) fill_color :(float) width
+-(bool)addAnnotPolyline:(RDPDFPath *)path :(int) style1 :(int) style2 :(int) color :(int) fill_color :(float) width
 {
 	return Page_addAnnotPolyline(m_page, [path handle], style1, style2, color, fill_color, width);
 }
@@ -1567,16 +1568,16 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotAttachment( m_page, [att UTF8String], icon, rect );
 }
--(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *) dimage :(const PDF_RECT *) rect
+-(bool)addAnnotBitmap0:(RDPDFMatrix *)mat :(RDPDFDocImage *) dimage :(const PDF_RECT *) rect
 {
 	return Page_addAnnotBitmap( m_page, [mat handle], [dimage handle], rect );
 }
--(bool)addAnnotBitmap:(PDFDocImage *) dimage :(const PDF_RECT *) rect
+-(bool)addAnnotBitmap:(RDPDFDocImage *) dimage :(const PDF_RECT *) rect
 {
 	return Page_addAnnotBitmap2( m_page, [dimage handle], rect );
 }
 
--(bool)addAnnotRichMedia:(NSString *) path_player :(NSString *) path_content :(int) type :(PDFDocImage *) dimage :(const PDF_RECT *) rect
+-(bool)addAnnotRichMedia:(NSString *) path_player :(NSString *) path_content :(int) type :(RDPDFDocImage *) dimage :(const PDF_RECT *) rect
 {
 	return Page_addAnnotRichMedia( m_page, path_player, path_content, type, [dimage handle], rect );
 }
@@ -1585,23 +1586,23 @@ extern uint annotStrikeoutColor;
 {
 	return Page_addAnnotStamp( m_page, rect, icon );
 }
--(PDF_PAGE_FONT)addResFont:(PDFDocFont *)font
+-(PDF_PAGE_FONT)addResFont:(RDPDFDocFont *)font
 {
 	return Page_addResFont( m_page, font.handle );
 }
--(PDF_PAGE_IMAGE)addResImage:(PDFDocImage *)image
+-(PDF_PAGE_IMAGE)addResImage:(RDPDFDocImage *)image
 {
 	return Page_addResImage( m_page, image.handle );
 }
--(PDF_PAGE_GSTATE)addResGState:(PDFDocGState *)gstate
+-(PDF_PAGE_GSTATE)addResGState:(RDPDFDocGState *)gstate
 {
 	return Page_addResGState( m_page, gstate.handle );
 }
--(PDF_PAGE_FORM)addResForm:(PDFDocForm *)form
+-(PDF_PAGE_FORM)addResForm:(RDPDFDocForm *)form
 {
 	return Page_addResForm( m_page, form.handle );
 }
--(bool)addContent:(PDFPageContent *)content :(bool)flush
+-(bool)addContent:(RDPDFPageContent *)content :(bool)flush
 {
     return Page_addContent( m_page, content.handle, flush );
 }
@@ -1617,7 +1618,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFImportCtx
+@implementation RDPDFImportCtx
 -(id)init
 {
     if( self = [super init] )
@@ -1654,7 +1655,7 @@ extern uint annotStrikeoutColor;
 }
 @end
 
-@implementation PDFDoc
+@implementation RDPDFDoc
 @synthesize handle = m_doc;
 -(id)init
 {
@@ -1761,16 +1762,16 @@ extern uint annotStrikeoutColor;
 {
 	return Document_advNewIndirectObj(m_doc);
 }
--(PDF_OBJ_REF)advanceNewIndirectObjAndCopy :(PDFObj *)obj
+-(PDF_OBJ_REF)advanceNewIndirectObjAndCopy :(RDPDFObj *)obj
 {
 	if(!obj) return 0;
 	return Document_advNewIndirectObjWithData(m_doc, [obj handle]);
 }
--(PDFObj *)advanceGetObj:(PDF_OBJ_REF)ref
+-(RDPDFObj *)advanceGetObj:(PDF_OBJ_REF)ref
 {
 	PDF_OBJ obj = Document_advGetObj(m_doc, ref);
 	if(!obj) return NULL;
-	return [[PDFObj alloc] init:obj];
+	return [[RDPDFObj alloc] init:obj];
 }
 
 -(bool)setCache:(NSString *)path
@@ -1788,7 +1789,7 @@ extern uint annotStrikeoutColor;
     return Document_runJS(m_doc, [js UTF8String], del);
 }
 
--(int)verifySign:(PDFSign *)sign
+-(int)verifySign:(RDPDFSign *)sign
 {
 	return Document_verifySign(m_doc, [sign handle]);
 }
@@ -1883,11 +1884,11 @@ extern uint annotStrikeoutColor;
 	return sz;
 }
 
--(PDFPage *)page:(int) pageno
+-(RDPDFPage *)page:(int) pageno
 {
     PDF_PAGE hand = Document_getPage(m_doc, pageno);
     if( !hand ) return NULL;
-    return [[PDFPage alloc] init:hand];
+    return [[RDPDFPage alloc] init:hand];
 }
 -(float)pageWidth:(int) pageno
 {
@@ -1902,11 +1903,11 @@ extern uint annotStrikeoutColor;
     return Document_getPageLabel(m_doc, pageno);
 }
 
--(PDFOutline *)rootOutline
+-(RDPDFOutline *)rootOutline
 {
     PDF_OUTLINE hand = Document_getOutlineNext(m_doc, NULL);
 	if( !hand ) return NULL;
-	return [[PDFOutline alloc] init:m_doc:hand];
+	return [[RDPDFOutline alloc] init:m_doc:hand];
 }
 
 -(bool)newRootOutline: (NSString *)label :(int) pageno :(float) top
@@ -1914,38 +1915,38 @@ extern uint annotStrikeoutColor;
     return Document_newRootOutline(m_doc, [label UTF8String], pageno, top);
 }
 
--(PDFDocFont *)newFontCID: (NSString *)name :(int) style
+-(RDPDFDocFont *)newFontCID: (NSString *)name :(int) style
 {
 	PDF_DOC_FONT hand = Document_newFontCID( m_doc, [name UTF8String], style );
 	if( !hand ) return NULL;
-	return [[PDFDocFont alloc] init:m_doc:hand];
+	return [[RDPDFDocFont alloc] init:m_doc:hand];
 }
 
--(PDFDocGState *)newGState
+-(RDPDFDocGState *)newGState
 {
 	PDF_DOC_GSTATE hand = Document_newGState( m_doc );
 	if( !hand ) return NULL;
-	return [[PDFDocGState alloc] init:m_doc:hand];
+	return [[RDPDFDocGState alloc] init:m_doc:hand];
 }
--(PDFDocForm *)newForm
+-(RDPDFDocForm *)newForm
 {
 	PDF_DOC_FORM hand = Document_newForm( m_doc );
 	if( !hand ) return NULL;
-	return [[PDFDocForm alloc] init:m_doc:hand];
+	return [[RDPDFDocForm alloc] init:m_doc:hand];
 }
 
--(PDFPage *)newPage:(int) pageno :(float) w :(float) h
+-(RDPDFPage *)newPage:(int) pageno :(float) w :(float) h
 {
     PDF_PAGE hand = Document_newPage(m_doc, pageno, w, h);
     if( !hand ) return NULL;
-    return [[PDFPage alloc] init:hand];
+    return [[RDPDFPage alloc] init:hand];
 }
 
--(PDFImportCtx *)newImportCtx:(PDFDoc *)src_doc
+-(RDPDFImportCtx *)newImportCtx:(RDPDFDoc *)src_doc
 {
 	PDF_IMPORTCTX hand = Document_importStart( m_doc, [src_doc handle] );
 	if( !hand ) return NULL;
-    return [[PDFImportCtx alloc] init:m_doc:hand];
+    return [[RDPDFImportCtx alloc] init:m_doc:hand];
 }
 
 -(bool)movePage:(int)pageno1 :(int)pageno2
@@ -1957,26 +1958,33 @@ extern uint annotStrikeoutColor;
 {
 	return Document_removePage( m_doc, pageno );
 }
--(PDFDocImage *)newImage:(CGImageRef)img : (bool)has_alpha
+-(RDPDFDocImage *)newImage:(CGImageRef)img :(bool)has_alpha
 {
 	if(!img) return nil;
 	PDF_DOC_IMAGE hand = Document_newImage( m_doc, img, has_alpha );
 	if( !hand ) return NULL;
-    return [[PDFDocImage alloc] init:m_doc:hand];
+    return [[RDPDFDocImage alloc] init:m_doc:hand];
+}
+-(RDPDFDocImage *)newImage2:(CGImageRef)img :(unsigned int)matte
+{
+	if(!img) return nil;
+	PDF_DOC_IMAGE hand = Document_newImage2( m_doc, img, matte );
+	if( !hand ) return NULL;
+    return [[RDPDFDocImage alloc] init:m_doc:hand];
 }
 
--(PDFDocImage *)newImageJPEG:(NSString *)path
+-(RDPDFDocImage *)newImageJPEG:(NSString *)path
 {
 	PDF_DOC_IMAGE hand = Document_newImageJPEG( m_doc, [path UTF8String] );
 	if( !hand ) return NULL;
-    return [[PDFDocImage alloc] init:m_doc:hand];
+    return [[RDPDFDocImage alloc] init:m_doc:hand];
 }
 
--(PDFDocImage *)newImageJPX:(NSString *)path
+-(RDPDFDocImage *)newImageJPX:(NSString *)path
 {
 	PDF_DOC_IMAGE hand = Document_newImageJPX( m_doc, [path UTF8String] );
 	if( !hand ) return NULL;
-    return [[PDFDocImage alloc] init:m_doc:hand];
+    return [[RDPDFDocImage alloc] init:m_doc:hand];
 }
 -(void)dealloc
 {

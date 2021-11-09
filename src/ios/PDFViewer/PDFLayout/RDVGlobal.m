@@ -252,10 +252,19 @@ NSString *g_serial = @"";
     Global_fontfileMapping("CourierNew-Bold",              "Cousine Bold");
     Global_fontfileMapping("CourierNew-BoldItalic",        "Cousine Bold Italic");
     Global_fontfileMapping("CourierNew-Italic",            "Cousine Italic");
+    Global_fontfileMapping("Symbol",                       "Symbol Neu for Powerline");
     
     bool ret;
     ret = Global_setDefaultFont(NULL, "Arial", false);
     ret = Global_setDefaultFont(NULL, "Arial", true);
+    ret = Global_setDefaultFont("Japan1", "Noto Sans CJK JP Regular", false);
+    ret = Global_setDefaultFont("Japan1", "Noto Sans CJK JP Regular", true);
+    ret = Global_setDefaultFont("CNS1", "Noto Sans CJK SC Regular", false);
+    ret = Global_setDefaultFont("CNS1", "Noto Sans CJK SC Regular", true);
+    ret = Global_setDefaultFont("GB1", "Noto Sans CJK SC Regular", false);
+    ret = Global_setDefaultFont("GB1", "Noto Sans CJK SC Regular", true);
+    ret = Global_setDefaultFont("Korea1", "Noto Sans CJK SC Regular", false);
+    ret = Global_setDefaultFont("Korea1", "Noto Sans CJK SC Regular", true);
     /*
     ret = Global_setDefaultFont("GB1", "BousungEG-Light-GB", false);
     ret = Global_setDefaultFont("GB1", "BousungEG-Light-GB", true);
@@ -276,28 +285,34 @@ NSString *g_serial = @"";
 
 - (void)setup {
     GLOBAL.g_render_quality = mode_normal;
-    
-    _g_render_mode = 0;
+    //0:vertical,
+    //1:hroizon,
+    //2:curl effect,
+    //3:single,
+    //4:cover as single, and other pages are in dual when landscape
+    //5:reflow
+    //6:dual page when landscape
+    _g_view_mode = 0;
     _g_navigation_mode = 1; //0 = slider, 1 = thumbnail
-    _g_tap_zoom_level = 3; //double tap, (2-5)
-    _g_layout_zoom_level = 10; //pinch to zoom
+    _g_tap_zoom_level = 11; //double tap, (2-5)
+    _g_layout_zoom_level = 11; //pinch to zoom
     _g_ink_width = 2;
-    _g_rect_width = 2;
-    _g_line_width = 2;
-    _g_oval_width = 2;
+    _g_rect_annot_width = 2;
+    _g_line_annot_width = 2;
+    _g_oval_annot_width = 2;
     _g_swipe_speed = 0.15f;
     _g_swipe_distance= 1.0f;
     _g_render_quality = 1;
     _g_zoom_step = 1;
     
-    _g_rect_color = 0xFF000000;
-    _g_line_color = 0xFF000000;
+    _g_rect_annot_color = 0xFF000000;
+    _g_line_annot_color = 0xFF000000;
     _g_ink_color = 0xFF000000;
     _g_sel_color = 0x400000C0;
-    _g_oval_color = 0xFF000000;
+    _g_oval_annot_color = 0xFF000000;
     _g_line_annot_fill_color = 0xFF000000;
     _g_rect_annot_fill_color = 0;
-    _g_ellipse_annot_fill_color = 0;
+    _g_oval_annot_fill_color = 0;
     _g_annot_highlight_clr = 0xFFFFFF00;
     _g_annot_underline_clr = 0xFF0000FF;
     _g_annot_strikeout_clr = 0xFFFF0000;
@@ -309,12 +324,15 @@ NSString *g_serial = @"";
     _g_readerview_bg_color = 0xFFBFBFBF;
     _g_thumbview_height = 99;
     _g_find_primary_color = 0x400000C0;
+    _g_find_secondary_color = 0x40000000;
     
-    _g_static_scale = false;
+    _g_fake_sign = false;
+    _g_layout_rtol = false;
+    _g_auto_scale = true;
     _g_curl_enabled = false;
     _g_cover_page_enabled = false;
     _g_fit_signature_to_field = true;
-    _g_execute_annot_JS = true;
+    _g_exec_js = true;
     _g_dark_mode = false;
     _g_annot_lock = true;
     _g_annot_readonly = true;
@@ -324,15 +342,15 @@ NSString *g_serial = @"";
     _g_cover_page_enabled = false;
     _g_case_sensitive = false;
     _g_match_whole_word = false;
-    _g_sel_right= false;
+    _g_sel_rtol = false;
     _g_screen_awake = false;
     _g_auto_launch_link = true;
-    _g_save_doc = false;
+    _g_auto_save_doc = false;
     _g_highlight_annotation = true;
-    _g_enable_graphical_signature = true;
+    _g_hand_signature = true;
     _g_readonly = false;
     
-    _g_author = @"";
+    _g_annot_def_author = @"";
     _g_sign_pad_descr = @"Sign here";
 }
 

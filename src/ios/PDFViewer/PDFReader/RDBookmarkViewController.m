@@ -20,6 +20,7 @@
     _tableView.translatesAutoresizingMaskIntoConstraints = NO;
     _tableView.delegate = self;
     _tableView.dataSource = self;
+    _bookmarkTitle.text = NSLocalizedString(@"Bookmarks", nil);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -62,7 +63,7 @@
     int pageno = [[arr objectAtIndex:0] intValue];
     pageno++;
     
-    cell.textLabel.text = [NSString stringWithFormat:@"Page: %i", pageno];
+    cell.textLabel.text = [NSString stringWithFormat:@"%@: %i",NSLocalizedString(@"Page", nil), pageno];
     
     return cell;
 }

@@ -7,11 +7,11 @@
 
 @interface RDVPage : NSObject
 {
-    PDFPage *m_page;
+    RDPDFPage *m_page;
 	RDVCacheSet *m_caches;
     RDVCacheSet *m_caches_zoom;
     CALayer *m_layer;
-    PDFDoc *m_doc;
+    RDPDFDoc *m_doc;
 	int m_pageno;
 	int m_x;
 	int m_y;
@@ -37,10 +37,10 @@
 @property(readonly) float scale;
 @property bool thumbMode;
 
--(id)init :(PDFDoc *) doc :(int) pageno :(int) cw :(int) ch;
+-(id)init :(RDPDFDoc *) doc :(int) pageno :(int) cw :(int) ch;
 -(void)vLayerInit : (CALayer *)root;
 -(void)vLayerDel;
-- (PDFPage *)GetPage;
+- (RDPDFPage *)GetPage;
 -(int)GetX;
 -(int)GetY;
 -(float)GetPDFX :(int) vx;
@@ -55,8 +55,8 @@
 -(int)ToDIBX :(float) pdfx;
 -(int)ToDIBY :(float) pdfy;
 -(float)ToPDFSize :(int) val;
--(PDFMatrix *)CreateInvertMatrix :(float) scrollx :(float) scrolly;
--(PDFMatrix *)CreateIMatrix :(float) scrollx :(float) scrolly :(float)scale;
+-(RDPDFMatrix *)CreateInvertMatrix :(float) scrollx :(float) scrolly;
+-(RDPDFMatrix *)CreateIMatrix :(float) scrollx :(float) scrolly :(float)scale;
 -(void)vDestroy :(RDVThread *) thread;
 -(void)vLayout :(int) x :(int) y :(float) scale :(bool) clip;
 -(void)vClips :(RDVThread *) thread :(bool) clip;
@@ -67,7 +67,7 @@
 -(void)vRenderAsync :(RDVThread *) thread :(int) docx :(int) docy :(int) vw :(int) vh;
 -(void)vRenderSync :(RDVThread *) thread :(int) docx :(int) docy :(int) vw :(int) vh;
 -(void)vDraw :(RDVThread *) thread :(int) docx :(int) docy :(int) vw :(int) vh;
--(bool)vDrawZoom :(float)scale;
+-(bool)vDrawZoom;
 -(void)vZoomStart;
 -(void)vZoomEnd :(RDVThread *) thread;
 @end

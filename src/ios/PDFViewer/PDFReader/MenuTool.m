@@ -14,23 +14,23 @@
 - (id)init:(CGPoint)point :(RDBlock)callback
 {
     NSMutableArray *items = [[NSMutableArray alloc] initWithObjects:
-    @{@"Undo": [UIImage imageNamed:@"btn_undo"]},
-    @{@"Redo": [UIImage imageNamed:@"btn_redo"]},
-    @{@"Selection": [UIImage imageNamed:@"btn_select"]},
-    @{@"Meta": [UIImage imageNamed:@"btn_meta"]},
-    @{@"Outlines": [UIImage imageNamed:@"btn_outline"]},
-    @{@"Bookmarks": [UIImage imageNamed:@"btn_bookmark"]},
-    @{@"Add bookmark": [UIImage imageNamed:@"btn_bookmark_add"]},
-    @{@"Slider": [UIImage imageNamed:@"btn_slider"]},
-    @{@"Night mode": [UIImage imageNamed:@"btn_night_mode"]},
-    @{@"Manage pages": [UIImage imageNamed:@"btn_manage_page"]},
+    @{NSLocalizedString(@"Undo", nil): [UIImage imageNamed:@"btn_undo"]},
+    @{NSLocalizedString(@"Redo", nil): [UIImage imageNamed:@"btn_redo"]},
+    @{NSLocalizedString(@"Selection", nil): [UIImage imageNamed:@"btn_select"]},
+    @{NSLocalizedString(@"Meta", nil): [UIImage imageNamed:@"btn_meta"]},
+    @{NSLocalizedString(@"Outlines", nil): [UIImage imageNamed:@"btn_outline"]},
+    @{NSLocalizedString(@"Bookmarks", nil): [UIImage imageNamed:@"btn_bookmark"]},
+    @{NSLocalizedString(@"Add Bookmark", nil): [UIImage imageNamed:@"btn_bookmark_add"]},
+    @{NSLocalizedString(@"Slider", nil): [UIImage imageNamed:@"btn_slider"]},
+    @{NSLocalizedString(@"Night mode", nil): [UIImage imageNamed:@"btn_night_mode"]},
+    @{NSLocalizedString(@"Manage pages", nil): [UIImage imageNamed:@"btn_manage_page"]},
                              nil];
     
     if (!GLOBAL.g_navigation_mode) {
-        items[7] = @{@"Thumbnail": [UIImage imageNamed:@"btn_thumb"]};
+        items[7] = @{NSLocalizedString(@"Thumbnail", nil): [UIImage imageNamed:@"btn_thumb"]};
     }
     if (GLOBAL.g_dark_mode) {
-        items[8] = @{@"Light mode": [UIImage imageNamed:@"btn_light_mode"]};
+        items[8] = @{NSLocalizedString(@"Light mode", nil): [UIImage imageNamed:@"btn_light_mode"]};
     }
     
     return [super init:point :callback :items];

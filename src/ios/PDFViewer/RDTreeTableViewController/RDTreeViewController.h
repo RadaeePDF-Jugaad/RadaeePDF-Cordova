@@ -8,7 +8,7 @@
 #import <UIKit/UIKit.h>
 #import "RDTreeTableViewCell.h"
 
-@class PDFDoc;
+@class RDPDFDoc;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RDTreeViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
-@property (strong, nonatomic) PDFDoc *doc;
+@property (strong, nonatomic) RDPDFDoc *doc;
 @property (nonatomic, weak) id<RDTreeViewControllerDelegate> delegate;
 
 @property (strong, nonatomic) IBOutlet UITableView *tableView;

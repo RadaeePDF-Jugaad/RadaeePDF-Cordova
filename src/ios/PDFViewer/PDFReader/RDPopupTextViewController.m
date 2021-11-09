@@ -19,6 +19,8 @@
     // Do any additional setup after loading the view from its nib.
     _subjectTextField.text = [_annot getPopupSubject];
     _textView.text = [_annot getPopupText];
+    _subjectLabel.text = NSLocalizedString(@"Subject", nil);
+    _textLabel.text = NSLocalizedString(@"Text", nil);
     _subjectTextField.userInteractionEnabled = _textView.userInteractionEnabled = ![_annot isAnnotReadOnly];
     
     if (@available(iOS 13.0, *)) {

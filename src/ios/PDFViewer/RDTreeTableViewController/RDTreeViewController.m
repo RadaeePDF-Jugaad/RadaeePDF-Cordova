@@ -32,7 +32,7 @@
     items = [NSMutableArray array];
     
     // Primo livello
-    PDFOutline *root = [_doc rootOutline];
+    RDPDFOutline *root = [_doc rootOutline];
     while(root)
     {
         OUTLINE_ITEM *item = [self itemWithObject:root];
@@ -49,7 +49,7 @@
     [super viewWillAppear:animated];
 }
 
-- (OUTLINE_ITEM *)itemWithObject:(PDFOutline *)obj {
+- (OUTLINE_ITEM *)itemWithObject:(RDPDFOutline *)obj {
     OUTLINE_ITEM *outline_item = [[OUTLINE_ITEM alloc]init];
     outline_item.label = [obj label];
     outline_item.dest = [obj dest];
@@ -118,7 +118,7 @@
 }
 
 - (void)openChild:(OUTLINE_ITEM *)item atIndex:(int)index {
-    PDFOutline *outline = [[items objectAtIndex:index] child];
+    RDPDFOutline *outline = [[items objectAtIndex:index] child];
     if (!outline) {
         return;
     }

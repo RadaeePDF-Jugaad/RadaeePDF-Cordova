@@ -42,7 +42,7 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (PDFDoc *)getDoc
+- (RDPDFDoc *)getDoc
 {
     return m_doc;
 }
@@ -63,20 +63,21 @@
         [m_view setReadOnly:YES];
     }
     [self enter_none];
+    UIApplication.sharedApplication.statusBarStyle = UIStatusBarStyleDarkContent;
 }
 
-- (void)setDoc:(PDFDoc *)doc
+- (void)setDoc:(RDPDFDoc *)doc
 {
     m_doc = doc;
     [self loadPDF];
 }
-- (void)setDoc:(PDFDoc *)doc :(BOOL)readonly
+- (void)setDoc:(RDPDFDoc *)doc :(BOOL)readonly
 {
     m_doc = doc;
     m_readonly = readonly;
     [self loadPDF];
 }
-- (void)setDoc:(PDFDoc *)doc :(int)pageno :(BOOL)readonly
+- (void)setDoc:(RDPDFDoc *)doc :(int)pageno :(BOOL)readonly
 {
     m_readonly = readonly;
     m_page_cnt = [m_doc pageCount];
@@ -129,7 +130,7 @@
 
 - (int)PDFCurPage
 {
-    return [m_view vGetCurrentPage];
+    return m_page_no;
 }
 
 - (void)showBars
@@ -149,11 +150,6 @@
 {
     if (immersive) [self hideBars];
     else [self showBars];
-}
-
-- (void)setFirstPageCover:(BOOL)cover
-{
-    [m_view setFirstPageCover:cover];
 }
 
 - (void)setDoubleTapZoomMode:(int)mode
@@ -181,15 +177,15 @@
     return [m_view saveImageFromAnnotAtIndex:index atPage:pageno savePath:path size:size];
 }
 
-+ (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc
++ (bool)flatAnnotAtPage:(int)page doc:(RDPDFDoc *)doc
 {
     if (doc == nil) {
-        doc = [[PDFDoc alloc] init];
+        doc = [[RDPDFDoc alloc] init];
         [doc open:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :@""];
     }
     if(page >= 0 && page < doc.pageCount)
     {
-        PDFPage *ppage = [doc page:page];
+        RDPDFPage *ppage = [doc page:page];
         [ppage objsStart];
         if ([ppage flatAnnots]) {
             return [doc save];
@@ -200,7 +196,7 @@
 
 - (bool)flatAnnots
 {
-    PDFDoc *doc = [[PDFDoc alloc] init];
+    RDPDFDoc *doc = [[RDPDFDoc alloc] init];
     if (m_doc == nil) {
         [doc open:[GLOBAL.g_pdf_path stringByAppendingPathComponent:GLOBAL.g_pdf_name] :@""];
     } else {
@@ -208,16 +204,17 @@
     }
     for (int page = 0; page != [doc pageCount]; page++) {
         [PDFReaderCtrl flatAnnotAtPage:page doc:doc];
-        if (page == [m_view vGetCurrentPage]) [m_view refreshCurrentPage];
     }
+    [m_view vUpdateRange];//update all pasges on screen.
     return nil;
 }
 
 - (bool)saveDocumentToPath:(NSString *)path
 {
-    if([path containsString:@"file://"])
+    if([path containsString:@"file://"] || [path containsString:@"file:/"])
     {
         NSString *filePath = [path stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+        filePath = [path stringByReplacingOccurrencesOfString:@"file:/" withString:@""];
         
         if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -229,9 +226,13 @@
     return [m_doc saveAs:path: NO];
 }
 
-- (void)refreshCurrentPage
+- (void)uddateAllPages
 {
-    [m_view refreshCurrentPage];
+    [m_view vUpdateRange];
+}
+- (void)uddatePage:(int)pageno
+{
+    [m_view vUpdatePage:pageno];
 }
 
 - (void)enter_none
@@ -419,11 +420,11 @@
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    /*if ([m_popup isViewLoaded]) {
+    if ([m_popup isViewLoaded]) {
         [self dismissViewControllerAnimated:NO completion:^{
             self->m_popup = nil;
         }];
-    }*/
+    }
 }
 
 - (void)setBarButtonVisibility {
@@ -485,7 +486,8 @@
 }
 - (IBAction)back_pressed:(id)sender
 {
-    if ([m_view isModified] && !GLOBAL.g_save_doc && !GLOBAL.g_readonly && !m_readonly) {
+    UIApplication.sharedApplication.statusBarStyle = UIStatusBarStyleDefault;
+    if ([m_view isModified] && !GLOBAL.g_auto_save_doc && !GLOBAL.g_readonly && !m_readonly) {
         
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Exiting", nil)
                                                                        message:NSLocalizedString(@"Document modified.\r\nDo you want to save it?", nil)
@@ -573,7 +575,7 @@
 {
     if(!m_doc.rootOutline)
     {
-        [self showBaseAlert:@"This PDF file has no outlines!"];
+        [self showBaseAlert:NSLocalizedString(@"This PDF file has no outlines!", nil)];
         return;
     }
     RDTreeViewController *treeViewController = [[RDTreeViewController alloc] initWithNibName:@"RDTreeViewController" bundle:nil];
@@ -626,13 +628,13 @@
         switch(tool)
         {
             case 0:
-                if(!m_readonly)
+                if(!self->m_readonly)
                 {
                     [vw vUndo];
                 }
                 break;
             case 1:
-                if(!m_readonly)
+                if(!self->m_readonly)
                 {
                     [vw vRedo];
                 }
@@ -642,7 +644,7 @@
                 [vw vSelStart];
                 break;
             case 3:
-                if(!m_readonly)
+                if(!self->m_readonly)
                 {
                     [thiz OnMeta];
                 }
@@ -651,16 +653,10 @@
                 [thiz OnOutline];
                 break;
             case 5:
-                if(!m_readonly)
-                {
-                    [thiz showBookmarksList];
-                }
+                [thiz showBookmarksList];
                 break;
             case 6:
-                if(!m_readonly)
-                {
-                    [thiz addBookmark];
-                }
+                [thiz addBookmark];
                 break;
             case 7:
                 if (GLOBAL.g_navigation_mode) {
@@ -678,11 +674,11 @@
                 } else {
                     GLOBAL.g_dark_mode = true;
                 }
-                [self->m_view refreshCurrentPage];
+                [self->m_view vUpdateRange];
                 break;
             case 9:
             {
-                if(!m_readonly)
+                if(!self->m_readonly)
                 {
                     PDFPagesCtrl *pages = [[UIStoryboard storyboardWithName:@"PDFPagesCtrl" bundle:nil] instantiateViewControllerWithIdentifier:@"rdpdfpages"];
                     [pages setCallback:self->m_doc :^(const bool *pages_del, const int *pages_rot)
@@ -699,7 +695,7 @@
                             {
                                 int deg = (pages_rot[pcur] & 0xffff) - (pages_rot[pcur] >> 16);
                                 if(deg < 0) deg += 360;
-                                PDFPage *page = [self->m_doc page:pcur];
+                                RDPDFPage *page = [self->m_doc page:pcur];
                                 int rotate = [page getRotate];
                                 [self->m_doc setPageRotate:pcur :rotate + deg];
                             }
@@ -939,8 +935,7 @@
     [self.view removeGestureRecognizer:searchTapNone];
     [self.view removeGestureRecognizer:searchTapField];
     [[RDExtendedSearch sharedInstance] clearSearch];
-    [m_view vFindEnd];
-    [self refreshCurrentPage];
+    [m_view vFindEnd];//this already update the screen.
     [self enter_none];
 }
 
@@ -1031,7 +1026,7 @@
     NSString *bookMarkFile = [BookMarkDir stringByAppendingPathComponent:tempFile];
     
     if (![[NSFileManager defaultManager] isWritableFileAtPath:BookMarkDir]) {
-        [self showBaseAlert:@"Cannot add bookmark."];
+        [self showBaseAlert:NSLocalizedString(@"Cannot add bookmark.", nil)];
     }
     
     NSLog(@"%@", bookMarkFile);
@@ -1043,10 +1038,10 @@
         [fileHandle seekToEndOfFile];
         [fileHandle writeData:[fileContent dataUsingEncoding:NSUTF8StringEncoding]];
         [fileHandle closeFile];
-        [self showBaseAlert:@"Bookmark added!"];
+        [self showBaseAlert:NSLocalizedString(@"Bookmark added!", nil)];
     }
     else {
-        [self showBaseAlert:[NSString stringWithFormat:@"Bookmark already exist at page %i", pageno + 1]];
+        [self showBaseAlert:[NSString stringWithFormat:@"%@ %i",NSLocalizedString(@"Bookmark already exist at page", nil), pageno + 1]];
     }
 }
 
@@ -1061,7 +1056,7 @@
         bookmarkViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         [self presentViewController:bookmarkViewController animated:YES completion:nil];
     } else {
-        [self showBaseAlert:@"No bookmark saved."];
+        [self showBaseAlert:NSLocalizedString(@"No bookmark saved.", nil)];
     }
 }
 
@@ -1193,13 +1188,12 @@
 
 - (void)OnPageChanged :(int)pageno
 {
-    static int prevPage = -1;
     if (_delegate && [_delegate respondsToSelector:@selector(didChangePage:)]) {
-        if (pageno != prevPage) {
-            prevPage = pageno;
+        if (pageno != m_page_no) {
             [_delegate didChangePage:pageno];
         }
     }
+    m_page_no = pageno;
     [self thumbGoTo:pageno];
 }
 - (void)OnPageUpdated :(int)pageno
@@ -1271,7 +1265,7 @@
     }
 }
 
--(void)OnAnnotEdit:(PDFAnnot *)annot
+-(void)OnAnnotEdit:(RDPDFAnnot *)annot
 {
     [self hideBars];
     RDPopupTextViewController *popupTextViewController = [[RDPopupTextViewController alloc] initWithNibName:@"RDPopupTextViewController" bundle:nil];
@@ -1280,7 +1274,7 @@
     popupTextViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     [self presentViewController:popupTextViewController animated:YES completion:nil];
 }
--(void)OnAnnotProp:(PDFAnnot *)annot
+-(void)OnAnnotProp:(RDPDFAnnot *)annot
 {
     int atype = [annot type];
     if(atype == 4 || atype == 8)//line and polyline
@@ -1366,7 +1360,7 @@
     }
 }
 
-- (void)OnAnnotClicked:(PDFAnnot *)annot :(CGRect)annotRect :(float)x :(float)y
+- (void)OnAnnotClicked:(RDPDFAnnot *)annot :(CGRect)annotRect :(float)x :(float)y
 {
     int atype = [annot type];
     PDFLayoutView *vw = m_view;
@@ -1476,7 +1470,7 @@
     //[tempfiles addObject:_fileName];
 }
 
-- (void)OnAnnotEditBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize
+- (void)OnAnnotEditBox:(RDPDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize
 {
     PDFPopupCtrl *pop;
     if([annot getEditType] == 3)//multi-line
@@ -1518,7 +1512,7 @@
     [self presentViewController:pop animated:NO completion:nil];
 }
 
-- (void)OnAnnotCommboBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index
+- (void)OnAnnotCommboBox:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index
 {
     MenuCombo *view = [[MenuCombo alloc] init];
     PDFPopupCtrl *pop = [[PDFPopupCtrl alloc] init:view];
@@ -1526,7 +1520,7 @@
         [self->m_view vAnnotEnd];
     }];
 
-    CGFloat fsize = [m_view vGetScale] * 12 / [m_view vGetPixSize];
+    CGFloat fsize = vp.scale * 12 / [m_view vGetPixSize];
     CGRect rect = [_mView convertRect:annotRect toView: pop.view];
     int max_cnt = (dataArray.count > 5) ? 5 : (int)dataArray.count;//max 5 items height for scrollView
     rect.origin.y += rect.size.height;
@@ -1544,7 +1538,7 @@
     [self presentViewController:pop animated:NO completion:nil];
 }
 
-- (void)OnAnnotList:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
+- (void)OnAnnotList:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes
 {
     MenuCombo *view = [[MenuCombo alloc] init];
     PDFPopupCtrl *pop = [[PDFPopupCtrl alloc] init:view];
@@ -1552,7 +1546,7 @@
         [self->m_view vAnnotEnd];
     }];
 
-    CGFloat fsize = [m_view vGetScale] * 12 / [m_view vGetPixSize];
+    CGFloat fsize = vp.scale * 12 / [m_view vGetPixSize];
     CGRect rect = [_mView convertRect:annotRect toView: pop.view];
     
     view.frame = rect;
@@ -1568,7 +1562,7 @@
     [self presentViewController:pop animated:NO completion:nil];
 }
 
-- (void)OnAnnotTapped:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
+- (void)OnAnnotTapped:(RDPDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point
 {
     if (_delegate && [_delegate respondsToSelector:@selector(didTapOnAnnotationOfType:atPage:atPoint:)]) {
         [_delegate didTapOnAnnotationOfType:annot.type atPage:page atPoint:point];
@@ -1581,7 +1575,7 @@
 
 #pragma mark - Signature
 
-- (void)OnAnnotSignature:(PDFAnnot *)annot {
+- (void)OnAnnotSignature:(RDVPage *)vp :(RDPDFAnnot *)annot {
     
     NSString *annotImage = [m_view getImageFromAnnot:annot];
     NSString *emptyImage = [m_view emptyImageFromAnnot:annot];
@@ -1592,7 +1586,7 @@
     if (attr.fileSize != emptyAttr.fileSize) {
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable") message:NSLocalizedString(@"Signature already exist. Do you want delete it?", nil) preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-            [self presentSignatureViewController:[annot getIndex]];
+            [self presentSignatureViewController:vp :annot];
         }];
         UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self->m_view vAnnotEnd];
@@ -1602,15 +1596,16 @@
         [alert addAction:cancel];
         [self presentViewController:alert animated:YES completion:nil];
     } else {
-        [self presentSignatureViewController:[annot getIndex]];
+        [self presentSignatureViewController:vp :annot];
     }
 }
 
-- (void)presentSignatureViewController:(int)annotIdx
+- (void)presentSignatureViewController :(RDVPage *)vpage :(RDPDFAnnot *)annot
 {
     SignatureViewController *sv = [[SignatureViewController alloc] init];
     sv.delegate = self;
-    sv.annotIdx = annotIdx;
+    sv.annotPage = vpage;
+    sv.annot = annot;
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         sv.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -1621,25 +1616,25 @@
     [self presentViewController:sv animated:YES completion:nil];
 }
 
-- (void)didSign:(int)annotIdx
+- (void)didSign:(RDVPage *)vp :(RDPDFAnnot *)annot
 {
     [self dismissViewControllerAnimated:YES completion:^{
-        PDFPage *page = [self->m_doc page:[self->m_view vGetCurrentPage]];
-        [self->m_view setSignatureImageAtIndex:annotIdx atPage:[self->m_view vGetCurrentPage]];
-        PDF_DOC_FORM hand = Document_newForm([self->m_doc handle]);
-        PDFDocForm *docForm = [[PDFDocForm alloc] init:[self->m_doc handle] :hand];
-        PDF_RECT rect;
-        [[page annotAtIndex:annotIdx] getRect:&rect];
-        NSString *certPath = [[[NSBundle mainBundle] pathForResource:@"PDFRes" ofType:nil] stringByAppendingPathComponent:@"test.pfx"];
-        int success = [page sign:docForm :&rect :certPath :@"111111" :@"" :@"" :@"" :@""];
+        if (![self->m_view PDFSignField:vp :annot])
+        {
+            UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                           message:@"Couldn't Sign the field."
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+            [alert addAction:okAction];
+            [self presentViewController:alert animated:YES completion:nil];
+        }
         [self onDismissSignView];
     }];
 }
 
 - (void)onDismissSignView
 {
-    [m_view vAnnotEnd];
-    [self refreshCurrentPage];
+    [m_view vAnnotEnd];//this function has already refreshed screen
 }
 
 #pragma mark - Search list delegate

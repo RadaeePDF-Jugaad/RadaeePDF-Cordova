@@ -27,7 +27,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnSelStart:(float)x :(float)y;
 - (void)OnSelEnd:(float)x1 :(float)y1 :(float)x2 :(float)y2;
 //enter annotation status.
-- (void)OnAnnotClicked:(PDFAnnot *)annot :(CGRect)annotRect :(float)x :(float)y;
+- (void)OnAnnotClicked:(RDPDFAnnot *)annot :(CGRect)annotRect :(float)x :(float)y;
 //notified when annotation status end.
 - (void)OnAnnotEnd;
 //this mehod fired only when vAnnotPerform method invoked.
@@ -38,18 +38,18 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotMovie:(NSString *)fileName;
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotSound:(NSString *)fileName;
-- (void)OnAnnotEditBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize;
-- (void)OnAnnotCommboBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index;
-- (void)OnAnnotList:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
-- (void)OnAnnotSignature:(PDFAnnot *)annot;
-- (void)OnAnnotTapped:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
+- (void)OnAnnotEditBox:(RDPDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize;
+- (void)OnAnnotCommboBox:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index;
+- (void)OnAnnotList:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
+- (void)OnAnnotSignature:(RDVPage *)vp :(RDPDFAnnot *)annot;
+- (void)OnAnnotTapped:(RDPDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point;
 - (void)OnEditboxOK;
 @end
 
 @class RDPDFCanvas;
 @interface PDFLayoutView : UIScrollView <UIScrollViewDelegate, PDFOffScreenDelegate, RDVLayoutDelegate, PDFJSDelegate>
 {
-    PDFDoc *m_doc;
+    RDPDFDoc *m_doc;
     RDVLayout *m_layout;
     NSTimer *m_timer;
     enum LAYOUT_STATUS
@@ -92,11 +92,11 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     RDVSel *m_sel;
     RDVPos m_sel_pos;
     
-    PDFInk *m_ink;
-    PDFPath *m_polygon;
+    RDPDFInk *m_ink;
+    RDPDFPath *m_polygon;
     
     int m_annot_idx;
-    PDFAnnot *m_annot;
+    RDPDFAnnot *m_annot;
     RDVPos m_annot_pos;
     PDF_RECT m_annot_rect;
     
@@ -126,22 +126,22 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     
     BOOL isResizing;
     BOOL isRotating;
-    BOOL coverPage;
     
     int doubleTapZoomMode;
     int readerBackgroundColor;
     
-    PDFPage *tappedPage;
+    RDPDFPage *tappedPage;
     
     bool isDoubleTapping;
 }
 
-@property (nonatomic) NSUInteger pageViewNo;
+@property (nonatomic) NSUInteger singleViewPageNo;
 
 -(id)initWithFrame:(CGRect)frame;
 - (id)initWithCoder:(NSCoder *)aDecoder;
--(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del;
+-(BOOL)PDFOpen :(RDPDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del;
 -(void)PDFClose;
+-(int)PDFGetVMode;
 -(void)PDFSetVMode:(int)vmode;
 -(void)PDFSaveView;
 -(void)PDFRestoreView;
@@ -231,63 +231,38 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 -(void)vAnnotRemove;
 //end annotation status.
 -(void)vAnnotEnd;
--(void)removeAnnot:(PDFAnnot *)annot;
 
 //TextAnnot
-- (PDFAnnot *)vGetTextAnnot:(int)x :(int)y;
+- (RDPDFAnnot *)vGetTextAnnot:(int)x :(int)y;
 - (void)vAddTextAnnot:(int)x :(int)y :(NSString *)text :(NSString *)subject;
 
 - (void)vGetPos:(RDVPos *)pos;
 - (void)vGetPos:(RDVPos *)pos x:(int)x y:(int)y;
 
-/**
- goto page
-
- @param pageno page number
- */
 -(void)vGoto:(int)pageno;
-
 - (void)vUndo;
 - (void)vRedo;
-
-- (int)vGetCurrentPage;
-
+- (void)vClearOP;
 - (void)PDFSetGBColor:(int)color;
-- (void)setFirstPageCover:(BOOL)cover;
 - (void)setDoubleTapZoomMode:(int)mode;
-
-/*
-- (CGImageRef )vGetImageForPage:(int)pg withSize:(CGSize)size withBackground:(BOOL)hasBackground;
-- (float)getViewWidth;
-- (float)getViewHeight;
-- (BOOL)isCurlEnabled;
-*/
-
-- (void)refreshCurrentPage;
-- (void)refreshCachedPages;
 - (void)vUpdateAnnotPage;
-- (CGFloat)vGetScale;
+- (void)vUpdatePage:(int)pageno;
+- (void)vUpdateRange;
 - (CGFloat)vGetPixSize;
 
 - (BOOL)isModified;
 - (void)setModified:(BOOL)modified force:(BOOL)force;
 
-- (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum;
-
+//functions below is not standard behavious of PDFLayoutView.
+- (BOOL)PDFSignField:(RDVPage *)vp :(RDPDFAnnot *)annot;
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
-- (NSString *)getImageFromAnnot:(PDFAnnot *)annot;
-- (NSString *)emptyImageFromAnnot:(PDFAnnot *)annot;
+- (NSString *)getImageFromAnnot:(RDPDFAnnot *)annot;
+- (NSString *)emptyImageFromAnnot:(RDPDFAnnot *)annot;
 - (NSString *)emptyAnnotWithSize:(CGSize)size;
 
 - (BOOL)addAttachmentFromPath:(NSString *)path;
-- (BOOL)forceSave;
-
 - (BOOL)canSaveDocument;
 - (void)setReadOnly:(BOOL)enabled;
-
-- (BOOL)pagingAvailable;
-
-- (NSString *)getImageFromRect:(int)top :(int)right :(int)left :(int)bottom :(int)pageNum;
 - (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect;
 - (CGPoint)screenPointsFromPdfPoints:(float)x :(float)y :(int)pageNum;
 - (CGRect)screenRectFromPdfRect:(float)left :(float)top :(float)right :(float)bottom :(int)pageNum;

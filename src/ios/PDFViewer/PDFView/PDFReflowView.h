@@ -12,8 +12,8 @@
 
 @interface PDFReflowView : UIScrollView
 {
-    PDFDoc *m_doc;
-    PDFPage *m_page;
+    RDPDFDoc *m_doc;
+    RDPDFPage *m_page;
     CGImageRef m_img;
     UIImageView *imageView;
     UIImage *m_image;
@@ -24,13 +24,13 @@
     int m_w;
     int m_h;
     int m_cur_page;
-    PDFDIB *dib;
+    RDPDFDIB *m_dib;
 }
 
 @property (copy) UIImage *m_image;
 
--(void)vOpen:(PDFDoc *)doc :(NSString *)docPath;
-//-(void)vOpenPage:(PDFDoc *)doc :(int)pageno :(float)x :(float)y;
+-(void)vOpen:(RDPDFDoc *)doc :(NSString *)docPath;
+//-(void)vOpenPage:(RDPDFDoc *)doc :(int)pageno :(float)x :(float)y;
 //-(void)vGoto:(int)pageno;
 -(void)vClose;
 -(void)render :(int)PageNo :(float)ratio;

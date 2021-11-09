@@ -30,7 +30,7 @@
     
     return self;
 }
--(void)vOpen:(PDFDoc *)doc :(NSString *)docPath
+-(void)vOpen:(RDPDFDoc *)doc :(NSString *)docPath
 {
     [self vClose];
     if(m_cur_page){
@@ -49,26 +49,16 @@
     
     m_w = self.frame.size.width*scale;
     m_h = [m_page reflowPrepare:m_w  - gap * 2:scale*ratio] +  gap * 2;
+    if (m_h > 4000) m_h = 4000;//to avoid out of memory.
     CGSize size = CGRectMake(0, 0, m_w/scale, m_h/scale+44).size;
     [self setContentSize:size];
     [imageView setFrame:CGRectMake(0, 0, m_w/scale, m_h/scale)];
-    
-    dib = [[PDFDIB alloc] init:m_w :m_h];
-    
-    
-    BOOL b = [m_page reflow:dib :gap:gap];
-    
-    void *data = [dib data];
-    CGDataProviderRef provider = CGDataProviderCreateWithData( NULL, data, m_w * m_h * 4, NULL );
-    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-    m_img = CGImageCreate( m_w, m_h, 8, 32, m_w<<2, cs, kCGBitmapByteOrder32Big|kCGImageAlphaNoneSkipLast, provider, NULL, FALSE, kCGRenderingIntentDefault );
-    //CGColorSpaceRelease(cs);
-    //CGDataProviderRelease( provider );
-    //imageView.image = nil;
-    
-    m_image = [UIImage imageWithCGImage:m_img];
-    NSString *filePath = @"/Users/lujinrong/Downloads/image.png";
-    BOOL result =[UIImagePNGRepresentation(m_image)writeToFile:filePath atomically:YES]; //
+
+    m_dib = [[RDPDFDIB alloc] init:m_w :m_h];
+    BOOL b = [m_page reflow:m_dib :gap:gap];
+    m_image = [[UIImage alloc] initWithCGImage: [m_dib image]];
+    //NSString *filePath = @"/Users/lujinrong/Downloads/image.png";
+    //BOOL result =[UIImagePNGRepresentation(m_image)writeToFile:filePath atomically:YES]; //
     [imageView setImage:m_image];
     //CGImageRelease(m_img);
     [self setNeedsDisplay];

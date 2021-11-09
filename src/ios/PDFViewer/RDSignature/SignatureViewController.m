@@ -53,7 +53,7 @@
 {
     // Save image to temp path
     [sigView signatureImage:CGPointZero text:@"" fitSignature:GLOBAL.g_fit_signature_to_field];
-    [_delegate didSign:_annotIdx];
+    [_delegate didSign:_annotPage :_annot];
 }
 
 - (void)resetImage

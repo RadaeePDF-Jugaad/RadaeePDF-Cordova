@@ -24,9 +24,6 @@
 @synthesize vw = m_w;
 @synthesize vh = m_h;
 
-@synthesize zoomMin = m_scale_min;
-@synthesize zoomMax = m_scale_max;
-@synthesize zoom = m_scale;
 @synthesize finder = m_finder;
 @synthesize cur_pg1 = m_disp_pg1;
 @synthesize cur_pg2 = m_disp_pg2;
@@ -48,9 +45,6 @@
         m_disp_pg2 = -1;
         m_scale = 1;
         m_zooming = 0;
-        m_scales = NULL;
-        m_scales_min = NULL;
-        m_scales_max = NULL;
         m_finder = [[RDVFinder alloc] init];
         m_del = del;
         CGRect srect = [[UIScreen mainScreen] bounds];
@@ -106,7 +100,6 @@
 
 -(void)ProLayout
 {
-    [self vCalculateScales];
 }
 
 -(void)ProRefreshDispRange
@@ -176,7 +169,7 @@
         [m_del RDVOnFound:finder];
 }
 
--(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay
+-(void)vOpen :(RDPDFDoc *)doc :(int)page_gap :(CALayer *)rlay
 {
     if (!doc) return;
     m_doc = doc;
@@ -200,11 +193,6 @@
     callback.OnCacheDestroy = @selector(ProOnRenderDestroy:);
     callback.OnFound = @selector(ProOnFound:);
     [m_thread create:self :&callback];
-    
-    // custom scales
-    m_scales = malloc(m_pages_cnt * sizeof(float) * 3);
-    m_scales_min = m_scales + m_pages_cnt;
-    m_scales_max = m_scales_min + m_pages_cnt;
     
     [self ProLayout];
 }
@@ -230,13 +218,6 @@
         m_pages_cnt = 0;
         m_doc = nil;
         m_scale = 1;
-    }
-    if(m_scales)//do not forgot to free memory.
-    {
-        free(m_scales);
-        m_scales = NULL;
-        m_scales_min = NULL;
-        m_scales_max = NULL;
     }
 }
 
@@ -264,7 +245,15 @@
 {
     if(!pos || pos->pageno < 0 || m_docw <= 0 || m_doch <= 0)
         return;
-    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pos->pageno];
+    RDVPage *vp;
+    if([m_pages count] == 1)
+    {
+        vp = (RDVPage *)[m_pages objectAtIndex:0];
+    }
+    else
+    {
+        vp = (RDVPage *)[m_pages objectAtIndex:pos->pageno];
+    }
     [self vMoveTo :[vp GetVX:pos->pdfx] - vx :[vp GetVY:pos->pdfy] - vy];
 }
 
@@ -301,7 +290,7 @@
         while(pg1 < pg2)
         {
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
-            [vp vDrawZoom :m_scales[pg1]];
+            [vp vDrawZoom];
             if( pg1 == find_page )
                 [m_finder find_draw_all:canvas :vp];
             pg1++;
@@ -320,7 +309,7 @@
         {
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
             [vp vLayerInit:m_rlayer];
-            [vp vDrawZoom :m_scales[pg1]];
+            [vp vDrawZoom];
             [vp vDraw :m_thread :docx :docy :lw :lh];
             if([vp vFinished]) [vp vZoomEnd :m_thread];
             if( pg1 == find_page )
@@ -331,11 +320,6 @@
     }
     //all drawing are finished, now we commit all layers to GPU.
     [CATransaction commit];
-}
-
--(float)vGetScaleMin:(int)page
-{
-    return m_scales_min[page];
 }
 
 -(void)vZoomStart
@@ -356,7 +340,7 @@
 -(void)vZooming:(float)zoom
 {
     if(!m_zooming) return;
-    m_scale = zoom;
+    m_scale = zoom * m_scale_min;
     [CATransaction begin];
     [CATransaction setDisableActions :YES];
     [self ProLayout];
@@ -415,6 +399,16 @@
     [vp vRenderSync :m_thread :m_docx - m_cellw :m_docy - m_cellw :m_w + m_cellw * 2 :m_h + m_cellh * 2];//display all new caches over old cache
     [CATransaction commit];
     [vp vBackEnd :m_thread :caches];//delete all old caches.
+}
+-(void)vRenderRange
+{
+    for (int pno = m_disp_pg1; pno < m_disp_pg2; pno++)
+    {
+        RDVPage *vp = (RDVPage *)m_pages[pno];
+        NSMutableArray *caches = [vp vBackCache];
+        [vp vRenderAsync :m_thread :m_docx - m_cellw :m_docy - m_cellw :m_w + m_cellw * 2 :m_h + m_cellh * 2];
+        [vp vBackEnd :m_thread :caches];
+    }
 }
 
 -(void)vFindStart:(NSString *)pat : (bool)match_case :(bool)whole_word
@@ -477,45 +471,16 @@
     return false;
 }
 
-- (void)vLoadPageLayout:(int)pcur width:(float)w height:(float)h
-{
-    [self vLoadPageLayout:pcur width:w height:h vert:NO];
-}
-
-- (void)vLoadPageLayout:(int)pcur width:(float)w height:(float)h vert:(BOOL)vert
-{
-    float scale1 = ((float)(m_w - m_page_gap)) / w;
-    float scale2 = ((float)(m_h - m_page_gap)) / h;
-    if( scale1 > scale2 && !vert) scale1 = scale2;
-    
-    m_scales_min[pcur] = scale1;
-    m_scales_max[pcur] = m_scales_min[pcur] * GLOBAL.g_layout_zoom_level;
-    m_scales[pcur] = m_scale * m_scales_min[pcur];
-    
-    if( m_scales[pcur] < m_scales_min[pcur] ) m_scales[pcur] = m_scales_min[pcur];
-    if( m_scales[pcur] > m_scales_max[pcur] ) m_scales[pcur] = m_scales_max[pcur];
-}
-
-- (void)vCalculateScales {
-    BOOL vert = [self isKindOfClass:[RDVLayoutVert class]];
-    PDF_SIZE sz = [m_doc getPagesMaxSize];
-    for (int i = 0; i < m_pages_cnt; i++) {
-        float w = (GLOBAL.g_static_scale) ? sz.cx : [m_doc pageWidth:i];
-        float h = (GLOBAL.g_static_scale) ? sz.cy : [m_doc pageHeight:i];
-        
-        [self vLoadPageLayout:i width:w height:h vert:vert];
-    }
-}
-
 @end
 
 @implementation RDVLayoutVert
--(id)init :(id<RDVLayoutDelegate>)del
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)same_width
 {
     self = [super init :del];
     if(self)
     {
         m_align = align_left;
+        m_same_width = same_width;
     }
     return self;
 }
@@ -528,48 +493,66 @@
 
 -(void)ProLayout
 {
-    if(m_w <= 0 || m_h <= 0) return;
-    [super ProLayout];
-    
+    if (m_w <= 0 || m_h <= 0) return;
+    PDF_SIZE sz = [m_doc getPagesMaxSize];
+    m_scale_min = (float)(m_w - m_page_gap) / sz.cx;
+    m_scale_max = m_scale_min * GLOBAL.g_layout_zoom_level;
+    if (m_scale < m_scale_min) m_scale = m_scale_min;
+    if (m_scale > m_scale_max) m_scale = m_scale_max;
+
     int pageno = 0;
     int docy = m_page_gap >> 1;
-    m_docw = m_w * m_scale;
+    m_docw = sz.cx * m_scale + m_page_gap;
+    if (m_docw < m_w) m_docw = m_w;
     
-    while(pageno < m_pages_cnt)
+    if (m_same_width)
     {
-        switch (m_align)
+        for (pageno = 0; pageno < m_pages_cnt; pageno++)
         {
-            case align_left:
+            float scale = (float)(m_docw - m_page_gap) / [m_doc pageWidth:pageno];
+            int ph = [m_doc pageHeight:pageno] * scale;
+            RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+            [vp vLayout:m_page_gap>>1 :docy :scale :true];
+            docy += ph;
+            docy += m_page_gap;
+        }
+    }
+    else
+    {
+        for (pageno = 0; pageno < m_pages_cnt; pageno++)
+        {
+            switch (m_align)
             {
-                int ph = [m_doc pageHeight:pageno] * m_scales[pageno];
-                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout:m_page_gap>>1 :docy :m_scales[pageno] :true];
-                docy += ph;
-                docy += m_page_gap;
-                break;
-            }
-            case align_right:
-            {
-                int ph = [m_doc pageHeight:pageno] * m_scales[pageno];
-                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout:(m_docw - (m_page_gap >> 1)) :docy :m_scales[pageno] :true];
-                docy += ph;
-                docy += m_page_gap;
-                break;
-            }
-            default:
-            {
-                int pw = [m_doc pageWidth:pageno] * m_scales[pageno];
-                int ph = [m_doc pageHeight:pageno] * m_scales[pageno];
-                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout:(m_docw - pw) >> 1 :docy :m_scales[pageno] :true];
-                docy += ph;
-                docy += m_page_gap;
-                break;
+                case align_left:
+                {
+                    int ph = [m_doc pageHeight:pageno] * m_scale;
+                    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                    [vp vLayout:m_page_gap>>1 :docy :m_scale :true];
+                    docy += ph;
+                    docy += m_page_gap;
+                    break;
+                }
+                case align_right:
+                {
+                    int ph = [m_doc pageHeight:pageno] * m_scale;
+                    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                    [vp vLayout:(m_docw - (m_page_gap >> 1)) :docy :m_scale :true];
+                    docy += ph;
+                    docy += m_page_gap;
+                    break;
+                }
+                default:
+                {
+                    int pw = [m_doc pageWidth:pageno] * m_scale;
+                    int ph = [m_doc pageHeight:pageno] * m_scale;
+                    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                    [vp vLayout:(m_docw - pw) >> 1 :docy :m_scale :true];
+                    docy += ph;
+                    docy += m_page_gap;
+                    break;
+                }
             }
         }
-        
-        pageno++;
     }
     
     m_doch = docy - (m_page_gap>>1);
@@ -600,19 +583,20 @@
 
 
 @implementation RDVLayoutHorz
--(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol :(bool)same_height
 {
     self = [super init :del];
     if(self)
     {
         m_align = align_vcenter;
         m_rtol = rtol;
+        m_same_height = same_height;
         m_thumb = false;
     }
     return self;
 }
 
--(void)vSetAlign :(PAGE_ALIGN) align
+-(void)vSetAlign :(PAGE_ALIGN)align
 {
     m_align = align;
     [self ProLayout];
@@ -621,60 +605,128 @@
 -(void)ProLayout
 {
     if(m_w <= 0 || m_h <= 0) return;
-    [super ProLayout];
-    
-    int pageno = 0;
-    m_docw = 0;
-    pageno = 0;
-    int docx = (m_thumb) ? m_w >> 1 : m_page_gap >> 1;
-    m_doch = m_h * m_scale;
-    
-    while(pageno < m_pages_cnt)
+    PDF_SIZE sz = [m_doc getPagesMaxSize];
+    m_scale_min = (float)(m_h - m_page_gap) / sz.cy;
+    m_scale_max = m_scale_min * GLOBAL.g_layout_zoom_level;
+    if (m_thumb) m_scale = m_scale_min;
+    else
     {
-        int cur = (m_rtol) ? m_pages_cnt - 1 - pageno : pageno;
-        
-        if (m_thumb) {
-            m_scales[cur] = m_scales_min[cur];
-        }
-        
-        switch (m_align)
-        {
-            case align_top:
-            {
-                int pw = [m_doc pageWidth:cur] * m_scales[cur];
-                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
-                vp.thumbMode = m_thumb;
-                [vp vLayout :docx :m_page_gap>>1 :m_scales[cur] :true];
-                docx += pw;
-                docx += m_page_gap;
-                break;
-            }
-            case align_bot:
-            {
-                int pw = [m_doc pageWidth:cur] * m_scales[cur];
-                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
-                vp.thumbMode = m_thumb;
-                [vp vLayout :docx :(m_doch - (m_page_gap >> 1)) :m_scales[cur] :true];
-                docx += pw;
-                docx += m_page_gap;
-                break;
-            }
-            default:
-            {
-                int pw = [m_doc pageWidth:cur] * m_scales[cur];
-                int ph = [m_doc pageHeight:cur] * m_scales[cur];
-                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
-                vp.thumbMode = m_thumb;
-                [vp vLayout :docx :(m_doch - ph) >> 1 :m_scales[cur] :true];
-                docx += pw;
-                docx += m_page_gap;
-                break;
-            }
-        }
-        
-        pageno++;
+        if (m_scale < m_scale_min) m_scale = m_scale_min;
+        if (m_scale > m_scale_max) m_scale = m_scale_max;
     }
+
+    int pageno;
+    int docx = (m_thumb) ? m_w >> 1 : m_page_gap >> 1;
+    m_docw = 0;
+    m_doch = sz.cy * m_scale + m_page_gap;
     
+    if (m_same_height)//all pages layout with same height in view.
+    {
+        if (m_rtol)
+        {
+            for (pageno = m_pages_cnt - 1; pageno >= 0; pageno--)
+            {
+                float scale = (float)(m_doch - m_page_gap) / [m_doc pageHeight:pageno];
+                int pw = [m_doc pageWidth:pageno] * scale;
+                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                [vp vLayout:docx :m_page_gap>>1 :scale :true];
+                docx += pw;
+                docx += m_page_gap;
+            }
+        }
+        else
+        {
+            for (pageno = 0; pageno < m_pages_cnt; pageno++)
+            {
+                int cur = (m_rtol) ? m_pages_cnt - 1 - pageno : pageno;
+                float scale = (float)(m_doch - m_page_gap) / [m_doc pageHeight:cur];
+                int pw = [m_doc pageWidth:cur] * scale;
+                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
+                [vp vLayout:docx :m_page_gap>>1 :scale :true];
+                docx += pw;
+                docx += m_page_gap;
+            }
+        }
+    }
+    else
+    {
+        if (m_rtol)
+        {
+            for (pageno = m_pages_cnt - 1; pageno >= 0; pageno--)
+            {
+                int pw = [m_doc pageWidth:pageno] * m_scale;
+                switch (m_align)
+                {
+                    case align_top:
+                    {
+                        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                        vp.thumbMode = m_thumb;
+                        [vp vLayout :docx :m_page_gap>>1 :m_scale :true];
+                        docx += pw;
+                        docx += m_page_gap;
+                        break;
+                    }
+                    case align_bot:
+                    {
+                        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                        vp.thumbMode = m_thumb;
+                        [vp vLayout :docx :(m_doch - (m_page_gap >> 1)) :m_scale :true];
+                        docx += pw;
+                        docx += m_page_gap;
+                        break;
+                    }
+                    default:
+                    {
+                        int ph = [m_doc pageHeight:pageno] * m_scale;
+                        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                        vp.thumbMode = m_thumb;
+                        [vp vLayout :docx :(m_doch - ph) >> 1 :m_scale :true];
+                        docx += pw;
+                        docx += m_page_gap;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (pageno = 0; pageno < m_pages_cnt; pageno++)
+            {
+                int pw = [m_doc pageWidth:pageno] * m_scale;
+                switch (m_align)
+                {
+                    case align_top:
+                    {
+                        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                        vp.thumbMode = m_thumb;
+                        [vp vLayout :docx :m_page_gap>>1 :m_scale :true];
+                        docx += pw;
+                        docx += m_page_gap;
+                        break;
+                    }
+                    case align_bot:
+                    {
+                        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                        vp.thumbMode = m_thumb;
+                        [vp vLayout :docx :(m_doch - (m_page_gap >> 1)) :m_scale :true];
+                        docx += pw;
+                        docx += m_page_gap;
+                        break;
+                    }
+                    default:
+                    {
+                        int ph = [m_doc pageHeight:pageno] * m_scale;
+                        RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+                        vp.thumbMode = m_thumb;
+                        [vp vLayout :docx :(m_doch - ph) >> 1 :m_scale :true];
+                        docx += pw;
+                        docx += m_page_gap;
+                        break;
+                    }
+                }
+            }
+        }
+    }
     m_docw = (m_thumb) ? docx + (m_w/2) : docx - (m_page_gap>>1);
 }
 
@@ -687,31 +739,34 @@
     int right = m_pages_cnt - 1;
     while(left <= right)
     {
-        int mid = (left + right)>>1;
+        int mid = (left + right) >> 1;
         RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:mid];
         if(docx > ([vp x] + [vp w] + (m_page_gap >> 1)))
+        {
             if (m_rtol)
                 right = mid - 1;
             else
                 left = mid + 1;
+        }
         else if(docx < ([vp x] - (m_page_gap >> 1)))
+        {
             if (m_rtol)
                 left = mid + 1;
             else
                 right = mid - 1;
+        }
         else
             return vp;
     }
-    return [m_pages objectAtIndex:((right < 0)?0:right)];
+    return [m_pages objectAtIndex:((right < 0) ? 0 : right)];
 }
-
 @end
 
 
 @implementation RDVLayoutThumb
 -(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol
 {
-    self = [super init :del];
+    self = [super init :del :rtol :false];
     if(self)
     {
         m_align = align_vcenter;
@@ -723,8 +778,6 @@
 
 -(void)ProRefreshDispRange
 {
-    //RDVPage *vp1 = [self ProGetPage :-m_w :-m_h];
-    //RDVPage *vp2 = [self ProGetPage :m_w<<1 :m_h<<1];
     RDVPage *vp1 = [self ProGetPage :0 :0];
     RDVPage *vp2 = [self ProGetPage :m_w :m_h];
     if(!vp1 || !vp2) return;
@@ -771,7 +824,7 @@
         while(pg1 < pg2)
         {
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
-            [vp vClips:m_thread :true];
+            [vp vClips:m_thread :false];
             pg1++;
         }
     }
@@ -844,11 +897,11 @@
     {
         for (int i = 0; i < cols; i++) {
             if (pageno >= m_pages_cnt) break;
-            int pw = [m_doc pageWidth:pageno] * m_scales[pageno];
-            int ph = [m_doc pageHeight:pageno] * m_scales[pageno];
+            int pw = [m_doc pageWidth:pageno] * m_scale;
+            int ph = [m_doc pageHeight:pageno] * m_scale;
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
             vp.thumbMode = m_thumb;
-            [vp vLayout :docx :(m_h - ph) >> 1 :m_scales[pageno] :true];
+            [vp vLayout :docx :(m_h - ph) >> 1 :m_scale :true];
             docx += pw + m_page_gap;
             if( m_h < ph ) m_h = ph;
             pageno++;
@@ -919,10 +972,17 @@
         m_cells = NULL;
         m_cells_cnt = 0;
         m_rtol = rtol;
+        m_smode = SCALE_NONE;
     }
     return self;
 }
 
+
+-(void)vSetScaleMode:(SCALE_MODE)scale_mode
+{
+    m_smode = scale_mode;
+    [self ProLayout];
+}
 
 -(void)vSetAlign :(PAGE_ALIGN) align
 {
@@ -960,62 +1020,39 @@
     
     int pageno = 0;
     int pcnt = [m_doc pageCount];
-    float maxh = 0;
-    //float maxw = 0;
+    float max_ch = 0;
+    float max_cw = 0;
     int ccur = 0;
     int ccnt = 0;
     m_cell_w = 0;
-    PDF_SIZE sz = [m_doc getPagesMaxSize];
-    float max_w_dual = 0;
-    
-    if (GLOBAL.g_static_scale) {
-        while( pageno < pcnt ) {
-            float w = [m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1];
-            if( max_w_dual < w ) max_w_dual = w;
-            
-            pageno += 2;
-        }
-        pageno = 0;
-    }
 
-    if (m_h > m_w){
-        //vertical
+    if (m_h > m_w)//portrait
+    {
         while( pageno < pcnt )
         {
-            if( m_vert_dual != NULL && ccnt < m_vert_dual_cnt && m_vert_dual[ccnt] && pageno < pcnt - 1 )
+            float w0 = [m_doc pageWidth:pageno];
+            float h0 = [m_doc pageHeight:pageno];
+            if( m_vert_dual != NULL && ccnt < m_vert_dual_cnt && m_vert_dual[ccnt] && pageno < pcnt - 1 )//dual page cell
             {
-                if (GLOBAL.g_static_scale) {
-                    [self vLoadPageLayout:pageno width:max_w_dual height:sz.cy];
-                } else {
-                    float w = [m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1];
-                    float h1 = [m_doc pageHeight:pageno];
-                    float h2 = [m_doc pageHeight:pageno + 1];
-                    float h = (h1 > h2) ? h1 : h2;
-                    
-                    [self vLoadPageLayout:pageno width:w height:h];
-                    m_scales_min[pageno+1] = m_scales_min[pageno];
-                    m_scales_max[pageno+1] = m_scales_max[pageno];
-                    m_scales[pageno+1] = m_scales[pageno];
-                }
-   
+                w0 += [m_doc pageWidth:pageno + 1];
+                float h1 = [m_doc pageHeight:pageno + 1];
+                if (h1 > h0) h0 = h1;
                 pageno += 2;
             }
-            else
-            {
-                if (GLOBAL.g_static_scale) {
-                    [self vLoadPageLayout:pageno width:sz.cx height:sz.cy];
-                } else {
-                    float w = [m_doc pageWidth:pageno];
-                    float h = [m_doc pageHeight:pageno];
-                    
-                    [self vLoadPageLayout:pageno width:w height:h];
-                }
+            else//single page cell
                 pageno++;
-            }
+            if (max_cw < w0) max_cw = w0;
+            if (max_ch < h0) max_ch = h0;
             ccnt++;
         }
-        
-        m_doch = m_h * m_scale;
+        m_scale_min = (m_w - m_page_gap) / max_cw;
+        float scale2 = (m_h - m_page_gap) / max_ch;
+        if (m_scale_min > scale2) m_scale_min = scale2;
+        m_scale_max = m_scale_min * GLOBAL.g_layout_zoom_level;
+        if (m_scale < m_scale_min) m_scale = m_scale_min;
+        if (m_scale > m_scale_max) m_scale = m_scale_max;
+        m_doch = max_ch * m_scale + m_page_gap;
+        if (m_doch < m_h) m_doch = m_h;
         
         if( m_cells ) free( m_cells );
         m_cells = (struct PDFCell *)malloc( sizeof(struct PDFCell) * ccnt );
@@ -1026,77 +1063,120 @@
         struct PDFCell *cell = m_cells;
         while( ccur < ccnt )
         {
-            int w = 0;
-            int cw = 0;
-            if( m_vert_dual != NULL && ccur < m_vert_dual_cnt && m_vert_dual[ccur] && pageno < pcnt - 1 ){
-                w = (int)( ([m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1]) * m_scales[pageno] );
-                if( w + m_page_gap < m_w ) cw = m_w;
-                else cw = w + m_page_gap;
+            int icw;
+            if (m_vert_dual != NULL && ccur < m_vert_dual_cnt && m_vert_dual[ccur] && pageno < pcnt - 1)//dual page cell
+            {
+                float scale;
+                float cw = [m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1];
+                float ch0 = [m_doc pageHeight:pageno];
+                float ch1 = [m_doc pageHeight:pageno + 1];
+                if (ch0 > ch1) ch1 = ch0;
+                float scale0 = (m_w - m_page_gap) / cw;
+                float scale1 = (m_h - m_page_gap) / ch1;
+                switch (m_smode)
+                {
+                    case SCALE_SAME_WIDTH:
+                        scale = scale0 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_SAME_HEIGHT:
+                        scale = scale1 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_FIT:
+                    {
+                        if (scale0 > scale1) scale0 = scale1;
+                        scale = scale0 * m_scale / m_scale_min;
+                    }
+                        break;
+                    default:
+                        scale = m_scale;
+                        break;
+                }
+                int iw = (int)(cw * scale);
+                icw = iw + m_page_gap;
+                if( icw < m_w ) icw = m_w;
+
                 cell->page_left = pageno;
                 cell->page_right = pageno + 1;
                 cell->left = left;
-                cell->right = left + cw;
+                cell->right = left + icw;
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                RDVPage *vp_next = (RDVPage *)[m_pages objectAtIndex:pageno+1];
-                [vp vLayout :left + (cw - w)/2:(m_doch - [m_doc pageHeight:pageno] * m_scales[pageno]) / 2 :m_scales[pageno] :true];
-                [vp_next vLayout :vp.x + vp.w :(m_doch - [m_doc pageHeight:pageno+1] * m_scales[pageno]) / 2  :m_scales[pageno] :true];
+                RDVPage *vp_next = (RDVPage *)[m_pages objectAtIndex:pageno + 1];
+                [vp vLayout :left + ((icw - iw) >> 1) :(m_doch - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
+                [vp_next vLayout :vp.x + vp.w :(m_doch - [m_doc pageHeight:pageno + 1] * scale) / 2  :scale :true];
                 pageno += 2;
-            }else{
-                w = (int)( [m_doc pageWidth:pageno] * m_scales[pageno] );
-                if( w + m_page_gap < m_w ) cw = m_w;
-                else cw = w + m_page_gap;
+            }
+            else//single page cell
+            {
+                float scale;
+                float cw = [m_doc pageWidth:pageno];
+                float ch = [m_doc pageHeight:pageno];
+                float scale0 = (m_w - m_page_gap) / cw;
+                float scale1 = (m_h - m_page_gap) / ch;
+                switch (m_smode)
+                {
+                    case SCALE_SAME_WIDTH:
+                        scale = scale0 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_SAME_HEIGHT:
+                        scale = scale1 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_FIT:
+                    {
+                        if (scale0 > scale1) scale0 = scale1;
+                        scale = scale0 * m_scale / m_scale_min;
+                    }
+                        break;
+                    default:
+                        scale = m_scale;
+                        break;
+                }
+                int iw = (int)(cw * scale);
+                icw = iw + m_page_gap;
+                if( icw < m_w ) icw = m_w;
+
                 cell->page_left = pageno;
                 cell->page_right = -1;
                 cell->left = left;
-                cell->right = left + cw;
+                cell->right = left + icw;
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout :left + (cw - w)/2: (int)(m_doch - [m_doc pageHeight:pageno] * m_scales[pageno]) / 2 :m_scales[pageno] :true];
+                [vp vLayout :left + ((icw - iw) >> 1): (int)(m_doch - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
                 pageno++;
             }
-            if(m_cell_w < cw) m_cell_w = cw;
-            left += cw;
+            if(m_cell_w < icw) m_cell_w = icw;
+            left += icw;
             cell++;
             ccur++;
         }
         m_docw = left;
-    }else{
-        //horizon
-        while(pageno < m_pages_cnt)
+    }
+    else//landscape
+    {
+        while( pageno < pcnt )
         {
-            float pgh = [m_doc pageHeight:pageno];
-            if(maxh < pgh) maxh = pgh;
-          
-            if( (m_horz_dual == NULL || ccnt >= m_horz_dual_cnt || m_horz_dual[ccnt]) && pageno < m_pages_cnt - 1 ){
-                if (GLOBAL.g_static_scale) {
-                    [self vLoadPageLayout:pageno width:max_w_dual height:sz.cy];
-                } else {
-                    float w = [m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1];
-                    float h1 = [m_doc pageHeight:pageno];
-                    float h2 = [m_doc pageHeight:pageno + 1];
-                    float h = (h1 > h2) ? h1 : h2;
-                    
-                    [self vLoadPageLayout:pageno width:w height:h];
-                    m_scales_min[pageno+1] = m_scales_min[pageno];
-                    m_scales_max[pageno+1] = m_scales_max[pageno];
-                    m_scales[pageno+1] = m_scales[pageno];
-                }
+            float w0 = [m_doc pageWidth:pageno];
+            float h0 = [m_doc pageHeight:pageno];
+            if( m_horz_dual != NULL && ccnt < m_horz_dual_cnt && m_horz_dual[ccnt] && pageno < pcnt - 1 )//dual page cell
+            {
+                w0 += [m_doc pageWidth:pageno + 1];
+                float h1 = [m_doc pageHeight:pageno + 1];
+                if (h1 > h0) h0 = h1;
                 pageno += 2;
-            }else{
-                if (GLOBAL.g_static_scale) {
-                    [self vLoadPageLayout:pageno width:sz.cx height:sz.cy];
-                } else {
-                    float w = [m_doc pageWidth:pageno];
-                    float h = [m_doc pageHeight:pageno];
-                    
-                    [self vLoadPageLayout:pageno width:w height:h];
-                }
-                pageno++;
             }
+            else//single page cell
+                pageno++;
+            if (max_cw < w0) max_cw = w0;
+            if (max_ch < h0) max_ch = h0;
             ccnt++;
         }
-        
-        m_doch = m_h * m_scale;
-        
+        m_scale_min = (m_w - m_page_gap) / max_cw;
+        float scale2 = (m_h - m_page_gap) / max_ch;
+        if (m_scale_min > scale2) m_scale_min = scale2;
+        m_scale_max = m_scale_min * GLOBAL.g_layout_zoom_level;
+        if (m_scale < m_scale_min) m_scale = m_scale_min;
+        if (m_scale > m_scale_max) m_scale = m_scale_max;
+        m_doch = max_ch * m_scale + m_page_gap;
+        if (m_doch < m_h) m_doch = m_h;
+
         if( m_cells ) free( m_cells );
         m_cells = (struct PDFCell *)malloc( sizeof(struct PDFCell) * ccnt );
         m_cells_cnt = ccnt;
@@ -1106,39 +1186,86 @@
         struct PDFCell *cell = m_cells;
         while( ccur < ccnt )
         {
-            int w = 0;
-            int cw = 0;
+            int icw = 0;
+            float scale;
             if( (m_horz_dual == NULL || ccur >= m_horz_dual_cnt || m_horz_dual[ccur]) && pageno < m_pages_cnt - 1 )
             {
-                w = (int)( ([m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1]) * m_scales[pageno] );
-                if( w + m_page_gap < m_w ) cw = m_w;
-                else cw = w + m_page_gap;
+                float cw = [m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1];
+                float ch0 = [m_doc pageHeight:pageno];
+                float ch1 = [m_doc pageHeight:pageno + 1];
+                if (ch0 > ch1) ch1 = ch0;
+                float scale0 = (m_w - m_page_gap) / cw;
+                float scale1 = (m_h - m_page_gap) / ch1;
+                switch (m_smode)
+                {
+                    case SCALE_SAME_WIDTH:
+                        scale = scale0 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_SAME_HEIGHT:
+                        scale = scale1 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_FIT:
+                    {
+                        if (scale0 > scale1) scale0 = scale1;
+                        scale = scale0 * m_scale / m_scale_min;
+                    }
+                        break;
+                    default:
+                        scale = m_scale;
+                        break;
+                }
+                int iw = (int)(cw * scale);
+                icw = iw + m_page_gap;
+                if( icw < m_w ) icw = m_w;
+
                 cell->page_left = pageno;
                 cell->page_right = pageno + 1;
                 cell->left = left;
-                cell->right = left + cw;
+                cell->right = left + icw;
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
                 RDVPage *vp_next = (RDVPage *)[m_pages objectAtIndex:pageno+1];
-                [vp vLayout :left + (cw - w)/2 : (int)(m_doch - [m_doc pageHeight:pageno] * m_scales[pageno]) / 2 :m_scales[pageno] :true];
-                [vp_next vLayout :vp.x + vp.w : (int)(m_doch - [m_doc pageHeight:pageno+1] * m_scales[pageno]) / 2:m_scales[pageno] :true];
+                [vp vLayout :left + ((icw - iw) >> 1) : (int)(m_doch - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
+                [vp_next vLayout :vp.x + vp.w : (int)(m_doch - [m_doc pageHeight:pageno+1] * scale) / 2 :scale :true];
                 pageno += 2;
             }
             else
             {
-                w = (int)( [m_doc pageWidth:pageno] * m_scales[pageno] );
-                if( w + m_page_gap < m_w ) cw = m_w;
-                else cw = w + m_page_gap;
+                float cw = [m_doc pageWidth:pageno];
+                float ch = [m_doc pageHeight:pageno];
+                float scale0 = (m_w - m_page_gap) / cw;
+                float scale1 = (m_h - m_page_gap) / ch;
+                switch (m_smode)
+                {
+                    case SCALE_SAME_WIDTH:
+                        scale = scale0 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_SAME_HEIGHT:
+                        scale = scale1 * m_scale / m_scale_min;
+                        break;
+                    case SCALE_FIT:
+                    {
+                        if (scale0 > scale1) scale0 = scale1;
+                        scale = scale0 * m_scale / m_scale_min;
+                    }
+                        break;
+                    default:
+                        scale = m_scale;
+                        break;
+                }
+                int iw = (int)(cw * scale);
+                icw = iw + m_page_gap;
+                if( icw < m_w ) icw = m_w;
+
                 cell->page_left = pageno;
                 cell->page_right = -1;
                 cell->left = left;
-                cell->right = left + cw;
+                cell->right = left + icw;
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout :left + (cw - w)/2: (int)(m_doch - [m_doc pageHeight:pageno] * m_scales[pageno]) / 2 :m_scales[pageno] :true];
- 
-                pageno++;
+                [vp vLayout :left + ((icw - iw) >> 1): (int)(m_doch - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
+                 pageno++;
             }
-            if(m_cell_w < cw) m_cell_w = cw;
-            left += cw;
+            if(m_cell_w < icw) m_cell_w = icw;
+            left += icw;
             cell++;
             ccur++;
         }
@@ -1166,10 +1293,9 @@
         int end = m_pages_cnt;
         while( cur < end ){
             RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
-      
             int x = m_docw - (vp.x + vp.w);
             int y = vp.y;
-            [vp vLayout:x :y :m_scales[pageno] :true];
+            [vp vLayout:x :y :vp.scale :true];
             cur++;
         }
     }
@@ -1184,7 +1310,8 @@
     int right = m_cells_cnt - 1;
     int x = (int)m_docx + vx;
     
-    if(!m_rtol){
+    if(!m_rtol)
+    {
         while (left <= right)
         {
             int mid = (left + right) >> 1;
@@ -1201,7 +1328,9 @@
                     return vp;
             }
         }
-    }else{
+    }
+    else
+    {
         while (left <= right)
         {
             int mid = (left + right) >> 1;
@@ -1228,17 +1357,25 @@
 
 -(void)vGotoPage:(int)pageno
 {
+    if (pageno < 0) return;
     struct PDFCell *ccur = m_cells;
     struct PDFCell *cend = ccur + m_cells_cnt;
     while(ccur < cend)
     {
-        if(ccur->page_left == pageno || ccur->page_right == pageno)
+        if (ccur->page_left == pageno)
         {
             m_docx = ccur->left;
-            if(ccur->page_right == pageno && m_cell_w > m_w)
+            return;
+        }
+        else if(ccur->page_right == pageno)
+        {
+            if (ccur->right - ccur->left <= m_w)
+                m_docx = ccur->left;
+            else
             {
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:ccur->page_right];
                 m_docx = [vp x];
+                if (m_docx + m_w > ccur->right) m_docx = ccur->right - m_w;
             }
             return;
         }
@@ -1304,23 +1441,27 @@
 -(void)ProLayout
 {
     if(m_w <= 0 || m_h <= 0) return;
-    [self vCalculateScales];
-    
+    float fpw = [m_doc pageWidth:pageViewNo];
+    float fph = [m_doc pageHeight:pageViewNo];
+    m_scale_min = m_w / fpw;
+    float scale2 = m_h / fph;
+    if (m_scale_min > scale2) m_scale_min = scale2;
+    m_scale_max = m_scale_min;
+    m_scale = m_scale_min;
+
     m_docw = 0;
-    //int pageno = pageViewNo;
     int docx = (m_thumb) ? m_w >> 1 : m_page_gap >> 1;
-    m_doch = m_h * m_scale;
+    m_doch = fph * m_scale;
+    if (m_doch < m_h) m_doch = m_h;
     
-    int cur = 0;
-    
-    int pw = [m_doc pageWidth:pageViewNo] * m_scales[0];
-    int ph = [m_doc pageHeight:pageViewNo] * m_scales[0];
+    int pw = fpw * m_scale_min;
+    int ph = fph * m_scale_min;
     
     docx = (m_w - m_page_gap/2 - pw)/2;
     
-    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cur];
+    RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:0];
     vp.thumbMode = m_thumb;
-    [vp vLayout :docx :(m_doch - ph) >> 1 :m_scales[0] :true];
+    [vp vLayout :docx :(m_doch - ph) >> 1 :m_scale :true];
     docx += pw;
     docx += m_page_gap;
  
@@ -1334,7 +1475,7 @@
     return [m_pages objectAtIndex:0];
 }
 
--(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay :(int)pageno
+-(void)vOpen :(RDPDFDoc *)doc :(int)page_gap :(CALayer *)rlay
 {
     if (!doc) return;
     m_doc = doc;
@@ -1345,7 +1486,7 @@
     m_pages_cnt = 1;
     m_pages = [NSMutableArray array];
     
-    RDVPage *vp = [[RDVPage alloc] init :m_doc :pageno :m_cellw :m_cellh];
+    RDVPage *vp = [[RDVPage alloc] init :m_doc :pageViewNo :m_cellw :m_cellh];
     [m_pages addObject:vp];
     
     m_thread = [[RDVThread alloc] init];
@@ -1354,11 +1495,6 @@
     callback.OnCacheDestroy = @selector(ProOnRenderDestroy:);
     callback.OnFound = @selector(ProOnFound:);
     [m_thread create:self :&callback];
-    
-    // custom scales
-    m_scales = malloc(m_pages_cnt * sizeof(float) * 3);
-    m_scales_min = m_scales + m_pages_cnt;
-    m_scales_max = m_scales_min + m_pages_cnt;
     
     [self ProLayout];
 }
@@ -1390,16 +1526,6 @@
         
         RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:0];
         [vp vClips:m_thread :true];
-    }
-}
-
-- (void)vCalculateScales {
-    BOOL vert = [self isKindOfClass:[RDVLayoutVert class]];
-    PDF_SIZE sz = [m_doc getPagesMaxSize];
-    for (int i = 0; i < m_pages_cnt; i++) {
-        float w = (GLOBAL.g_static_scale) ? sz.cx : [m_doc pageWidth:pageViewNo];
-        float h = (GLOBAL.g_static_scale) ? sz.cy : [m_doc pageHeight:pageViewNo];
-        [self vLoadPageLayout:i width:w height:h vert:vert];
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  PDFDoc.h
+//  RDRDPDFDoc.h
 //  PDFViewer
 //
 //  Created by Radaee on 12-9-18.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "PDFIOS.h"
-#import "RDVGlobal.h"
+//#import "RDVGlobal.h"
 #pragma once
 
 typedef struct _PDF_TEXT_RET_
@@ -17,7 +17,7 @@ typedef struct _PDF_TEXT_RET_
 	int num_lines;
 }PDF_TEXT_RET;
 
-@interface PDFSign : NSObject
+@interface RDPDFSign : NSObject
 {
 	PDF_SIGN m_sign;
 }
@@ -78,7 +78,7 @@ typedef struct _PDF_TEXT_RET_
 -(NSString *)modTime;
 @end
 
-@interface PDFDIB : NSObject
+@interface RDPDFDIB : NSObject
 {
     PDF_DIB m_dib;
 }
@@ -130,7 +130,7 @@ typedef struct _PDF_TEXT_RET_
 -(CGImageRef)image;
 @end
 
-@interface PDFObj : NSObject
+@interface RDPDFObj : NSObject
 {
 	PDF_OBJ m_obj;
 }
@@ -273,7 +273,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return PDFObj item.
  */
--(PDFObj *)dictGetItemByIndex:(int)index;
+-(RDPDFObj *)dictGetItemByIndex:(int)index;
 /**
  *  @brief  Get PDFObj dictionary's item by tag.
  *
@@ -281,7 +281,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return PDFObj item.
  */
--(PDFObj *)dictGetItemByTag:(NSString *)tag;
+-(RDPDFObj *)dictGetItemByTag:(NSString *)tag;
 /**
  *  @brief  Set PDFObj item in dictionary by tag.
  *
@@ -311,7 +311,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return PDFObj item.
  */
--(PDFObj *)arrayGetItem:(int)index;
+-(RDPDFObj *)arrayGetItem:(int)index;
 /**
  *  @brief  Append PDFObj item in array.
  */
@@ -334,7 +334,7 @@ typedef struct _PDF_TEXT_RET_
 -(void)arrayClear;
 @end
 
-@interface PDFOutline : NSObject
+@interface RDPDFOutline : NSObject
 {
     PDF_OUTLINE m_handle;
     PDF_DOC m_doc;
@@ -352,11 +352,11 @@ typedef struct _PDF_TEXT_RET_
 /**
  *	@brief	Get next sibling outline.
  */
--(PDFOutline *)next;
+-(RDPDFOutline *)next;
 /**
  *	@brief	Get first child outline.
  */
--(PDFOutline *)child;
+-(RDPDFOutline *)child;
 /**
  *	@brief	Get destination pageno.
  *
@@ -409,7 +409,7 @@ typedef struct _PDF_TEXT_RET_
 -(bool)addChild:(NSString *)label :(int)pageno :(float)top;
 @end
 
-@interface PDFDocFont : NSObject
+@interface RDPDFDocFont : NSObject
 {
     PDF_DOC_FONT m_handle;
     PDF_DOC m_doc;
@@ -438,7 +438,7 @@ typedef struct _PDF_TEXT_RET_
 -(float)descent;
 @end
 
-@interface PDFDocGState : NSObject
+@interface RDPDFDocGState : NSObject
 {
     PDF_DOC_GSTATE m_handle;
     PDF_DOC m_doc;
@@ -503,7 +503,7 @@ typedef struct _PDF_TEXT_RET_
 -(bool)setBlendMode :(int)bmode;
 @end
 
-@interface PDFDocImage : NSObject
+@interface RDPDFDocImage : NSObject
 {
     PDF_DOC_IMAGE m_handle;
     PDF_DOC m_doc;
@@ -522,7 +522,7 @@ typedef struct _PDF_TEXT_RET_
 @end
 
 
-@interface PDFFinder : NSObject
+@interface RDPDFFinder : NSObject
 {
 	PDF_FINDER m_handle;
 }
@@ -544,22 +544,22 @@ typedef struct _PDF_TEXT_RET_
 /**
  *	@brief Get found location by index.
  *
- *	@param find_index       Index value in range [0, PDFFinder.count - 1].
+ *	@param find_index       Index value in range [0, RDPDFFinder.count - 1].
  *
- *	@return	Index value in range [0, PDFPage.objsCount - 1].
+ *	@return	Index value in range [0, RDPDFPage.objsCount - 1].
  */
 -(int)objsIndex:(int)find_index;
 /**
  *  @brief Get found location by index.
  *
- *  @param find_index    Index value in range [0, PDFFinder.count - 1].
+ *  @param find_index    Index value in range [0, RDPDFFinder.count - 1].
  *
- *  @return  Index value in range [0, PDFPage.objsCount - 1].
+ *  @return  Index value in range [0, RDPDFPage.objsCount - 1].
  */
 -(int)objsEnd:(int)find_index;
 @end
 
-@interface PDFPath : NSObject
+@interface RDPDFPath : NSObject
 {
 	PDF_PATH m_handle;
 }
@@ -621,7 +621,7 @@ typedef struct _PDF_TEXT_RET_
 -(int)node:(int)index :(PDF_POINT *)pt;
 @end
 
-@interface PDFInk : NSObject
+@interface RDPDFInk : NSObject
 {
 	PDF_INK m_handle;
 }
@@ -666,9 +666,9 @@ typedef struct _PDF_TEXT_RET_
  * @brief	Get each node by index.
  *			Example:
  *			PDF_POINT pt;
- *			int node_type = [PDFInk node:index:&pt];
+ *			int node_type = [RDPDFInk node:index:&pt];
  *
- * @param	index	Range [0, PDFInk.nodesCount - 1]
+ * @param	index	Range [0, RDPDFInk.nodesCount - 1]
  * @param	pt      Output value.
  *
  * @return	Node type:
@@ -681,7 +681,7 @@ typedef struct _PDF_TEXT_RET_
 -(int)node:(int)index :(PDF_POINT *)pt;
 @end
 
-@interface PDFMatrix : NSObject
+@interface RDPDFMatrix : NSObject
 {
     PDF_MATRIX m_mat;
 }
@@ -731,12 +731,12 @@ typedef struct _PDF_TEXT_RET_
  *  @brief Transform path.
  *  @param path Path object to be transformed.
  */
--(void)transformPath:(PDFPath *)path;
+-(void)transformPath:(RDPDFPath *)path;
 /**
  *  @brief Transform ink.
  *  @param ink Ink object to be transformed.
  */
--(void)transformInk:(PDFInk *)ink;
+-(void)transformInk:(RDPDFInk *)ink;
 /**
  *  @brief Transform rect.
  *  @param rect Rect object to be transformed.
@@ -749,7 +749,7 @@ typedef struct _PDF_TEXT_RET_
 -(void)transformPoint:(PDF_POINT *)point;
 @end
 
-@interface PDFPageContent : NSObject
+@interface RDPDFPageContent : NSObject
 {
 	PDF_PAGECONTENT m_handle;
 }
@@ -776,7 +776,7 @@ typedef struct _PDF_TEXT_RET_
  *  @brief Concat current matrix.
  *  @param mat Current matrix object.
  */
--(void)gsCatMatrix:(PDFMatrix *) mat;
+-(void)gsCatMatrix:(RDPDFMatrix *) mat;
 /**
  *  @brief Text section begin.
  */
@@ -835,21 +835,21 @@ typedef struct _PDF_TEXT_RET_
  *
  * @param path  Path to stroke.
  */
--(void)strokePath:(PDFPath *) path;
+-(void)strokePath:(RDPDFPath *) path;
 /**
  * @brief Fill the path.
  *
  * @param path  Path to fill.
  * @param winding   Winding value (set as true if use winding rule, false if even-odd rule).
  */
--(void)fillPath:(PDFPath *)path :(bool) winding;
+-(void)fillPath:(RDPDFPath *)path :(bool) winding;
 /**
  * @brief Set the path to clip.
  *
  * @param path  Path to clip.
  * @param winding   Winding value (set as true if use winding rule, false if even-odd rule).
  */
--(void)clipPath:(PDFPath *)path :(bool) winding;
+-(void)clipPath:(RDPDFPath *)path :(bool) winding;
 /**
  * @brief Set fill color.
  *
@@ -946,7 +946,7 @@ typedef struct _PDF_TEXT_RET_
 @end
 
 
-@interface PDFDocForm : NSObject
+@interface RDPDFDocForm : NSObject
 {
 	PDF_DOC_FORM m_handle;
 	PDF_DOC m_doc;
@@ -969,7 +969,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return Font resource handle.
  */
--(PDF_PAGE_FONT)addResFont :(PDFDocFont *)font;
+-(PDF_PAGE_FONT)addResFont :(RDPDFDocFont *)font;
 /**
  *  @brief  Add image as form's resource.
  *
@@ -977,7 +977,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return Image resource handle.
  */
--(PDF_PAGE_IMAGE)addResImage :(PDFDocImage *)img;
+-(PDF_PAGE_IMAGE)addResImage :(RDPDFDocImage *)img;
 /**
  *  @brief  Add graphic state as form's resource.
  *
@@ -985,7 +985,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return Graphic state resource handle.
  */
--(PDF_PAGE_GSTATE)addResGState : (PDFDocGState *)gs;
+-(PDF_PAGE_GSTATE)addResGState : (RDPDFDocGState *)gs;
 /**
  *  @brief  Add sub-form as form's resource.
  *
@@ -993,7 +993,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return Sub-form state resource handle.
  */
--(PDF_PAGE_FORM)addResForm : (PDFDocForm *)form;
+-(PDF_PAGE_FORM)addResForm : (RDPDFDocForm *)form;
 /**
  *  @brief  Set form's content. It needs a box defined in form.
             The box define form area's edge, which PageContent object includes.
@@ -1005,7 +1005,7 @@ typedef struct _PDF_TEXT_RET_
  *  @param  content    Page content object.
  *
  */
--(void)setContent : (float)x : (float)y : (float)w : (float)h : (PDFPageContent *)content;
+-(void)setContent : (float)x : (float)y : (float)w : (float)h : (RDPDFPageContent *)content;
 /**
  *  @brief  Set this form as transparency.
  *
@@ -1017,8 +1017,8 @@ typedef struct _PDF_TEXT_RET_
 @end
 
 
-@class PDFPage;
-@interface PDFAnnot : NSObject
+@class RDPDFPage;
+@interface RDPDFAnnot : NSObject
 {
 	PDF_ANNOT m_handle;
 	PDF_PAGE m_page;
@@ -1100,7 +1100,7 @@ typedef struct _PDF_TEXT_RET_
  *
  *  @return 1 or 0 (success or failure).
  */
--(int)signField :(PDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
+-(int)signField :(RDPDFDocForm *)appearence :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
 /**
  * @brief	Get annotation field type in acroForm.
  *			WARNING: this method is valid in premium version.
@@ -1206,7 +1206,7 @@ typedef struct _PDF_TEXT_RET_
  *
  * @return true or false.
  */
--(bool)render:(PDFDIB *)dib :(int)back_color;
+-(bool)render:(RDPDFDIB *)dib :(int)back_color;
 /**
  * @brief Get annotation's box rectangle.
  *		  WARNING: this method is valid in professional or premium version.
@@ -1252,37 +1252,37 @@ typedef struct _PDF_TEXT_RET_
  *
  * @return Annotation's ink path.
  */
--(PDFPath *)getInkPath;
+-(RDPDFPath *)getInkPath;
 /**
  * @brief Set selected annotation's ink path.
  * @param path Annotation's ink path.
  * @return true or false.
  */
--(bool)setInkPath:(PDFPath *)path;
+-(bool)setInkPath:(RDPDFPath *)path;
 /**
  * @brief Get selected annotation's polygon path.
  *
  * @return Annotation's polygon path.
  */
--(PDFPath *)getPolygonPath;
+-(RDPDFPath *)getPolygonPath;
 /**
  * @brief Set selected annotation's polygon path.
  * @param path Annotation's polygon path.
  * @return true or false.
  */
--(bool)setPolygonPath:(PDFPath *)path;
+-(bool)setPolygonPath:(RDPDFPath *)path;
 /**
  * @brief Get selected annotation's polyline path.
  *
  * @return Annotation's polyline path.
  */
--(PDFPath *)getPolylinePath;
+-(RDPDFPath *)getPolylinePath;
 /**
  * @brief Set selected annotation's polyline path.
  * @param path Annotation's polyline path.
  * @return true or false.
  */
--(bool)setPolylinePath:(PDFPath *)path;
+-(bool)setPolylinePath:(RDPDFPath *)path;
 /**
  * @brief Get selected annotation's line style.
  *
@@ -1469,7 +1469,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  *  @return true or false.
  */
--(bool)setIcon2:(NSString *)icon_name :(PDFDocForm *)icon;
+-(bool)setIcon2:(NSString *)icon_name :(RDPDFDocForm *)icon;
 /**
  * @brief Get annotation's destination.
  * WARNING: this method is valid in professional or premium version.
@@ -1616,7 +1616,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Popup object.
  */
--(PDFAnnot *)getPopup;
+-(RDPDFAnnot *)getPopup;
 /**
  * @brief Get annotation's popup open status.
  * 
@@ -1750,7 +1750,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)setEditFont:(PDFDocFont *)font;
+-(bool)setEditFont:(RDPDFDocFont *)font;
 /**
  * @brief Get edit-box's color.
  * WARNING: this method is valid in premium version.
@@ -1930,7 +1930,7 @@ typedef struct _PDF_TEXT_RET_
  * WARNING: this method is valid in professional or premium version.
  * @return Signature object.
  */
--(PDFSign *)getSign;
+-(RDPDFSign *)getSign;
 /**
  * @brief Move annotation from page to other.
  * WARNING: this method is valid in professional or premium version.
@@ -1939,7 +1939,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)MoveToPage:(PDFPage *)page :(const PDF_RECT *)rect;
+-(bool)MoveToPage:(RDPDFPage *)page :(const PDF_RECT *)rect;
 /**
  * @brief Check if annot can be moved.
  * @return true or false.
@@ -1963,13 +1963,13 @@ typedef struct _PDF_TEXT_RET_
 
 @end
 
-@interface PDFPage : NSObject
+@interface RDPDFPage : NSObject
 {
     PDF_PAGE m_page;
 }
 @property (readonly) PDF_PAGE handle;
 /**
- * @brief create PDFPage object.
+ * @brief create RDPDFPage object.
  * WARNING: this method is not supplied for developers, but invoked inner.
  *
  */
@@ -1999,11 +1999,11 @@ typedef struct _PDF_TEXT_RET_
  * @brief Reneder page's thumb.
  * @param dib DIB object.
  */
--(bool)renderThumb:(PDFDIB *)dib;
+-(bool)renderThumb:(RDPDFDIB *)dib;
 /**
  * @brief Prepare to render, this method just erase DIB to white.
  */
--(void)renderPrepare:(PDFDIB *)dib;
+-(void)renderPrepare:(RDPDFDIB *)dib;
 /**
  * @brief render page to dib object. this function returned for cancelled or finished.
  * WARNING: before render, you need invoke RenderPrepare.
@@ -2015,7 +2015,7 @@ typedef struct _PDF_TEXT_RET_
  *                2: best quality.
  * @return true or false.
  */
--(bool)render:(PDFDIB *)dib :(PDFMatrix *)mat :(int)quality;
+-(bool)render:(RDPDFDIB *)dib :(RDPDFMatrix *)mat :(int)quality;
 /**
  * @brief Set page status to cancelled and cancel render function.
  */
@@ -2042,7 +2042,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)reflow:(PDFDIB *)dib :(float)orgx :(float)orgy;
+-(bool)reflow:(RDPDFDIB *)dib :(float)orgx :(float)orgy;
 /**
  * @brief Get rotate degree for page (for example 0 or 90).
  * @return Rotate int value.
@@ -2067,7 +2067,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return 1 or 0.
  */
--(int)sign :(PDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
+-(int)sign :(RDPDFDocForm *)appearence :(const PDF_RECT *)box :(NSString *)cert_file :(NSString *)pswd :(NSString*)name :(NSString *)reason :(NSString *)location :(NSString *)contact;
 /**
  * @brief Get pages' text objects to memory.
  * WARNING: a standard license is required for this method.
@@ -2115,7 +2115,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Find session's handle. On no results found returns 0.
  */
--(PDFFinder *)find:(NSString *)key :(bool)match_case :(bool)whole_word;
+-(RDPDFFinder *)find:(NSString *)key :(bool)match_case :(bool)whole_word;
 /**
  * @brief Create a find session. This can be invoked after ObjsStart.
  * @param key Key string to find.
@@ -2125,7 +2125,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Find session's handle. On no results found returns 0.
  */
--(PDFFinder *)find2:(NSString *)key :(bool)match_case :(bool)whole_word :(bool)skip_blanks;
+-(RDPDFFinder *)find2:(NSString *)key :(bool)match_case :(bool)whole_word :(bool)skip_blanks;
 /**
  * @brief Get page's annotation count. This can be invoked after ObjsStart or Render or RenderToBmp.
  * WARNING: this method is valid in professional or premium version.
@@ -2139,7 +2139,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Annotation's handle. It's valid until Close method invoked.
  */
--(PDFAnnot *)annotAtIndex:(int)index;
+-(RDPDFAnnot *)annotAtIndex:(int)index;
 /**
  * @brief Get annotations by PDF point. This can be invoked after ObjsStart or Render or RenderToBmp.
  * WARNING: this method is valid in professional or premium version.
@@ -2148,7 +2148,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Annotation's handle. It's valid until Close method invoked.
  */
--(PDFAnnot *)annotAtPoint:(float)x :(float)y;
+-(RDPDFAnnot *)annotAtPoint:(float)x :(float)y;
 /**
  * @brief Get annotations by name. This can be invoked after ObjsStart or Render or RenderToBmp.
  * WARNING: this method is valid in professional or premium version.
@@ -2156,7 +2156,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Annotation's handle. It's valid until Close method invoked.
  */
--(PDFAnnot *)annotByName:(NSString *)name;
+-(RDPDFAnnot *)annotByName:(NSString *)name;
 /**
  * @brief Copy annotation. This can be invoked after ObjsStart or Render or RenderToBmp.
  * WARNING: this method is valid in professional or premium version.
@@ -2165,7 +2165,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)copyAnnot:(PDFAnnot *)annot :(const PDF_RECT *)rect;
+-(bool)copyAnnot:(RDPDFAnnot *)annot :(const PDF_RECT *)rect;
 /**
  * @brief Add annotation. This can be invoked after ObjsStart or Render or RenderToBmp.
  * WARNING: this method is valid in professional or premium version.
@@ -2184,7 +2184,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)addAnnotPopup:(PDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open;
+-(bool)addAnnotPopup:(RDPDFAnnot *)parent :(const PDF_RECT *)rect :(bool)open;
 /**
  * @brief Add a text-markup annotation to page.
  * WARNING: you should re-render page to display modified data.
@@ -2211,7 +2211,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)addAnnotInk:(PDFInk *)ink;
+-(bool)addAnnotInk:(RDPDFInk *)ink;
 /**
  * @brief Add goto-page link annotation to page.
  * WARNING: you should re-render page to display modified data.
@@ -2299,7 +2299,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)addAnnotPolygon:(PDFPath *)path :(int) color :(int) fill_color :(float) width;
+-(bool)addAnnotPolygon:(RDPDFPath *)path :(int) color :(int) fill_color :(float) width;
 /**
  * @brief Add polyline to page.
  * WARNING: you should re-render page to display modified data.
@@ -2324,7 +2324,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)addAnnotPolyline:(PDFPath *)path :(int) style1 :(int) style2 :(int) color :(int) fill_color :(float) width;
+-(bool)addAnnotPolyline:(RDPDFPath *)path :(int) style1 :(int) style2 :(int) color :(int) fill_color :(float) width;
 /**
  * @brief Add a sticky text annotation to page.
  * WARNING: you should re-render page to display modified data.
@@ -2380,7 +2380,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
 */
--(bool)addAnnotBitmap0:(PDFMatrix *)mat :(PDFDocImage *)dimage :(const PDF_RECT *)rect;
+-(bool)addAnnotBitmap0:(RDPDFMatrix *)mat :(RDPDFDocImage *)dimage :(const PDF_RECT *)rect;
 /**
  * @brief Add a bitmap object as an annotation to page.
  * WARNING: you should re-render page to display modified data.
@@ -2391,7 +2391,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
 */
--(bool)addAnnotBitmap:(PDFDocImage *)dimage : (const PDF_RECT *)rect;
+-(bool)addAnnotBitmap:(RDPDFDocImage *)dimage : (const PDF_RECT *)rect;
 /**
  * @brief Add a RichMedia annotation to page.
  * WARNING: you should re-render page to display modified data.
@@ -2409,7 +2409,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
 */
--(bool)addAnnotRichMedia:(NSString *)path_player :(NSString *)path_content :(int)type :(PDFDocImage *)dimage :(const PDF_RECT *)rect;
+-(bool)addAnnotRichMedia:(NSString *)path_player :(NSString *)path_content :(int)type :(RDPDFDocImage *)dimage :(const PDF_RECT *)rect;
 /**
  * @brief Add a file as an attachment to page.
  * WARNING: you should re-render page to display modified data.
@@ -2429,34 +2429,34 @@ typedef struct _PDF_TEXT_RET_
 /**
  * @brief Add a font as resource of this page.
  * WARNING: a premium license is required for this method.
- * @param font Font object created by PDFDoc.newFontCID.
+ * @param font Font object created by RDRDPDFDoc.newFontCID.
  * 
  * @return Font resource.
  */
--(PDF_PAGE_FONT)addResFont:(PDFDocFont *)font;
+-(PDF_PAGE_FONT)addResFont:(RDPDFDocFont *)font;
 /**
  * @brief Add an image as resource of this page.
  * WARNING: a premium license is required for this method.
- * @param image Image object created by PDFDoc.newImageXXX.
+ * @param image Image object created by RDRDPDFDoc.newImageXXX.
  * 
  * @return Image resource. Null means failed.
  */
--(PDF_PAGE_IMAGE)addResImage:(PDFDocImage *)image;
+-(PDF_PAGE_IMAGE)addResImage:(RDPDFDocImage *)image;
 /**
  * @brief Add GraphicState as resource of this page.
  * WARNING: a premium license is required for this method.
- * @param gstate ExtGraphicState created by PDFDoc.newGState();
+ * @param gstate ExtGraphicState created by RDRDPDFDoc.newGState();
  * 
  * @return GraphicState resource. Null means failed.
  */
--(PDF_PAGE_GSTATE)addResGState:(PDFDocGState *)gstate;
+-(PDF_PAGE_GSTATE)addResGState:(RDPDFDocGState *)gstate;
 /**
  * @brief Add sub-form as resource of form.
  * @param form Form object returned by Document.NewForm()
  * 
  * @return Sub-form resource.
 */
--(PDF_PAGE_FORM)addResForm:(PDFDocForm *)form;
+-(PDF_PAGE_FORM)addResForm:(RDPDFDocForm *)form;
 /**
  * @brief Add content stream to this page.
  * WARNING: a premium license is required for this method.
@@ -2464,7 +2464,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(bool)addContent:(PDFPageContent *)content :(bool)flush;
+-(bool)addContent:(RDPDFPageContent *)content :(bool)flush;
 /**
  * @brief Add edit text annotation to page.
  * WARNING: you should re-render page to display modified data.
@@ -2477,7 +2477,7 @@ typedef struct _PDF_TEXT_RET_
 -(bool)addAnnotEditText:(const PDF_RECT *)rect;
 @end
 
-@interface PDFImportCtx : NSObject
+@interface RDPDFImportCtx : NSObject
 {
     PDF_DOC m_doc;
 	PDF_IMPORTCTX m_handle;
@@ -2494,7 +2494,7 @@ typedef struct _PDF_TEXT_RET_
 -(bool)import:(int)src_no :(int)dst_no;
 @end
 
-@interface PDFDoc : NSObject
+@interface RDPDFDoc : NSObject
 {
     PDF_DOC m_doc;
 }
@@ -2659,7 +2659,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return  PDF cross reference to new object, using Advance_GetObj to get Object data.
  */
--(PDF_OBJ_REF)advanceNewIndirectObjAndCopy :(PDFObj *)obj;
+-(PDF_OBJ_REF)advanceNewIndirectObjAndCopy :(RDPDFObj *)obj;
 /**
  * @brief Advanced function to get object from Document to edit.
  * WARNING: this method require premium license.
@@ -2667,7 +2667,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return PDF object.
  */
--(PDFObj *)advanceGetObj:(PDF_OBJ_REF)ref;
+-(RDPDFObj *)advanceGetObj:(PDF_OBJ_REF)ref;
 /**
  * @brief Set cache file to PDF.
  * WARNING: a professional or premium license is required for this method.
@@ -2702,7 +2702,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return true or false.
  */
--(int)verifySign:(PDFSign *)sign;
+-(int)verifySign:(RDPDFSign *)sign;
 /**
  * @brief Check if document can be modified or saved.
  * WARNING: this always return false, if no license actived.
@@ -2847,7 +2847,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Page object.
  */
--(PDFPage *)page:(int) pageno;
+-(RDPDFPage *)page:(int) pageno;
 /**
  * @brief Get page width by page number.
  * @param pageno 0 based page number with range in [0, pageCount()-1].
@@ -2873,7 +2873,7 @@ typedef struct _PDF_TEXT_RET_
  * @brief Get first root outline item.
  * @return First outline's handle value. It returns null if no outlines.
  */
--(PDFOutline *)rootOutline;
+-(RDPDFOutline *)rootOutline;
 -(bool)newRootOutline: (NSString *)label :(int) pageno :(float) top;
 /**
  * @brief Create a font object, used to write texts.
@@ -2887,19 +2887,19 @@ typedef struct _PDF_TEXT_RET_
  *
  * @return DocFont object.
  */
--(PDFDocFont *)newFontCID: (NSString *)name :(int) style;
+-(RDPDFDocFont *)newFontCID: (NSString *)name :(int) style;
 /**
  * @brief Create a ExtGraphicState object used to set alpha values.
  * WARNING: a premium license is required for this method.
  * @return DocGState object.
  */
--(PDFDocGState *)newGState;
+-(RDPDFDocGState *)newGState;
 /**
  * @brief Create a DocFont object.
  * WARNING: a premium license is required for this method.
  * @return DocFont object.
  */
--(PDFDocForm *)newForm;
+-(RDPDFDocForm *)newForm;
 /**
  * @brief Insert a page to Document. If pagheno >= page_count, it do same as append. Otherwise, insert to pageno.
  * WARNING: a premium license is required for this method.
@@ -2909,7 +2909,7 @@ typedef struct _PDF_TEXT_RET_
  *
  * @return Page object.
  */
--(PDFPage *)newPage:(int) pageno :(float) w :(float) h;
+-(RDPDFPage *)newPage:(int) pageno :(float) w :(float) h;
 /**
  * @brief Start import operations, import page from src.
  * WARNING: a premium license is required for this method.
@@ -2918,7 +2918,7 @@ typedef struct _PDF_TEXT_RET_
  * 
  * @return Context object used in ImportPage. 
  */
--(PDFImportCtx *)newImportCtx:(PDFDoc *)src_doc;
+-(RDPDFImportCtx *)newImportCtx:(RDPDFDoc *)src_doc;
 /**
  * @brief Move the page to other position.
  * WARNING: a premium license is required for this method.
@@ -2940,16 +2940,16 @@ typedef struct _PDF_TEXT_RET_
  * @brief Create an image from Bitmap object.
  * @param img Bitmap image reference in ARGB_8888/ARGB_4444/RGB_565 format.
  * @param Generate Alpha channel information flag.
- * @return PDFDocImage object.
+ * @return RDPDFDocImage object.
  */
--(PDFDocImage *)newImage:(CGImageRef)img : (bool)has_alpha;
+-(RDPDFDocImage *)newImage:(CGImageRef)img : (bool)has_alpha;
 /**
  * @brief create an image from JPEG/JPG file. Supported image color space: GRAY, RGB, CMYK
  * WARNING: a professional or premium license is required for this method.
  * @param path JPEG file's path.
  * @return DocImage object.
  */
--(PDFDocImage *)newImageJPEG:(NSString *)path;
+-(RDPDFDocImage *)newImageJPEG:(NSString *)path;
 /**
  * @brief Create an image from JPX/JPEG 2k file.
  * WARNING: a professional or premium license is required for this method.
@@ -2957,5 +2957,5 @@ typedef struct _PDF_TEXT_RET_
  *
  * @return DocImage object.
  */
--(PDFDocImage *)newImageJPX:(NSString *)path;
+-(RDPDFDocImage *)newImageJPX:(NSString *)path;
 @end

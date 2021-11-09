@@ -27,7 +27,7 @@
     [self setNeedsDisplay];
 }
 
--(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(id<PDFThumbViewDelegate>)del
+-(BOOL)PDFOpen :(RDPDFDoc *)doc :(int)page_gap :(id<PDFThumbViewDelegate>)del
 {
     [self PDFClose];
     m_zoom = 1;

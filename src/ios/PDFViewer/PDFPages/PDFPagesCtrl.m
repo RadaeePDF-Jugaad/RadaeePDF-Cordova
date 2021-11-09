@@ -10,7 +10,7 @@
 #import "PDFObjc.h"
 
 @implementation PDFPagesCtrl
--(void)setCallback:(PDFDoc *)doc :(PagesDone)done
+-(void)setCallback:(RDPDFDoc *)doc :(PagesDone)done
 {
     m_doc = doc;
     m_done = done;

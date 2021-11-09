@@ -47,7 +47,7 @@
 @interface RDUtils : NSObject
 
 + (NSString *)getPDFID:(NSString *)pdfPath password:(NSString *)password;
-+ (NSString *)getPDFIDForDoc:(PDFDoc *)m_doc;
++ (NSString *)getPDFIDForDoc:(RDPDFDoc *)m_doc;
 + (NSDate *)dateFromPdfDate:(NSString *)dateString;
 + (NSString *)pdfDateFromDate:(NSDate *)date;
 + (UIColor *)invertColor:(UIColor *)color;
@@ -55,4 +55,5 @@
 + (void)setGlobalFromString:(NSString *)string withValue:(id)value;
 + (UIColor *)radaeeWhiteColor;
 + (UIColor *)radaeeBlackColor;
++ (UIColor *)radaeeIconColor;
 @end

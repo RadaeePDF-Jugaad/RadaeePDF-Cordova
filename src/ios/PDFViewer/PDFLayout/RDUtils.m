@@ -136,7 +136,7 @@
 
 + (NSString *)getPDFID:(NSString *)pdfPath password:(NSString *)password
 {
-    PDFDoc *m_doc = [[PDFDoc alloc] init];
+    RDPDFDoc *m_doc = [[RDPDFDoc alloc] init];
     if ([m_doc open:pdfPath :password] == 0) {
         return [RDUtils getPDFIDForDoc:m_doc];
     }
@@ -144,7 +144,7 @@
     return @"";
 }
 
-+ (NSString *)getPDFIDForDoc:(PDFDoc *)m_doc
++ (NSString *)getPDFIDForDoc:(RDPDFDoc *)m_doc
 {
     if (m_doc) {
         
@@ -171,7 +171,7 @@
     return @"";
 }
 
-+ (NSString *)getTagId:(PDFDoc *)m_doc
++ (NSString *)getTagId:(RDPDFDoc *)m_doc
 {
     if (m_doc) {
         return [m_doc meta:UUID];
@@ -180,7 +180,7 @@
     return @"";
 }
 
-+ (void)setTagId:(NSString *)tag doc:(PDFDoc *)m_doc
++ (void)setTagId:(NSString *)tag doc:(RDPDFDoc *)m_doc
 {
     if (m_doc) {
         [m_doc setMeta:UUID :tag];
@@ -252,6 +252,13 @@
         return [UIColor colorNamed:@"systemBlackColor"];
     }
     return [UIColor blackColor];
+}
+
++ (UIColor *)radaeeIconColor {
+    if (@available(iOS 11.0, *)) {
+        return [UIColor colorNamed:@"iconTint"];
+    }
+    return [UIColor orangeColor];
 }
 
 @end

@@ -34,7 +34,7 @@
     return sharedInstance;
 }
 
-- (BOOL)searchInit:(PDFDoc *)doc
+- (BOOL)searchInit:(RDPDFDoc *)doc
 {
     m_doc = doc;
     m_finder = NULL;
@@ -42,7 +42,7 @@
     return YES;
 }
 
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *, NSMutableArray *))progress finish:(void (^)(void))finish
+- (void)searchText:(NSString *)text inDoc:(RDPDFDoc *)doc progress:(void (^)(NSMutableArray *, NSMutableArray *))progress finish:(void (^)(void))finish
 {
     _searching = YES;
     self.searchResults =  [[NSMutableArray alloc] init];
@@ -83,7 +83,7 @@
     });
 }
 
-- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *, NSMutableArray *))progress
+- (void)addPageSearchResults:(RDPDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *, NSMutableArray *))progress
 {
     NSMutableArray *progressResult = [NSMutableArray array];
     for (int i = 0; i < finder.count; i++) {

@@ -8,18 +8,18 @@
 #pragma once
 #import <UIKit/UIKit.h>
 #import "UIPageCellView.h"
-@class PDFDoc;
-@class PDFPage;
-@class PDFDIB;
+@class RDPDFDoc;
+@class RDPDFPage;
+@class RDPDFDIB;
 
-@interface PDFPageCell : NSObject
+@interface RDPDFPageCell : NSObject
 {
     UIView *m_parent;
     UIPageCellView *m_view;
-    PDFDoc *m_doc;
-    PDFPage *m_page;
+    RDPDFDoc *m_doc;
+    RDPDFPage *m_page;
     int m_pageno;
-    PDFDIB *m_dib;
+    RDPDFDIB *m_dib;
     bool m_deleted;
     int m_rotate;
     int m_status;
@@ -30,7 +30,7 @@
 }
 @property bool deleted;
 @property int rotate;
--(id)init:(UIView *)parent :(PDFDoc *) doc :(int)pageno :(onPageDelete)del;
+-(id)init:(UIView *)parent :(RDPDFDoc *) doc :(int)pageno :(onPageDelete)del;
 -(bool)updateRotate;
 -(void)UISetPos:(CGFloat)x :(CGFloat)y;
 -(void)UIRemove;
@@ -41,7 +41,7 @@
 @interface PDFPagesView : UIScrollView<UIScrollViewDelegate>
 {
     dispatch_queue_t m_queue;
-    PDFDoc *m_doc;
+    RDPDFDoc *m_doc;
     int m_row_cnt;
     int m_col_cnt;
     int m_gap;
@@ -50,7 +50,7 @@
 }
 -(id)initWithFrame:(CGRect)frame;
 -(id)initWithCoder:(NSCoder *)aDecoder;
--(void)open:(PDFDoc *)doc;
+-(void)open:(RDPDFDoc *)doc;
 -(bool)modified;
 -(void)getEditData:(bool *)dels :(int *)rots;
 @end

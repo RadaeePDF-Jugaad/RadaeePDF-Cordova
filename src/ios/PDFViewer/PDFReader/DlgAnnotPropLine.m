@@ -39,7 +39,7 @@
     mLocked.selected = !mLocked.selected;
 }
 
--(void)setAnnot:(PDFAnnot *)annot :(UIViewController *)vc
+-(void)setAnnot:(RDPDFAnnot *)annot :(UIViewController *)vc
 {
     m_annot = annot;
     m_vc = vc;
@@ -58,6 +58,14 @@
     mAlpha.value = (lcolor >> 24) / 255.0f;
     mLAlpha.text = [NSString stringWithFormat:@"%d",(lcolor >> 24)];
     mLocked.selected = [m_annot isLocked];
+    mLLWidth.text = NSLocalizedString(@"Line width", nil);
+    mLLStyle.text = NSLocalizedString(@"Line style", nil);
+    mLLColor.text = NSLocalizedString(@"Line color", nil);
+    mLFColor.text = NSLocalizedString(@"Fill color", nil);
+    mLLStart.text = NSLocalizedString(@"Line start", nil);
+    mLLEnd.text = NSLocalizedString(@"Line end", nil);
+    mLLock.text = NSLocalizedString(@"Lock", nil);
+    [mLocked setTitle:NSLocalizedString(@"Locked", nil) forState:UIControlStateNormal];
 }
 
 -(void)updateAnnot

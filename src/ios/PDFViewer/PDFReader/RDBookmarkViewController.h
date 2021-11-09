@@ -18,6 +18,7 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewHeight;
 @property (strong, nonatomic) NSMutableArray *items;
 @property (weak, nonatomic) id <BookmarkTableViewDelegate> delegate;
+@property (weak, nonatomic) IBOutlet UILabel *bookmarkTitle;
 
 - (IBAction)dismissView:(id)sender;
 

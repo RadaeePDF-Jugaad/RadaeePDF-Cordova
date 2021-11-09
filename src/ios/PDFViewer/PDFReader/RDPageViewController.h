@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setImmersive:(BOOL)immersive;
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size;
 - (BOOL)addAttachmentFromPath:(NSString *)path;
-- (bool)flatAnnotAtPage:(int)page doc:(PDFDoc *)doc;
+- (bool)flatAnnotAtPage:(int)page doc:(RDPDFDoc *)doc;
 - (bool)flatAnnots;
 - (bool)saveDocumentToPath:(NSString *)path;
 

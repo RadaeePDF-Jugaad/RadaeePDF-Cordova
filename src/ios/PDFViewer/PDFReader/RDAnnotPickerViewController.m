@@ -40,7 +40,7 @@
     _greenTextField.text = [NSString stringWithFormat:@"%i", (int)_greenSlider.value];
     _blueTextField.text = [NSString stringWithFormat:@"%i", (int)_blueSlider.value];
     _alphaTextField.text = [NSString stringWithFormat:@"%.01f",_alphaSlider.value];
-    
+    [_cancelButton setTitle:NSLocalizedString(@"Cancel", nil) forState:UIControlStateNormal];
     
     [_redSlider addTarget:self action:@selector(onSliderValueChange:) forControlEvents:UIControlEventValueChanged];
     [_greenSlider addTarget:self action:@selector(onSliderValueChange:) forControlEvents:UIControlEventValueChanged];
@@ -116,13 +116,19 @@
     if (!_colorBtn) {
         switch (_annotType) {
             case 1:
-                GLOBAL.g_line_color = color;
+                GLOBAL.g_line_annot_color = color;
                 break;
             case 3:
-                GLOBAL.g_rect_color = color;
+                GLOBAL.g_rect_annot_color = color;
                 break;
             case 4:
-                GLOBAL.g_oval_color = color;
+                GLOBAL.g_oval_annot_color = color;
+                break;
+            case 7:
+                GLOBAL.g_line_annot_color = color;
+                break;
+            case 8:
+                GLOBAL.g_line_annot_color = color;
                 break;
             default:
                 GLOBAL.g_ink_color = color;
@@ -149,13 +155,19 @@
     if (!_colorBtn) {
         switch (_annotType) {
             case 1:
-                rgbValue = GLOBAL.g_line_color;
+                rgbValue = GLOBAL.g_line_annot_color;
                 break;
             case 3:
-                rgbValue = GLOBAL.g_rect_color;
+                rgbValue = GLOBAL.g_rect_annot_color;
                 break;
             case 4:
-                rgbValue = GLOBAL.g_oval_color;
+                rgbValue = GLOBAL.g_oval_annot_color;
+                break;
+            case 7:
+                rgbValue = GLOBAL.g_line_annot_color;
+                break;
+            case 8:
+                rgbValue = GLOBAL.g_line_annot_color;
                 break;
             default:
                 rgbValue = GLOBAL.g_ink_color;

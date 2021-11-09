@@ -6,10 +6,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RDVPage.h"
 
 @protocol SignatureDelegate <NSObject>
 
-- (void)didSign:(int)annotIdx;
+- (void)didSign:(RDVPage *)vp :(RDPDFAnnot *)annot;
 - (void)onDismissSignView;
 
 @end
@@ -17,6 +18,7 @@
 @interface SignatureViewController : UIViewController
 
 @property (weak, nonatomic) id <SignatureDelegate> delegate;
-@property (nonatomic) int annotIdx;
+@property (nonatomic) RDVPage *annotPage;
+@property (nonatomic) RDPDFAnnot *annot;
 
 @end

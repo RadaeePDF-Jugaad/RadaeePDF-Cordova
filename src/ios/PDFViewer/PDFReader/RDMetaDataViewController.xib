@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RDMetaDataViewController">
             <connections>
+                <outlet property="authorLabel" destination="DT6-Fb-aQf" id="kZJ-vh-XMn"/>
                 <outlet property="authorTextField" destination="TUe-O4-Nmy" id="xmp-0C-iyg"/>
                 <outlet property="keyWordsTextView" destination="tGQ-B7-fWk" id="cyU-5E-eXX"/>
+                <outlet property="keywordLabel" destination="Z2c-e9-e0T" id="0P0-VQ-5zh"/>
+                <outlet property="subjectLabel" destination="1aI-Ng-gCO" id="sZ7-pS-jmL"/>
                 <outlet property="subjectTextField" destination="Il4-48-hQf" id="61W-OS-B83"/>
+                <outlet property="titleLabel" destination="ZSR-Zf-Puu" id="pii-6T-7fc"/>
                 <outlet property="titleTextField" destination="wp5-5u-8QP" id="tIO-dR-6rj"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -22,7 +27,7 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wsf-VA-z5k">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wsf-VA-z5k">
                     <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                     <connections>
                         <action selector="dismissView:" destination="-1" eventType="touchUpInside" id="0r5-Bh-hwL"/>
@@ -111,11 +116,11 @@
                                 </label>
                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tGQ-B7-fWk">
                                     <rect key="frame" x="0.0" y="230" width="319" height="254"/>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
                                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="130" id="xZq-p5-kkA"/>
                                     </constraints>
-                                    <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <color key="textColor" systemColor="labelColor"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     <userDefinedRuntimeAttributes>
@@ -140,7 +145,7 @@
                             </subviews>
                         </stackView>
                     </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
                         <constraint firstAttribute="width" priority="750" constant="400" id="0cY-by-6vt"/>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="3b6-q2-KyH"/>
@@ -169,6 +174,7 @@
                     </userDefinedRuntimeAttributes>
                 </view>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
             <color key="backgroundColor" white="0.0" alpha="0.25307684075342468" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="wsf-VA-z5k" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="3f7-P7-rLg"/>
@@ -180,8 +186,15 @@
                 <constraint firstItem="wsf-VA-z5k" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="dyZ-hT-a6B"/>
                 <constraint firstAttribute="trailing" secondItem="wsf-VA-z5k" secondAttribute="trailing" id="vBL-Au-AFB"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
             <point key="canvasLocation" x="136.23188405797103" y="140.625"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

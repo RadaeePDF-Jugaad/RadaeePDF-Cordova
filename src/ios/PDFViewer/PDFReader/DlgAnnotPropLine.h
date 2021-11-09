@@ -12,24 +12,31 @@
 #import "UILHeadView.h"
 #import "UIColorBtn.h"
 #import "../UILShadowView.h"
-@class PDFAnnot;
+@class RDPDFAnnot;
 @interface DlgAnnotPropLine : UILShadowView
 {
-    PDFAnnot *m_annot;
+    RDPDFAnnot *m_annot;
     UIViewController *m_vc;
     __weak IBOutlet UITextField *mLWidth;
+    __weak IBOutlet UILabel *mLLWidth;
     __weak IBOutlet UILStyleBtn *mLStyle;
+    __weak IBOutlet UILabel *mLLStyle;
     __weak IBOutlet UIColorBtn *mLColor;
+    __weak IBOutlet UILabel *mLLColor;
     __weak IBOutlet UIColorBtn *mFColor;
+    __weak IBOutlet UILabel *mLFColor;
     __weak IBOutlet UILHeadBtn *mLStart;
+    __weak IBOutlet UILabel *mLLStart;
     __weak IBOutlet UILHeadBtn *mLEnd;
+    __weak IBOutlet UILabel *mLLEnd;
     __weak IBOutlet UISlider *mAlpha;
     __weak IBOutlet UILabel *mLAlpha;
+    __weak IBOutlet UILabel *mLLock;
     __weak IBOutlet UIButton *mLocked;
 }
 -(id)initWithFrame:(CGRect)frame;
 -(id)initWithCoder:(NSCoder *)aDecoder;
--(void)setAnnot:(PDFAnnot *)annot :(UIViewController *)vc;
+-(void)setAnnot:(RDPDFAnnot *)annot :(UIViewController *)vc;
 -(void)updateAnnot;
 -(IBAction)OnAlphaChanged:(id)sender;
 -(IBAction)OnLock:(id)sender;

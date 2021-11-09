@@ -45,7 +45,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    GLOBAL.g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    GLOBAL.g_annot_def_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     if([url hasPrefix:@"http://"] || [url hasPrefix:@"https://"]){
         
@@ -56,8 +56,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         
         [self readerInit];
         
-        PDFDoc *doc = [[PDFDoc alloc] init];
-        [PDFDoc setOpenFlag:3];
+        RDPDFDoc *doc = [[RDPDFDoc alloc] init];
+        [RDPDFDoc setOpenFlag:3];
         int result = [doc openStream:httpStream :@""];
         
         switch(result)
@@ -106,7 +106,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    GLOBAL.g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    GLOBAL.g_annot_def_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:url ofType:nil];
     
@@ -118,7 +118,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     // Get user parameters
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     url = [params objectForKey:@"url"];
-    GLOBAL.g_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
+    GLOBAL.g_annot_def_author = ([params objectForKey:@"author"]) ? [params objectForKey:@"author"] : @"";
     
     NSString *filePath = url;
     
@@ -144,13 +144,13 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     if ([self isPageViewController]) {
         result = [m_pdfP PDFOpenAtPath:filePath withPwd:password];
     } else {
-        PDFDoc *doc = [[PDFDoc alloc] init];
+        RDPDFDoc *doc = [[RDPDFDoc alloc] init];
         result = [doc open:filePath :password];
         if(!result)
         {
             GLOBAL.g_pdf_path = [[filePath stringByDeletingLastPathComponent] mutableCopy];
             GLOBAL.g_pdf_name = [[filePath lastPathComponent] mutableCopy];
-            GLOBAL.g_save_doc = autoSave;
+            GLOBAL.g_auto_save_doc = autoSave;
             [m_pdf setDoc:doc :page :readOnly];
         }
     }
@@ -279,7 +279,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
     
-    int count = [(PDFDoc *)[m_pdf getDoc] pageCount];
+    int count = [(RDPDFDoc *)[m_pdf getDoc] pageCount];
     [self cdvOkWithMessage:[NSString stringWithFormat:@"%i", count]];
 }
 
@@ -476,7 +476,6 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         [self setPagingEnabled:NO];
         [self setDoublePageEnabled:YES];
         
-        [m_pdf setFirstPageCover:firstPageCover];
         [m_pdf setDoubleTapZoomMode:2];
         [m_pdf setImmersive:isImmersive];
         
@@ -600,14 +599,14 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     
     int pageNum = [[params objectForKey:@"page"] intValue];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         [self cdvErrorWithMessage:@"Error in pdf instance"];
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     [page objsStart];
     
     [self cdvOkWithMessage:[page objsString:0 :page.objsCount]];
@@ -628,7 +627,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     int method = [[params objectForKey:@"method"] intValue];
     NSString *idString = [params objectForKey:@"id"];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         [self cdvErrorWithMessage:@"Error in pdf instance"];
@@ -654,7 +653,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     
     NSString *path = [params objectForKey:@"path"];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         [self cdvErrorWithMessage:@"Error in pdf instance"];
@@ -681,7 +680,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     int width = [[params objectForKey:@"width"] intValue];
     int height = [[params objectForKey:@"height"] intValue];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         [self cdvErrorWithMessage:@"Error in pdf instance"];
@@ -730,6 +729,11 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     
     NSString *path = [params objectForKey:@"path"];
     
+    if(![[[path pathExtension] lowercaseString] isEqualToString:@"pdf"])
+    {
+        path = [path stringByAppendingPathComponent:@"newFile.pdf"];
+    }
+    
     if([m_pdf saveDocumentToPath:path])
     {
         [self cdvOkWithMessage:@"Success"];
@@ -764,7 +768,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     
     int mode = [[params objectForKey:@"mode"] intValue];
     
-    GLOBAL.g_render_mode = mode;
+    GLOBAL.g_view_mode = mode;
 }
 
 - (void)setToolbarEnabled:(CDVInvokedUrlCommand *)command
@@ -780,7 +784,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (BOOL)isPageViewController
 {
-    if (GLOBAL.g_render_mode != 2) {
+    if (GLOBAL.g_view_mode != 2) {
         return NO;
     }
     else return YES;
@@ -1259,7 +1263,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
 - (void)refreshCurrentPage
 {
-    [m_pdf refreshCurrentPage];
+    //[m_pdf updateAllPages];
 }
 
 #pragma mark - Path Utils
@@ -1303,7 +1307,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     int pageNum = [[params objectForKey:@"page"] intValue];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     NSMutableArray *array = [NSMutableArray array];
     NSString *json = @"";
     
@@ -1312,7 +1316,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         [self cdvErrorWithMessage:@"Failure"];
@@ -1322,7 +1326,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     [page objsStart];
     
     for (int c = 0; c < [page annotCount]; c++) {
-        PDFAnnot *annot = [page annotAtIndex:c];
+        RDPDFAnnot *annot = [page annotAtIndex:c];
         //detect if is annot text
         if (annot.type == 1) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -1354,7 +1358,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
     int pageNum = [[params objectForKey:@"page"] intValue];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     NSMutableArray *array = [NSMutableArray array];
     NSString *json = @"";
     
@@ -1363,7 +1367,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         [self cdvErrorWithMessage:@"Failure"];
@@ -1373,7 +1377,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     [page objsStart];
     
     for (int c = 0; c < [page annotCount]; c++) {
-        PDFAnnot *annot = [page annotAtIndex:c];
+        RDPDFAnnot *annot = [page annotAtIndex:c];
         //detect if is annot text
         if (annot.type >= 9 && annot.type <= 12) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -1408,13 +1412,13 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     NSString *text = [params objectForKey:@"text"];
     NSString *subject = [params objectForKey:@"subject"];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return;
@@ -1427,13 +1431,13 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     pt.y = y;
     [page addAnnotNote:&pt];
     
-    PDFAnnot *annot = [page annotAtIndex:[page annotCount]-1];
+    RDPDFAnnot *annot = [page annotAtIndex:[page annotCount]-1];
     [annot setPopupText:text];
     [annot setPopupSubject:subject];
     
     if (annot) {
         [doc save];
-        [m_pdf refreshCurrentPage];
+        [m_pdf updatePage:pageNum];
         [self cdvOkWithMessage:@"Success"];
     } else {
         [self cdvErrorWithMessage:@"Failure"];
@@ -1451,13 +1455,13 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     float x = [[params objectForKey:@"x"] floatValue];
     float y = [[params objectForKey:@"y"] floatValue];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     if (m_pdf == nil || doc == nil) {
         [self cdvErrorWithMessage:@"Failure"];
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         [self cdvErrorWithMessage:@"Failure"];
@@ -1478,13 +1482,13 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     int index1 = [[params objectForKey:@"index1"] intValue];
     int index2 = [[params objectForKey:@"index2"] intValue];
     
-    PDFDoc *doc = [m_pdf getDoc];
+    RDPDFDoc *doc = [m_pdf getDoc];
     
     if (m_pdf == nil || doc == nil) {
         return;
     }
     
-    PDFPage *page = [doc page:pageNum];
+    RDPDFPage *page = [doc page:pageNum];
     
     if (page == nil) {
         return;
@@ -1499,7 +1503,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     
     if ([page addAnnotMarkup:index1 :index2 :type :color]) {
         [doc save];
-        [m_pdf refreshCurrentPage];
+        [m_pdf updatePage:pageNum];
         [self cdvOkWithMessage:@"Success"];
     } else {
         [self cdvErrorWithMessage:@"Failure"];

@@ -15,6 +15,7 @@
     UILabel *vlab = [[UILabel alloc] initWithFrame:CGRectMake(2, y, w - 2, fsize + 2)];
     vlab.text = val;
     [vlab setFont:[UIFont systemFontOfSize:fsize]];
+    vlab.textColor = [UIColor blackColor];
     return vlab;
 }
 
@@ -30,7 +31,7 @@
     m_data = data;
     m_fsize = fsize;
     CGFloat item_h = fsize + 2;
-    self.backgroundColor = [UIColor colorWithRed:1 green:1 blue:0.8f alpha:1];
+    self.backgroundColor = [UIColor colorWithRed:218.0f/255.0f green:227.0f/255.0f blue:255.0f/255.0f alpha:1];
     
     UIView *view;
     CGFloat y = 0;

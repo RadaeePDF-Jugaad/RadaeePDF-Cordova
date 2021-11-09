@@ -13,10 +13,10 @@
 - (id)init:(CGPoint)point :(RDBlock)callback
 {
     NSArray *items = @[
-    @{@"Vertical": [UIImage imageNamed:@"btn_view_vert"]},
-    @{@"Horizon": [UIImage imageNamed:@"btn_view_horz"]},
-    @{@"Single Page": [UIImage imageNamed:@"btn_view_single"]},
-    @{@"Dual Page": [UIImage imageNamed:@"btn_view_dual"]}
+    @{NSLocalizedString(@"Vertical", nil): [UIImage imageNamed:@"btn_view_vert"]},
+    @{NSLocalizedString(@"Horizontal", nil): [UIImage imageNamed:@"btn_view_horz"]},
+    @{NSLocalizedString(@"Single Page", nil): [UIImage imageNamed:@"btn_view_single"]},
+    @{NSLocalizedString(@"Double Page", nil): [UIImage imageNamed:@"btn_view_dual"]}
     ];
     
     return [super init:point :callback :items];

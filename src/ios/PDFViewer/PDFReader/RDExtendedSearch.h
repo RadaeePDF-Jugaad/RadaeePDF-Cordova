@@ -25,9 +25,9 @@
 
 @interface RDExtendedSearch : NSObject
 {
-    PDFPage *m_page;
-    PDFDoc *m_doc;
-    PDFFinder *m_finder;
+    RDPDFPage *m_page;
+    RDPDFDoc *m_doc;
+    RDPDFFinder *m_finder;
     void(^finishBlock)(void);
     void(^progressBlock)(NSMutableArray *, NSMutableArray *);
 }
@@ -39,9 +39,9 @@
 
 + (RDExtendedSearch *)sharedInstance;
 
-- (BOOL)searchInit:(PDFDoc *)doc;
-- (void)searchText:(NSString *)text inDoc:(PDFDoc *)doc progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress finish:(void (^)(void))finish;
-- (void)addPageSearchResults:(PDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress;
+- (BOOL)searchInit:(RDPDFDoc *)doc;
+- (void)searchText:(NSString *)text inDoc:(RDPDFDoc *)doc progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress finish:(void (^)(void))finish;
+- (void)addPageSearchResults:(RDPDFFinder *)finder forPage:(int)page progress:(void (^)(NSMutableArray *occurrences, NSMutableArray *total))progress;
 - (BOOL)pageIsInSearchResults:(int)page;
 - (int)getNextPageFromCurrentPage:(int)page;
 - (int)getPrevPageFromCurrentPage:(int)page;

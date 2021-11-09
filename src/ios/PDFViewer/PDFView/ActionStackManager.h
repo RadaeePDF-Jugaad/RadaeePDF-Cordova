@@ -16,20 +16,20 @@
 @property (nonatomic) PDF_OBJ_REF hand;
 
 - (instancetype)initWithPage:(int)pgno index:(int)idx;
-- (void)undo:(PDFDoc *)doc;
-- (void)redo:(PDFDoc *)doc;
+- (void)undo:(RDPDFDoc *)doc;
+- (void)redo:(RDPDFDoc *)doc;
 - (int)pageno:(int)idx;
 @end
 
 @interface ASDel : ASItem
 
-- (instancetype)initWithPage:(int)pgno page:(PDFPage *)page index:(int)idx;
+- (instancetype)initWithPage:(int)pgno page:(RDPDFPage *)page index:(int)idx;
 
 @end
 
 @interface ASAdd : ASItem
 
-- (instancetype)initWithPage:(int)pgno page:(PDFPage *)page index:(int)idx;
+- (instancetype)initWithPage:(int)pgno page:(RDPDFPage *)page index:(int)idx;
 
 @end
 
@@ -53,7 +53,7 @@
 }
 
 - (void)push:(ASItem *)item;
-
+- (void)clear;
 - (ASItem *)undo;
 - (ASItem *)redo;
 - (int)cur;

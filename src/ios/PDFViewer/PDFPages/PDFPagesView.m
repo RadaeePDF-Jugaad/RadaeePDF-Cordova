@@ -13,10 +13,10 @@
 #define CELL_HEIGHT 198
 #define CELL_SIZE 158
 
-@implementation PDFPageCell
+@implementation RDPDFPageCell
 @synthesize deleted = m_deleted;
 @synthesize rotate = m_rotate;
--(id)init:(UIView *)parent :(PDFDoc *) doc :(int)pageno :(onPageDelete)del
+-(id)init:(UIView *)parent :(RDPDFDoc *) doc :(int)pageno :(onPageDelete)del
 {
     self = [super init];
     if(self)
@@ -67,9 +67,9 @@
         if (self->m_status < 0) return;
         
         float csize = CELL_SIZE * self->m_scale_pix;
-        PDFDoc *doc = self->m_doc;
+        RDPDFDoc *doc = self->m_doc;
         int pageno = self->m_pageno;
-        PDFPage *page = [doc page:pageno];
+        RDPDFPage *page = [doc page:pageno];
         float pw = [doc pageWidth:pageno];
         float ph = [doc pageHeight:pageno];
         float scale1 = csize / pw;
@@ -78,9 +78,9 @@
         int iw = pw * scale1;
         int ih = ph * scale1;
         
-        PDFDIB *dib = [[PDFDIB alloc] init:iw :ih];
+        RDPDFDIB *dib = [[RDPDFDIB alloc] init:iw :ih];
         [dib erase:-1];
-        PDFMatrix *mat = [[PDFMatrix alloc] init:scale1 :-scale1 :0 :ih];
+        RDPDFMatrix *mat = [[RDPDFMatrix alloc] init:scale1 :-scale1 :0 :ih];
         self->m_page = page;
         [page render:dib :mat :2];
         mat = nil;
@@ -175,7 +175,7 @@
     int pidx = 0;
     for(int pcur = 0; pcur < pcnt; pcur++)
     {
-        PDFPageCell *cell = [m_cells_org objectAtIndex:pcur];
+        RDPDFPageCell *cell = [m_cells_org objectAtIndex:pcur];
         if(cell.deleted)
             [cell UIRemove];
         else
@@ -224,7 +224,7 @@
     int pcnt = (int)m_cells_org.count;
     for(int pcur = 0; pcur < pcnt; pcur++)
     {
-        PDFPageCell *cell = [m_cells_org objectAtIndex:pcur];
+        RDPDFPageCell *cell = [m_cells_org objectAtIndex:pcur];
         if (cell.deleted) return true;
         else if ([cell updateRotate]) return true;
     }
@@ -236,14 +236,14 @@
     int pcnt = (int)m_cells_org.count;
     for(int pcur = 0; pcur < pcnt; pcur++)
     {
-        PDFPageCell *cell = [m_cells_org objectAtIndex:pcur];
+        RDPDFPageCell *cell = [m_cells_org objectAtIndex:pcur];
         dels[pcur] = cell.deleted;
         [cell updateRotate];
         rots[pcur] = cell.rotate;
     }
 }
 
--(void)open:(PDFDoc *)doc
+-(void)open:(RDPDFDoc *)doc
 {
     m_doc = doc;
     int pcnt = [m_doc pageCount];
@@ -251,7 +251,7 @@
     m_cells = [[NSMutableArray alloc] init];
     onPageDelete del = ^(int pageno)
     {
-        PDFPageCell *cell = [self->m_cells_org objectAtIndex:pageno];
+        RDPDFPageCell *cell = [self->m_cells_org objectAtIndex:pageno];
         [cell UICancel:self->m_queue];
         cell.deleted = true;
         [self onPagesUpdate];
@@ -260,8 +260,8 @@
 
     for(int pcur = 0; pcur < pcnt; pcur++)
     {
-        PDFPageCell *cell = [[PDFPageCell alloc] init:self :m_doc :pcur :del];
-        PDFPage *page = [m_doc page:pcur];
+        RDPDFPageCell *cell = [[RDPDFPageCell alloc] init:self :m_doc :pcur :del];
+        RDPDFPage *page = [m_doc page:pcur];
         int rot = [page getRotate];
         page = nil;
         cell.rotate = (rot << 16) | rot;
@@ -294,19 +294,19 @@
     int icur = 0;
     while(icur < idx0)
     {
-        PDFPageCell *cell = [m_cells objectAtIndex:icur];
+        RDPDFPageCell *cell = [m_cells objectAtIndex:icur];
         [cell UICancel:m_queue];
         icur++;
     }
     while(icur < idx1)
     {
-        PDFPageCell *cell = [m_cells objectAtIndex:icur];
+        RDPDFPageCell *cell = [m_cells objectAtIndex:icur];
         [cell UIRender:m_queue];
         icur++;
     }
     while(icur < pcnt)
     {
-        PDFPageCell *cell = [m_cells objectAtIndex:icur];
+        RDPDFPageCell *cell = [m_cells objectAtIndex:icur];
         [cell UICancel:m_queue];
         icur++;
     }

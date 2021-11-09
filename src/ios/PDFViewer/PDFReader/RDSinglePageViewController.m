@@ -25,9 +25,9 @@
     mView = [[RDPDFView alloc] initWithFrame:self.view.frame];
     _pdfView = mView.view;
     _pdfView.scrollEnabled = NO;
-    _pdfView.pageViewNo = _pageViewNo;
+    _pdfView.singleViewPageNo = _pageViewNo;
     _pdfView.userInteractionEnabled = NO;
-//-(BOOL)PDFOpen :(PDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del;
+//-(BOOL)PDFOpen :(RDPDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del;
     BOOL success = [_pdfView PDFOpen:_doc :4 :mView.canvas :self];
     [self.view addSubview:_pdfView];
 }
@@ -38,11 +38,11 @@
     [_pdfView sizeThatFits:size];
 }
 
-- (void)OnAnnotClicked:(PDFAnnot *)annot :(float)x :(float)y {
+- (void)OnAnnotClicked:(RDPDFAnnot *)annot :(float)x :(float)y {
     
 }
 
-- (void)OnAnnotCommboBox:(NSArray *)dataArray selected:(int)index {
+- (void)OnAnnotCommboBox:(RDVPage *)vp :(NSArray *)dataArray selected:(int)index {
     
 }
 
@@ -58,7 +58,7 @@
     
 }
 
-- (void)OnAnnotList:(PDFAnnot *)annot items:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes {
+- (void)OnAnnotList:(RDVPage *)vp :(RDPDFAnnot *)annot items:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes {
     
 }
 
@@ -70,11 +70,11 @@
     
 }
 
-- (void)OnAnnotPopup:(PDFAnnot *)annot {
+- (void)OnAnnotPopup:(RDPDFAnnot *)annot {
     
 }
 
-- (void)OnAnnotSignature:(PDFAnnot *)annot {
+- (void)OnAnnotSignature:(RDVPage *)vp :(RDPDFAnnot *)annot {
     
 }
 
@@ -114,27 +114,27 @@
     
 }
 
-- (void)OnAnnotClicked:(PDFAnnot *)annot :(PDF_RECT)rect :(float)x :(float)y {
+- (void)OnAnnotClicked:(RDPDFAnnot *)annot :(PDF_RECT)rect :(float)x :(float)y {
 }
 
 
-- (void)OnAnnotCommboBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index {
+- (void)OnAnnotCommboBox:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index {
 }
 
 
-- (void)OnAnnotEditBox:(PDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize {
+- (void)OnAnnotEditBox:(RDPDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize {
 }
 
 
-- (void)OnAnnotList:(PDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes {
+- (void)OnAnnotList:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes {
 }
 
 
-- (void)OnAnnotTapped:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point {
+- (void)OnAnnotTapped:(RDPDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point {
 }
 
 
-- (void)didTapAnnot:(PDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point {
+- (void)didTapAnnot:(RDPDFAnnot *)annot atPage:(int)page atPoint:(CGPoint)point {
     
 }
 

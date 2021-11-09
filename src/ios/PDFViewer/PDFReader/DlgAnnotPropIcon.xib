@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="4096" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -71,7 +72,7 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gFv-YX-fFb">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gFv-YX-fFb">
                                     <rect key="frame" x="255" y="0.0" width="100" height="40"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="40" id="1ZY-bC-bIG"/>
@@ -91,7 +92,7 @@
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BdD-T1-Fr9">
                                     <rect key="frame" x="0.0" y="0.0" width="355" height="50"/>
                                     <subviews>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cuW-a0-ajB">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cuW-a0-ajB">
                                             <rect key="frame" x="8" y="5" width="100" height="40"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="100" id="Z26-1v-Na1"/>
@@ -100,7 +101,7 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <state key="normal" title="OK"/>
                                         </button>
-                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H8n-Iq-Vk3">
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H8n-Iq-Vk3">
                                             <rect key="frame" x="255" y="5" width="100" height="40"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="100" id="E1g-6J-onI"/>
@@ -110,7 +111,7 @@
                                             <state key="normal" title="Cancel"/>
                                         </button>
                                     </subviews>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     <constraints>
                                         <constraint firstItem="H8n-Iq-Vk3" firstAttribute="centerY" secondItem="BdD-T1-Fr9" secondAttribute="centerY" id="7MP-ij-D9Z"/>
                                         <constraint firstItem="cuW-a0-ajB" firstAttribute="centerY" secondItem="BdD-T1-Fr9" secondAttribute="centerY" id="b8Y-PY-n9c"/>
@@ -147,10 +148,18 @@
                 <outlet property="cancelButton" destination="H8n-Iq-Vk3" id="8BP-H6-6C2"/>
                 <outlet property="mFColor" destination="K60-Hf-1mX" id="TP9-oB-JJh"/>
                 <outlet property="mIcon" destination="IMT-2n-cGh" id="HbV-We-JCU"/>
+                <outlet property="mLFColor" destination="fSV-eg-fFy" id="4nx-nT-8TJ"/>
+                <outlet property="mLIcon" destination="Sno-5r-MGS" id="NjD-99-SkD"/>
+                <outlet property="mLLock" destination="d9a-3b-Uxg" id="VmE-Z2-k7M"/>
                 <outlet property="mLocked" destination="gFv-YX-fFb" id="avw-1D-qv7"/>
                 <outlet property="okButton" destination="cuW-a0-ajB" id="iKg-9h-iWc"/>
             </connections>
             <point key="canvasLocation" x="-50.399999999999999" y="44.334975369458128"/>
         </view>
     </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

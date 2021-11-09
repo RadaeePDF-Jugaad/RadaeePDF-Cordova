@@ -17,7 +17,7 @@
     [mTools setFrame:CGRectMake(mTools.frame.origin.x, mTools.frame.origin.y, mImg.frame.size.width, mTools.frame.size.height)];
 }
 
-- (void)UIUpdate:(PDFDIB *)dib
+- (void)UIUpdate:(RDPDFDIB *)dib
 {
     if(!dib) [mImg setImage:nil];
     else [mImg setImage:[UIImage imageWithCGImage:[dib image]]];

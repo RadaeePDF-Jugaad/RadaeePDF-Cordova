@@ -38,7 +38,7 @@
     mLocked.selected = !mLocked.selected;
 }
 
--(void)setAnnot:(PDFAnnot *)annot :(UIViewController *)vc
+-(void)setAnnot:(RDPDFAnnot *)annot :(UIViewController *)vc
 {
     m_vc = vc;
     m_annot = annot;
@@ -50,6 +50,10 @@
     mAlpha.value = (fcolor >> 24) / 255.0f;
     mLAlpha.text = [NSString stringWithFormat:@"%d",(fcolor >> 24)];
     mLocked.selected = [m_annot isLocked];
+    mLIcon.text = NSLocalizedString(@"Icon", nil);
+    mLFColor.text = NSLocalizedString(@"Fill color", nil);
+    mLLock.text = NSLocalizedString(@"Lock", nil);
+    [mLocked setTitle:NSLocalizedString(@"Locked", nil) forState:UIControlStateNormal];
 }
 
 -(void)updateAnnot

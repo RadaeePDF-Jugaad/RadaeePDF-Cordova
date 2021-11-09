@@ -14,7 +14,7 @@
 #import "../PDFPages/PDFPagesView.h"
 #import "../PDFPages/UIPageCellView.h"
 
-@class PDFDoc;
+@class RDPDFDoc;
 @class PDFReaderCtrl;
 @class RDPageViewController;
 

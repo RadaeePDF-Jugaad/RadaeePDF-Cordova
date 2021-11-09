@@ -44,6 +44,7 @@
         m_status = sta_none;
         m_sel = nil;
         m_cur_page = -1;
+        m_save_vmode = 0;
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = YES;
         self.alwaysBounceHorizontal = NO;
@@ -77,6 +78,7 @@
         m_status = sta_none;
         m_sel = nil;
         m_cur_page = -1;
+        m_save_vmode = 0;
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = YES;
         self.alwaysBounceHorizontal = NO;
@@ -109,10 +111,7 @@
     self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
     [m_layout vGotoPage:m_cur_page];
     [self setContentOffset:CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix) animated:NO];
-    
-    if (self.zoomScale <= 1 && [self pagingAvailable]) {
-        self.pagingEnabled = GLOBAL.g_paging_enabled;
-    }
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
 }
 
 -(void)dealloc
@@ -128,7 +127,7 @@
     }
 }
 
--(BOOL)PDFOpen:(PDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del
+-(BOOL)PDFOpen:(RDPDFDoc *)doc :(int)page_gap :(RDPDFCanvas *)canvas :(id<PDFLayoutDelegate>) del
 {
     [self clean];
     m_canvas = canvas;
@@ -150,16 +149,20 @@
     actionManger = [[ActionStackManager alloc] init];
     self.backgroundColor = (GLOBAL.g_readerview_bg_color != 0) ? UIColorFromRGB(GLOBAL.g_readerview_bg_color) : [UIColor colorWithRed:0.8f green:0.8f blue:0.8f alpha:1.0f];
 
-    [self PDFSetVMode:GLOBAL.g_render_mode];
+    [self PDFSetVMode:GLOBAL.g_view_mode];
     
     m_timer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(ProOnTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop]addTimer:m_timer forMode:NSDefaultRunLoopMode];
    return TRUE;
 }
-
+-(int)PDFGetVMode
+{
+    return m_save_vmode;
+}
 -(void)PDFSetVMode:(int)vmode
 {
-    GLOBAL.g_render_mode = vmode;
+    m_save_vmode = vmode;
+    bool center_page = false;
     RDVPos pos;
     pos.pageno = -1;
     pos.pdfx = 0;
@@ -177,74 +180,60 @@
     self.zoomScale = 1;
 
     bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
-    m_save_vmode = vmode;
-    switch (vmode) {
+    switch (m_save_vmode) {
         case 1:// Horizontal LTOR
             doublePage = NO;
-            GLOBAL.g_paging_enabled = NO;
-            m_layout = [[RDVLayoutHorz alloc] init:self :false];
+            m_layout = [[RDVLayoutHorz alloc] init:self :GLOBAL.g_layout_rtol :GLOBAL.g_auto_scale];
             break;
-        case 2:// PageView RTOL
+        case 2:// PageView
             doublePage = NO;
-            GLOBAL.g_paging_enabled = NO;
             memset(horzs, 0, sizeof(bool));
-            m_layout = [[RDVLayoutSingle alloc] init:self :true :(int)_pageViewNo];
+            m_layout = [[RDVLayoutSingle alloc] init:self :GLOBAL.g_layout_rtol :(int)_singleViewPageNo];
             break;
         case 3:// Single Page (LTOR, paging enabled)
             doublePage = NO;
-            GLOBAL.g_paging_enabled = YES;
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
+            m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
+            center_page = true;
+            //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
+            if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
-        case 4: // Double Page first page single (paging enabled)
-            for (int i = 0; i < m_doc.pageCount; i++) {
-                if (i > 0) {
-                    horzs[i] = true;
-                }
-            }
+        case 4: //Double Page, and first page as single, when in landscape(paging enabled)
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
-            break;
-        case 5:// Double Page (RTOL, paging enabled)
-            GLOBAL.g_paging_enabled = YES;
-            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :true :NULL :0 :horzs :[m_doc pageCount]];
+            horzs[0] = false;
+            m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
+            center_page = true;
+            //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
+            if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         case 6:// Double Page (LTOR, paging enabled)
-            GLOBAL.g_paging_enabled = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
-            break;
-        case 7:// Horizontal RTOL
-            doublePage = NO;
-            GLOBAL.g_paging_enabled = NO;
-            memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutHorz alloc] init:self :true];
+            m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
+            center_page = true;
+            //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
+            if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         default:// 0: Vertical
-            GLOBAL.g_paging_enabled = NO;
-            m_layout = [[RDVLayoutVert alloc] init : self];
+            m_layout = [[RDVLayoutVert alloc] init : self :GLOBAL.g_auto_scale];
+            [((RDVLayoutVert *)m_layout) vSetAlign:align_vcenter];
             break;
     }
     free( horzs );
-    if ([self pagingAvailable]) {
-        self.pagingEnabled = GLOBAL.g_paging_enabled;
-    }
-    if (GLOBAL.g_render_mode == 2) {
-        [(RDVLayoutSingle *)m_layout vOpen :m_doc :m_page_gap :self.layer :(int)_pageViewNo];
-    } else {
-        [m_layout vOpen :m_doc :m_page_gap :self.layer];
-    }
+    [m_layout vOpen :m_doc :m_page_gap :self.layer];
     m_status = sta_none;
     m_zoom = 1;
     self.zoomScale = 1;
     CGRect rect = self.frame;
     CGSize size = rect.size;
     [m_layout vResize:size.width * m_scale_pix :size.height * m_scale_pix];
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
     self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
     if(pos.pageno >= 0)
     {
-        [m_layout vSetPos:[m_layout vw] /2 :[m_layout vh] /2 :&pos];
+        if (center_page)
+            [m_layout vGotoPage:pos.pageno];
+        else
+            [m_layout vSetPos:[m_layout vw] /2 :[m_layout vh] /2 :&pos];
         CGPoint pt;
         pt.x = [m_layout docx] / m_scale_pix;
         pt.y = [m_layout docy] / m_scale_pix;
@@ -273,77 +262,65 @@
 
 -(void)PDFRestoreView
 {
+    bool center_page = false;
     m_modified = true;
     actionManger = [[ActionStackManager alloc] init];//reset all undo/redo
     bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
     switch (m_save_vmode) {
         case 1:// Horizontal LTOR
             doublePage = NO;
-            GLOBAL.g_paging_enabled = NO;
-            m_layout = [[RDVLayoutHorz alloc] init:self :false];
+            m_layout = [[RDVLayoutHorz alloc] init:self :GLOBAL.g_layout_rtol :GLOBAL.g_auto_scale];
             break;
-        case 2:// PageView RTOL
+        case 2:// PageView
             doublePage = NO;
-            GLOBAL.g_paging_enabled = NO;
             memset(horzs, 0, sizeof(bool));
-            m_layout = [[RDVLayoutSingle alloc] init:self :true :(int)_pageViewNo];
+            m_layout = [[RDVLayoutSingle alloc] init:self :GLOBAL.g_layout_rtol :(int)_singleViewPageNo];
             break;
         case 3:// Single Page (LTOR, paging enabled)
             doublePage = NO;
-            GLOBAL.g_paging_enabled = YES;
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
+            m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
+            center_page = true;
+            //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
+            if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
-        case 4: // Double Page first page single (paging enabled)
-            for (int i = 0; i < m_doc.pageCount; i++) {
-                if (i > 0) {
-                    horzs[i] = true;
-                }
-            }
+        case 4: //Double Page, and first page as single, when in landscape(paging enabled)
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
-            break;
-        case 5:// Double Page (RTOL, paging enabled)
-            GLOBAL.g_paging_enabled = YES;
-            memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :true :NULL :0 :horzs :[m_doc pageCount]];
+            horzs[0] = false;
+            m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
+            center_page = true;
+            //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
+            if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         case 6:// Double Page (LTOR, paging enabled)
-            GLOBAL.g_paging_enabled = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutDual alloc] init:self :false :NULL :0 :horzs :[m_doc pageCount]];
-            break;
-        case 7:// Horizontal RTOL
-            doublePage = NO;
-            GLOBAL.g_paging_enabled = NO;
-            memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
-            m_layout = [[RDVLayoutHorz alloc] init:self :true];
+            m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
+            center_page = true;
+            //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
+            if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         default:// 0: Vertical
-            GLOBAL.g_paging_enabled = NO;
-            m_layout = [[RDVLayoutVert alloc] init : self];
+            m_layout = [[RDVLayoutVert alloc] init : self :GLOBAL.g_auto_scale];
+            [((RDVLayoutVert *)m_layout) vSetAlign:align_vcenter];
             break;
     }
     free( horzs );
-    if ([self pagingAvailable]) {
-        self.pagingEnabled = GLOBAL.g_paging_enabled;
-    }
-    if (GLOBAL.g_render_mode == 2) {
-        [(RDVLayoutSingle *)m_layout vOpen :m_doc :m_page_gap :self.layer :(int)_pageViewNo];
-    } else {
-        [m_layout vOpen :m_doc :m_page_gap :self.layer];
-    }
+    [m_layout vOpen :m_doc :m_page_gap :self.layer];
     m_status = sta_none;
     m_zoom = 1;
     self.zoomScale = 1;
     CGRect rect = self.frame;
     CGSize size = rect.size;
     [m_layout vResize:size.width * m_scale_pix :size.height * m_scale_pix];
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
     self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
     if(m_save_pos.pageno >= 0)
     {
         if (m_save_pos.pageno >= m_doc.pageCount) m_save_pos.pageno = m_doc.pageCount - 1;
-        [m_layout vSetPos:[m_layout vw] /2 :[m_layout vh] /2 :&m_save_pos];
+        if (center_page)
+            [m_layout vGotoPage:m_save_pos.pageno];
+        else
+            [m_layout vSetPos:[m_layout vw] /2 :[m_layout vh] /2 :&m_save_pos];
         CGPoint pt;
         pt.x = [m_layout docx] / m_scale_pix;
         pt.y = [m_layout docy] / m_scale_pix;
@@ -376,21 +353,21 @@
     }
 }
 
-- (void)updateLastAnnotInfoAtPage:(PDFPage *)page
+- (void)updateLastAnnotInfoAtPage:(RDPDFPage *)page
 {
-    PDFAnnot *annot = [page annotAtIndex:(page.annotCount - 1)];
+    RDPDFAnnot *annot = [page annotAtIndex:(page.annotCount - 1)];
     if (annot) {
         [self setAuthorForAnnot:annot];
         [self setModifyDateForAnnot:annot];
     }
 }
 
-- (void)setAuthorForAnnot:(PDFAnnot *)annot
+- (void)setAuthorForAnnot:(RDPDFAnnot *)annot
 {
-    [annot setPopupLabel:GLOBAL.g_author];
+    [annot setPopupLabel:GLOBAL.g_annot_def_author];
 }
 
-- (void)setModifyDateForAnnot:(PDFAnnot *)annot
+- (void)setModifyDateForAnnot:(RDPDFAnnot *)annot
 {
     [annot setModDate:[RDUtils pdfDateFromDate:[NSDate date]]];
 }
@@ -410,8 +387,8 @@
     if([[NSFileManager defaultManager] fileExistsAtPath:path])
         [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
     
-    PDFPage *page = [m_doc page:pageno];
-    PDFAnnot *annot = [page annotAtIndex:index];
+    RDPDFPage *page = [m_doc page:pageno];
+    RDPDFAnnot *annot = [page annotAtIndex:index];
     
     NSString *annotPath = [self getImageFromAnnot:annot];
     UIImage *img = [UIImage imageWithContentsOfFile:annotPath];
@@ -437,13 +414,13 @@
     return NO;
 }
 
-- (NSString *)getImageFromAnnot:(PDFAnnot *)annot
+- (NSString *)getImageFromAnnot:(RDPDFAnnot *)annot
 {
     PDF_RECT rect;
     [annot getRect:&rect];
     int width = (rect.right - rect.left) * m_scale_pix;
     int height = (rect.bottom- rect.top) * m_scale_pix;
-    PDFDIB *dib = [[PDFDIB alloc] init:width : height];
+    RDPDFDIB *dib = [[RDPDFDIB alloc] init:width : height];
     Global_setAnnotTransparency(0x00000000);
     [annot render:dib :0xffffffff];
     Global_setAnnotTransparency(0x200040FF);
@@ -460,7 +437,7 @@
     return filePath;
 }
 
-- (NSString *)emptyImageFromAnnot:(PDFAnnot *)annot {
+- (NSString *)emptyImageFromAnnot:(RDPDFAnnot *)annot {
     PDF_RECT rect;
     [annot getRect:&rect];
     int width = (rect.right - rect.left) * m_scale_pix;
@@ -470,7 +447,7 @@
 
 - (NSString *)emptyAnnotWithSize:(CGSize)size
 {
-    PDFDIB *emptyDib = [[PDFDIB alloc] init:size.width : size.height];
+    RDPDFDIB *emptyDib = [[RDPDFDIB alloc] init:size.width : size.height];
     [emptyDib erase:0xffffffff];
     UIImage *emptyImg = [UIImage imageWithCGImage:[emptyDib image]];
     
@@ -498,7 +475,7 @@
 - (void)imageFromPage:(int)index inPDFRect:(CGRect )rect withScale:(float)scale {
     
     // Get the page
-    PDFPage *page = [m_doc page:index];
+    RDPDFPage *page = [m_doc page:index];
     
     // Initialize the DIB with the annotation size
     float w = rect.size.width * scale;
@@ -544,7 +521,7 @@
     
     if([[NSFileManager defaultManager] fileExistsAtPath:path])
     {
-        PDFPage *page = [m_doc page:pageno];
+        RDPDFPage *page = [m_doc page:pageno];
         BOOL res = [page addAnnotAttachment:path :0 :&rect];
         
         if(res)
@@ -560,7 +537,7 @@
 }
 
 - (void)autoSave {
-    if(GLOBAL.g_save_doc && m_modified)
+    if(GLOBAL.g_auto_save_doc && m_modified)
     {
         [m_doc save];
         m_modified = false;
@@ -713,11 +690,11 @@
         PDF_POINT pt;
         if(cnt > 1)//can be stroked?
         {
-            red = ((GLOBAL.g_line_color>>16)&0xFF)/255.0f;
-            green = ((GLOBAL.g_line_color>>8)&0xFF)/255.0f;
-            blue = (GLOBAL.g_line_color&0xFF)/255.0f;
-            alpha = ((GLOBAL.g_line_color>>24)&0xFF)/255.0f;
-            CGContextSetLineWidth(context, GLOBAL.g_line_width);
+            red = ((GLOBAL.g_line_annot_color>>16)&0xFF)/255.0f;
+            green = ((GLOBAL.g_line_annot_color>>8)&0xFF)/255.0f;
+            blue = (GLOBAL.g_line_annot_color&0xFF)/255.0f;
+            alpha = ((GLOBAL.g_line_annot_color>>24)&0xFF)/255.0f;
+            CGContextSetLineWidth(context, GLOBAL.g_line_annot_width);
             CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
             CGContextBeginPath( context );
             for(cur = 0; cur < cnt; cur++)
@@ -789,11 +766,11 @@
         PDF_POINT pt;
         if(cnt > 1)//can be stroked?
         {
-            red = ((GLOBAL.g_line_color>>16)&0xFF)/255.0f;
-            green = ((GLOBAL.g_line_color>>8)&0xFF)/255.0f;
-            blue = (GLOBAL.g_line_color&0xFF)/255.0f;
-            alpha = ((GLOBAL.g_line_color>>24)&0xFF)/255.0f;
-            CGContextSetLineWidth(context, GLOBAL.g_line_width);
+            red = ((GLOBAL.g_line_annot_color>>16)&0xFF)/255.0f;
+            green = ((GLOBAL.g_line_annot_color>>8)&0xFF)/255.0f;
+            blue = (GLOBAL.g_line_annot_color&0xFF)/255.0f;
+            alpha = ((GLOBAL.g_line_annot_color>>24)&0xFF)/255.0f;
+            CGContextSetLineWidth(context, GLOBAL.g_line_annot_width);
             CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
             CGContextBeginPath( context );
             for(cur = 0; cur < cnt; cur++)
@@ -832,11 +809,11 @@
 {
     if( m_status == sta_line && (m_lines_cnt || m_lines_drawing) )
     {
-        CGContextSetLineWidth(context, GLOBAL.g_line_width);
-        float red = ((GLOBAL.g_line_color>>16)&0xFF)/255.0f;
-        float green = ((GLOBAL.g_line_color>>8)&0xFF)/255.0f;
-        float blue = (GLOBAL.g_line_color&0xFF)/255.0f;
-        float alpha = ((GLOBAL.g_line_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_line_annot_width);
+        float red = ((GLOBAL.g_line_annot_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_line_annot_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_line_annot_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_line_annot_color>>24)&0xFF)/255.0f;
         CGContextSetRGBFillColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_lines;
         PDF_POINT *pt_end = m_lines + (m_lines_cnt<<1);
@@ -856,11 +833,11 @@
 {
     if( m_status == sta_rect && (m_rects_cnt || m_rects_drawing) )
     {
-        CGContextSetLineWidth(context, GLOBAL.g_rect_width);
-        float red = ((GLOBAL.g_rect_color>>16)&0xFF)/255.0f;
-        float green = ((GLOBAL.g_rect_color>>8)&0xFF)/255.0f;
-        float blue = (GLOBAL.g_rect_color&0xFF)/255.0f;
-        float alpha = ((GLOBAL.g_rect_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_rect_annot_width);
+        float red = ((GLOBAL.g_rect_annot_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_rect_annot_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_rect_annot_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_rect_annot_color>>24)&0xFF)/255.0f;
         CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_rects;
         PDF_POINT *pt_end = m_rects + (m_rects_cnt<<1);
@@ -902,11 +879,11 @@
 {
     if( m_status == sta_ellipse && (m_ellipse_cnt || m_ellipse_drawing) )
     {
-        CGContextSetLineWidth(context, GLOBAL.g_oval_width);
-        float red = ((GLOBAL.g_oval_color>>16)&0xFF)/255.0f;
-        float green = ((GLOBAL.g_oval_color>>8)&0xFF)/255.0f;
-        float blue = (GLOBAL.g_oval_color&0xFF)/255.0f;
-        float alpha = ((GLOBAL.g_oval_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_oval_annot_width);
+        float red = ((GLOBAL.g_oval_annot_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_oval_annot_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_oval_annot_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_oval_annot_color>>24)&0xFF)/255.0f;
         CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_ellipse;
         PDF_POINT *pt_end = m_ellipse + (m_ellipse_cnt<<1);
@@ -971,11 +948,11 @@
 {
     if( m_status == sta_editbox && (m_rects_cnt || m_rects_drawing) )
     {
-        CGContextSetLineWidth(context, GLOBAL.g_rect_width);
-        float red = ((GLOBAL.g_rect_color>>16)&0xFF)/255.0f;
-        float green = ((GLOBAL.g_rect_color>>8)&0xFF)/255.0f;
-        float blue = (GLOBAL.g_rect_color&0xFF)/255.0f;
-        float alpha = ((GLOBAL.g_rect_color>>24)&0xFF)/255.0f;
+        CGContextSetLineWidth(context, GLOBAL.g_rect_annot_width);
+        float red = ((GLOBAL.g_rect_annot_color>>16)&0xFF)/255.0f;
+        float green = ((GLOBAL.g_rect_annot_color>>8)&0xFF)/255.0f;
+        float blue = (GLOBAL.g_rect_annot_color&0xFF)/255.0f;
+        float alpha = ((GLOBAL.g_rect_annot_color>>24)&0xFF)/255.0f;
         CGContextSetRGBStrokeColor(context, red, green, blue, alpha);
         PDF_POINT *pt_cur = m_rects;
         PDF_POINT *pt_end = m_rects + (m_rects_cnt<<1);
@@ -1058,16 +1035,6 @@
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if(scrollView != self) return;
-    /*
-    if(GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 4) {
-        //Vertical block
-        if (self.contentOffset.y <= 0)
-            self.contentOffset = CGPointMake(self.contentOffset.x, 0);
-        if (self.contentOffset.y > 0 && self.contentOffset.y >= self.contentSize.height - self.frame.size.height) {
-            self.contentOffset = CGPointMake(self.contentOffset.x, self.contentSize.height - self.frame.size.height);
-        }
-    }*/
-    
     //NSLog(@"POS:%f,%f", self.contentOffset.x, self.contentOffset.y);
     if(m_status == sta_zoom)
     {
@@ -1123,7 +1090,6 @@
 - (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view
 {
     if( m_status != sta_none ) return;
-    self.pagingEnabled = NO;
     CGPoint point = [scrollView.pinchGestureRecognizer locationInView:m_canvas];
     [m_layout vZoomStart];
     m_status = sta_zoom;
@@ -1157,6 +1123,7 @@
     [m_layout vSetPos:(point.x - (zoomPoint.x * m_zoom)) * m_scale_pix :(point.y - (zoomPoint.y * m_zoom)) * m_scale_pix :&m_zoom_pos];
     self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
     [self refresh];
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
 }
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
@@ -1171,14 +1138,7 @@
     m_status = sta_none;
     [self refresh];
     
-    if (self.zoomScale <= 1 && m_status != sta_annot)
-    {
-        [self vGoto:m_cur_page];
-        
-        if (self.zoomScale <= 1 && [self pagingAvailable]) {
-            self.pagingEnabled = GLOBAL.g_paging_enabled;
-        }
-    }
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
 }
 
 - (void)zoomPageToScale:(CGFloat)scale atPoint:(CGPoint)point {
@@ -1195,7 +1155,8 @@
     [m_layout vSetPos:pt.x :pt.y :&m_zoom_pos];
     self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
     [m_layout vZoomConfirm];
-    
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
+
     m_status = sta_none;
     [self refresh];
     
@@ -1203,9 +1164,7 @@
         [self vGoto:m_cur_page];
     }
 
-    //[self zoomStartAtPoint:point];
-    //[self zoomToScale:scale atPoint:point];
-    //[self zoomConfirmToScale:scale];
+    self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
 }
 
 - (void)refresh
@@ -1217,7 +1176,7 @@
 
 - (void)centerPage
 {
-    if(GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 6)
+    if(m_save_vmode == 3 || m_save_vmode == 6)
     {
         //[self resetZoomLevel];
     }
@@ -1315,9 +1274,8 @@
     {
         if (m_zoom > GLOBAL.g_tap_zoom_level)
         {
-            if ([self pagingAvailable])
-                self.pagingEnabled = GLOBAL.g_paging_enabled;
             [self defaultZoom:touch];
+            self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
         }
         else
         {
@@ -1382,13 +1340,13 @@
             if(m_del) [m_del OnSingleTapped:x:y];
             return;
            }
-        PDFPage *page = [vpage GetPage];
+        RDPDFPage *page = [vpage GetPage];
         if( !page ) return;
         m_annot = [page annotAtPoint:m_annot_pos.pdfx: m_annot_pos.pdfy];
         m_annot_idx = -1;
         if( m_annot )
         {
-            PDFPageContent *content = [[PDFPageContent alloc] init];
+            RDPDFPageContent *content = [[RDPDFPageContent alloc] init];
             [content gsSave];
             
             PDF_RECT rect;
@@ -1401,7 +1359,7 @@
             float yTranslation = height / 2.0f;
             
             //set the matrix 20x20
-            PDFMatrix *matrix = [[PDFMatrix alloc] init:width :height :xTranslation :yTranslation];
+            RDPDFMatrix *matrix = [[RDPDFMatrix alloc] init:width :height :xTranslation :yTranslation];
             [content gsCatMatrix:matrix];
             matrix = nil;
             
@@ -1473,7 +1431,7 @@
                 [self executeAnnotJS];
                 
                 if (m_del){
-                    [m_del OnAnnotCommboBox:m_annot :[self annotRect] :arr selected:[m_annot getComboSel]];
+                    [m_del OnAnnotCommboBox :vpage :m_annot :[self annotRect] :arr selected:[m_annot getComboSel]];
                 }
                 return ;
             }
@@ -1503,7 +1461,7 @@
                 }
                 
                 if (m_del){
-                    [m_del OnAnnotList:m_annot :[self annotRect] :arr selectedIndexes:selected_items];// Modified method
+                    [m_del OnAnnotList :vpage :m_annot :[self annotRect] :arr selectedIndexes:selected_items];// Modified method
                 }
                 return;
             }
@@ -1511,7 +1469,7 @@
             int type = [m_annot getEditType];
             if (type > 0) {
                 if (m_del) {
-                    [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * (m_zoom * [m_layout vGetScaleMin:m_cur_page])];
+                    [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * vpage.scale];
                 }
                 return ;
             }
@@ -1529,8 +1487,8 @@
             }
             
             if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
-                if (m_del && [m_del respondsToSelector:@selector(OnAnnotSignature:)] && GLOBAL.g_enable_graphical_signature) {
-                    [m_del OnAnnotSignature:m_annot];
+                if (m_del && GLOBAL.g_hand_signature) {
+                    [m_del OnAnnotSignature :vpage :m_annot];
                 }
                 return;
             }
@@ -1587,38 +1545,6 @@
     return true;
 }
 
-- (NSString *)getImageFromRect:(int)top :(int)right :(int)left :(int)bottom :(int) pageNum
-{
-    if (!m_doc)
-        return nil;
-    
-    // set dib size with the draw_rect
-    int width = right - left;
-    int height = bottom - top;
-    
-    // get the selected page
-    PDFPage *page = [m_doc page:pageNum];
-    [page objsStart];
-    PDFDIB *dib = [[PDFDIB alloc] init :width :height];
-    
-    // set the matrix with the draw_rect (we need only a portion of the page)
-    PDFMatrix *mat = [[PDFMatrix alloc] init :1 :-1 :-left :bottom];
-    [page renderPrepare :dib];
-    [page render :dib :mat :2];//always render best.
-    mat = NULL;
-    
-    // get the UIImage
-    UIImage *img = [UIImage imageWithCGImage:[dib image]];
-    
-    //save image in PNG
-    NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.png"];
-    [UIImagePNGRepresentation(img) writeToFile:tempDir atomically:YES];
-    
-    NSString *imageBase64 = [UIImagePNGRepresentation(img) base64EncodedStringWithOptions:(NSDataBase64Encoding64CharacterLineLength)];
-    
-    return imageBase64;
-}
-
 -(bool)OnAnnotTouchBegin:(CGPoint)point
 {
     if (m_status != sta_annot) return false;
@@ -1669,11 +1595,11 @@
         RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
         RDVPos pos;
         [m_layout vGetPos :point.x * m_scale_pix :point.y * m_scale_pix :&pos];
-        PDFPage *page = [vpage GetPage];
-        PDFAnnot *annot = [page annotAtIndex:m_annot_idx];
+        RDPDFPage *page = [vpage GetPage];
+        RDPDFAnnot *annot = [page annotAtIndex:m_annot_idx];
         if( pos.pageno == m_annot_pos.pageno )
         {
-            PDFMatrix *mat = [vpage CreateInvertMatrix
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix
                               :self.contentOffset.x * m_scale_pix
                               :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&m_annot_rect];
@@ -1691,10 +1617,10 @@
         else if (m_tx != m_px && m_ty != m_py)
         {
             RDVPage *vdest = [m_layout vGetPage:pos.pageno];
-            PDFPage *dpage = [vdest GetPage];
+            RDPDFPage *dpage = [vdest GetPage];
             if( dpage )
             {
-                PDFMatrix *mat = [vdest CreateInvertMatrix
+                RDPDFMatrix *mat = [vdest CreateInvertMatrix
                                   :self.contentOffset.x * m_scale_pix
                                   :self.contentOffset.y * m_scale_pix];
                 [mat transformRect :&m_annot_rect];
@@ -1748,7 +1674,7 @@
     RDVPage *vpage = [m_layout vGetPage:pos.pageno];
     if( vpage )
     {
-        PDFPage *page = [vpage GetPage];
+        RDPDFPage *page = [vpage GetPage];
         if( page )
         {
             [self setModified:YES force:NO];
@@ -1779,7 +1705,7 @@
     {
         m_tx = point.x * m_scale_pix;
         m_ty = point.y * m_scale_pix;
-        m_ink = [[PDFInk alloc] init :GLOBAL.g_ink_width * m_scale_pix: GLOBAL.g_ink_color];
+        m_ink = [[RDPDFInk alloc] init :GLOBAL.g_ink_width * m_scale_pix: GLOBAL.g_ink_color];
     }
     [m_ink onDown :point.x * m_scale_pix :point.y * m_scale_pix];
     return true;
@@ -1813,7 +1739,7 @@
 -(bool)OnPolygonTouchEnd:(CGPoint)point
 {
     if( m_status != sta_polygon ) return false;
-    if (!m_polygon) m_polygon = [[PDFPath alloc] init];
+    if (!m_polygon) m_polygon = [[RDPDFPath alloc] init];
     if([m_polygon nodesCount] < 1)
     {
         m_tx = point.x * m_scale_pix;
@@ -1838,7 +1764,7 @@
 -(bool)OnPolylineTouchEnd:(CGPoint)point
 {
     if( m_status != sta_polyline ) return false;
-    if (!m_polygon) m_polygon = [[PDFPath alloc] init];
+    if (!m_polygon) m_polygon = [[RDPDFPath alloc] init];
     if([m_polygon nodesCount] < 1)
     {
         m_tx = point.x * m_scale_pix;
@@ -2015,8 +1941,11 @@
         if (!isRotating) {
             float width = (deltaMoveX > deltaMoveY) ? self.contentOffset.x + point.x - origin.origin.x : (self.contentOffset.y + point.y - origin.origin.y) * prop;
             float height = (deltaMoveX < deltaMoveY) ? self.contentOffset.y + point.y - origin.origin.y : (self.contentOffset.x + point.x - origin.origin.x) / prop;
-            if(width > 15 && height > 15)
-            [imgAnnot setFrame:CGRectMake(origin.origin.x, origin.origin.y, width, height)];
+            if(width > 0 && height > 0)
+            {
+                [imgAnnot setFrame:CGRectMake(origin.origin.x, origin.origin.y, width, height)];
+            }
+            
         } else {
             double l1 = point.x - imgAnnot.center.x;
             double l2 = imgAnnot.center.y - point.y;
@@ -2114,7 +2043,7 @@
     if (m_del) [m_del OnEditboxOK];
     RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
     if( !vpage ) return true;//shall not happen
-    PDFPage *page = [vpage GetPage];
+    RDPDFPage *page = [vpage GetPage];
     if( !page ) return true;//shall not happen
     m_annot_idx = [page annotCount] - 1;
     m_annot = [page annotAtIndex:m_annot_idx];
@@ -2130,7 +2059,7 @@
     [self ProRedrawOS];
 
     if (m_del) {
-        [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * (m_zoom * [m_layout vGetScaleMin:m_cur_page])];
+        [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * vpage.scale];
     }
     
     return true;
@@ -2214,7 +2143,7 @@
     {
         RDVPage *vpage = [m_layout vGetPage:pos.pageno];
         if( !vpage ) return;
-        PDFPage *page = [vpage GetPage];
+        RDPDFPage *page = [vpage GetPage];
         if (!page) {
             return;
         }
@@ -2228,26 +2157,26 @@
         //Action Stack Manger
         [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
         
-        PDFAnnot *annot = [page annotAtIndex: [page annotCount] - 1];
+        RDPDFAnnot *annot = [page annotAtIndex: [page annotCount] - 1];
         [annot setPopupSubject:subject];
         [annot setPopupText:text];
         
         // Set Author and Modify date
         [self updateLastAnnotInfoAtPage:page];
         
-        [self refreshCurrentPage];
+        [self ProUpdatePage:pos.pageno];
         [self autoSave];
     }
 }
 
-- (PDFAnnot *)vGetTextAnnot:(int)x :(int)y
+- (RDPDFAnnot *)vGetTextAnnot:(int)x :(int)y
 {
-    PDFAnnot *annot;
+    RDPDFAnnot *annot;
     RDVPos pos;
     [m_layout vGetPos:x * m_scale_pix :y * m_scale_pix :&pos];
     if(pos.pageno>=0)
     {
-        PDFPage *page = [m_doc page:pos.pageno];
+        RDPDFPage *page = [m_doc page:pos.pageno];
         [page objsStart];
         if( !page ) return NULL;
         annot = [page annotAtPoint:pos.pdfx: pos.pdfy];
@@ -2263,15 +2192,15 @@
     tp = [tp stringByAppendingPathComponent:@"cache.dat"];
     [m_doc setCache:tp];
     
-    // Create the PDFPage instance of the current page
-    PDFPage *page = [m_doc page:m_cur_page];
+    // Create the RDPDFPage instance of the current page
+    RDPDFPage *page = [m_doc page:m_cur_page];
     [page objsStart];
     
     // Create the CGImageRef of the image
     CGImageRef ref = [image CGImage];
     
-    // Get PDFDocImage instance from CGImageRef (keeping alpha channel)
-    PDFDocImage *i = [m_doc newImage:ref :YES];
+    // Get RDPDFDocImage instance from CGImageRef (keeping alpha channel)
+    RDPDFDocImage *i = [m_doc newImage:ref :YES];
     
     // Add the image
     [page addAnnotBitmap:i :&rect];
@@ -2291,34 +2220,23 @@
     [self autoSave];
 }
 
-- (BOOL)setSignatureImageAtIndex:(int)index atPage:(int)pageNum {
+- (BOOL)PDFSignField:(RDVPage *)vp :(RDPDFAnnot *)annot
+{
+    if (!vp) return false;
+
     // Create path.
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
-    
     UIImage *image = [UIImage imageWithContentsOfFile:filePath];
     
-    //get the PDFVPage
-    RDVPage *vpage = [m_layout vGetPage:pageNum];
-    if( !vpage ) return NO;
-    
-    //get the PDFPage
-    PDFPage *page = [vpage GetPage];
-    if (!page) {
-        return NO;
-    }
-    
-    //get the annotation
-    PDFAnnot *annot = [page annotAtIndex:index];
-    
-    //init PDFDocForm and PDFPageContent
-    PDFDocForm *form = [m_doc newForm];
-    PDFPageContent *content = [[PDFPageContent alloc] init];
+    //init RDPDFDocForm and RDPDFPageContent
+    RDPDFDocForm *form = [m_doc newForm];
+    RDPDFPageContent *content = [[RDPDFPageContent alloc] init];
     [content gsSave];
     
-    //create PDFDocImage with CGImageRef
+    //create RDPDFDocImage with CGImageRef
     CGImageRef ref = [image CGImage];
-    PDFDocImage *docImage = [m_doc newImage:ref :YES];
+    RDPDFDocImage *docImage = [m_doc newImage:ref :YES];
     PDF_PAGE_IMAGE rimg = [form addResImage:docImage];
     
     PDF_RECT rect;
@@ -2336,34 +2254,33 @@
     float yTranslation = (height - originalHeight * scale) / 2.0f;
     
     //set the matrix 20x20
-    PDFMatrix *matrix = [[PDFMatrix alloc] init:scale * originalWidth :scale * originalHeight :xTranslation :yTranslation];
+    RDPDFMatrix *matrix = [[RDPDFMatrix alloc] init:scale * originalWidth :scale * originalHeight :xTranslation :yTranslation];
     [content gsCatMatrix:matrix];
     matrix = nil;
     
-    //draw the image on the PDFPageContent
+    //draw the image on the RDPDFPageContent
     [content drawImage:rimg];
     [content gsRestore];
-    
-    //set the content on the PDFDocForm
+    //set the content on the RDPDFDocForm
     [form setContent:0 :0 :width :height :content];
-    
-    //set the custom icon
-    BOOL success = [annot setIcon2:@"myIcon" :form];
-    
     //free objects
     content = nil;
-    page = nil;
-    
-    [self ProUpdatePage:pageNum];
-    
     // Delete temp signature image
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-    
-    if (success) {
-        [self setModified:YES force:NO];
+
+    BOOL ret = false;
+    if (GLOBAL.g_fake_sign)
+        ret = [annot setIcon2:@"rdsign" :form];
+    else
+    {
+        NSString *cert_path = [[[NSBundle mainBundle] pathForResource:@"PDFRes" ofType:nil] stringByAppendingPathComponent:@"test.pfx"];
+        ret = ([annot signField:form :cert_path :@"111111" :@"" :@"" :@"" :@""] == 0);
     }
     
-    return success;
+    [self vClearOP];
+    [self setModified:NO force:YES];
+    [self ProUpdatePage:vp.pageno];
+    return ret;
 }
 /*
 -(void)vGetTextFromPoint:(CGPoint )point
@@ -2423,51 +2340,29 @@
 }
  */
 
-- (void)refreshCurrentPage {
-    if (m_cur_page > 0) {
-        [self ProUpdatePage:m_cur_page - 1];
-    }
-    if ((m_cur_page + 1) < [m_doc pageCount]) {
-        [self ProUpdatePage:m_cur_page + 1];
-    }
-    
-    if (m_cur_page >= 0 && m_cur_page < [m_doc pageCount]) {
-        [self ProUpdatePage:m_cur_page];
-    }
-    
-    [self setNeedsDisplay];
-    [m_canvas setNeedsDisplay];
-}
-
-- (void)refreshCachedPages {
-    int start = m_layout.cur_pg1;
-    int end = m_layout.cur_pg2;
-    
-    while (start < end) {
-        [self ProUpdatePage:start];
-        start++;
-    }
-}
-
-- (void)vUpdateAnnotPage
+-(void)vUpdateAnnotPage
 {
     [self ProUpdatePage:m_annot_pos.pageno];
     [self setNeedsDisplay];
     [m_canvas setNeedsDisplay];
 }
-- (CGFloat)vGetScale
+- (void)vUpdatePage:(int)pageno
 {
-    return [[m_layout vGetPage:m_cur_page] scale];
+    [self ProUpdatePage:pageno];
+    [self setNeedsDisplay];
+    [m_canvas setNeedsDisplay];
+}
+
+-(void)vUpdateRange
+{
+    [m_layout vRenderRange];
+    [self setNeedsDisplay];
+    [m_canvas setNeedsDisplay];
 }
 
 - (CGFloat)vGetPixSize
 {
     return m_scale_pix;
-}
-
-- (BOOL)pagingAvailable
-{
-    return (GLOBAL.g_render_mode == 3 || GLOBAL.g_render_mode == 4 || GLOBAL.g_render_mode == 6);
 }
 
 - (BOOL)canSaveDocument
@@ -2482,16 +2377,9 @@
 
 - (void)PDFSetGBColor:(int)color
 {
-    GLOBAL.g_readerview_bg_color = color;
-    
-    if (GLOBAL.g_readerview_bg_color != 0) {
+    if (color != 0) {
         self.backgroundColor = UIColorFromRGB(color);
     }
-}
-
-- (void)setFirstPageCover:(BOOL)cover
-{
-    coverPage = cover;
 }
 
 - (void)setDoubleTapZoomMode:(int)mode
@@ -2518,7 +2406,7 @@
     return NO;
 }
 
-- (BOOL)isReadOnlyAnnotEnabled:(PDFAnnot *)annot
+- (BOOL)isReadOnlyAnnotEnabled:(RDPDFAnnot *)annot
 {
     int pageno = [m_annot getDest];
     if( pageno >= 0 )       //is goto annot
@@ -2538,16 +2426,6 @@
     
     if (m_annot.type == 1)  //is note annot
         return YES;
-    
-    return NO;
-}
-
-- (BOOL)forceSave
-{
-    if ([m_doc save]) {
-        [self setModified:NO force:YES];
-        return YES;
-    }
     
     return NO;
 }
@@ -2575,6 +2453,7 @@
 {
     [m_layout vFindEnd];
     [self setNeedsDisplay];
+    [m_canvas setNeedsDisplay];
 }
 
 
@@ -2594,7 +2473,7 @@
         self.scrollEnabled = true;
         m_status = sta_none;
         m_sel = nil;
-        [self refreshCurrentPage];
+        [self ProRedrawOS];
     }
 }
 
@@ -2609,7 +2488,7 @@
     if( m_status != sta_sel || !m_sel ) return false;
     
     [self setModified:[m_sel SetSelMarkup:type] force:NO];
-    [actionManger push:[[ASAdd alloc] initWithPage:m_sel.pageno page:m_sel.pdfpage index:(m_sel.pdfpage.annotCount - 1)]];
+    [actionManger push:[[ASAdd alloc] initWithPage:m_sel.pageno page:m_sel.page index:(m_sel.page.annotCount - 1)]];
     
     [self autoSave];
     [self ProUpdatePage :m_sel_pos.pageno];
@@ -2659,8 +2538,8 @@
         return;
     }
     if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
-        if (m_del && [m_del respondsToSelector:@selector(OnAnnotSignature:)] && GLOBAL.g_enable_graphical_signature) {
-            [m_del OnAnnotSignature:m_annot];
+        if (m_del && GLOBAL.g_hand_signature) {
+            [m_del OnAnnotSignature :[m_layout vGetPage:m_annot_pos.pageno] :m_annot];
         }
         return;
     }
@@ -2681,10 +2560,10 @@
     [self setModified:YES force:NO];
     
     //Action Stack Manger
-    PDFPage *page = [m_doc page:m_annot_pos.pageno];
+    RDPDFPage *page = [m_doc page:m_annot_pos.pageno];
     [actionManger push:[[ASDel alloc] initWithPage:m_annot_pos.pageno page:page index:m_annot_idx]];
     
-    PDFAnnot *annot = [page annotAtIndex:m_annot_idx];
+    RDPDFAnnot *annot = [page annotAtIndex:m_annot_idx];
     [annot removeFromPage];
     [self vAnnotEnd];
     
@@ -2693,13 +2572,6 @@
     [m_canvas setNeedsDisplay];
     
     [self autoSave];
-}
--(void)removeAnnot :(PDFAnnot *)annot
-{
-    [annot removeFromPage];
-    [self setNeedsDisplay];
-    [m_canvas setNeedsDisplay];
-    [m_doc save];
 }
 
 -(void)vAnnotEnd
@@ -2807,9 +2679,9 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     if(pos.pageno >= 0)
     {
         RDVPage *vpage = [m_layout vGetPage:pos.pageno];
-        PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                   :self.contentOffset.y * m_scale_pix];
-        PDFPage *page = [vpage GetPage];
+        RDPDFPage *page = [vpage GetPage];
         [mat transformInk:m_ink];
         [page addAnnotInk:m_ink];
         // Set Author and Modify date
@@ -2863,11 +2735,11 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     if(pos.pageno >= 0)
     {
         RDVPage *vpage = [m_layout vGetPage:pos.pageno];
-        PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                   :self.contentOffset.y * m_scale_pix];
-        PDFPage *page = [vpage GetPage];
+        RDPDFPage *page = [vpage GetPage];
         [mat transformPath:m_polygon];
-        [page addAnnotPolygon:m_polygon :GLOBAL.g_line_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_width * m_scale_pix / [vpage scale]];
+        [page addAnnotPolygon:m_polygon :GLOBAL.g_line_annot_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_annot_width * m_scale_pix / [vpage scale]];
         // Set Author and Modify date
         [self updateLastAnnotInfoAtPage:page];
         
@@ -2920,11 +2792,11 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     if(pos.pageno >= 0)
     {
         RDVPage *vpage = [m_layout vGetPage:pos.pageno];
-        PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                   :self.contentOffset.y * m_scale_pix];
-        PDFPage *page = [vpage GetPage];
+        RDPDFPage *page = [vpage GetPage];
         [mat transformPath:m_polygon];
-        [page addAnnotPolyline:m_polygon :0 :0 :GLOBAL.g_line_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_width * m_scale_pix / [vpage scale]];
+        [page addAnnotPolyline:m_polygon :0 :0 :GLOBAL.g_line_annot_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_annot_width * m_scale_pix / [vpage scale]];
         // Set Author and Modify date
         [self updateLastAnnotInfoAtPage:page];
 
@@ -3016,11 +2888,11 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
                     rect.top = pt_cur->y;
                     rect.bottom = pt_cur[1].y;
                 }
-                PDFPage *page = [vpage GetPage];
-                PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+                RDPDFPage *page = [vpage GetPage];
+                RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
-                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_line_width :GLOBAL.g_line_annot_style1 :GLOBAL.g_line_annot_style2 :GLOBAL.g_line_color :GLOBAL.g_line_annot_fill_color];
+                [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_line_annot_width :GLOBAL.g_line_annot_style1 :GLOBAL.g_line_annot_style2 :GLOBAL.g_line_annot_color :GLOBAL.g_line_annot_fill_color];
                 
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -3122,11 +2994,11 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
                 rect.top = pt_cur->y;
                 rect.bottom = pt_cur[1].y;
             }
-            PDFPage *page = [vpage GetPage];
-            PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+            RDPDFPage *page = [vpage GetPage];
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                       :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&rect];
-            [page addAnnotRect:&rect: GLOBAL.g_rect_width * m_scale_pix / [vpage scale]: GLOBAL.g_rect_color: GLOBAL.g_rect_annot_fill_color];
+            [page addAnnotRect:&rect: GLOBAL.g_rect_annot_width * m_scale_pix / [vpage scale]: GLOBAL.g_rect_annot_color: GLOBAL.g_rect_annot_fill_color];
             
             //Action Stack Manger
             [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -3226,11 +3098,11 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
                 rect.top = pt_cur->y;
                 rect.bottom = pt_cur[1].y;
             }
-            PDFPage *page = [vpage GetPage];
-            PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+            RDPDFPage *page = [vpage GetPage];
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                       :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&rect];
-            [page addAnnotEllipse:&rect:GLOBAL.g_oval_width * m_scale_pix / [vpage scale] :GLOBAL.g_oval_color:GLOBAL.g_ellipse_annot_fill_color];
+            [page addAnnotEllipse:&rect:GLOBAL.g_oval_annot_width * m_scale_pix / [vpage scale] :GLOBAL.g_oval_annot_color:GLOBAL.g_oval_annot_fill_color];
             
             //Action Stack Manger
             [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -3412,8 +3284,8 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
                 rect.top = pt_cur->y;
                 rect.bottom = pt_cur[1].y;
             }
-            PDFPage *page = [vpage GetPage];
-            PDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+            RDPDFPage *page = [vpage GetPage];
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
                                                       :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&rect];
             if (rect.right - rect.left < 80) rect.right = rect.left + 80;
@@ -3475,11 +3347,6 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     [self setNeedsDisplay];
 }
 
-- (int)vGetCurrentPage
-{
-    return m_cur_page;
-}
-
 - (void)vUndo
 {
     ASItem *item = [actionManger undo];
@@ -3501,7 +3368,6 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     }
     
     [actionManger orderIndexes:item];
-    //[self refreshCurrentPage];
     
     // call update delegate method
     if(pg0 == pg1)
@@ -3545,7 +3411,6 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     }
     
     [actionManger orderIndexes:item];
-    //[self refreshCurrentPage];
     
     // call update delegate method
     if(pg0 == pg1)
@@ -3566,15 +3431,20 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     }
 }
 
+- (void)vClearOP
+{
+    [actionManger clear];
+}
+
 #pragma mark - PDFJSDelegate Methods
 
 - (void)executeAnnotJS {
     [self executeAnnotJS:m_annot];
 }
 
-- (void)executeAnnotJS:(PDFAnnot *)annot
+- (void)executeAnnotJS:(RDPDFAnnot *)annot
 {
-    if (!annot || ! GLOBAL.g_execute_annot_JS) {
+    if (!annot || ! GLOBAL.g_exec_js) {
         return;
     }
     

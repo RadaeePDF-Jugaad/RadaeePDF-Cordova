@@ -7,7 +7,7 @@
 
 #pragma once
 #import <UIKit/UIKit.h>
-@class PDFDIB;
+@class RDPDFDIB;
 
 typedef void(^onPageDelete)(int pageno);
 @interface UIPageCellView : UIView
@@ -18,7 +18,7 @@ typedef void(^onPageDelete)(int pageno);
     int m_pageno;
     onPageDelete m_del;
 }
-- (void)UIUpdate:(PDFDIB *)dib;
+- (void)UIUpdate:(RDPDFDIB *)dib;
 - (void)UIRemove;
 - (void)setPageNo:(onPageDelete)del :(int)pageno;
 - (int)getRotate;

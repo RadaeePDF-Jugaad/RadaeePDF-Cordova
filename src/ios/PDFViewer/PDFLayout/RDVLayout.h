@@ -28,7 +28,7 @@ typedef struct _RDVPos
 
 @interface RDVLayout :NSObject
 {
-    PDFDoc *m_doc;
+    RDPDFDoc *m_doc;
     NSMutableArray *m_pages;
     int m_pages_cnt;
     RDVThread *m_thread;
@@ -53,11 +53,6 @@ typedef struct _RDVPos
     RDVFinder *m_finder;
     id<RDVLayoutDelegate> m_del;
     CALayer *m_rlayer;
-    
-    // custom scales
-    float *m_scales_min;
-    float *m_scales_max;
-    float *m_scales;
 }
 @property(readonly) int docx;
 @property(readonly) int docy;
@@ -65,15 +60,12 @@ typedef struct _RDVPos
 @property(readonly) int doch;
 @property(readonly) int vw;
 @property(readonly) int vh;
-@property(readonly) float zoomMin;
-@property(readonly) float zoomMax;
-@property(readonly) float zoom;
 @property(readonly) RDVFinder *finder;
 @property(readonly) int cur_pg1;
 @property(readonly) int cur_pg2;
 
 -(id)init :(id<RDVLayoutDelegate>)del;
--(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay;
+-(void)vOpen :(RDPDFDoc *)doc :(int)page_gap :(CALayer *)rlay;
 -(void)vClose;
 -(void)vResize :(int)vw :(int)vh;
 -(void)vGetPos :(int)vx :(int)vy :(RDVPos *)pos;
@@ -81,13 +73,13 @@ typedef struct _RDVPos
 -(void)vMoveTo :(int)docx :(int)docy;
 -(RDVPage *)vGetPage :(int)pageno;
 -(void)vDraw :(RDVCanvas *)canvas;
--(float)vGetScaleMin:(int)page;
 -(void)vZoomStart;
 -(void)vZooming:(float)zoom;
 -(void)vZoomConfirm;
 -(void)vGotoPage:(int)pageno;
 -(void)vRenderAsync:(int)pageno;
 -(void)vRenderSync:(int)pageno;
+-(void)vRenderRange;
 -(void)vFindStart:(NSString *)pat :(bool)match_case :(bool) whole_word;
 -(int)vFind:(int) dir;
 -(void)vFindEnd;
@@ -108,7 +100,9 @@ typedef enum _PAGE_ALIGN
 @interface RDVLayoutVert :RDVLayout
 {
     PAGE_ALIGN m_align;
+    bool m_same_width;
 }
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)same_width;
 -(void)vSetAlign :(PAGE_ALIGN) align;
 @end
 
@@ -116,16 +110,17 @@ typedef enum _PAGE_ALIGN
 {
     PAGE_ALIGN m_align;
     bool       m_rtol;
+    bool       m_same_height;
     bool       m_thumb;
 }
--(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol;
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol :(bool)same_height;
 -(void)vSetAlign :(PAGE_ALIGN) align;
 @end
 
 @interface RDVLayoutThumb :RDVLayoutHorz
 {
 }
--(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol;
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol;
 @end
 
 @interface RDVLayoutGrid :RDVLayout
@@ -138,9 +133,18 @@ typedef enum _PAGE_ALIGN
 -(id)init :(id<RDVLayoutDelegate>)del :(int)height :(int)mode;
 @end
 
+typedef enum
+{
+    SCALE_NONE = 0,//no scale, same to old layout style.
+    SCALE_SAME_WIDTH = 1,//min scale of all cells are in same width
+    SCALE_SAME_HEIGHT = 2,//min scale of all cells are in same height
+    SCALE_FIT = 3//min scale of all cells are fit screen.
+}SCALE_MODE;
+
 @interface RDVLayoutDual :RDVLayout
 {
     PAGE_ALIGN m_align;
+    SCALE_MODE m_smode;
     bool       m_rtol;
     int        m_cells_cnt;
     bool       *m_vert_dual;
@@ -157,6 +161,7 @@ typedef enum _PAGE_ALIGN
     }* m_cells;
 }
 -(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol :(const bool *)verts :(int)verts_cnt :(const bool *)horzs :(int) horzs_cnt;
+-(void)vSetScaleMode :(SCALE_MODE)scale_mode;
 -(void)vSetAlign :(PAGE_ALIGN) align;
 @end
 
@@ -169,5 +174,4 @@ typedef enum _PAGE_ALIGN
 }
 -(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol :(int)pageno;
 -(void)vSetAlign :(PAGE_ALIGN) align;
--(void)vOpen :(PDFDoc *)doc :(int)page_gap :(CALayer *)rlay :(int)pageno;
 @end

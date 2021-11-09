@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class PDFOutline;
+@class RDPDFOutline;
 
 @interface OUTLINE_ITEM : NSObject
 @property(nonatomic,strong) NSString *label;
@@ -20,5 +20,5 @@
 @property(nonatomic,strong) NSMutableArray *childIndexes;
 @property(nonatomic,assign) int dest;
 @property(nonatomic,assign) int level;
-@property(nonatomic,strong) PDFOutline *child;
+@property(nonatomic,strong) RDPDFOutline *child;
 @end

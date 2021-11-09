@@ -1,6 +1,7 @@
 #import "RDVPage.h"
 #import "RDVThread.h"
 #import "RDVCache.h"
+#import "RDVGlobal.h"
 
 @implementation RDVPage
 @synthesize pageno = m_pageno;
@@ -11,7 +12,7 @@
 @synthesize scale = m_scale;
 @synthesize thumbMode = m_thumb;
 
--(id)init :(PDFDoc *) doc :(int) pageno :(int) cw :(int) ch
+-(id)init :(RDPDFDoc *) doc :(int) pageno :(int) cw :(int) ch
 {
     if( self = [super init] )
     {
@@ -56,7 +57,7 @@
     m_layer = nil;
 }
 
-- (PDFPage *)GetPage
+- (RDPDFPage *)GetPage
 {
     if(!m_page) m_page = [m_doc page:m_pageno];
     return m_page;
@@ -122,14 +123,14 @@
 {
 	return (float)val / m_scale;
 }
--(PDFMatrix *)CreateInvertMatrix :(float) scrollx :(float) scrolly
+-(RDPDFMatrix *)CreateInvertMatrix :(float) scrollx :(float) scrolly
 {
-	return [[PDFMatrix alloc] init :1/m_scale :-1/m_scale :(scrollx - m_x)/m_scale :(m_y + m_h - scrolly)/m_scale];
+	return [[RDPDFMatrix alloc] init :1/m_scale :-1/m_scale :(scrollx - m_x)/m_scale :(m_y + m_h - scrolly)/m_scale];
 }
 
--(PDFMatrix *)CreateIMatrix :(float) scrollx :(float) scrolly :(float)scale
+-(RDPDFMatrix *)CreateIMatrix :(float) scrollx :(float) scrolly :(float)scale
 {
-    return [[PDFMatrix alloc] init :scale/m_scale :-scale/m_scale :(scrollx - m_x) * scale/m_scale :(m_y + m_h - scrolly) * scale/m_scale];
+    return [[RDPDFMatrix alloc] init :scale/m_scale :-scale/m_scale :(scrollx - m_x) * scale/m_scale :(m_y + m_h - scrolly) * scale/m_scale];
 }
 
 -(void)blocks_destroy :(RDVThread *) thread
@@ -250,7 +251,7 @@
 -(void)vEndPage :(RDVThread *) thread
 {
     [self vZoomEnd :thread];
-    PDFPage *page = m_page;
+    RDPDFPage *page = m_page;
     m_page = nil;
     [thread end_page:page];
 	if (!m_caches) return;
@@ -490,7 +491,7 @@
     }
 }
 
--(bool)vDrawZoom :(float)scale
+-(bool)vDrawZoom
 {
     if (!m_caches_zoom) return false;
     int xcnt = [m_caches_zoom cols];
@@ -502,7 +503,7 @@
         for(xcur = 0; xcur < xcnt; xcur++)
         {
             RDVCache *vc = [m_caches_zoom get :xcur :ycur];
-            if(vc) [vc vDrawZoom :m_layer :scale];
+            if(vc) [vc vDrawZoom :m_layer :m_scale];
         }
     }
     return true;

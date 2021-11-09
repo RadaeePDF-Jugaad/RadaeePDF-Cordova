@@ -21,6 +21,10 @@
     [_authorTextField setText:[_doc meta:@"Author"]];
     [_subjectTextField setText:[_doc meta:@"Subject"]];
     [_keyWordsTextView setText:[_doc meta:@"Keywords"]];
+    _titleLabel.text = NSLocalizedString(@"Title", nil);
+    _authorLabel.text = NSLocalizedString(@"Author", nil);
+    _subjectLabel.text = NSLocalizedString(@"Subject", nil);
+    _keywordLabel.text = NSLocalizedString(@"Keywords", nil);
     
     if (@available(iOS 13.0, *)) {
         _keyWordsTextView.layer.borderColor = [UIColor systemGray4Color].CGColor;
