@@ -9,7 +9,7 @@
     ]
   },
     "dependencies": {
-  "cordova-android": "^8.0.0",
+  "cordova-android": "^8.0.0"
 },
   "repository": {
     "type": "git",
