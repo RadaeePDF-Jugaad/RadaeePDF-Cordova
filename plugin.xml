@@ -109,7 +109,7 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PopupEditAct.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePluginCallback.java" target-dir="src/com/radaee/util" />
-		
+
 		<!-- Radaee source - java.com.radaee.view -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayout.java" target-dir="src/com/radaee/view"/>
@@ -146,7 +146,7 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowBlock.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowCanvas.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual2.java" target-dir="src/com/radaee/view"/>
-		
+
 		<!-- Annot UI -->
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlg.java" target-dir="src/com/radaee/annotui"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgComm.java" target-dir="src/com/radaee/annotui"/>
@@ -216,12 +216,12 @@
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_icon_text.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lhead.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/pop_lstyle.xml" target-dir="res/layout" />
-		<source-file src="src/android/ViewLib/src/main/res/layout/pop_more.xml" target-dir="res/layout" />		
+		<source-file src="src/android/ViewLib/src/main/res/layout/pop_more.xml" target-dir="res/layout" />
         <source-file src="src/android/ViewLib/src/main/res/layout/pop_view.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
-		
+
         <!-- Radaee raw -->
         <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/arimo" target-dir="res/raw" />
@@ -290,7 +290,7 @@
 		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_btn_menu.xml" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_background.png" target-dir="res/drawable" />
 		<source-file src="src/android/ViewLib/src/main/res/drawable/bg_menu.png" target-dir="res/drawable" />
-	    
+
 		<!-- Radaee values -->
 		<source-file src="src/android/ViewLib/src/main/res/values/styles.xml" target-dir="res/values" />
 		<source-file src="src/android/ViewLib/src/main/res/values/bools.xml" target-dir="res/values" />
@@ -330,7 +330,7 @@
             <string name="failed_unknown">Open Failed: Unknown Error</string>
             <string name="please_wait">Please wait</string>
             <string name="no_more_found">No more found</string>
-            
+
             <string name="thumbnail_creation_running">Thumbnail creation is running…</string>
             <string name="exiting">Exiting</string>
             <string name="no">No</string>
@@ -355,7 +355,7 @@
             <string name="reflow">Text reflow</string>
             <string name="save_msg">Document modified.\nDo you want to save it?</string>
             <string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
-            
+
             <string name="read_only_annotation">Read only annotation</string>
             <string name="note_content">Note Content</string>
             <string name="note_subject">Subject:</string>
@@ -376,7 +376,7 @@
             <string name="create_pdf">CreatePDF</string>
             <string name="javascript">JavaScript</string>
             <string name="about">About</string>
-            
+
             <string name="ok">OK</string>
             <string name="todo_open_url">todo: open url: </string>
             <string name="todo_java_script">todo: execute java script</string>
@@ -389,15 +389,15 @@
             <string name="file_not_opened">Cannot open %1$s.</string>
             <string name="catalog_not_found">Catalog object is not a dictionary.</string>
             <string name="edit_catalog_failed">Edit catalog failed.</string>
-            
+
             <string name="no_pdf_outlines">PDF does not contain outlines</string>
             <string name="pdf_print_not_available">PDF File is not available for print.</string>
             <string name="pdf_print_calculation_failed">Page count calculation failed.</string>
-            
+
             <string name="pdf_share_not_available">PDF File is not available for share.</string>
-            
+
             <string name="copy_text">Text copied to clipboard: %1$s</string>
-            
+
             <string name="print">Print</string>
             <string name="share">Share</string>
             <string name="bookmark_label">Page: %1$d</string>
@@ -417,7 +417,7 @@
             <string name="saved_message">Document saved</string>
             <string name="delete_signature_message">A signature is already present, do you want to delete it?</string>
             <string name="warning">Warning</string>
-			
+
 			<string name="no_search_reflow">Search not supported in Reflow mode!</string>
 			<string name="pages_list">Pages List</string>
             <string name="annot_perform">Perform</string>
@@ -434,7 +434,7 @@
             <string name="icon">icon</string>
             <string name="annot_lock">Lock</string>
             <string name="alpha">Alpha</string>
-			
+
 		</config-file>
 
         <!-- Hooks -->
@@ -459,7 +459,7 @@
         <!-- Radaee sources -->
         <source-file src="src/ios/RadaeePDFPlugin.m" />
         <header-file src="src/ios/RadaeePDFPlugin.h" />
-        
+
         <header-file src="src/ios/PDFViewer/RDToolBar.h" target-dir="ios/PDFViewer"/>
         <source-file src="src/ios/PDFViewer/RDToolBar.m" target-dir="ios/PDFViewer"/>
         <header-file src="src/ios/PDFViewer/RDMenu.h" target-dir="ios/PDFViewer"/>
@@ -470,7 +470,7 @@
         <source-file src="src/ios/PDFViewer/UILShadowView.m" target-dir="ios/PDFViewer"/>
         <header-file src="src/ios/PDFViewer/UINavigationController+autoRotate.h" target-dir="ios/PDFViewer"/>
         <source-file src="src/ios/PDFViewer/UINavigationController+autoRotate.m" target-dir="ios/PDFViewer"/>
-        
+
         <source-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.m" target-dir="ios/PDFViewer/PDFReader"/>
         <header-file src="src/ios/PDFViewer/PDFReader/PDFReaderCtrl.h" target-dir="ios/PDFViewer/PDFReader"/>
         <source-file src="src/ios/PDFViewer/PDFReader/DlgAnnotPropComm.m" target-dir="ios/PDFViewer/PDFReader"/>
@@ -530,7 +530,7 @@
         <resource-file src="src/ios/PDFViewer/PDFReader/RDPopupTextViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
         <resource-file src="src/ios/PDFViewer/PDFReader/SearchResultViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
         <resource-file src="src/ios/PDFViewer/PDFReader/RDBookmarkViewController.xib" target-dir="ios/PDFViewer/PDFReader"/>
-        
+
         <source-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
         <header-file src="src/ios/PDFViewer/RDTreeTableViewController/OUTLINE_ITEM.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
         <source-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeTableViewCell.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
@@ -538,7 +538,7 @@
         <source-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.m" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
         <header-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.h" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
         <resource-file src="src/ios/PDFViewer/RDTreeTableViewController/RDTreeViewController.xib" target-dir="ios/PDFViewer/RDTreeTableViewController"/>
-        
+
         <source-file src="src/ios/PDFViewer/PDFView/ActionStackManager.m" target-dir="ios/PDFViewer/PDFView"/>
         <header-file src="src/ios/PDFViewer/PDFView/ActionStackManager.h" target-dir="ios/PDFViewer/PDFView"/>
         <header-file src="src/ios/PDFViewer/PDFView/PDFDelegate.h" target-dir="ios/PDFViewer/PDFView"/>
@@ -556,7 +556,7 @@
         <header-file src="src/ios/PDFViewer/PDFView/PDFThumbView.h" target-dir="ios/PDFViewer/PDFView"/>
         <source-file src="src/ios/PDFViewer/PDFView/RDPDFView.m" target-dir="ios/PDFViewer/PDFView"/>
         <header-file src="src/ios/PDFViewer/PDFView/RDPDFView.h" target-dir="ios/PDFViewer/PDFView"/>
-        
+
         <source-file src="src/ios/PDFViewer/PDFLayout/RDUtils.m" target-dir="ios/PDFViewer/PDFLayout"/>
         <header-file src="src/ios/PDFViewer/PDFLayout/RDUtils.h" target-dir="ios/PDFViewer/PDFLayout"/>
         <source-file src="src/ios/PDFViewer/PDFLayout/RDVLayout.m" target-dir="ios/PDFViewer/PDFLayout"/>
@@ -575,14 +575,14 @@
         <header-file src="src/ios/PDFViewer/PDFLayout/RDVThread.h" target-dir="ios/PDFViewer/PDFLayout"/>
         <source-file src="src/ios/PDFViewer/PDFLayout/RDVSel.m" target-dir="ios/PDFViewer/PDFLayout"/>
         <header-file src="src/ios/PDFViewer/PDFLayout/RDVSel.h" target-dir="ios/PDFViewer/PDFLayout"/>
-        
+
         <source-file src="src/ios/PDFViewer/PDFLib/PDFHttpStream.m" target-dir="ios/PDFViewer/PDFLib"/>
         <header-file src="src/ios/PDFViewer/PDFLib/PDFHttpStream.h" target-dir="ios/PDFViewer/PDFLib"/>
         <source-file src="src/ios/PDFViewer/PDFLib/PDFObjc.m" target-dir="ios/PDFViewer/PDFLib"/>
         <header-file src="src/ios/PDFViewer/PDFLib/PDFObjc.h" target-dir="ios/PDFViewer/PDFLib"/>
         <header-file src="src/ios/PDFViewer/PDFLib/PDFIOS.h" target-dir="ios/PDFViewer/PDFLib"/>
         <source-file src="src/ios/PDFViewer/PDFLib/libRDPDFLib.a" framework="true" target-dir="ios/PDFViewer/PDFLib"/>
-        
+
         <source-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.m" target-dir="ios/PDFViewer/PDFPages"/>
         <header-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.h" target-dir="ios/PDFViewer/PDFPages"/>
         <source-file src="src/ios/PDFViewer/PDFPages/PDFPagesView.m" target-dir="ios/PDFViewer/PDFPages"/>
@@ -591,10 +591,10 @@
         <header-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.h" target-dir="ios/PDFViewer/PDFPages"/>
         <resource-file src="src/ios/PDFViewer/PDFPages/PDFPagesCtrl.storyboard" target-dir="ios/PDFViewer/PDFPages"/>
         <resource-file src="src/ios/PDFViewer/PDFPages/UIPageCellView.xib" target-dir="ios/PDFViewer/PDFPages"/>
-        
+
         <source-file src="src/ios/PDFViewer/RDPlugin/RDFormManager.m" target-dir="ios/PDFViewer/RDPlugin"/>
         <header-file src="src/ios/PDFViewer/RDPlugin/RDFormManager.h" target-dir="ios/PDFViewer/RDPlugin"/>
-        
+
         <source-file src="src/ios/PDFViewer/RDSignature/SignatureViewController.m" target-dir="ios/PDFViewer/RDSignature"/>
         <header-file src="src/ios/PDFViewer/RDSignature/SignatureViewController.h" target-dir="ios/PDFViewer/RDSignature"/>
         <source-file src="src/ios/PDFViewer/RDSignature/UviSignatureView.m" target-dir="ios/PDFViewer/RDSignature"/>
@@ -621,8 +621,11 @@
         <source-file src="src/ios/PDFViewer/ASIHttpRequest/Reachability.m" target-dir="ios/PDFViewer/ASIHttpRequest"/>
         <header-file src="src/ios/PDFViewer/ASIHttpRequest/Reachability.h" target-dir="ios/PDFViewer/ASIHttpRequest"/>
         -->
-        
+
         <resource-file src="src/ios/PDFViewer/PDFRes" target-dir="ios/PDFViewer"/>
+        <resource-file src="src/ios/PDFViewer/en.lproj" target-dir="ios/PDFViewer"/>
+        <resource-file src="src/ios/PDFViewer/it.lproj" target-dir="ios/PDFViewer"/>
+        <resource-file src="src/ios/PDFViewer/zh-Hans.lproj" target-dir="ios/PDFViewer"/>
 
         <!-- fonts -->
         <resource-file src="fonts/Roboto-Black.ttf" />
