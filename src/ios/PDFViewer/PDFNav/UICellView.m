@@ -18,7 +18,7 @@
     RDVLocker *m_locker;
 
     func_delete m_delete;
-    PDFDIB *m_dib;//rendered thumb
+    RDPDFDIB *m_dib;//rendered thumb
     int m_dibw;
     int m_dibh;
 }
@@ -92,11 +92,11 @@
 -(void)BKRender
 {
     [m_locker lock];
-    PDFDoc *doc = [[PDFDoc alloc] init];
+    RDPDFDoc *doc = [[RDPDFDoc alloc] init];
     int err = [doc open:m_path :nil];
     if(!err)
     {
-        PDFPage *page = [doc page:0];
+        RDPDFPage *page = [doc page:0];
         float pw = [doc pageWidth:0];
         float ph = [doc pageHeight:0];
         float scale0 = m_dibw / pw;
@@ -106,11 +106,11 @@
         ph *= scale0;
         int dibw = (int)(pw + 0.5f);
         int dibh = (int)(ph + 0.5f);
-        m_dib = [[PDFDIB alloc] init: dibw :dibh];
+        m_dib = [[RDPDFDIB alloc] init: dibw :dibh];
         [page renderPrepare:m_dib];
         if(![page renderThumb:m_dib])
         {
-            PDFMatrix *mat = [[PDFMatrix alloc] init:scale0 :-scale0 :0 :dibh];
+            RDPDFMatrix *mat = [[RDPDFMatrix alloc] init:scale0 :-scale0 :0 :dibh];
             [page render:m_dib :mat :2];
             mat = nil;
         }
@@ -120,10 +120,10 @@
     [m_locker unlock];
 }
 
--(PDFDoc *)UIGetDoc : (NSString *)pswd :(int *)err
+-(RDPDFDoc *)UIGetDoc : (NSString *)pswd :(int *)err
 {
     [m_locker lock];
-    PDFDoc *doc = [[PDFDoc alloc] init];
+    RDPDFDoc *doc = [[RDPDFDoc alloc] init];
     *err = [doc open:m_path :pswd];
     [m_locker unlock];
     return doc;

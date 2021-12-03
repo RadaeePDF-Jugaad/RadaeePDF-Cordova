@@ -211,10 +211,9 @@
 
 - (bool)saveDocumentToPath:(NSString *)path
 {
-    if([path containsString:@"file://"] || [path containsString:@"file:/"])
+    if([path containsString:@"file://"])
     {
         NSString *filePath = [path stringByReplacingOccurrencesOfString:@"file://" withString:@""];
-        filePath = [path stringByReplacingOccurrencesOfString:@"file:/" withString:@""];
         
         if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);

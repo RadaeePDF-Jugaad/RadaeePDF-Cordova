@@ -90,9 +90,9 @@ static NSString * const reuseIdentifier = @"Cell";
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     RDFileItem *item = [m_files objectAtIndex:indexPath.row];
-    if (GLOBAL.g_render_mode == 2)
+    if (GLOBAL.g_view_mode == 2)
         [self pdf_open_path_page:item :nil];
-    else if(GLOBAL.g_render_mode == 5)
+    else if(GLOBAL.g_view_mode == 5)
         [self pdf_open_path_reflow:item :nil];
     else
         [self pdf_open_path:item :nil];
@@ -247,7 +247,7 @@ static NSString * const reuseIdentifier = @"Cell";
 - (void)pdf_open_path:(RDFileItem *)item :(NSString *)pswd
 {
     //Open PDF file
-    PDFDoc *doc = [[PDFDoc alloc] init];
+    RDPDFDoc *doc = [[RDPDFDoc alloc] init];
     [item.locker lock];
     int result = [doc open:item.path :pswd];
     [item.locker unlock];
@@ -256,6 +256,7 @@ static NSString * const reuseIdentifier = @"Cell";
         m_pdf = [[UIStoryboard storyboardWithName:@"PDFReaderCtrl" bundle:nil] instantiateViewControllerWithIdentifier:@"rdpdfreader"];
         [m_pdf setDoc:doc];
         m_pdf.hidesBottomBarWhenPushed = YES;
+        GLOBAL.g_pdf_path = [item.path stringByDeletingLastPathComponent];
         GLOBAL.g_pdf_name = [NSMutableString stringWithString:[item.path lastPathComponent]];
         [self.navigationController pushViewController:m_pdf animated:YES];
     }
@@ -394,8 +395,8 @@ static NSString * const reuseIdentifier = @"Cell";
     NSString *testfile = [[NSTemporaryDirectory() stringByAppendingString:@""] stringByAppendingString:@"cache.pdf"];
     httpStream = [[PDFHttpStream alloc] init];
     [httpStream open:url :testfile];
-    PDFDoc *doc = [[PDFDoc alloc] init];
-    [PDFDoc setOpenFlag:3];
+    RDPDFDoc *doc = [[RDPDFDoc alloc] init];
+    [RDPDFDoc setOpenFlag:3];
     int error = [doc openStream:httpStream :@""];
     
     switch(error)
@@ -439,7 +440,7 @@ static NSString * const reuseIdentifier = @"Cell";
 
 - (void)showSelectedFileMeta:(NSString *)pdfPath
 {
-    PDFDoc *doc = [[PDFDoc alloc] init];
+    RDPDFDoc *doc = [[RDPDFDoc alloc] init];
     __block BOOL error = [doc open:pdfPath :@""];
     if (error) {
         [self pdf_show_pwd_error:^(NSString *pwd) {

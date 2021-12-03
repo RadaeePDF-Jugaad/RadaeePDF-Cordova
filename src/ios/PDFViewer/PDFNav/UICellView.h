@@ -18,6 +18,6 @@ typedef void(^func_delete)(id);
 -(void)UISetDelete:(func_delete)callback;
 -(void)UIUpdate;
 -(void)BKRender;
--(PDFDoc *)UIGetDoc : (NSString *)pswd :(int *)err;
+-(RDPDFDoc *)UIGetDoc : (NSString *)pswd :(int *)err;
 -(void)UIDelete;
 @end

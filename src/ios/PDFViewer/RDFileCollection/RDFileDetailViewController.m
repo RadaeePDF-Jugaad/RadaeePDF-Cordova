@@ -27,7 +27,7 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd hh:mm"];
     NSString *modificationDate = [dateFormatter stringFromDate:[attributes objectForKey:NSFileModificationDate]];
-    NSString *lastModifiedString = [NSString stringWithFormat:@"Last modified %@", modificationDate];
+    NSString *lastModifiedString = [NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Last modified", nil), modificationDate];
     
     [_sizeLabel setText:fileSize];
     [_lastModifiedLabel setText:lastModifiedString];
@@ -40,6 +40,10 @@
     [_renameButton setTitleColor:[RDUtils radaeeBlackColor] forState:UIControlStateNormal];
     [_shareButton setTitleColor:[RDUtils radaeeBlackColor] forState:UIControlStateNormal];
     [_deleteButton setTitleColor:[RDUtils radaeeBlackColor] forState:UIControlStateNormal];
+    [_metaButton setTitle:NSLocalizedString(@"Meta", nil) forState:UIControlStateNormal];
+    [_renameButton setTitle:NSLocalizedString(@"Rename", nil) forState:UIControlStateNormal];
+    [_shareButton setTitle:NSLocalizedString(@"Share", nil) forState:UIControlStateNormal];
+    [_deleteButton setTitle:NSLocalizedString(@"Delete", nil) forState:UIControlStateNormal];
 }
 
 - (IBAction)dismissView:(id)sender
@@ -60,14 +64,14 @@
     if (!_nameField.userInteractionEnabled) {
         [_nameField setUserInteractionEnabled:YES];
         [_nameField becomeFirstResponder];
-        [_renameButton setTitle:@"Save" forState:UIControlStateNormal];
+        [_renameButton setTitle:NSLocalizedString(@"Save", nil) forState:UIControlStateNormal];
     } else {
         NSError * err = NULL;
         NSFileManager * fm = [[NSFileManager alloc] init];
         NSString *newPath = [[_pdfPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[_nameField.text stringByAppendingPathExtension:@"pdf"]];
         if (![_pdfPath isEqualToString:newPath] && [fm fileExistsAtPath:newPath]) {
-            NSString *message = [NSString stringWithFormat:@"%@ already exist",[newPath lastPathComponent]];
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Warining" message:message preferredStyle:UIAlertControllerStyleAlert];
+            NSString *message = [NSString stringWithFormat:@"%@ %@",[newPath lastPathComponent],NSLocalizedString(@"already exist", nil)];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Warning", nil) message:message preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil];
             [alertController addAction:cancelAction];
             [self presentViewController:alertController animated:YES completion:^{
@@ -79,7 +83,7 @@
         if(!result)
             NSLog(@"Error: %@", err);
         _pdfPath = newPath;
-        [_renameButton setTitle:@"Rename" forState:UIControlStateNormal];
+        [_renameButton setTitle:NSLocalizedString(@"Rename", nil) forState:UIControlStateNormal];
         [_nameField resignFirstResponder];
         [_nameField setUserInteractionEnabled:NO];
     }
@@ -90,18 +94,26 @@
     NSURL *fileUrl = [NSURL fileURLWithPath:_pdfPath];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[fileUrl]
                                     applicationActivities:nil];
-    [self presentViewController:activityViewController animated:YES completion:nil];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [self presentViewController:activityViewController animated:YES completion:nil];
+    }
+    else
+    {
+        UIPopoverController *popup = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        [popup presentPopoverFromRect:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/2, 0, 0) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    }
 }
 
 - (IBAction)deleteButtonTapped:(id)sender
 {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Warining" message:@"Are you sure you want to delete this file?" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Warning", nil) message:NSLocalizedString(@"Are you sure you want to delete this file?", nil) preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Delete", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         NSFileManager *fm = [NSFileManager defaultManager];
         [fm removeItemAtPath:self->_pdfPath error:nil];
         [self dismissView:nil];
     }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil];
     [alertController addAction:okAction];
     [alertController addAction:cancelAction];
     

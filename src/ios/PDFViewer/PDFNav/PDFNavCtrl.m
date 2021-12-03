@@ -14,7 +14,7 @@
 
 - (void)show_error:(NSString *)msg
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:msg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", nil) message:msg preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *conform = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }];
     [alert addAction:conform];
@@ -23,12 +23,12 @@
 
 - (void)show_password :(UICellView *)cell
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Password" message:@"Need password to open the PDF file." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Password" message:NSLocalizedString(@"Need password to open the PDF file.", nil) preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *conform = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         UITextField *txt = [alert textFields][0];
         [self process_open :cell :[txt text]];
     }];
-    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
     }];
     
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
@@ -42,13 +42,13 @@
 
 - (void)process_delete:(UICellView *)cell
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete" message:@"Do you confirm to delete the PDF file?" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Delete" , nil) message:NSLocalizedString(@"Do you confirm to delete the PDF file?", nil) preferredStyle:UIAlertControllerStyleAlert];
     PDFNavThumb *vw = mNav;
     UIAlertAction *conform = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [cell UIDelete];
         [vw refresh];
     }];
-    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
     }];
     [alert addAction:conform];
     [alert addAction:cancel];
@@ -59,7 +59,7 @@
 {
     int err = 0;
     PDFReaderCtrl *reader;
-    PDFDoc *doc = [cell UIGetDoc:pswd :&err];
+    RDPDFDoc *doc = [cell UIGetDoc:pswd :&err];
     switch(err)
     {
         case err_ok://goto reader page.

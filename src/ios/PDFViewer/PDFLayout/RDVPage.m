@@ -440,7 +440,7 @@
 -(void)vDraw :(RDVThread *) thread :(int) vx :(int) vy :(int) vw :(int) vh
 {
     if (!m_caches) return;
-    
+
     int xcnt = [m_caches cols];
     int ycnt = [m_caches rows];
     [self get_xyb0 :vx :vy :vw :vh :xcnt :ycnt];
@@ -460,7 +460,7 @@
             RDVCache *vc = [m_caches get :xcur :ycur];
             [thread start_render :vc];
             [vc vDraw :m_layer];
-            
+
             xval += vc.w;
         }
         [self end_render_xb :thread :xcur :xcnt :ycur];

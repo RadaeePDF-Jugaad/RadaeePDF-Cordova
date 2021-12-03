@@ -19,11 +19,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [[UIBarButtonItem appearance] setTintColor:[UIColor systemOrangeColor]];
-    [[UIButton appearance] setTintColor:[UIColor systemOrangeColor]];
+    [[UIBarButtonItem appearance] setTintColor:[RDUtils radaeeIconColor]];
+    [[UIButton appearance] setTintColor:[RDUtils radaeeIconColor]];
     [[UIButton appearance] setTitleColor:[UIColor systemBlueColor] forState:UIControlStateNormal];
-    [[UIImageView appearance] setTintColor:[UIColor systemOrangeColor]];
-    [[UITableViewCell appearance] setTintColor:[UIColor systemOrangeColor]];
+    [[UIImageView appearance] setTintColor:[RDUtils radaeeIconColor]];
+    [[UITableViewCell appearance] setTintColor:[RDUtils radaeeIconColor]];
     
     
     g_id = [[NSBundle mainBundle] bundleIdentifier];
@@ -45,14 +45,12 @@
     NSMutableArray *localControllesArray = [[NSMutableArray alloc]initWithCapacity:4];
     RDFileCollectionViewController *ctl = [[RDFileCollectionViewController alloc] initWithNibName:@"RDFileCollectionViewController" bundle:nil];
     navController = [[UINavigationController alloc] initWithRootViewController:ctl];
-    navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     [localControllesArray addObject:navController];
     
     NSString *title4 =[[NSString alloc]initWithFormat:NSLocalizedString(@"More", @"Localizable")];
     // Do any additional setup after loading the view from its nib.
     MoreViewController *moreCtl = [[MoreViewController alloc]initWithNibName:@"MoreViewController" bundle:nil];
     navController = [[UINavigationController alloc] initWithRootViewController:moreCtl];
-    navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
     UITabBarItem *item3 = [[UITabBarItem alloc] initWithTitle:title4 image:[UIImage imageNamed:@"btn_info"] tag:3 ];
     moreCtl.tabBarItem = item3;
     [localControllesArray addObject:navController];
@@ -76,10 +74,10 @@
 
 - (void)customizeAppearance
 {
-    [[UINavigationBar appearance] setTintColor:[UIColor orangeColor]];
-    [[UITabBar appearance] setTintColor:[UIColor orangeColor]];
-    [[UIToolbar appearance] setTintColor:[UIColor orangeColor]];
-    [[UISwitch appearance] setTintColor:[UIColor orangeColor]];
+    [[UINavigationBar appearance] setTintColor:[RDUtils radaeeIconColor]];
+    [[UITabBar appearance] setTintColor:[RDUtils radaeeIconColor]];
+    [[UIToolbar appearance] setTintColor:[RDUtils radaeeIconColor]];
+    [[UISwitch appearance] setTintColor:[RDUtils radaeeIconColor]];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

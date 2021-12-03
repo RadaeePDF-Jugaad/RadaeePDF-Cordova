@@ -1359,7 +1359,7 @@ extern uint annotStrikeoutColor;
 {
     if ([self isLocked])
         return YES;
-    
+
     return NO;
 }
 
@@ -1367,7 +1367,7 @@ extern uint annotStrikeoutColor;
 {
     if (GLOBAL.g_annot_readonly && [self isReadonly])
         return YES;
-    
+
     return NO;
 }
 
@@ -1993,9 +1993,3 @@ extern uint annotStrikeoutColor;
 }
 
 @end
-
-
-
-
-
-
