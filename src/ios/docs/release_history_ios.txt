@@ -1,5 +1,55 @@
 PDFViewer SDK for iOS - Release notes
 
+4.6.2
+- FIX jpg decoding issue
+- FIX Auto generate checked icon of checkbox when icon of checkbox is empty
+- FIX Code cleanup
+
+4.6.1
+- UPDATE changed native class names to make it compatible with PDFKit.framework by Apple
+- FIX Italian localization
+- FIX Rendering issues
+
+4.6
+- NEW objsStart support rtol now.
+- UPDATE core lib
+- FIX Polygon and Polyline color palette
+- FIX Stamp crash when size < 0
+- FIX Signature issue.
+- FIX Layout issue for vertical and horizontal layout.
+
+4.5.4
+- NEW GLOBAL.g_layout_rtol option
+- UPDATE core lib to fix some special case rendering glitch
+- UPDATE GLOBAL.g_render_mode renamed to GLOBAL.g_view_mode
+- FIX rendering issue for RTOL in dual mode
+- FIX Double page with first page single
+- FIX Zoom scale values
+- FIX Curl / PageView crash
+- FIX Share pdf crash
+- FIX Form Fields background color changed from yellow to light blue
+- FIX Form Fields Text color changed from white to black
+
+4.5.3
+- FIX CMYK->RGB conversion may bring to unexpected crash during some special bitmap decoding
+
+4.5.2
+-fix dark mode status bar 
+
+4.5.1
+- Font mapping improvement.
+- found a memory leak for bitmap scaling(very long time ago to adjust scaling algorithm).
+- added GLOBAL.g_readonly to make the reader in readonly mode
+- fix readonly pdf
+- fix Slider/Thumbnail and Night Mode/Light Mode button 
+
+4.5
+- Improved the page browsing experience when single page mode is set
+- Added Polygon annotation- Added Polyline annotation
+- Bookmark functionality is restored from 3.7x
+- Improved the support to M1 architecture
+- Minor fix
+
 4.4
 - FIX render issue
 - Adapted classes for modules compatibility
@@ -7,6 +57,11 @@ PDFViewer SDK for iOS - Release notes
 - FIX bad linearized header loading issue
 - FIX specific editbox crash
 - Minor fixes
+- FIX missing outlines issue
+- FIX indirect stream object references issue (on importing context)
+- FIX minor fixes and clean up
+- FIX font loading during framework startup
+- Code cleanup
 
 4.3
 - NEW method to get name of signer
