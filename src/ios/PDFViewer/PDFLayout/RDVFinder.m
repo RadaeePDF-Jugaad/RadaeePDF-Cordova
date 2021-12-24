@@ -105,6 +105,7 @@
 {
     int ret = 0;
     int pcnt = [m_doc pageCount];
+    
     if( m_dir < 0 )
     {
         while( (m_page == NULL || m_page_find_index < 0) && m_page_no >= 0 && !is_cancel )
@@ -127,11 +128,17 @@
                 }
                 m_page = NULL;
                 m_page_find_cnt = 0;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self->_updateBlock(pcnt-(self->m_page_no)-1,pcnt);
+                });
                 m_page_no--;
             }
         }
         if( is_cancel || m_page_no < 0 )
         {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cancelBlock(false);
+            });
             if( m_finder != NULL )
             {
                 m_finder = NULL;
@@ -143,7 +150,12 @@
             ret = 0;//find error, notify UI process
         }
         else
+        {
             ret = 1;//find finished, notify UI process
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cancelBlock(true);
+            });
+        }
     }
     else
     {
@@ -167,11 +179,18 @@
                 }
                 m_page = NULL;
                 m_page_find_cnt = 0;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self->_updateBlock(self->m_page_no,pcnt);
+                });
                 m_page_no++;
+                
             }
         }
         if( is_cancel || m_page_no >= pcnt )
         {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cancelBlock(false);
+            });
             if( m_finder != NULL )
             {
                 m_finder = NULL;
@@ -183,7 +202,13 @@
             ret = 0;////find error, notify UI process
         }
         else
+        {
             ret = 1;//find finished, notify UI process
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cancelBlock(true);
+            });
+        }
+            
     }
     [m_eve notify];
     return ret;

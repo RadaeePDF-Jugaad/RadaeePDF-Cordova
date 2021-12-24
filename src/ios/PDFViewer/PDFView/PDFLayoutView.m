@@ -3325,6 +3325,10 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
      */
 }
 
+-(RDVFinder *)getView{
+    return [m_layout finder];
+}
+
 #pragma mark view Method
 -(void)vGetPos:(RDVPos *)pos
 {

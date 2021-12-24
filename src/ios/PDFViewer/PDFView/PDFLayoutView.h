@@ -266,6 +266,6 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (PDF_RECT)pdfRectFromScreenRect:(CGRect)screenRect;
 - (CGPoint)screenPointsFromPdfPoints:(float)x :(float)y :(int)pageNum;
 - (CGRect)screenRectFromPdfRect:(float)left :(float)top :(float)right :(float)bottom :(int)pageNum;
-
+- (RDVFinder *)getView;
 @end
 

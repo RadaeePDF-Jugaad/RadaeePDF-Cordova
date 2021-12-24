@@ -28,6 +28,7 @@
 #import "PDFThumbView.h"
 #import "SignatureViewController.h"
 #import "RDBookmarkViewController.h"
+#import "../PDFLayout/RDVFinder.h"
 
 @interface PDFReaderCtrl () <UITextFieldDelegate, PDFLayoutDelegate, PDFThumbViewDelegate, SearchResultViewControllerDelegate, RDPopupTextViewControllerDelegate, RDTreeViewControllerDelegate, SignatureDelegate, BookmarkTableViewDelegate>
 @end
@@ -35,8 +36,8 @@
 @implementation PDFReaderCtrl
 - (void)showBaseAlert:(NSString *)msg
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Warning" message:msg preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *conform = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Warning", nil)  message:msg preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *conform = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }];
     [alert addAction:conform];
     [self presentViewController:alert animated:YES completion:nil];
@@ -89,11 +90,11 @@
 - (void)thumbInit
 {
     m_thumb = (PDFThumbView *)[_mThumb view];
-    
+
     if (GLOBAL.g_thumbview_height) {
         _thumbHeightConstraint.constant = GLOBAL.g_thumbview_height;
     }
-    
+
     if (!GLOBAL.g_navigation_mode) {
         _mSlider.minimumValue = 1;
         _mSlider.maximumValue = m_doc.pageCount;
@@ -101,13 +102,13 @@
         _mSliderLabel.text = [NSString stringWithFormat:@"%i/%i", self.PDFCurPage, m_doc.pageCount];
         [_mSlider addTarget:self action:@selector(OnSliderValueChange:forEvent:) forControlEvents:UIControlEventValueChanged];
     }
-    
+
     if (GLOBAL.g_navigation_mode) {
          [self->_mBarThumbButton setImage:[UIImage imageNamed:@"btn_thumb"]];
     } else {
         [self->_mBarThumbButton setImage:[UIImage imageNamed:@"btn_slider"]];
     }
-    
+
 }
 
 - (void)PDFGoto:(int)pageno
@@ -214,7 +215,7 @@
     if([path containsString:@"file://"])
     {
         NSString *filePath = [path stringByReplacingOccurrencesOfString:@"file://" withString:@""];
-        
+
         if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -286,20 +287,20 @@
     [_mBarSearchTop setHidden:NO];
     [_mBarSearchBottom setHidden:NO];
     [_mThumb setHidden:YES];
-    
+
     [_mSearchText becomeFirstResponder];
     [_mSearchText addTarget:self action:@selector(search_forward:) forControlEvents:UIControlEventEditingDidEndOnExit];
-    
+
     _mSearchText.delegate = self;
-    
+
     // This could be in an init method.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSearchKeyboardFrameChanged:) name:UIKeyboardDidChangeFrameNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSearchKeyboardHiding:) name:UIKeyboardWillHideNotification object:nil];
-    
+
 
     searchTapNone = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:searchTapNone];
-    
+
     searchTapField = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(enter_search)];
     [_mSearchText addGestureRecognizer:searchTapField];
 }
@@ -320,7 +321,7 @@
     NSValue* keyboardFrameEnd = [keyboardInfo valueForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
     CGRect keyboardFrameEndRect = [keyboardFrameEnd CGRectValue];
-    
+
     if ([_mSearchText isFirstResponder]) {
         [UIView animateWithDuration:0.33 delay:0 options:UIViewAnimationOptionTransitionCurlUp animations:^{
            if (keyboardFrameBeginRect.origin.y > keyboardFrameEndRect.origin.y) {
@@ -375,7 +376,7 @@
 {
     if(self.navigationController)
         self.navigationController.navigationBarHidden = YES;
-    
+
     if (_delegate && [_delegate respondsToSelector:@selector(willShowReader)]) {
         [_delegate willShowReader];
     }
@@ -390,20 +391,20 @@
         _mBtnPrev.image = _prevImage;
     if(_nextImage)
         _mBtnNext.image = _nextImage;
-    
+
     _fileName.text = [GLOBAL.g_pdf_name stringByDeletingPathExtension];
     _fileName.textColor = _mBarNoneTop.tintColor;
     [self initialPopupView];
-    
+
     _mBarNoneBottomWidthConstraint.constant = 250;
-    
+
     [self setBarButtonVisibility];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
     if (_delegate && [_delegate respondsToSelector:@selector(didShowReader)]) {
         [_delegate didShowReader];
     }
@@ -412,7 +413,7 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    
+
     if (m_view == nil && _delegate && [_delegate respondsToSelector:@selector(didCloseReader)]) {
         [_delegate didCloseReader];
     }
@@ -432,28 +433,28 @@
         [noneToolbarItems removeObject:_searchItem];
         [_mBarNoneTop setItems:noneToolbarItems];
     }
-    
+
     if (_hideDrawImage) {
         NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
         [noneToolbarItems removeObject:_annotItem];
         [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
         _mBarNoneBottomWidthConstraint.constant -= _annotItem.image.size.width*2;
     }
-    
+
     if (_hideViewImage) {
         NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
         [noneToolbarItems removeObject:_viewItem];
         [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
         _mBarNoneBottomWidthConstraint.constant -= _viewItem.image.size.width*2;
     }
-    
+
     if (_hideThumbImage) {
         NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
         [noneToolbarItems removeObject:_thumbItem];
         [_mBarNoneBottom.toolbar setItems:noneToolbarItems];
         _mBarNoneBottomWidthConstraint.constant -= _thumbItem.image.size.width*2;
     }
-    
+
     if (_hideMoreImage) {
         NSMutableArray *noneToolbarItems = [_mBarNoneBottom.toolbar.items mutableCopy];
         [noneToolbarItems removeObject:_moreItem];
@@ -487,7 +488,7 @@
 {
     UIApplication.sharedApplication.statusBarStyle = UIStatusBarStyleDefault;
     if ([m_view isModified] && !GLOBAL.g_auto_save_doc && !GLOBAL.g_readonly && !m_readonly) {
-        
+
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Exiting", nil)
                                                                        message:NSLocalizedString(@"Document modified.\r\nDo you want to save it?", nil)
                                                                 preferredStyle:UIAlertControllerStyleAlert];
@@ -532,7 +533,7 @@
     PDFLayoutView *vw = m_view;
     PDFReaderCtrl *thiz = self;
     //CGRect from = [self buttonRect:sender];
-    
+
     if (showingThumb) {
         [self thumb_pressed:nil];
     }
@@ -580,7 +581,7 @@
     RDTreeViewController *treeViewController = [[RDTreeViewController alloc] initWithNibName:@"RDTreeViewController" bundle:nil];
     treeViewController.doc = m_doc;
     treeViewController.delegate = self;
-    
+
     treeViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     treeViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     [self presentViewController:treeViewController animated:YES completion:nil];
@@ -617,11 +618,11 @@
     PDFLayoutView *vw = m_view;
     PDFReaderCtrl *thiz = self;
     //CGRect from = [self buttonRect:sender];
-    
+
     if (showingThumb) {
         [self thumb_pressed:nil];
     }
-    
+
     MenuTool *view = [[MenuTool alloc] init:CGPointMake(self.view.center.x-125, _mBarNoneBottom.frame.origin.y) :^(int tool){
         [thiz->m_popup dismiss];
         switch(tool)
@@ -702,12 +703,12 @@
                         [self->m_thumb PDFRestoreView];
                         [self->m_view PDFRestoreView];
                     }];
-                    
+
                     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
                         pages.modalPresentationStyle = UIModalPresentationFullScreen;
                     else
                         pages.modalPresentationStyle = UIModalPresentationFormSheet;
-                    
+
                     [self presentViewController:pages animated:YES completion:nil];
                 }
             }
@@ -722,7 +723,7 @@
     } /* else {
         [view updateVisible:_hideUndoImage :_hideRedoImage :_hideSelImage];
     } */
-    
+
     if (view.frame.size.height > (self.view.frame.size.height - [[UIApplication sharedApplication] statusBarFrame].size.height - 50 - 50 - 10)) {
         m_popup = [[PDFPopupCtrl alloc] init:[self getScrollViewWithMenu:view]];
     } else {
@@ -738,11 +739,11 @@
         PDFLayoutView *vw = m_view;
         PDFReaderCtrl *thiz = self;
         //CGRect from = [self buttonRect:sender];
-        
+
         if (showingThumb) {
             [self thumb_pressed:nil];
         }
-        
+
         MenuAnnot *view = [[MenuAnnot alloc] init:CGPointMake(self.view.center.x-125, _mBarNoneBottom.frame.origin.y) :^(int type){
             thiz->m_annot_type = type;
             switch(type)
@@ -782,7 +783,7 @@
             [self enter_annot];
         }];
         [view updateIcons:_drawImage];
-        
+
         if (view.frame.size.height > (self.view.frame.size.height - [[UIApplication sharedApplication] statusBarFrame].size.height - 50 - 50 - 10)) {
             m_popup = [[PDFPopupCtrl alloc] init:[self getScrollViewWithMenu:view]];
         } else {
@@ -887,7 +888,7 @@
     if (_mSearchText.text.length == 0) {
         return;
     }
-    
+
     SearchResultViewController *viewController = [[SearchResultViewController alloc] initWithNibName:@"SearchResultViewController" bundle:nil];
     viewController.delegate = self;
     viewController.searchedString = _mSearchText.text;
@@ -901,10 +902,12 @@
 {
     NSString *pat = _mSearchText.text;
     if(!pat || pat.length <= 0) return;
+    [self searchProgress];
     BOOL mwhole = _mSearchWhole.state == UIControlStateSelected;
     BOOL mcase = _mSearchCase.state == UIControlStateSelected;
     GLOBAL.g_match_whole_word = mwhole;
     GLOBAL.g_case_sensitive = mcase;
+
     [self startSearch:pat dir:-1 reset:NO];
 }
 
@@ -912,6 +915,7 @@
 {
     NSString *pat =_mSearchText.text;
     if(!pat || pat.length <= 0) return;
+    [self searchProgress];
     BOOL mwhole =_mSearchWhole.state == UIControlStateSelected;
     BOOL mcase =_mSearchCase.state == UIControlStateSelected;
     GLOBAL.g_match_whole_word = mwhole;
@@ -943,20 +947,20 @@
     CGFloat x = self.view.center.x - menu.frame.size.width / 2;
         CGFloat y = [[UIApplication sharedApplication] statusBarFrame].size.height + 50 + 10;
     CGFloat height = self.view.frame.size.height - y - (self.view.frame.size.height - _mBarNoneBottom.frame.origin.y) - 10;
-    
+
     UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, menu.frame.size.width, height)];
     [menu setFrame:CGRectMake(0, 0, menu.frame.size.width, menu.frame.size.height)];
     [scrollView addSubview:menu];
     scrollView.layer.cornerRadius = 10.0f;
     scrollView.contentSize = CGSizeMake(menu.frame.origin.x, menu.frame.size.height);
-    
+
     RDMenu *rdMenu = [[RDMenu alloc] initWithFrame:CGRectMake(x, y, menu.frame.size.width, height)];
     rdMenu.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.0f];
     rdMenu.layer.cornerRadius = 10.0f;
     rdMenu.layer.shadowRadius = 10.0f;
-    
+
     [rdMenu addSubview:scrollView];
-    
+
     return rdMenu;
 }
 
@@ -970,7 +974,7 @@
 - (NSMutableArray *)addBookMarks:(NSString *)dpath :(NSString *)subdir :(NSFileManager* )fm pdfName:(NSString *)pdfName withPath:(BOOL)withPath
 {
     NSMutableArray *bookmarks = [NSMutableArray array];
-    
+
     NSDirectoryEnumerator *fenum = [fm enumeratorAtPath:dpath];
     NSString *fName;
     while(fName = [fenum nextObject])
@@ -978,34 +982,34 @@
         NSLog(@"%@", [dpath stringByAppendingPathComponent:fName]);
         NSString *dst = [dpath stringByAppendingPathComponent:fName];
         NSString *tempString;
-        
+
         if(fName.length >10)
         {
             tempString = [fName pathExtension];
         }
-        
+
         if( [tempString isEqualToString:@"bookmark"] )
         {
             if (pdfName.length > 0 && ![fName containsString:pdfName]) {
                 continue;
             }
-            
+
             //add to list.
             NSFileHandle *fileHandle =[NSFileHandle fileHandleForReadingAtPath:dst];
             NSString *content = [[NSString alloc]initWithData:[fileHandle availableData] encoding:NSUTF8StringEncoding];
             NSArray *myarray =[content componentsSeparatedByString:@","];
             [myarray objectAtIndex:0];
             NSArray *arr = [[NSArray alloc] initWithObjects:[myarray objectAtIndex:0],dst,nil];
-            
+
             if (withPath) {
                 [bookmarks addObject:arr];
             } else {
                 [bookmarks addObject:@{@"Page:": [NSNumber numberWithInteger:[[myarray objectAtIndex:0] intValue]], @"Label": @""}];
             }
-            
+
         }
     }
-    
+
     return bookmarks;
 }
 
@@ -1018,18 +1022,18 @@
     int pageno = pos.pageno;
     NSString *tempName = [[pdfpath lastPathComponent] stringByDeletingPathExtension];
     NSString *tempFile = [tempName stringByAppendingFormat:@"_%d%@",pageno,@".bookmark"];
-    
+
     NSString *fileContent = [NSString stringWithFormat:@"%i",pageno];
     NSString *BookMarkDir = [pdfpath stringByDeletingLastPathComponent];
-    
+
     NSString *bookMarkFile = [BookMarkDir stringByAppendingPathComponent:tempFile];
-    
+
     if (![[NSFileManager defaultManager] isWritableFileAtPath:BookMarkDir]) {
         [self showBaseAlert:NSLocalizedString(@"Cannot add bookmark.", nil)];
     }
-    
+
     NSLog(@"%@", bookMarkFile);
-    
+
     if(![[NSFileManager defaultManager] fileExistsAtPath:bookMarkFile])
     {
         [[NSFileManager defaultManager]createFileAtPath:bookMarkFile contents:nil attributes:nil];
@@ -1093,7 +1097,7 @@
     if (page >= m_doc.pageCount) {
         page = m_doc.pageCount;
     }
-    
+
     if (haveToGoTo) {
         [self OnPageClicked:page - 1];
     } else {
@@ -1116,14 +1120,31 @@
         UIMenuItem *highline = [[UIMenuItem alloc] initWithTitle:@"HGL" action:@selector(highlight:)];
         UIMenuItem *strike = [[UIMenuItem alloc] initWithTitle:@"STR" action:@selector(strikeOut:)];
         UIMenuItem *squiggly = [[UIMenuItem alloc] initWithTitle:@"SQG" action:@selector(squiggly:)];
-        UIMenuItem *copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
+        UIMenuItem *copyText;
+        if(!GLOBAL.g_disable_text_copy)
+        {
+            copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
+        }
+        else
+        {
+            copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(removeTarget:action:)];
+        }
         NSArray *itemsMC = [[NSArray alloc] initWithObjects:underline, highline, strike, squiggly, copyText, nil];
         selectMenu = [UIMenuController sharedMenuController];
         [selectMenu setMenuItems:itemsMC];
     }
     else
     {
-        UIMenuItem *copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
+        UIMenuItem *copyText;
+        if(!GLOBAL.g_disable_text_copy)
+        {
+            copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(copyText:)];
+
+        }
+        else
+        {
+            copyText = [[UIMenuItem alloc] initWithTitle:@"COPY" action:@selector(removeTarget:action:)];
+        }
         NSArray *itemsMC = [[NSArray alloc] initWithObjects:copyText, nil];
         selectMenu = [UIMenuController sharedMenuController];
         [selectMenu setMenuItems:itemsMC];
@@ -1149,7 +1170,7 @@
         [self->m_view vSelMarkup:0];
         [self endSelect];
     });
-    
+
 }
 -(void)underline:(id)sender
 {
@@ -1216,7 +1237,7 @@
         [m_view vGetPos:&pos x:x y:y];
         [_delegate didTapOnPage:pos.pageno atPoint:CGPointMake(x, y)];
     }
-    
+
     if(_mBarNoneTop.hidden)
     {
         [self showBars];
@@ -1241,10 +1262,10 @@
     if (_delegate && [_delegate respondsToSelector:@selector(didSearchTerm:found:)]) {
         [_delegate didSearchTerm:_mSearchText.text found:found];
     }
-    
+
     if(!found)
     {
-        [self showBaseAlert:@"No more found!"];
+        //[self showBaseAlert:@"No more found!"];
     }
 }
 
@@ -1280,7 +1301,7 @@
     {
         NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgAnnotPropLine" owner:self options:nil];
         DlgAnnotPropLine *view = [views lastObject];
-        
+
         PDFLayoutView *vw = m_view;
         PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, 300, 410) :YES :^(BOOL is_ok){
             if (is_ok)
@@ -1300,7 +1321,7 @@
     {
         NSArray *views = [[NSBundle mainBundle] loadNibNamed:@"DlgAnnotPropMarkup" owner:self options:nil];
         DlgAnnotPropMarkup *view = [views lastObject];
-        
+
         PDFLayoutView *vw = m_view;
         PDFDialog *dlg = [[PDFDialog alloc] init:view :CGRectMake(0, 0, 300, 210) :YES :^(BOOL is_ok)
         {
@@ -1423,7 +1444,7 @@
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable")
                                                                        message:[NSString stringWithFormat:@"%@ %@", NSLocalizedString(@"Do you want to open:", @"Localizable"), url]
                                                                 preferredStyle:UIAlertControllerStyleAlert];
-        
+
         UIAlertAction* ok = [UIAlertAction
                              actionWithTitle:NSLocalizedString(@"OK", nil)
                              style:UIAlertActionStyleDefault
@@ -1435,7 +1456,7 @@
                                  actionWithTitle:NSLocalizedString(@"Cancel", nil)
                                  style:UIAlertActionStyleDefault
                                  handler:nil];
-        
+
         [alert addAction:ok];
         [alert addAction:cancel];
         [self presentViewController:alert animated:YES completion:nil];
@@ -1524,7 +1545,7 @@
     int max_cnt = (dataArray.count > 5) ? 5 : (int)dataArray.count;//max 5 items height for scrollView
     rect.origin.y += rect.size.height;
     rect.size.height = (fsize + 2) * max_cnt;
-    
+
     view.frame = rect;
     PDFLayoutView *vw = m_view;
     [view setPara:rect.size.width :fsize :dataArray :^(int idx){
@@ -1547,7 +1568,7 @@
 
     CGFloat fsize = vp.scale * 12 / [m_view vGetPixSize];
     CGRect rect = [_mView convertRect:annotRect toView: pop.view];
-    
+
     view.frame = rect;
     PDFLayoutView *vw = m_view;
     [view setPara:rect.size.width :fsize :dataArray :^(int idx){
@@ -1575,13 +1596,13 @@
 #pragma mark - Signature
 
 - (void)OnAnnotSignature:(RDVPage *)vp :(RDPDFAnnot *)annot {
-    
+
     NSString *annotImage = [m_view getImageFromAnnot:annot];
     NSString *emptyImage = [m_view emptyImageFromAnnot:annot];
-    
+
     NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:annotImage error:nil];
     NSDictionary *emptyAttr = [[NSFileManager defaultManager] attributesOfItemAtPath:emptyImage error:nil];
-    
+
     if (attr.fileSize != emptyAttr.fileSize) {
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Alert", @"Localizable") message:NSLocalizedString(@"Signature already exist. Do you want delete it?", nil) preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction* ok = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
@@ -1590,7 +1611,7 @@
         UIAlertAction* cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self->m_view vAnnotEnd];
         }];
-              
+
         [alert addAction:ok];
         [alert addAction:cancel];
         [self presentViewController:alert animated:YES completion:nil];
@@ -1605,13 +1626,13 @@
     sv.delegate = self;
     sv.annotPage = vpage;
     sv.annot = annot;
-    
+
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         sv.modalPresentationStyle = UIModalPresentationFormSheet;
     } else {
         sv.modalPresentationStyle = UIModalPresentationFullScreen;
     }
-    
+
     [self presentViewController:sv animated:YES completion:nil];
 }
 
@@ -1658,7 +1679,7 @@
         [m_view vFindEnd];
         findStart = NO;
     }
-    
+
     if (!findStart) {
         [m_view vFindStart:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
         findStart = YES;
@@ -1666,6 +1687,47 @@
     } else if (text != nil && text.length > 0) {
         [m_view vFind:dir];
     }
+}
+
+- (void)searchProgress{
+    RDVFinder *m_rdvfinder = [m_view getView];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Searching", nil) message:@"" preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        m_rdvfinder->is_cancel = true;
+        m_rdvfinder.cancelBlock(true);
+    }];
+
+    [alert addAction:cancel];
+    UIView *alertView = alert.view;
+    UIProgressView *progressBar = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    progressBar.translatesAutoresizingMaskIntoConstraints = false;
+    progressBar.progress = 0;
+    [alertView addSubview:progressBar];
+
+    NSLayoutConstraint *bottomConstraint = [progressBar.bottomAnchor constraintEqualToAnchor:alertView.bottomAnchor];
+    [bottomConstraint setActive:YES];
+    bottomConstraint.constant = -45;
+
+    [[progressBar.leftAnchor constraintEqualToAnchor:alertView.leftAnchor constant:10.0] setActive:YES];
+    [[progressBar.rightAnchor constraintEqualToAnchor:alertView.rightAnchor constant:-10.0] setActive:YES];
+
+    [self presentViewController:alert animated:YES completion:nil];
+    m_rdvfinder.updateBlock =  ^(int index, int pcnt)
+    {
+        alert.message = [NSString stringWithFormat:@"%i/%i",index,pcnt];
+        progressBar.progress = (float)index/(float)pcnt;
+    };
+    m_rdvfinder.cancelBlock = ^(bool result){
+        [self dismissViewControllerAnimated:NO completion:^{
+            if(!result)
+            {
+                [self showBaseAlert:NSLocalizedString(@"No more found!", nil)];
+            }
+
+        }];
+    };
+
 }
 
 #pragma mark - Popup text delegate

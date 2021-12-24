@@ -90,6 +90,7 @@ extern NSString *g_serial;
 @property (nonatomic) bool g_hand_signature;
 @property (nonatomic) bool g_readonly;
 @property (nonatomic) bool g_fake_sign;
+@property (nonatomic) bool g_disable_text_copy;
 
 @property (nonatomic) bool g_layout_rtol;
 @property (nonatomic) bool g_auto_scale;

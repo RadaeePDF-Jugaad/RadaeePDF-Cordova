@@ -21,7 +21,7 @@
 	RDPDFFinder *m_finder;
 	
 	int m_dir;
-	bool is_cancel;
+	@public bool is_cancel;
 	bool is_notified;
 	bool is_waitting;
 	RDVEvent *m_eve;
@@ -34,4 +34,8 @@
 -(int)find_get_page;//get current found's page NO
 -(void)find_end;
 -(void)drawOffScreen :(RDVCanvas *)canvas :(RDVPage *)page :(int)docx :(int)docy;
+
+@property (nonatomic, copy) void (^cancelBlock)(bool);
+@property (nonatomic, copy) void (^updateBlock)(int,int);
+
 @end
