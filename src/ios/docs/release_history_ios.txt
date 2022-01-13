@@ -1,5 +1,15 @@
 PDFViewer SDK for iOS - Release notes
 
+4.6.4
+- FIX paging issue on single and double pages
+- FIX thumbnail issues on horizontal pages
+- FIX crash issues caused by invalid data
+
+4.6.3
+- NEW GLOBAL.g_disable_text_copy
+- NEW search progress bar
+- FIX checkbox when wrong value is set to the field
+
 4.6.2
 - FIX jpg decoding issue
 - FIX Auto generate checked icon of checkbox when icon of checkbox is empty

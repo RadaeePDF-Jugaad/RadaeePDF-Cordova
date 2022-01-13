@@ -132,8 +132,6 @@
     [self clean];
     m_canvas = canvas;
     m_del = del;
-    // Load global var
-    doublePage = GLOBAL.g_double_page_enabled;
     
     // Zoom action on double tap
     // 1: default zoom
@@ -178,19 +176,23 @@
     m_status = sta_none;
     m_zoom = 1;
     self.zoomScale = 1;
+    firstPageSingle = NO;
 
     bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
     switch (m_save_vmode) {
         case 1:// Horizontal LTOR
+            singlePage = NO;
             doublePage = NO;
             m_layout = [[RDVLayoutHorz alloc] init:self :GLOBAL.g_layout_rtol :GLOBAL.g_auto_scale];
             break;
         case 2:// PageView
+            singlePage = NO;
             doublePage = NO;
             memset(horzs, 0, sizeof(bool));
             m_layout = [[RDVLayoutSingle alloc] init:self :GLOBAL.g_layout_rtol :(int)_singleViewPageNo];
             break;
         case 3:// Single Page (LTOR, paging enabled)
+            singlePage = YES;
             doublePage = NO;
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
@@ -199,6 +201,9 @@
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         case 4: //Double Page, and first page as single, when in landscape(paging enabled)
+            singlePage = NO;
+            doublePage = YES;
+            firstPageSingle = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             horzs[0] = false;
             m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
@@ -207,6 +212,8 @@
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         case 6:// Double Page (LTOR, paging enabled)
+            singlePage = NO;
+            doublePage = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
             center_page = true;
@@ -214,6 +221,8 @@
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         default:// 0: Vertical
+            singlePage = NO;
+            doublePage = NO;
             m_layout = [[RDVLayoutVert alloc] init : self :GLOBAL.g_auto_scale];
             [((RDVLayoutVert *)m_layout) vSetAlign:align_vcenter];
             break;
@@ -265,18 +274,23 @@
     bool center_page = false;
     m_modified = true;
     actionManger = [[ActionStackManager alloc] init];//reset all undo/redo
+    firstPageSingle = NO;
+    
     bool *horzs = (bool *)calloc( sizeof(bool), m_doc.pageCount );
     switch (m_save_vmode) {
         case 1:// Horizontal LTOR
+            singlePage = NO;
             doublePage = NO;
             m_layout = [[RDVLayoutHorz alloc] init:self :GLOBAL.g_layout_rtol :GLOBAL.g_auto_scale];
             break;
         case 2:// PageView
+            singlePage = NO;
             doublePage = NO;
             memset(horzs, 0, sizeof(bool));
             m_layout = [[RDVLayoutSingle alloc] init:self :GLOBAL.g_layout_rtol :(int)_singleViewPageNo];
             break;
         case 3:// Single Page (LTOR, paging enabled)
+            singlePage = YES;
             doublePage = NO;
             memset(horzs, 0, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
@@ -285,6 +299,9 @@
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         case 4: //Double Page, and first page as single, when in landscape(paging enabled)
+            singlePage = NO;
+            doublePage = YES;
+            firstPageSingle = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             horzs[0] = false;
             m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
@@ -293,6 +310,8 @@
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         case 6:// Double Page (LTOR, paging enabled)
+            singlePage = NO;
+            doublePage = YES;
             memset(horzs, 1, sizeof(bool) * m_doc.pageCount);
             m_layout = [[RDVLayoutDual alloc] init:self :GLOBAL.g_layout_rtol :NULL :0 :horzs :[m_doc pageCount]];
             center_page = true;
@@ -300,6 +319,8 @@
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
         default:// 0: Vertical
+            singlePage = NO;
+            doublePage = NO;
             m_layout = [[RDVLayoutVert alloc] init : self :GLOBAL.g_auto_scale];
             [((RDVLayoutVert *)m_layout) vSetAlign:align_vcenter];
             break;
@@ -999,7 +1020,7 @@
     
     //check current page changed?
     RDVPos pos;
-    [m_layout vGetPos :((doublePage) ? [m_layout vw] >> 2 : [m_layout vw] >> 1) :[m_layout vh] >> 1 :&pos];
+    [m_layout vGetPos :[m_layout vw] >> 2 :[m_layout vh] >> 2 :&pos];
     if( m_cur_page != pos.pageno )
     {
         m_cur_page = pos.pageno;
@@ -1035,49 +1056,1230 @@
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     if(scrollView != self) return;
-    //NSLog(@"POS:%f,%f", self.contentOffset.x, self.contentOffset.y);
     if(m_status == sta_zoom)
     {
         self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
         [self setNeedsDisplay];
+        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
     }
     else
     {
-        int xval = self.contentOffset.x * m_scale_pix;
-        int yval = self.contentOffset.y * m_scale_pix;
-        int xlay = [m_layout docx];
-        int ylay = [m_layout docy];
-        int vw = [m_layout vw];
-        int vh = [m_layout vh];
-        if(xval > xlay - vw && xval < xlay + vw && yval > ylay - vh && yval < ylay + vh)
+        if(singlePage && GLOBAL.g_paging_enabled)
         {
-            if(xval < 0) xval = 0;
-            if(yval < 0) yval = 0;
-            [m_layout vMoveTo:xval :yval];
+            if(m_zoom > 1)
+            {
+                CGFloat getstatusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+
+                CGSize screenSize = [self getScreenFrameForCurrentOrientation];
+                CGFloat screenWidth = screenSize.width;
+                CGFloat screenHeight = screenSize.height ;
+                //stop on boundaries = true
+                if(GLOBAL.g_zoomed_stop_on_boundaries)
+                {
+                    //screen size < page size
+                    if(screenWidth < [m_layout vGetPage:m_cur_page].GetWidth )
+                    {
+                        //right
+                        if ((self.contentOffset.x * m_scale_pix + screenWidth) > [m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth)
+                        {
+                            [self setContentOffset: CGPointMake(([m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y)  animated:NO];
+                        }
+                        //left
+                        if (self.contentOffset.x * m_scale_pix < [m_layout vGetPage:m_cur_page].GetX)
+                        {
+                            [self setContentOffset:CGPointMake(([m_layout vGetPage:m_cur_page].GetX / m_scale_pix), self.contentOffset.y) animated:NO];
+                        }
+                    }
+                    //screen size > page size
+                    else
+                    {
+                        //right + left
+                        [self setContentOffset:CGPointMake(([m_layout vGetPage:m_cur_page].GetX - ((screenWidth - [m_layout vGetPage:m_cur_page].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y) animated:NO];
+                    }
+                }
+                if(isAnimating)
+                {
+                    [self setContentOffset:animatePoint animated:YES];
+                }
+                else
+                {
+                    if(isDecelerating)
+                    {
+                        if(screenWidth < [m_layout vGetPage:m_cur_page].GetWidth)
+                        {
+                            //right
+                            if (m_cur_page + 1 <= m_doc.pageCount && ( (self.contentOffset.x * m_scale_pix + screenWidth) > [m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth))
+                            {
+                                [self setContentOffset: CGPointMake(([m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y)  animated:YES];
+                            }
+                            //left
+                            if (m_cur_page >= 0 && (self.contentOffset.x * m_scale_pix < [m_layout vGetPage:m_cur_page].GetX))
+                            {
+                                [self setContentOffset:CGPointMake(([m_layout vGetPage:m_cur_page].GetX / m_scale_pix), self.contentOffset.y) animated:YES];
+                            }
+                        }
+                        else
+                        {
+                            //left + right
+                            [self setContentOffset:CGPointMake(([m_layout vGetPage:m_cur_page].GetX - ((screenWidth - [m_layout vGetPage:m_cur_page].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y) animated:YES];
+                        }
+                    }
+                    else
+                    {
+                        int xval = self.contentOffset.x * m_scale_pix;
+                        int yval = self.contentOffset.y * m_scale_pix;
+                        int xlay = [m_layout docx];
+                        int ylay = [m_layout docy];
+                        int vw = [m_layout vw];
+                        int vh = [m_layout vh];
+                        if(xval > xlay - vw && xval < xlay + vw && yval > ylay - vh && yval < ylay + vh)
+                        {
+                            if(xval < 0) xval = 0;
+                            if(yval < 0) yval = 0;
+                            [m_layout vMoveTo:xval :yval];
+                        }
+                    }
+                    if ((screenHeight) < [m_layout vGetPage:m_cur_page].GetHeight)
+                    {
+                        //top page
+                        if(self.contentOffset.y * m_scale_pix < [m_layout vGetPage:m_cur_page].GetY)
+                        {
+                            self.contentOffset = CGPointMake(self.contentOffset.x, ([m_layout vGetPage:m_cur_page].GetY / m_scale_pix));
+                        }
+                        //bottom page
+                        if((self.contentOffset.y * m_scale_pix + screenHeight) > [m_layout vGetPage:m_cur_page].GetY + [m_layout vGetPage:m_cur_page].GetHeight + getstatusBarHeight * m_scale_pix)
+                        {
+                            self.contentOffset =CGPointMake(self.contentOffset.x, ([m_layout vGetPage:m_cur_page].GetY + [m_layout vGetPage:m_cur_page].GetHeight - screenHeight) / m_scale_pix + getstatusBarHeight);
+                        }
+                    }
+                }
+                [self setNeedsDisplay];
+                [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+                
+            }
+            else
+            {
+                int xval = self.contentOffset.x * m_scale_pix;
+                int yval = self.contentOffset.y * m_scale_pix;
+                int xlay = [m_layout docx];
+                int ylay = [m_layout docy];
+                int vw = [m_layout vw];
+                int vh = [m_layout vh];
+                if(xval > xlay - vw && xval < xlay + vw && yval > ylay - vh && yval < ylay + vh)
+                {
+                    if(xval < 0) xval = 0;
+                    if(yval < 0) yval = 0;
+                    [m_layout vMoveTo:xval :yval];
+                }
+                else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
+                [self setNeedsDisplay];
+            }
         }
-        else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
-        [self setNeedsDisplay];
-        //NSLog(@"ZPOS4:%f,%f", self.contentOffset.x, self.contentOffset.y);
+        else if(doublePage && GLOBAL.g_paging_enabled)
+        {
+            if(m_zoom > 1)
+            {
+                UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+                CGFloat getstatusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+                CGSize screenSize = [self getScreenFrameForCurrentOrientation];
+                CGFloat screenWidth = screenSize.width;
+                CGFloat screenHeight = screenSize.height ;
+                int doublePageX;
+                int doublePageY;
+                int doublePageWidth;
+                int doublePageHeight;
+                bool m_layout_rtol = GLOBAL.g_layout_rtol;
+                if(orientation == UIInterfaceOrientationPortrait)
+                {
+                    doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                    doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth;
+                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                }
+                else
+                {
+                    if(m_layout_rtol)
+                    {
+                        if(m_cur_page % 2 != 0)
+                        {
+                            if(m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 != 0)
+                            {
+                                doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                                doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                                doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth;
+                                doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                            }
+                            else
+                            {
+                                doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                                if([m_layout vGetPage:m_cur_page].GetY <= [m_layout vGetPage:m_cur_page - 1].GetY)
+                                {
+                                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                                }
+                                else
+                                {
+                                    doublePageY = [m_layout vGetPage:m_cur_page - 1].GetY;
+                                }
+                                doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth + [m_layout vGetPage:m_cur_page - 1].GetWidth;
+                                if([m_layout vGetPage:m_cur_page].GetHeight >= [m_layout vGetPage:m_cur_page - 1].GetHeight)
+                                {
+                                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                                }
+                                else
+                                {
+                                    doublePageHeight = [m_layout vGetPage:m_cur_page - 1].GetHeight;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            doublePageX = [m_layout vGetPage:m_cur_page + 1].GetX;
+                            if([m_layout vGetPage:m_cur_page + 1].GetY <= [m_layout vGetPage:m_cur_page].GetY)
+                            {
+                                doublePageY = [m_layout vGetPage:m_cur_page + 1].GetY;
+                            }
+                            else
+                            {
+                                doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                            }
+                            doublePageWidth = [m_layout vGetPage:m_cur_page + 1].GetWidth + [m_layout vGetPage:m_cur_page].GetWidth;
+                            if([m_layout vGetPage:m_cur_page + 1].GetHeight >= [m_layout vGetPage:m_cur_page].GetHeight)
+                            {
+                                doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                            }
+                            else
+                            {
+                                doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                            }
+                        }
+                    }
+                    else if(firstPageSingle)
+                    {
+                        if(m_cur_page == 0)
+                        {
+                            doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                            doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                            doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth;
+                            doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                        }
+                        else
+                        {
+                            if(m_cur_page % 2 != 0)
+                            {
+                                doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                                if([m_layout vGetPage:m_cur_page].GetY <= [m_layout vGetPage:m_cur_page + 1].GetY)
+                                {
+                                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                                }
+                                else
+                                {
+                                    doublePageY = [m_layout vGetPage:m_cur_page + 1].GetY;
+                                }
+                                doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth + [m_layout vGetPage:m_cur_page + 1].GetWidth;
+                                if([m_layout vGetPage:m_cur_page].GetHeight >= [m_layout vGetPage:m_cur_page + 1].GetHeight)
+                                {
+                                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                                }
+                                else
+                                {
+                                    doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                                }
+                            }
+                            else
+                            {
+                                doublePageX = [m_layout vGetPage:m_cur_page - 1].GetX;
+                                if([m_layout vGetPage:m_cur_page + 1].GetY <= [m_layout vGetPage:m_cur_page].GetY)
+                                {
+                                    doublePageY = [m_layout vGetPage:m_cur_page + 1].GetY;
+                                }
+                                else
+                                {
+                                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                                }
+                                doublePageWidth = [m_layout vGetPage:m_cur_page - 1].GetWidth + [m_layout vGetPage:m_cur_page].GetWidth;
+                                if([m_layout vGetPage:m_cur_page + 1].GetHeight >= [m_layout vGetPage:m_cur_page].GetHeight)
+                                {
+                                    doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                                }
+                                else
+                                {
+                                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(m_cur_page % 2 == 0)
+                        {
+                            doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                            if([m_layout vGetPage:m_cur_page].GetY <= [m_layout vGetPage:m_cur_page + 1].GetY)
+                            {
+                                doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                            }
+                            else
+                            {
+                                doublePageY = [m_layout vGetPage:m_cur_page + 1].GetY;
+                            }
+                            doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth + [m_layout vGetPage:m_cur_page + 1].GetWidth;
+                            if([m_layout vGetPage:m_cur_page].GetHeight >= [m_layout vGetPage:m_cur_page + 1].GetHeight)
+                            {
+                                doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                            }
+                            else
+                            {
+                                doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                            }
+                        }
+                        else
+                        {
+                            doublePageX = [m_layout vGetPage:m_cur_page - 1].GetX;
+                            if([m_layout vGetPage:m_cur_page + 1].GetY <= [m_layout vGetPage:m_cur_page].GetY)
+                            {
+                                doublePageY = [m_layout vGetPage:m_cur_page + 1].GetY;
+                            }
+                            else
+                            {
+                                doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                            }
+                            doublePageWidth = [m_layout vGetPage:m_cur_page - 1].GetWidth + [m_layout vGetPage:m_cur_page].GetWidth;
+                            if([m_layout vGetPage:m_cur_page + 1].GetHeight >= [m_layout vGetPage:m_cur_page].GetHeight)
+                            {
+                                doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                            }
+                            else
+                            {
+                                doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                            }
+                        }
+                    }
+                }
+                
+                if(GLOBAL.g_zoomed_stop_on_boundaries)
+                {
+                    if(screenWidth < doublePageWidth)
+                    {
+                        //right
+                        if ((self.contentOffset.x * m_scale_pix + screenWidth) > doublePageX + doublePageWidth)
+                        {
+                            [self setContentOffset: CGPointMake((doublePageX + doublePageWidth - screenWidth) / m_scale_pix , self.contentOffset.y)  animated:NO];
+                        }
+                        //left
+                        if (self.contentOffset.x * m_scale_pix < doublePageX)
+                        {
+                            [self setContentOffset:CGPointMake((doublePageX / m_scale_pix), self.contentOffset.y) animated:NO];
+                        }
+                    }
+                }
+                if(isAnimating)
+                {
+                    [self setContentOffset:animatePoint animated:YES];
+                }
+                else
+                {
+                    if(isDecelerating)
+                    {
+                        if(m_layout_rtol)
+                        {
+                            if(screenWidth < doublePageWidth)
+                            {
+                                //right
+                                if (m_cur_page > 0 && ( (self.contentOffset.x * m_scale_pix + screenWidth) > doublePageX + doublePageWidth))
+                                {
+                                    [self setContentOffset: CGPointMake((doublePageX + doublePageWidth - screenWidth) / m_scale_pix , self.contentOffset.y)  animated:YES];
+                                }
+                                //left
+                                if (m_cur_page + 1 < m_doc.pageCount && (self.contentOffset.x * m_scale_pix < doublePageX))
+                                {
+                                    [self setContentOffset:CGPointMake((doublePageX / m_scale_pix), self.contentOffset.y) animated:YES];
+                                }
+                            }
+                            else
+                            {
+                                //left + right
+                                [self setContentOffset:CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y) animated:YES];
+                            }
+                        }
+                        else
+                        {
+                            if(screenWidth < doublePageWidth)
+                            {
+                                //right
+                                if (m_cur_page + 1 < m_doc.pageCount && ( (self.contentOffset.x * m_scale_pix + screenWidth) > doublePageX + doublePageWidth))
+                                {
+                                    [self setContentOffset: CGPointMake((doublePageX + doublePageWidth - screenWidth) / m_scale_pix , self.contentOffset.y)  animated:YES];
+                                }
+                                //left
+                                if (m_cur_page > 0 && (self.contentOffset.x * m_scale_pix < doublePageX))
+                                {
+                                    [self setContentOffset:CGPointMake((doublePageX / m_scale_pix), self.contentOffset.y) animated:YES];
+                                }
+                            }
+                            else
+                            {
+                                //left + right
+                                [self setContentOffset:CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y) animated:YES];
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        int xval = self.contentOffset.x * m_scale_pix;
+                        int yval = self.contentOffset.y * m_scale_pix;
+                        int xlay = [m_layout docx];
+                        int ylay = [m_layout docy];
+                        int vw = [m_layout vw];
+                        int vh = [m_layout vh];
+                        if(xval > xlay - vw && xval < xlay + vw && yval > ylay - vh && yval < ylay + vh)
+                        {
+                            if(xval < 0) xval = 0;
+                            if(yval < 0) yval = 0;
+                            [m_layout vMoveTo:xval :yval];
+                        }
+                    }
+                    if ((screenHeight) < doublePageHeight)
+                    {
+                        //top page
+                        if(self.contentOffset.y * m_scale_pix < doublePageY)
+                        {
+                            self.contentOffset = CGPointMake(self.contentOffset.x, (doublePageY / m_scale_pix));
+                        }
+                        //bottom page
+                        if((self.contentOffset.y * m_scale_pix + screenHeight) > doublePageY + doublePageHeight + getstatusBarHeight * m_scale_pix)
+                        {
+                            self.contentOffset =CGPointMake(self.contentOffset.x, (doublePageY + doublePageHeight - screenHeight) / m_scale_pix + getstatusBarHeight);
+                        }
+                    }
+                }
+                [self setNeedsDisplay];
+                [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+            }
+            else
+            {
+                int xval = self.contentOffset.x * m_scale_pix;
+                int yval = self.contentOffset.y * m_scale_pix;
+                int xlay = [m_layout docx];
+                int ylay = [m_layout docy];
+                int vw = [m_layout vw];
+                int vh = [m_layout vh];
+                if(xval > xlay - vw && xval < xlay + vw && yval > ylay - vh && yval < ylay + vh)
+                {
+                    if(xval < 0) xval = 0;
+                    if(yval < 0) yval = 0;
+                    [m_layout vMoveTo:xval :yval];
+                }
+                else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
+                [self setNeedsDisplay];
+            }
+        }
+        else
+        {
+            int xval = self.contentOffset.x * m_scale_pix;
+            int yval = self.contentOffset.y * m_scale_pix;
+            int xlay = [m_layout docx];
+            int ylay = [m_layout docy];
+            int vw = [m_layout vw];
+            int vh = [m_layout vh];
+            if(xval > xlay - vw && xval < xlay + vw && yval > ylay - vh && yval < ylay + vh)
+            {
+                if(xval < 0) xval = 0;
+                if(yval < 0) yval = 0;
+                [m_layout vMoveTo:xval :yval];
+            }
+            else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
+            [self setNeedsDisplay];
+        }
+        
     }
+    
     [self ProRedrawOS];
+}
+
+- (CGSize)getScreenFrameForCurrentOrientation {
+    return [self getScreenFrameForOrientation:[UIApplication sharedApplication].statusBarOrientation];
+}
+
+- (CGSize)getScreenFrameForOrientation:(UIInterfaceOrientation)orientation {
+
+    CGSize fullScreenRect = [UIScreen mainScreen].currentMode.size;
+
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        CGSize temp = CGSizeZero;
+        temp.width = fullScreenRect.height;
+        temp.height = fullScreenRect.width;
+        fullScreenRect = temp;
+    }
+
+    return fullScreenRect;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+    isDecelerating = false;
+    touchBeginPoint = [self convertPoint:touchPoint toView:nil];
+    touchBeginTime = [NSDate date];
+    begin_touch_page = m_cur_page;
+}
+
+-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
+    touchPoint = point;
+    return self;
+}
+
+-(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    isAnimating = false;
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+    float speed;
+    float speed_to_change_page = 500;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    bool m_layout_rtol = GLOBAL.g_layout_rtol;
+    if((singlePage || (doublePage && orientation == UIInterfaceOrientationPortrait)) && GLOBAL.g_paging_enabled)
+    {
+        isDecelerating = false;
+        touchEndPoint = [self convertPoint:touchPoint toView:nil];
+        touchEndTime = [NSDate date];
+        NSTimeInterval executionTime = [touchEndTime timeIntervalSinceDate:touchBeginTime];
+        //speed = pixel/second
+        if(touchEndPoint.x > touchBeginPoint.x)
+        {
+            speed = (touchEndPoint.x - touchBeginPoint.x)/executionTime;
+        }
+        else
+        {
+            speed = (touchBeginPoint.x - touchEndPoint.x)/executionTime;
+        }
+        if(m_zoom > 1 && m_status != sta_zoom && !GLOBAL.g_zoomed_stop_on_boundaries )
+        {
+            CGSize screenSize = [self getScreenFrameForCurrentOrientation];
+            CGFloat screenWidth = screenSize.width;
+            if(m_layout_rtol)
+            {
+                if((screenWidth) < [m_layout vGetPage:m_cur_page].GetWidth)
+                {
+                    //right
+                    if(m_cur_page > 0 && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        if(touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX / m_scale_pix), self.contentOffset.y);
+                            
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page + 1 < m_doc.pageCount && (self.contentOffset.x * m_scale_pix < [m_layout vGetPage:m_cur_page].GetX))
+                    {
+                        if(touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX + [m_layout vGetPage:begin_touch_page + 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX / m_scale_pix), self.contentOffset.y);;
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+                else
+                {
+                    //right
+                    if(m_cur_page > 0 && touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page - 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page + 1 < m_doc.pageCount && touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //right
+                    else if(m_cur_page > 0 && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX - ((screenWidth - [m_layout vGetPage:m_cur_page].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page - 1].GetWidth + ([m_layout vGetPage:m_cur_page].GetX / 2))
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX - ((screenWidth - [m_layout vGetPage:m_cur_page].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+            }
+            else
+            {
+                if((screenWidth) < [m_layout vGetPage:m_cur_page].GetWidth)
+                {
+                    //right
+                    if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        if(touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
+                            
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX + [m_layout vGetPage:m_cur_page].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && (self.contentOffset.x * m_scale_pix < [m_layout vGetPage:m_cur_page].GetX))
+                    {
+                        if(touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX / m_scale_pix), self.contentOffset.y);;
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+                else
+                {
+                    //right
+                    if(m_cur_page + 1 < m_doc.pageCount && touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page - 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //right
+                    else if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX - ((screenWidth - [m_layout vGetPage:m_cur_page].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page - 1].GetWidth + ([m_layout vGetPage:m_cur_page].GetX / 2))
+                    {
+                        animatePoint = CGPointMake(([m_layout vGetPage:m_cur_page].GetX - ((screenWidth - [m_layout vGetPage:m_cur_page].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+            }
+        }
+        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+        [self ProRedrawOS];
+    }
+    else if(doublePage && GLOBAL.g_paging_enabled)
+    {
+        int doublePageX;
+        int doublePageY;
+        int doublePageWidth;
+        int doublePageHeight;
+        if(firstPageSingle)
+        {
+            if((m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 == 0) || m_cur_page == 0)
+            {
+                doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth;
+                doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+            }
+            else
+            {
+                if(m_cur_page % 2 != 0)
+                {
+                    doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                    doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth + [m_layout vGetPage:m_cur_page + 1].GetWidth;
+                    doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                }
+                else
+                {
+                    doublePageX = [m_layout vGetPage:m_cur_page - 1].GetX;
+                    doublePageY = [m_layout vGetPage:m_cur_page - 1].GetY;
+                    doublePageWidth = [m_layout vGetPage:m_cur_page - 1].GetWidth + [m_layout vGetPage:m_cur_page].GetWidth;
+                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                }
+            }
+        }
+        else
+        {
+            if(m_layout_rtol)
+            {
+                if(m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 != 0)
+                {
+                    doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                    doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth;
+                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                }
+                else
+                {
+                    if(m_cur_page % 2 != 0)
+                    {
+                        doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                        doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                        doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth + [m_layout vGetPage:m_cur_page - 1].GetWidth;
+                        doublePageHeight = [m_layout vGetPage:m_cur_page - 1].GetHeight;
+                    }
+                    else
+                    {
+                        doublePageX = [m_layout vGetPage:m_cur_page + 1].GetX;
+                        doublePageY = [m_layout vGetPage:m_cur_page + 1].GetY;
+                        doublePageWidth = [m_layout vGetPage:m_cur_page + 1].GetWidth + [m_layout vGetPage:m_cur_page].GetWidth;
+                        doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                    }
+                }
+            }
+            else
+            {
+                if(m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 != 0)
+                {
+                    doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                    doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                    doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth;
+                    doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                }
+                else
+                {
+                    if(m_cur_page % 2 == 0)
+                    {
+                        doublePageX = [m_layout vGetPage:m_cur_page].GetX;
+                        doublePageY = [m_layout vGetPage:m_cur_page].GetY;
+                        doublePageWidth = [m_layout vGetPage:m_cur_page].GetWidth + [m_layout vGetPage:m_cur_page + 1].GetWidth;
+                        doublePageHeight = [m_layout vGetPage:m_cur_page + 1].GetHeight;
+                    }
+                    else
+                    {
+                        doublePageX = [m_layout vGetPage:m_cur_page - 1].GetX;
+                        doublePageY = [m_layout vGetPage:m_cur_page - 1].GetY;
+                        doublePageWidth = [m_layout vGetPage:m_cur_page - 1].GetWidth + [m_layout vGetPage:m_cur_page].GetWidth;
+                        doublePageHeight = [m_layout vGetPage:m_cur_page].GetHeight;
+                    }
+                }
+            }
+        }
+        isDecelerating = false;
+        touchEndPoint = [self convertPoint:touchPoint toView:nil];
+        touchEndTime = [NSDate date];
+        NSTimeInterval executionTime = [touchEndTime timeIntervalSinceDate:touchBeginTime];
+        //speed = pixel/second
+        
+        if(touchEndPoint.x > touchBeginPoint.x)
+        {
+            speed = (touchEndPoint.x - touchBeginPoint.x)/executionTime;
+        }
+        else
+        {
+            speed = (touchBeginPoint.x - touchEndPoint.x)/executionTime;
+        }
+        
+        if(m_zoom > 1 && m_status != sta_zoom && !GLOBAL.g_zoomed_stop_on_boundaries)
+        {
+            CGSize screenSize = [self getScreenFrameForCurrentOrientation];
+            CGFloat screenWidth = screenSize.width;
+            if(m_layout_rtol)
+            {
+                if((screenWidth) < doublePageWidth)
+                {
+                    //right
+                    if(m_cur_page > 1 && self.contentOffset.x * m_scale_pix + screenWidth > doublePageX + doublePageWidth)
+                    {
+                        if(touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            if(begin_touch_page % 2 != 0)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX / m_scale_pix), self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX / m_scale_pix), self.contentOffset.y);
+                            }
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake((doublePageX + doublePageWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page + 1 < m_doc.pageCount && (self.contentOffset.x * m_scale_pix < doublePageX))
+                    {
+                        if(touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            if(m_doc.pageCount == m_cur_page + 2 && m_doc.pageCount % 2 != 0)
+                            {
+                                if(screenWidth < [m_layout vGetPage:begin_touch_page + 1].GetWidth)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX + [m_layout vGetPage:begin_touch_page + 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                                }
+                                
+                            }
+                            else if(m_doc.pageCount == m_cur_page + 3 && m_doc.pageCount % 2 != 0)
+                            {
+                                if(screenWidth < [m_layout vGetPage:begin_touch_page + 2].GetWidth)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX + [m_layout vGetPage:begin_touch_page + 2].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 2].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                                }
+                            }
+                            else
+                            {
+                                if(begin_touch_page % 2 != 0)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX + [m_layout vGetPage:begin_touch_page + 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX + [m_layout vGetPage:begin_touch_page + 2].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake((doublePageX / m_scale_pix), self.contentOffset.y);;
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+                else
+                {
+                    //right
+                    if(m_cur_page > 1 && touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        if(m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 != 0)
+                        {
+                            if(screenWidth < [m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        else
+                        {
+                            if(begin_touch_page % 2 == 0)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth) ) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 2].GetWidth + [m_layout vGetPage:begin_touch_page - 3].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page + 1 < m_doc.pageCount && touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        if(begin_touch_page % 2 == 0)
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 2].GetWidth + [m_layout vGetPage:begin_touch_page + 3].GetWidth) ) / 2)) / m_scale_pix , self.contentOffset.y);
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 2].GetWidth + [m_layout vGetPage:begin_touch_page + 1].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //right
+                    else if(m_cur_page >= 0 && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        animatePoint = CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page + 1].GetWidth + ([m_layout vGetPage:m_cur_page].GetX / 2))
+                    {
+                        animatePoint = CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+            }
+            else if(firstPageSingle)
+            {
+                if((screenWidth) < doublePageWidth)
+                {
+                    //right
+                    if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > doublePageX + doublePageWidth)
+                    {
+                        if(touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            if(begin_touch_page % 2 != 0)
+                            {
+                                if(begin_touch_page + 3 < m_doc.pageCount)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX / m_scale_pix), self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    if(screenWidth < [m_layout vGetPage:begin_touch_page + 2].GetWidth)
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX / m_scale_pix), self.contentOffset.y);
+                                    }
+                                    else
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 2].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if(begin_touch_page + 2 < m_doc.pageCount)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    if(screenWidth < [m_layout vGetPage:begin_touch_page + 1].GetWidth)
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
+                                    }
+                                    else
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake((doublePageX + doublePageWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && (self.contentOffset.x * m_scale_pix < doublePageX))
+                    {
+                        if(touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            if(begin_touch_page - 3 < 0)
+                            {
+                                if(begin_touch_page - 1 == 0)
+                                {
+                                    if(screenWidth < [m_layout vGetPage:begin_touch_page - 1].GetWidth)
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                    else
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 1].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                }
+                                else
+                                {
+                                    if(screenWidth < [m_layout vGetPage:begin_touch_page - 2].GetWidth)
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX + [m_layout vGetPage:begin_touch_page - 2].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                    else
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if(begin_touch_page % 2 != 0)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX + [m_layout vGetPage:begin_touch_page - 2].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake((doublePageX / m_scale_pix), self.contentOffset.y);;
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+                else
+                {
+                    //right
+                    if(m_cur_page + 2 < m_doc.pageCount && touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        if(m_cur_page == 0)
+                        {
+                            if(screenWidth < [m_layout vGetPage:begin_touch_page + 1].GetWidth + [m_layout vGetPage:begin_touch_page + 2].GetWidth)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 1].GetWidth + [m_layout vGetPage:begin_touch_page + 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        else
+                        {
+                            if(begin_touch_page % 2 != 0)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 2].GetWidth + [m_layout vGetPage:begin_touch_page + 3].GetWidth) ) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 1].GetWidth + [m_layout vGetPage:begin_touch_page + 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        if(m_cur_page - 1 == 0)
+                        {
+                            if(screenWidth < [m_layout vGetPage:begin_touch_page - 1].GetWidth)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 1].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        else if(m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 == 0)
+                        {
+                            if(screenWidth < [m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        else
+                        {
+                            if(begin_touch_page % 2 != 0)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 2].GetWidth + [m_layout vGetPage:begin_touch_page - 1].GetWidth) ) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 3].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 3].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //right
+                    else if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        animatePoint = CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page - 1].GetWidth + ([m_layout vGetPage:m_cur_page].GetX / 2))
+                    {
+                        animatePoint = CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+            }
+            else
+            {
+                if((screenWidth) < doublePageWidth)
+                {
+                    //right
+                    if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > doublePageX + doublePageWidth)
+                    {
+                        if(touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            if(begin_touch_page % 2 == 0)
+                            {
+                                if(begin_touch_page + 3 < m_doc.pageCount)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX / m_scale_pix), self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    if(begin_touch_page + 2 != m_doc.pageCount)
+                                    {
+                                        if(screenWidth < [m_layout vGetPage:begin_touch_page + 2].GetWidth)
+                                        {
+                                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX / m_scale_pix), self.contentOffset.y);
+                                        }
+                                        else
+                                        {
+                                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 2].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if(begin_touch_page + 2 < m_doc.pageCount)
+                                {
+                                    animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
+                                }
+                                else
+                                {
+                                    if(screenWidth < [m_layout vGetPage:begin_touch_page + 1].GetWidth)
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
+                                    }
+                                    else
+                                    {
+                                        animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake((doublePageX + doublePageWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page - 1 > 0 && (self.contentOffset.x * m_scale_pix < doublePageX))
+                    {
+                        if(touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                        {
+                            if(begin_touch_page % 2 == 0)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX + [m_layout vGetPage:begin_touch_page - 2].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake((doublePageX / m_scale_pix), self.contentOffset.y);;
+                        }
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+                else
+                {
+                    //right
+                    if(m_cur_page + 3 < m_doc.pageCount && touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        if(begin_touch_page % 2 == 0)
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 2].GetWidth + [m_layout vGetPage:begin_touch_page + 3].GetWidth) ) / 2)) / m_scale_pix , self.contentOffset.y);
+                        }
+                        else
+                        {
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page + 1].GetWidth + [m_layout vGetPage:begin_touch_page + 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                        }
+                        
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 1 && touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
+                    {
+                        if(m_doc.pageCount == m_cur_page + 1 && m_doc.pageCount % 2 != 0)
+                        {
+                            if(screenWidth < [m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 1].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        else
+                        {
+                            if(begin_touch_page % 2 == 0)
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 2].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 2].GetWidth + [m_layout vGetPage:begin_touch_page - 1].GetWidth) ) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                            else
+                            {
+                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 3].GetX - ((screenWidth - ([m_layout vGetPage:begin_touch_page - 3].GetWidth + [m_layout vGetPage:begin_touch_page - 2].GetWidth)) / 2)) / m_scale_pix , self.contentOffset.y);
+                            }
+                        }
+                        
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //right
+                    else if(m_cur_page + 1 < m_doc.pageCount && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page].GetWidth)
+                    {
+                        animatePoint = CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                    //left
+                    else if(m_cur_page > 0 && self.contentOffset.x * m_scale_pix + screenWidth > [m_layout vGetPage:m_cur_page - 1].GetWidth + ([m_layout vGetPage:m_cur_page].GetX / 2))
+                    {
+                        animatePoint = CGPointMake((doublePageX - ((screenWidth - doublePageWidth) / 2)) / m_scale_pix , self.contentOffset.y);
+                        [self setContentOffset:animatePoint animated:YES];
+                        isAnimating = true;
+                    }
+                }
+            }
+        }
+        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+        [self ProRedrawOS];
+    }
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
 {
+    isDecelerating = true;
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+    isDecelerating = false;
+    isAnimating = false;
 }
-
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {

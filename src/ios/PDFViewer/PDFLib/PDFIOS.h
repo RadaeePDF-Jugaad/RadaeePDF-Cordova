@@ -71,38 +71,44 @@ typedef unsigned long long PDF_OBJ_REF;
 
 int Global_active(NSString* serial);
 /**
- *	@brief	Active Standard license, this type of license can view PDF only.
+ *    @brief    Active Standard license, this type of license can view PDF only.
  *
- *	@param 	name 	Bundle ID of Application in ios
- *	@param 	company Company name inputed when pruchase.
- *	@param 	mail 	Email address inputed when pruchase.
- *	@param 	serial 	Serial Number you recieved after paid.
+ *    @param     name     Bundle ID of Application in ios
+ *    @param     company Company name inputed when pruchase.
+ *    @param     mail     Email address inputed when pruchase.
+ *    @param     serial     Serial Number you recieved after paid.
  *
- *	@return	true or false.
+ *    @return    true or false.
  */
 bool Global_activeStandard( const char *name, const char *company, const char *mail, const char *serial );
 
 /**
- *	@brief	Active Professional license, this type of license can do some viewing and editing.
+ *    @brief    Active Professional license, this type of license can do some viewing and editing.
  *
- *	@param 	name 	Bundle ID of Application in ios
- *	@param 	company Company name inputed when pruchase.
- *	@param 	mail 	Email address inputed when pruchase.
- *	@param 	serial 	Serial Number you recieved after paid.
+ *    @param     name     Bundle ID of Application in ios
+ *    @param     company Company name inputed when pruchase.
+ *    @param     mail     Email address inputed when pruchase.
+ *    @param     serial     Serial Number you recieved after paid.
  *
- *	@return	true or false.
+ *    @return    true or false.
  */
 bool Global_activeProfession( const char *name, const char *company, const char *mail, const char *serial );
 
+bool Global_activePremium( const char *name, const char *company, const char *mail, const char *serial );
+
+void Global_getVerString( char ret[8] );
+bool Global_activePremiumForVer( const char *company, const char *mail, const char *serial );
+bool Global_activeProfessionalForVer( const char *company, const char *mail, const char *serial );
+bool Global_activeStandardForVer( const char *company, const char *mail, const char *serial );
 /**
- *	@brief	Active Premium license, this type of license can do some viewing and editing and form editing.
+ *    @brief    Active Premium license, this type of license can do some viewing and editing and form editing.
  *
- *	@param 	name 	Bundle ID of Application in ios.
- *	@param 	company Company name inputed when pruchase.
- *	@param 	mail 	Email address inputed when pruchase.
- *	@param 	serial 	Serial Number you recieved after paid.
+ *    @param     name     Bundle ID of Application in ios.
+ *    @param     company Company name inputed when pruchase.
+ *    @param     mail     Email address inputed when pruchase.
+ *    @param     serial     Serial Number you recieved after paid.
  *
- *	@return	true or false.
+ *    @return    true or false.
  */
 bool Global_activePremium( const char *name, const char *company, const char *mail, const char *serial );
 
@@ -110,8 +116,6 @@ void Global_getVerString( char ret[8] );
 bool Global_activePremiumForVer( const char *company, const char *mail, const char *serial );
 bool Global_activeProfessionalForVer( const char *company, const char *mail, const char *serial );
 bool Global_activeStandardForVer( const char *company, const char *mail, const char *serial );
-
-
 /**
 
  *	@brief	Load font file.

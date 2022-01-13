@@ -91,6 +91,7 @@ extern NSString *g_serial;
 @property (nonatomic) bool g_readonly;
 @property (nonatomic) bool g_fake_sign;
 @property (nonatomic) bool g_disable_text_copy;
+@property (nonatomic) bool g_zoomed_stop_on_boundaries;
 
 @property (nonatomic) bool g_layout_rtol;
 @property (nonatomic) bool g_auto_scale;

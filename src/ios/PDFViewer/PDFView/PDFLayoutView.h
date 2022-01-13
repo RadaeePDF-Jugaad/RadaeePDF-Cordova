@@ -118,14 +118,26 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     bool m_ellipse_drawing;
     
     BOOL readOnlyEnabled;
-    BOOL doublePage;
-    
     UIImageView *imgAnnot;
     NSString *tmpImage;
     double lastAngle;
     
     BOOL isResizing;
     BOOL isRotating;
+    BOOL isDecelerating;
+    BOOL isAnimating;
+    BOOL singlePage;
+    BOOL doublePage;
+    BOOL firstPageSingle;
+    
+    CGPoint touchBeginPoint;
+    CGPoint touchPoint;
+    CGPoint touchEndPoint;
+    CGPoint animatePoint;
+    
+    NSDate *touchBeginTime;
+    NSDate *touchEndTime;
+    int begin_touch_page;
     
     int doubleTapZoomMode;
     int readerBackgroundColor;

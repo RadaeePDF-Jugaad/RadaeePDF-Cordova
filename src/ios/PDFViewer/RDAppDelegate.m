@@ -24,8 +24,7 @@
     [[UIButton appearance] setTitleColor:[UIColor systemBlueColor] forState:UIControlStateNormal];
     [[UIImageView appearance] setTintColor:[RDUtils radaeeIconColor]];
     [[UITableViewCell appearance] setTintColor:[RDUtils radaeeIconColor]];
-    
-    
+
     g_id = [[NSBundle mainBundle] bundleIdentifier];
     g_company = @"radaee";
     g_mail = @"radaeepdf@gmail.com";
