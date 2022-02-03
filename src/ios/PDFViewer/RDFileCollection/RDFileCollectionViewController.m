@@ -104,11 +104,11 @@ static NSString * const reuseIdentifier = @"Cell";
 {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         if ([[UIScreen mainScreen] bounds].size.width <= 375) {
-            return CGSizeMake(150, 150);
+            return CGSizeMake(130, 150);
         }
-        return CGSizeMake(170, 170);
+        return CGSizeMake(160, 180);
     }
-    return CGSizeMake(200, 200);
+    return CGSizeMake(180, 200);
 }
 /*
 // Uncomment this method to specify if the specified item should be highlighted during tracking

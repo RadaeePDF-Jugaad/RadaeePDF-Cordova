@@ -135,16 +135,16 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     CGPoint touchEndPoint;
     CGPoint animatePoint;
     
+    NSTimeInterval m_doubleTapTime;
+    int m_doubleTapCount;
+    
     NSDate *touchBeginTime;
     NSDate *touchEndTime;
     int begin_touch_page;
     
     int doubleTapZoomMode;
     int readerBackgroundColor;
-    
     RDPDFPage *tappedPage;
-    
-    bool isDoubleTapping;
 }
 
 @property (nonatomic) NSUInteger singleViewPageNo;

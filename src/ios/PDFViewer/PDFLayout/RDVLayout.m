@@ -43,7 +43,7 @@
         m_doch = 0;
         m_disp_pg1 = -1;
         m_disp_pg2 = -1;
-        m_scale = 1;
+        m_scale = 0.01f;
         m_zooming = 0;
         m_finder = [[RDVFinder alloc] init];
         m_del = del;
@@ -217,7 +217,7 @@
         m_thread = nil;
         m_pages_cnt = 0;
         m_doc = nil;
-        m_scale = 1;
+        m_scale = 0.01f;
     }
 }
 
@@ -225,7 +225,7 @@
 {
     m_w = vw;
     m_h = vh;
-    m_scale = 1;
+    m_scale = 0.01f;
     [self ProLayout];
 }
 
@@ -1415,8 +1415,295 @@
 {
     return (m_cell_w <= m_w);
 }
-
 @end
+
+
+
+@implementation RDVLayoutDualV
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol :(bool)has_cover :(bool)same_width
+{
+    self = [super init :del];
+    if(self)
+    {
+        m_cells = NULL;
+        m_cells_cnt = 0;
+        m_rtol = rtol;
+        m_has_cover = has_cover;
+        m_same_width = same_width;
+    }
+    return self;
+}
+
+-(void)vSetAlign :(PAGE_ALIGN) align
+{
+    m_align = align;
+    [self ProLayout];
+}
+
+-(void)vClose
+{
+    [super vClose];
+    if( m_cells )
+    {
+        free( m_cells );
+        m_cells = NULL;
+        m_cells_cnt = 0;
+    }
+}
+
+-(void)ProLayout
+{
+    if( m_doc == NULL || m_w <= m_page_gap || m_h <= m_page_gap ) return;
+    
+    int pageno = 0;
+    int pcnt = [m_doc pageCount];
+    float max_ch = 0;
+    float max_cw = 0;
+    int ccur = 0;
+    int ccnt = 0;
+
+    while( pageno < pcnt )
+    {
+        float w0 = [m_doc pageWidth:pageno];
+        float h0 = [m_doc pageHeight:pageno];
+        if((!m_has_cover || pageno > 0) && pageno < pcnt - 1)//dual page cell
+        {
+            w0 += [m_doc pageWidth:pageno + 1];
+            float h1 = [m_doc pageHeight:pageno + 1];
+            if (h1 > h0) h0 = h1;
+            pageno += 2;
+        }
+        else//single page cell
+            pageno++;
+        if (max_cw < w0) max_cw = w0;
+        if (max_ch < h0) max_ch = h0;
+        ccnt++;
+    }
+    m_scale_min = (m_w - m_page_gap) / max_cw;
+    m_scale_max = m_scale_min * GLOBAL.g_layout_zoom_level;
+    if (m_scale < m_scale_min) m_scale = m_scale_min;
+    if (m_scale > m_scale_max) m_scale = m_scale_max;
+    m_docw = max_cw * m_scale + m_page_gap;
+    if (m_docw < m_w) m_docw = m_w;
+
+    if( m_cells ) free( m_cells );
+    m_cells = (struct PDFCellV *)malloc( sizeof(struct PDFCellV) * ccnt );
+    m_cells_cnt = ccnt;
+    pageno = 0;
+    ccur = 0;
+    int ty = 0;
+    struct PDFCellV *cell = m_cells;
+    while( ccur < ccnt )
+    {
+        int ich = 0;
+        float scale;
+        if((!m_has_cover || pageno > 0) && pageno < pcnt - 1)
+        {
+            float cw = [m_doc pageWidth:pageno] + [m_doc pageWidth:pageno + 1];
+            if (m_same_width)
+                scale = (m_docw - m_page_gap) / cw;
+            else
+                scale = m_scale;
+            int iw = (int)(cw * scale);
+
+            RDVPage *vp_cur = (RDVPage *)[m_pages objectAtIndex:pageno];
+            RDVPage *vp_nxt = (RDVPage *)[m_pages objectAtIndex:pageno+1];
+            int ph1 = [m_doc pageHeight:pageno] * scale;
+            int ph2 = [m_doc pageHeight:pageno+1] * scale;
+            ich = ph1;
+            if (ich < ph2) ich = ph2;
+            ich += m_page_gap;
+            cell->top = ty;
+            cell->bot = ty + ich;
+            if (m_rtol)
+            {
+                cell->page_left = pageno + 1;
+                cell->page_right = pageno;
+                [vp_nxt vLayout :((m_docw - iw) >> 1) : ty + ((ich - ph2) >> 1) :scale :true];
+                [vp_cur vLayout :vp_nxt.x + vp_nxt.w : ty + ((ich - ph1) >> 1) :scale :true];
+            }
+            else
+            {
+                cell->page_left = pageno;
+                cell->page_right = pageno + 1;
+                [vp_cur vLayout :((m_docw - iw) >> 1) : ty + ((ich - ph1) >> 1) :scale :true];
+                [vp_nxt vLayout :vp_cur.x + vp_cur.w : ty + ((ich - ph2) >> 1) :scale :true];
+            }
+            pageno += 2;
+        }
+        else
+        {
+            float cw = [m_doc pageWidth:pageno];
+            if (m_same_width)
+                scale = (m_docw - m_page_gap) / cw;
+            else
+                scale = m_scale;
+            int iw = (int)(cw * scale);
+
+            cell->page_left = pageno;
+            cell->page_right = -1;
+            RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
+            ich = [m_doc pageHeight:pageno] * scale + m_page_gap;
+            cell->top = ty;
+            cell->bot = ty + ich;
+            [vp vLayout :((m_docw - iw) >> 1): ty + (m_page_gap >> 1) :scale :true];
+            pageno++;
+        }
+        ty += ich;
+        cell++;
+        ccur++;
+    }
+    m_doch = ty;
+}
+
+-(void)ProRefreshDispRange
+{
+    //RDVPage *vp1 = [self ProGetPage :-m_w :-m_h];
+    //RDVPage *vp2 = [self ProGetPage :m_w<<1 :m_h<<1];
+    RDVPage *vp1 = [self ProGetPage :-m_cellw :-m_cellh];
+    RDVPage *vp2 = [self ProGetPage :m_w + m_cellw :m_h + m_cellh];
+    if(!vp1 || !vp2) return;
+    int pg1 = [vp1 pageno];
+    int pg2 = [vp2 pageno];
+    if(pg1 > pg2)
+    {
+        int tmp = pg1;
+        pg1 = pg2;
+        pg2 = tmp;
+    }
+    pg2++;
+    if (m_rtol)
+    {
+        if (pg1 > 0) pg1--;
+        if (pg2 < m_pages_cnt) pg2++;
+    }
+
+    if(m_zooming)
+    {
+        m_disp_pg1 = pg1;
+        m_disp_pg2 = pg2;
+    }
+    else
+    {
+        if(m_disp_pg1 >= 0 && m_disp_pg2 >= 0)//need to cancel previous range pages.
+        {
+            int pgno1 = m_disp_pg1;
+            int pgno2 = (pg1 > m_disp_pg2)?m_disp_pg2:pg1;
+            while(pgno1 < pgno2)
+            {
+                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pgno1];
+                [vp vEndPage:m_thread];
+                [vp vLayerDel];
+                pgno1++;
+            }
+            pgno1 = (m_disp_pg1 > pg2)?m_disp_pg1:pg2;
+            pgno2 = m_disp_pg2;
+            while(pgno1 < pgno2)
+            {
+                RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pgno1];
+                [vp vEndPage:m_thread];
+                [vp vLayerDel];
+                pgno1++;
+            }
+        }
+        m_disp_pg1 = pg1;
+        m_disp_pg2 = pg2;
+        while(pg1<pg2)
+        {
+            RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pg1];
+            [vp vClips:m_thread :true];
+            pg1++;
+        }
+    }
+}
+
+-(RDVPage *)ProGetPage :(int)vx :(int)vy
+{
+    if( m_docw <= 0 || m_doch <= 0)
+        return nil;
+    
+    int top = 0;
+    int bot = m_cells_cnt - 1;
+    int y = (int)m_docy + vy;
+    int x = (int)m_docx + vx;
+
+    while (top <= bot)
+    {
+        int mid = (top + bot) >> 1;
+        struct PDFCellV *cmid = m_cells + mid;
+        if (y < cmid->top){
+            bot = mid - 1;
+        }else if (y > cmid->bot){
+            top = mid + 1;
+        }else{
+            RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:cmid->page_left];
+            if (cmid->page_right >= 0 && x > vp.x + vp.w)
+                return  (RDVPage *)[m_pages objectAtIndex:cmid->page_right];
+            else
+                return vp;
+        }
+    }
+    if (bot < 0)
+        return m_pages[0];
+    else
+        return m_pages[m_pages.count - 1];
+}
+
+-(void)vGotoPage:(int)pageno
+{
+    if (pageno < 0) return;
+    struct PDFCellV *ccur = m_cells;
+    struct PDFCellV *cend = ccur + m_cells_cnt;
+    while(ccur < cend)
+    {
+        if (ccur->page_left == pageno)
+        {
+            m_docx = 0;
+            m_docy = ccur->top;
+            return;
+        }
+        if (ccur->page_right == pageno)
+        {
+            RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:ccur->page_left];
+            m_docx = vp.x + vp.w;
+            if (m_docx > m_w - vp.w) m_docx = m_w - vp.w;
+            m_docy = ccur->top;
+            return;
+        }
+        ccur++;
+    }
+}
+
+-(bool)vFindGoto
+{
+    if( m_pages == NULL ) return false;
+    int pg = [m_finder find_get_page];
+    if( pg < 0 || pg >= [m_doc pageCount] ) return false;
+    PDF_RECT pos;
+    if( ![m_finder find_get_pos:&pos] ) return false;
+    [self vGotoPage :pg];
+    RDVPage *vpage = m_pages[pg];
+    pos.left = [vpage GetVX:pos.left];
+    pos.top = [vpage GetVY:pos.top];
+    pos.right = [vpage GetVX:pos.right];
+    pos.bottom = [vpage GetVY:pos.bottom];
+    float x = m_docx;
+    float y = m_docy;
+    if( x > pos.left - m_w/8 ) x = pos.left - m_w/8;
+    if( x < pos.right - m_w*7/8 ) x = pos.right - m_w*7/8;
+    if( y > pos.top - m_h/8 ) y = pos.top - m_h/8;
+    if( y < pos.bottom - m_h*7/8 ) y = pos.bottom - m_h*7/8;
+    if( x > m_docw - m_w ) x = m_docw - m_w;
+    if( x < 0 ) x = 0;
+    if( y > m_doch - m_h ) y = m_doch - m_h;
+    if( y < 0 ) y = 0;
+    m_docx = x;
+    m_docy = y;
+    return true;
+}
+@end
+
+
 
 @implementation RDVLayoutSingle
 -(id)init :(id<RDVLayoutDelegate>)del :(BOOL)rtol :(int)pageno

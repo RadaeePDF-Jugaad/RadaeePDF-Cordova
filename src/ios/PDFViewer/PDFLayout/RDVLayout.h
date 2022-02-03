@@ -165,6 +165,26 @@ typedef enum
 -(void)vSetAlign :(PAGE_ALIGN) align;
 @end
 
+@interface RDVLayoutDualV :RDVLayout
+{
+    PAGE_ALIGN m_align;//unused.
+    bool       m_rtol;
+    bool       m_same_width;
+    bool       m_has_cover;
+    int        m_cells_cnt;
+    struct PDFCellV
+    {
+        int top;
+        int bot;
+        int page_left;
+        int page_right;
+    }* m_cells;
+}
+-(id)init :(id<RDVLayoutDelegate>)del :(bool)rtol :(bool)has_cover :(bool)same_width;
+-(void)vSetAlign :(PAGE_ALIGN) align;
+@end
+
+
 @interface RDVLayoutSingle :RDVLayout
 {
     PAGE_ALIGN m_align;

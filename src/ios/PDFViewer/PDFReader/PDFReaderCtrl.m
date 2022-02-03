@@ -226,11 +226,11 @@
     return [m_doc saveAs:path: NO];
 }
 
-- (void)uddateAllPages
+- (void)updateAllPages
 {
     [m_view vUpdateRange];
 }
-- (void)uddatePage:(int)pageno
+- (void)updatePage:(int)pageno
 {
     [m_view vUpdatePage:pageno];
 }
@@ -548,7 +548,7 @@
                 [vw PDFSetVMode:3];
                 break;
             case 3:
-                [vw PDFSetVMode:4];
+                [vw PDFSetVMode:7];
                 break;
             default:
                 [vw PDFSetVMode:0];

@@ -292,6 +292,8 @@ NSString *g_serial = @"";
     //4:cover as single, and other pages are in dual when landscape
     //5:reflow
     //6:dual page when landscape
+    //7:dual page with cover, like Acrobat on windows.
+    //8:dual page without cover, like Acrobat on windows.
     _g_view_mode = 0;
     _g_navigation_mode = 1; //0 = slider, 1 = thumbnail
     _g_tap_zoom_level = 11; //double tap, (2-5)

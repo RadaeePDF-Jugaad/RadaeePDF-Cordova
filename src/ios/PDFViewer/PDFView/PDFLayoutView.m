@@ -45,6 +45,7 @@
         m_sel = nil;
         m_cur_page = -1;
         m_save_vmode = 0;
+        m_doubleTapCount = 0;
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = YES;
         self.alwaysBounceHorizontal = NO;
@@ -220,6 +221,18 @@
             //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
             break;
+        case 7://dual page with cover, same like Acrobat on Windows
+            singlePage = NO;
+            doublePage = NO;
+            m_layout = [[RDVLayoutDualV alloc] init:self :GLOBAL.g_layout_rtol :YES :NO];
+            [((RDVLayoutDualV *)m_layout) vSetAlign:align_hcenter];
+            break;
+        case 8://dual page without cover, same like Acrobat on Windows
+            singlePage = NO;
+            doublePage = NO;
+            m_layout = [[RDVLayoutDualV alloc] init:self :GLOBAL.g_layout_rtol :NO :NO];
+            [((RDVLayoutDualV *)m_layout) vSetAlign:align_hcenter];
+            break;
         default:// 0: Vertical
             singlePage = NO;
             doublePage = NO;
@@ -317,6 +330,18 @@
             center_page = true;
             //[((RDVLayoutDual *)m_layout) vSetAlign:align_top];
             if (GLOBAL.g_auto_scale) [((RDVLayoutDual *)m_layout) vSetScaleMode:SCALE_FIT];
+            break;
+        case 7://dual page with cover, same like Acrobat on Windows
+            singlePage = NO;
+            doublePage = NO;
+            m_layout = [[RDVLayoutDualV alloc] init:self :GLOBAL.g_layout_rtol :YES :NO];
+            [((RDVLayoutDualV *)m_layout) vSetAlign:align_hcenter];
+            break;
+        case 8://dual page without cover, same like Acrobat on Windows
+            singlePage = NO;
+            doublePage = NO;
+            m_layout = [[RDVLayoutDualV alloc] init:self :GLOBAL.g_layout_rtol :NO :NO];
+            [((RDVLayoutDualV *)m_layout) vSetAlign:align_hcenter];
             break;
         default:// 0: Vertical
             singlePage = NO;
@@ -2404,6 +2429,12 @@
         if( [self OnImageTouchBegin:point] ) return;
         if( [self OnEditboxTouchBegin:point] ) return;
         [self OnNoneTouchBegin:point:touch.timestamp];
+        m_doubleTapCount++;
+        if (m_doubleTapCount == 1)//first tap of double tap
+        {
+            m_doubleTapTime = event.timestamp;
+            [self performSelector:@selector(OnDoubleTapCheckEnd:) withObject:self afterDelay:0.5];
+        }
     }
 }
 
@@ -2433,32 +2464,55 @@
 
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    UITouch *touch = [touches anyObject];
-    if (touch.tapCount == 2 && m_status == sta_none) {
-        //this is the double tap action
-        [self OnDoubleTap:touch];
-    }
-    else
+    NSSet *allTouches = [event allTouches];
+    NSUInteger cnt = [allTouches count];
+    if( cnt == 1 )
     {
-        NSSet *allTouches = [event allTouches];
-        NSUInteger cnt = [allTouches count];
-        if( cnt == 1 )
+        UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
+        CGPoint point=[touch locationInView:m_canvas];
+        if( [self OnSelTouchEnd:[touch locationInView:self]] ) return;
+        if( [self OnAnnotTouchEnd:point] ) return;
+        if( [self OnNoteTouchEnd:point] ) return;
+        if( [self OnInkTouchEnd:point] ) return;
+        if( [self OnPolygonTouchEnd:point] ) return;
+        if( [self OnPolylineTouchEnd:point] ) return;
+        if( [self OnLineTouchEnd:point] ) return;
+        if( [self OnRectTouchEnd:point] ) return;
+        if( [self OnEllipseTouchEnd:point] ) return;
+        if( [self OnImageTouchEnd:point] ) return;
+        if( [self OnEditboxTouchEnd:point] ) return;
+        if (m_status == sta_none && m_doubleTapCount == 2)
         {
-            UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
-            CGPoint point=[touch locationInView:m_canvas];
-            if( [self OnSelTouchEnd:[touch locationInView:self]] ) return;
-            if( [self OnAnnotTouchEnd:point] ) return;
-            if( [self OnNoteTouchEnd:point] ) return;
-            if( [self OnInkTouchEnd:point] ) return;
-            if( [self OnPolygonTouchEnd:point] ) return;
-            if( [self OnPolylineTouchEnd:point] ) return;
-            if( [self OnLineTouchEnd:point] ) return;
-            if( [self OnRectTouchEnd:point] ) return;
-            if( [self OnEllipseTouchEnd:point] ) return;
-            if( [self OnImageTouchEnd:point] ) return;
-            if( [self OnEditboxTouchEnd:point] ) return;
-            [self OnNoneTouchEnd:point:touch.timestamp];
+            float dx = point.x - m_tx / m_scale_pix;
+            float dy = point.y - m_ty / m_scale_pix;
+            bool double_tap = true;
+            if( dx > 5 || dx < -5 )
+                double_tap = false;
+            if( dy > 5 || dy < -5 )
+                double_tap = false;
+            //this is the double tap action
+            if (double_tap && event.timestamp - m_doubleTapTime < 0.5)
+            {
+                if (doubleTapZoomMode > 0)
+                {
+                    if (m_zoom > GLOBAL.g_tap_zoom_level)
+                    {
+                        [self defaultZoom:touch];
+                        self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
+                    }
+                    else
+                    {
+                        self.pagingEnabled = NO;
+                        if (doubleTapZoomMode == 1) [self defaultZoom:touch];
+                   }
+                }
+                if (m_del)
+                    [m_del OnDoubleTapped:[touch locationInView:self.window].x :[touch locationInView:m_canvas].y];
+            }
+            m_doubleTapCount = 0;
         }
+        else
+            [self OnNoneTouchEnd:point:touch.timestamp];
     }
 }
 
@@ -2467,41 +2521,184 @@
     [self touchesEnded:touches withEvent:event];
 }
 
-- (void)OnDoubleTap:(UITouch *)touch
+- (void)OnDoubleTapCheckEnd:(id)sendor
 {
-    isDoubleTapping = YES;
-    NSLog(@"double tap");
+    if (m_doubleTapCount == 0) return;
+
+    m_doubleTapCount = 0;
+    [m_layout vGetPos :m_tx :m_ty :&m_annot_pos];
     
-    if (doubleTapZoomMode > 0)
+    CGFloat x = m_tx / m_scale_pix;
+    CGFloat y = m_ty / m_scale_pix;
+    if( m_annot_pos.pageno < 0 ) return;
+
+    RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+    if( !vpage )//shall not happen
     {
-        if (m_zoom > GLOBAL.g_tap_zoom_level)
+        if (m_del) [m_del OnSingleTapped:x:y];
+        return;
+    }
+    RDPDFPage *page = [vpage GetPage];
+    if( !page ) return;
+    m_annot = [page annotAtPoint:m_annot_pos.pdfx: m_annot_pos.pdfy];
+    m_annot_idx = -1;
+    if( m_annot )
+    {
+        
+        PDF_RECT rect;
+        [m_annot getRect:&rect];
+        
+        /*
+        RDPDFPageContent *content = [[RDPDFPageContent alloc] init];
+        [content gsSave];
+        float width = (rect.right - rect.left);
+        float height = (rect.bottom - rect.top);
+         
+        float xTranslation = width / 2.0f;
+        float yTranslation = height / 2.0f;
+
+        //set the matrix 20x20
+        RDPDFMatrix *matrix = [[RDPDFMatrix alloc] init:width :height :xTranslation :yTranslation];
+        [content gsCatMatrix:matrix];
+        matrix = nil;
+        
+        [content drawText:@"Testo di prova" :0 :50.0];
+        [content gsRestore];
+        content = nil;
+        */
+        
+        m_annot_idx = [m_annot getIndex];
+        
+        if(m_del && [m_del respondsToSelector:@selector(OnAnnotTapped:atPage:atPoint:)])
         {
-            [self defaultZoom:touch];
-            self.pagingEnabled = GLOBAL.g_paging_enabled && m_layout && [m_layout vCanPaging];
+            [m_del OnAnnotTapped:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
         }
-        else
+        
+        if (![self canSaveDocument] && m_annot.type != 1) {
+            if (m_del) [m_del OnSingleTapped:x:y];
+            return;
+        }
+        
+        if ([m_annot isAnnotReadOnly] && !([self isReadOnlyAnnotEnabled:m_annot]))
+            return;
+        
+        self.scrollEnabled = false;
+        m_status = sta_annot;
+        [m_annot getRect:&m_annot_rect];
+        m_annot_rect.left = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.left];
+        m_annot_rect.right = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.right];
+        float tmp = m_annot_rect.top;
+        m_annot_rect.top = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:m_annot_rect.bottom];
+        m_annot_rect.bottom = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:tmp];
+        [self ProRedrawOS];
+        
+        int nu = [m_annot getCheckStatus];
+        if (nu != -1) {
+            switch (nu) {
+                case 0:
+                    [m_annot setCheckValue:YES];
+                    break;
+                case 1:
+                    [m_annot setCheckValue:NO];
+                default:
+                    //case 2,3 set Radiobox
+                    [m_annot setRadio];
+                    break;
+            }
+            [self setModified:YES force:NO];
+            //need refresh PDFView and save annot status
+            [self ProUpdatePage :m_annot_pos.pageno];
+            [self vAnnotEnd];
+            [self autoSave];
+            return;
+        }
+        
+        nu = [m_annot getComboItemCount];
+        if (nu != -1){
+            //int j= [m_annot getComboSel];
+            NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
+            for (int i = 0; i < nu; i++) {
+                NSString *str = [m_annot getComboItem:i];
+                [arr addObject:str];
+            }
+            
+            [self executeAnnotJS];
+            
+            if (m_del){
+                [m_del OnAnnotCommboBox :vpage :m_annot :[self annotRect] :arr selected:[m_annot getComboSel]];
+            }
+            return ;
+        }
+        
+        nu = [m_annot getListItemCount];
+        if (nu != -1){
+            
+            //BOOL multi = [m_annot isMultiSel];
+            
+            NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
+            for (int i = 0; i < nu; i++) {
+                NSString *str = [m_annot getListItem:i];
+                [arr addObject:str];
+            }
+            
+            // GET SELECTED ITEMS
+            
+            int sels[16]; //custom this number of sels
+            int count = [m_annot getListSels:sels :16]; //count is how many cell had been selected
+            int *cur = sels;
+            int *end = sels + count;
+            NSMutableArray *selected_items = [NSMutableArray array];
+            while(cur < end)
+            {
+                [selected_items addObject:[NSNumber numberWithInt:*cur]]; //selected cell index
+                cur++;
+            }
+            
+            if (m_del){
+                [m_del OnAnnotList :vpage :m_annot :[self annotRect] :arr selectedIndexes:selected_items];// Modified method
+            }
+            return;
+        }
+        
+        int type = [m_annot getEditType];
+        if (type > 0) {
+            if (m_del) {
+                [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * vpage.scale];
+            }
+            return ;
+        }
+        
+        NSString *nuri = [m_annot getURI];
+        nuri = [m_annot getURI];
+        if(nuri)//open url
         {
-            self.pagingEnabled = NO;
-            if (doubleTapZoomMode == 1) [self defaultZoom:touch];
-       }
+            if( GLOBAL.g_auto_launch_link)
+            {
+                if(m_del) [m_del OnAnnotOpenURL:nuri];
+                [self vAnnotEnd];
+                return;
+            }
+        }
+        
+        if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
+            if (m_del && GLOBAL.g_hand_signature) {
+                [m_del OnAnnotSignature :vpage :m_annot];
+            }
+            return;
+        }
+        
+        if(m_del) [m_del OnAnnotClicked:m_annot :[self annotRect] :x :y];
     }
-    
-    if (m_del) [m_del OnDoubleTapped:[touch locationInView:self.window].x :[touch locationInView:m_canvas].y];
-    
-    [self performSelector:@selector(delayedDoubleTapping) withObject:nil afterDelay:0.5];
-
-}
-
-- (void)delayedOnSingleTapping:(NSArray *)a
-{
-    if (!isDoubleTapping && a && m_del) {
-        [m_del OnSingleTapped:[[a objectAtIndex:0] floatValue]:[[a objectAtIndex:1] floatValue]];
+    else
+    {
+        if (m_del) [m_del OnSingleTapped:x:y];
+        [self vAnnotEnd];
+        m_annot_rect.left = 0;
+        m_annot_rect.top = 0;
+        m_annot_rect.right = 0;
+        m_annot_rect.bottom = 0;
+        m_status = sta_none;
     }
-}
-
-- (void)delayedDoubleTapping
-{
-    isDoubleTapping = NO;
 }
 
 - (void)resetZoomLevel
@@ -2528,189 +2725,6 @@
     if (self.zoomScale > GLOBAL.g_tap_zoom_level) m_zoom = 1;
     else m_zoom = (self.zoomScale + GLOBAL.g_zoom_step > GLOBAL.g_tap_zoom_level) ? GLOBAL.g_tap_zoom_level : self.zoomScale + GLOBAL.g_zoom_step;
     [self zoomPageToScale:m_zoom atPoint:[touch locationInView:m_canvas]];
-}
-
--(void)OnSingleTap:(float)x :(float)y
-{
-    [m_layout vGetPos :x * m_scale_pix :y * m_scale_pix :&m_annot_pos];
-    
-    if( m_annot_pos.pageno >= 0 )
-    {
-        RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
-        if( !vpage )//shall not happen
-        {
-            if(m_del) [m_del OnSingleTapped:x:y];
-            return;
-           }
-        RDPDFPage *page = [vpage GetPage];
-        if( !page ) return;
-        m_annot = [page annotAtPoint:m_annot_pos.pdfx: m_annot_pos.pdfy];
-        m_annot_idx = -1;
-        if( m_annot )
-        {
-            RDPDFPageContent *content = [[RDPDFPageContent alloc] init];
-            [content gsSave];
-            
-            PDF_RECT rect;
-            [m_annot getRect:&rect];
-            
-            float width = (rect.right - rect.left);
-            float height = (rect.bottom - rect.top);
-            
-            float xTranslation = width / 2.0f;
-            float yTranslation = height / 2.0f;
-            
-            //set the matrix 20x20
-            RDPDFMatrix *matrix = [[RDPDFMatrix alloc] init:width :height :xTranslation :yTranslation];
-            [content gsCatMatrix:matrix];
-            matrix = nil;
-            
-            [content drawText:@"Testo di prova" :0 :50.0];
-            [content gsRestore];
-            content = nil;
-            
-            m_annot_idx = [m_annot getIndex];
-            
-            if(m_del && [m_del respondsToSelector:@selector(OnAnnotTapped:atPage:atPoint:)])
-            {
-                [m_del OnAnnotTapped:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
-            }
-            
-            if (![self canSaveDocument] && m_annot.type != 1) {
-                if(m_del)
-                {
-                    if (!isDoubleTapping) {
-                        NSArray *a = [NSArray arrayWithObjects:[NSNumber numberWithFloat:x], [NSNumber numberWithFloat:y], nil];
-                        [self performSelector:@selector(delayedOnSingleTapping:) withObject:a afterDelay:0.3];
-                    }
-                }
-                return;
-            }
-            
-            if ([m_annot isAnnotReadOnly] && !([self isReadOnlyAnnotEnabled:m_annot]))
-                return;
-            
-            self.scrollEnabled = false;
-            m_status = sta_annot;
-            [m_annot getRect:&m_annot_rect];
-            m_annot_rect.left = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.left];
-            m_annot_rect.right = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.right];
-            float tmp = m_annot_rect.top;
-            m_annot_rect.top = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:m_annot_rect.bottom];
-            m_annot_rect.bottom = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:tmp];
-            [self ProRedrawOS];
-            
-            int nu = [m_annot getCheckStatus];
-            if (nu != -1) {
-                switch (nu) {
-                    case 0:
-                        [m_annot setCheckValue:YES];
-                        break;
-                    case 1:
-                        [m_annot setCheckValue:NO];
-                    default:
-                        //case 2,3 set Radiobox
-                        [m_annot setRadio];
-                        break;
-                }
-                [self setModified:YES force:NO];
-                //need refresh PDFView and save annot status
-                [self ProUpdatePage :m_annot_pos.pageno];
-                [self vAnnotEnd];
-                [self autoSave];
-                return;
-            }
-            
-            nu = [m_annot getComboItemCount];
-            if (nu != -1){
-                //int j= [m_annot getComboSel];
-                NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
-                for (int i = 0; i < nu; i++) {
-                    NSString *str = [m_annot getComboItem:i];
-                    [arr addObject:str];
-                }
-                
-                [self executeAnnotJS];
-                
-                if (m_del){
-                    [m_del OnAnnotCommboBox :vpage :m_annot :[self annotRect] :arr selected:[m_annot getComboSel]];
-                }
-                return ;
-            }
-            
-            nu = [m_annot getListItemCount];
-            if (nu != -1){
-                
-                //BOOL multi = [m_annot isMultiSel];
-                
-                NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
-                for (int i = 0; i < nu; i++) {
-                    NSString *str = [m_annot getListItem:i];
-                    [arr addObject:str];
-                }
-                
-                // GET SELECTED ITEMS
-                
-                int sels[16]; //custom this number of sels
-                int count = [m_annot getListSels:sels :16]; //count is how many cell had been selected
-                int *cur = sels;
-                int *end = sels + count;
-                NSMutableArray *selected_items = [NSMutableArray array];
-                while(cur < end)
-                {
-                    [selected_items addObject:[NSNumber numberWithInt:*cur]]; //selected cell index
-                    cur++;
-                }
-                
-                if (m_del){
-                    [m_del OnAnnotList :vpage :m_annot :[self annotRect] :arr selectedIndexes:selected_items];// Modified method
-                }
-                return;
-            }
-            
-            int type = [m_annot getEditType];
-            if (type > 0) {
-                if (m_del) {
-                    [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * vpage.scale];
-                }
-                return ;
-            }
-            
-            NSString *nuri = [m_annot getURI];
-            nuri = [m_annot getURI];
-            if(nuri)//open url
-            {
-                if( GLOBAL.g_auto_launch_link)
-                {
-                    if(m_del) [m_del OnAnnotOpenURL:nuri];
-                    [self vAnnotEnd];
-                    return;
-                }
-            }
-            
-            if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
-                if (m_del && GLOBAL.g_hand_signature) {
-                    [m_del OnAnnotSignature :vpage :m_annot];
-                }
-                return;
-            }
-            
-            if(m_del) [m_del OnAnnotClicked:m_annot :[self annotRect] :x :y];
-        }
-        else
-        {
-            if(m_del) {
-                NSArray *a = [NSArray arrayWithObjects:[NSNumber numberWithFloat:x], [NSNumber numberWithFloat:y], nil];
-                [self performSelector:@selector(delayedOnSingleTapping:) withObject:a afterDelay:0.3];
-            }
-            [self vAnnotEnd];
-            m_annot_rect.left = 0;
-            m_annot_rect.top = 0;
-            m_annot_rect.right = 0;
-            m_annot_rect.bottom = 0;
-            m_status = sta_none;
-        }
-    }
 }
 
 -(bool)OnSelTouchBegin:(CGPoint)point
@@ -3319,11 +3333,9 @@
             single_tap = false;
         if( dy > 5 || dy < -5 )
             single_tap = false;
-        if( single_tap )
-        {
-            [self OnSingleTap :point.x :point.y];
-        }
+        if (!single_tap) m_doubleTapCount = 0;
     } else {
+        m_doubleTapCount = 0;
         bool long_press = true;
         if( dx > 5 || dx < -5 )
             long_press = false;
