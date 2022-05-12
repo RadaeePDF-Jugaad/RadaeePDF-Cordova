@@ -1661,6 +1661,7 @@
 - (void)didSelectSelectSearchResult:(int)index
 {
     [self dismissViewControllerAnimated:YES completion:^{
+        [self searchProgress];
         [self goToSearchResult:index];
     }];
 }

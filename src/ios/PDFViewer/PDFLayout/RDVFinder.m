@@ -79,7 +79,13 @@
             }
         }
         else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cancelBlock(true);
+            });
             return 1;
+        }
+            
     }
     else
     {
@@ -97,7 +103,13 @@
             }
         }
         else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cancelBlock(true);
+            });
             return 1;
+        }
+            
     }
     return 0;
 }
