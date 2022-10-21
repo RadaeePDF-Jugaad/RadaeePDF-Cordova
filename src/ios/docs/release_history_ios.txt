@@ -1,5 +1,39 @@
 PDFViewer SDK for iOS - Release notes
 
+4.6.10
+- ENHANCED image scaling performance.
+- ENHANCED native code size optimized.
+- ENHANCED performance for jbig2 decoding.
+- FIX image decoding issues.
+- FIX rendering issues.
+
+4.6.9
+- ENHANCED native code optimized and cleaned up for speed and performances
+- ENHANCED native code size optimized
+- FIX improved the jpx decoder reliability
+
+4.6.8
+- ENHANCED native code optimized and cleaned up for speed and performances
+- ENHANCED PDF/A1 when the core-lib saves/exports file
+- FIX native code improved handling for some special cases previously not correctly managed
+
+4.6.7
+- ENHANCED performance for high quality image scaling.
+- FIX rendering issue for shading.
+
+4.6.6
+- ENHANCED sign as RFC2315 to support PDF/A-2 and PDF/A-3 cleaner support
+- ENHANCED improved PDF/A support during save and export
+- FIX core-lib clean up
+- FIX improved the signature fields when has lock status set
+
+4.6.5
+- NEW double page with first page single vertical 
+- NEW double page vertical 
+- FIX rendering issue
+- FIX single/double tap issue
+- FIX ui adjustment
+
 4.6.4
 - FIX paging issue on single and double pages
 - FIX thumbnail issues on horizontal pages
