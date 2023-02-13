@@ -1,5 +1,21 @@
 PDFViewer SDK for iOS - Release notes
 
+4.7.2
+- FIX combo box crash.
+- FIX rendering issues.
+
+4.7.1
+- FIX image rendering issues.
+- FIX rendering issues.
+- FIX issue that can't scroll down while zoomed on single page.
+
+4.7
+- NEW Support for Xcode 14 and newer version.
+- ENHANCED code optimization.
+- ENHANCED performance for reflow rendering.
+- FIX rendering issues.
+- FIX crash risk on loading font with very long name.
+
 4.6.10
 - ENHANCED image scaling performance.
 - ENHANCED native code size optimized.
