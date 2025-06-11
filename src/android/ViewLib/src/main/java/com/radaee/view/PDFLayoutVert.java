@@ -13,8 +13,8 @@ public class PDFLayoutVert extends PDFLayout
         int cnt = m_doc.GetPageCount();
         int cur;
 
-		if(Global.fit_different_page_size && m_scales == null) m_scales = new float[cnt];
-		if(Global.fit_different_page_size && m_scales_min == null) m_scales_min = new float[cnt];
+		if(Global.g_auto_scale && m_scales == null) m_scales = new float[cnt];
+		if(Global.g_auto_scale && m_scales_min == null) m_scales_min = new float[cnt];
 
 		m_scale_min = (m_w - m_page_gap) / m_page_maxw;
 		m_scale_max = m_scale_min * m_zoom_level;
@@ -26,16 +26,16 @@ public class PDFLayoutVert extends PDFLayout
 		boolean clip = m_scale / m_scale_min > m_zoom_level_clip;
 		for(cur = 0;cur < cnt;cur++)
 		{
-			if(Global.fit_different_page_size && m_scales[cur] == 0) {
+			if(Global.g_auto_scale && m_scales[cur] == 0) {
 				m_scales[cur] = ((float)(m_w - m_page_gap)) / m_doc.GetPageWidth(cur);
 				m_scales_min[cur] = ((float)(m_w - m_page_gap)) / m_doc.GetPageWidth(cur);
 			}
-            float pageScale = Global.fit_different_page_size ? m_scales[cur] : m_scale;
+            float pageScale = Global.g_auto_scale ? m_scales[cur] : m_scale;
 			int w = (int)(m_doc.GetPageWidth(cur) * pageScale);
 			int h = (int)(m_doc.GetPageHeight(cur) * pageScale);
-			int x = Global.fit_different_page_size ? m_page_gap >> 1:
+			int x = Global.g_auto_scale ? m_page_gap >> 1:
 					((int)(m_page_maxw * pageScale) + m_page_gap - w)>>1;
-			boolean clipPage = Global.fit_different_page_size ? pageScale / m_scales_min[cur] > m_zoom_level_clip : clip;
+			boolean clipPage = Global.g_auto_scale ? pageScale / m_scales_min[cur] > m_zoom_level_clip : clip;
 			m_pages[cur].vLayout(x, y, pageScale, clipPage);
 			y += h + m_page_gap;
 		}

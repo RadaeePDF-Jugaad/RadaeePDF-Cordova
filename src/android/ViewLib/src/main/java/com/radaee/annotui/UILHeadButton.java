@@ -91,7 +91,7 @@ public class UILHeadButton extends Button {
         vw_lhead.setStyle(9);
         vw_lhead.setOnClickListener(listener);
 
-        m_popup = new UIAnnotPop(m_layout, Dp2Px(120), Dp2Px(m_layout.getChildCount() * 30));
+        m_popup = new UIAnnotPop(m_layout, Dp2Px(90), Dp2Px(m_layout.getChildCount() * 25));
         m_popup.setFocusable(true);
         m_popup.setTouchable(true);
         m_popup.setBackgroundDrawable(new ColorDrawable(0));

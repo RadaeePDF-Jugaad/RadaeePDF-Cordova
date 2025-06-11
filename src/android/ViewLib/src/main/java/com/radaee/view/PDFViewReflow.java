@@ -97,9 +97,9 @@ public class PDFViewReflow extends PDFView
 			canvas.drawColor(m_back);
     	if( m_bmp != null )
     	{
-    		if( m_dark != Global.dark_mode )
+    		if( m_dark != Global.g_dark_mode )
     		{
-    			m_dark = Global.dark_mode;
+    			m_dark = Global.g_dark_mode;
     			m_draw_bmp.Create(m_bmp);
     			m_draw_bmp.Invert();
     			m_draw_bmp.Free(m_bmp);
@@ -146,18 +146,21 @@ public class PDFViewReflow extends PDFView
 		vGotoPage( m_finder.find_get_page() );
     }
     @Override
-    protected void vSingleTap( float x, float y )
+    protected boolean vSingleTap( float x, float y )
     {
 		if( x > 4 && x < BUTTON_SIZE + 4 && y > m_h/2 - BUTTON_SIZE && y < m_h/2 + BUTTON_SIZE )
 		{
     		m_status = STA_NONE;
 			vGotoPage(m_pageno - 1);
+			return true;
 		}
 		if( x < m_w - 4 && x > m_w - BUTTON_SIZE - 4 && y > m_h/2 - BUTTON_SIZE && y < m_h/2 + BUTTON_SIZE )
 		{
     		m_status = STA_NONE;
 			vGotoPage(m_pageno + 1);
+			return true;
 		}
+		return false;
     }
     @Override
 	protected boolean vOnFling( float dx, float dy, float velocityX, float velocityY )

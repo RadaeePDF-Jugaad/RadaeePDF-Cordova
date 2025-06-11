@@ -3,12 +3,15 @@ package com.radaee.annotui;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,8 +19,6 @@ import android.widget.Toast;
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
-
-import com.radaee.util.FileBrowserAdt;
 import com.radaee.util.FileBrowserView;
 import com.radaee.viewlib.R;
 
@@ -31,74 +32,98 @@ public class UIAnnotDlgSign extends UIAnnotDlg {
         super((RelativeLayout) LayoutInflater.from(ctx).inflate(R.layout.dlg_annot_signature, null));
         setCancelable(false);
         Button btn_browser = m_layout.findViewById(R.id.btn_browser);
-        final UISignView sign_pad = m_layout.findViewById(R.id.sign_pad);
         final EditText edit_path = m_layout.findViewById(R.id.edit_path);
+        EditText edit_pswd = m_layout.findViewById(R.id.edit_pswd);
+        TextView txt_cert = m_layout.findViewById(R.id.txt_cert);
+        TextView txt_pswd = m_layout.findViewById(R.id.txt_pswd);
 
-        btn_browser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //open browser dialog.
-                AlertDialog.Builder builder = new AlertDialog.Builder(m_layout.getContext());
-                builder.setTitle("Please select cert file");
-                LayoutInflater inflater = (LayoutInflater)ctx.getSystemService (Context.LAYOUT_INFLATER_SERVICE);
-                View view = inflater.inflate(R.layout.dlg_browser, null);
-                builder.setView(view);
-                builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                final AlertDialog dlg = builder.create();
-                dlg.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface dialog) {
-                        final FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
-                        TextView txt_filter = dlg.findViewById(R.id.txt_filter);
-                        txt_filter.setText("*.p12 *.pfx");
-                        fb_view.FileInit("/mnt", new String[]{".p12", ".pfx"});
-                        fb_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                FileBrowserAdt.SnatchItem item = (FileBrowserAdt.SnatchItem)fb_view.getItemAtPosition(position);
-                                if(item.m_item.is_dir()) fb_view.FileGotoSubdir(item.m_item.get_name());
-                                else {
-                                    edit_path.setText(item.m_item.get_path());
-                                    dlg.dismiss();
+        if(!Global.g_fake_sign) {
+            btn_browser.setVisibility(View.VISIBLE);
+            edit_path.setVisibility(View.VISIBLE);
+            edit_pswd.setVisibility(View.VISIBLE);
+            txt_cert.setVisibility(View.VISIBLE);
+            txt_pswd.setVisibility(View.VISIBLE);
+            btn_browser.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //open browser dialog.
+                    AlertDialog.Builder builder = new AlertDialog.Builder(m_layout.getContext());
+                    builder.setTitle(getContext().getString(R.string.sign_select_certificate));
+                    LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View view = inflater.inflate(R.layout.dlg_browser, null);
+                    builder.setView(view);
+                    builder.setNegativeButton(getContext().getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    final AlertDialog dlg = builder.create();
+                    dlg.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialog) {
+                            final FileBrowserView fb_view = dlg.findViewById(R.id.fb_view);
+                            TextView txt_filter = dlg.findViewById(R.id.txt_filter);
+                            txt_filter.setText(getContext().getString(R.string.sign_certificate_filetype));
+                            fb_view.FileInit("/mnt", new String[]{".p12", ".pfx"});
+                            fb_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    FileBrowserView.FileBrowserAdt.SnatchItem item = (FileBrowserView.FileBrowserAdt.SnatchItem) fb_view.getItemAtPosition(position);
+                                    if (item.m_item.is_dir())
+                                        fb_view.FileGotoSubdir(item.m_item.get_name());
+                                    else {
+                                        edit_path.setText(item.m_item.get_path());
+                                        dlg.dismiss();
+                                    }
                                 }
-                            }
-                        });
-                    }
-                });
-                dlg.show();
-            }
-        });
-        setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            });
+                        }
+                    });
+                    dlg.show();
+                }
+            });
+        } else {
+            btn_browser.setVisibility(View.GONE);
+            edit_path.setVisibility(View.GONE);
+            edit_pswd.setVisibility(View.GONE);
+            txt_cert.setVisibility(View.GONE);
+            txt_pswd.setVisibility(View.GONE);
+        }
+        setPositiveButton(getContext().getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                EditText edit_pswd = m_layout.findViewById(R.id.edit_pswd);
+                UISignView sign_pad = m_layout.findViewById(R.id.sign_pad);
                 Document.DocForm form = sign_pad.SignMakeForm(m_doc, m_annot);
                 if (form == null) {
                     Toast.makeText(getContext(), "Form is empty", Toast.LENGTH_LONG).show();
                     return;
                 }
-                String spath = edit_path.getText().toString();
-                String spswd = edit_pswd.getText().toString();
-                String signer = !TextUtils.isEmpty(Global.sAnnotAuthor) ? Global.sAnnotAuthor : "radaee";
-                int iret = m_annot.SignField(form, spath, spswd, signer,"", "", "");
-                if(iret == 0)
+                String spswd = null;
+                String spath = null;
+                if(!Global.g_fake_sign) {
+                    spath = edit_path.getText().toString();
+                    spswd = edit_pswd.getText().toString();
+                } else {
+                    // The dummy certificate is only to set the graphic signature
+                    // the suggestion is to substitute the resource with a different certificate
+                    spath = Global.tmp_path + "/radaeepdf_test.pfx";
+                    spswd = "RadaeePDFTest";
+                }
+                int iRet = m_annot.SignField(form, spath, spswd, "", "", "", "");
+                if(iRet == 0)
                 {
                     dialog.dismiss();
                     if(m_callback != null)
                         m_callback.onUpdate();
                 }
-                else if(iret == -5)
-                    Toast.makeText(getContext(), "Sign failed, can't open cert file.", Toast.LENGTH_LONG).show();
+                else if(iRet == -5)
+                    Toast.makeText(getContext(), getContext().getString(R.string.sign_error_fail_certificate), Toast.LENGTH_LONG).show();
                 else
-                    Toast.makeText(getContext(), "Sign failed.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getContext().getString(R.string.sign_error_fail), Toast.LENGTH_LONG).show();
             }
         });
-        setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        setNegativeButton(getContext().getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -109,34 +134,59 @@ public class UIAnnotDlgSign extends UIAnnotDlg {
         m_layout.addOnLayoutChangeListener(
                 new View.OnLayoutChangeListener() {
                     @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        //keep signature area aspect.
-                        float signPadW = sign_pad.getWidth();
-                        //104 dp is exclude height value that assigned by layout xml file.
-                        //if layout file changed, you shall update exclude dp value in following codes.
-                        float exclude = dp2px(getContext(), 104);
-                        float signPadH = (bottom - top) - exclude;
-                        float[] annotRect = m_annot.GetRect();
-                        float scaleW = signPadW / (annotRect[2] - annotRect[0]);
-                        float scaleH = signPadH / (annotRect[3] - annotRect[1]);
-                        if(scaleW > scaleH) scaleW = scaleH;
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom)
+                    {
+                        // keep signature area aspect ratio.
+                        // 104dp is exclude height value that assigned by layout xml file.
+                        // if layout file changed, you shall update exclude dp value in following codes.
+                        int dpExclude;
+                        if(!Global.g_fake_sign) {
+                            dpExclude = 104;
+                        } else {
+                            dpExclude = 34;
+                        }
+                        DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+                        float layw = dm.widthPixels * 0.9f;
+                        float layh = dm.heightPixels * 0.9f;
+                        float exclude = dp2px(getContext(), dpExclude);
+                        float arect[] = m_annot.GetRect();
+                        float scale1 = layw / (arect[2] - arect[0]);
+                        float scale2 = (layh - exclude) / (arect[3] - arect[1]);
+                        if(scale1 > scale2) scale1 = scale2;
 
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) ((annotRect[2] - annotRect[0]) * scaleW),
-                                (int) ((annotRect[3] - annotRect[1]) * scaleW));
-                        layoutParams.addRule(RelativeLayout.BELOW, R.id.txt_hwriting);
-                        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                        sign_pad.setLayoutParams(layoutParams);
+                        layw = (arect[2] - arect[0]) * scale1;
+                        layh = (arect[3] - arect[1]) * scale1;
+
+                        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)layw,  (int)(layh + exclude));
+                        v.setLayoutParams(lp);
+                        forceWrapContent(v);
                     }
                 });
     }
-    public void show(Page.Annotation annot, Document doc, UIAnnotMenu.IMemnuCallback calllback)
+    public void show(Page.Annotation annot, Document doc, UIAnnotMenu.IMemnuCallback callBack)
     {
-        setTitle("Sign the Field");
+        //setTitle(getContext().getString(R.string.sign_title));
         m_annot = annot;
         m_doc = doc;
-        m_callback = calllback;
+        m_callback = callBack;
         AlertDialog dlg = create();
         dlg.show();
+    }
+
+    protected void forceWrapContent(View v) {
+        View current = v;
+        do {
+            ViewParent parent = current.getParent();
+            if (parent != null) {
+                try {
+                    current = (View) parent;
+                } catch (ClassCastException e) {
+                    break;
+                }
+                current.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                current.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            }
+        } while (current.getParent() != null);
+        current.requestLayout();
     }
 }

@@ -64,4 +64,8 @@ public class PDFBotBar
 		});
 		m_view.startAnimation(anim);
 	}
+	public final boolean BarIsHide()
+	{
+		return (m_view.getVisibility() != View.VISIBLE);
+	}
 }

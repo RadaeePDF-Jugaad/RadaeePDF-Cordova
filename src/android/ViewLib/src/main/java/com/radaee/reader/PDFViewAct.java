@@ -13,14 +13,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.radaee.annotui.UIAnnotMenu;
@@ -32,10 +31,12 @@ import com.radaee.pdf.Page.Annotation;
 import com.radaee.util.PDFAssetStream;
 import com.radaee.util.PDFHttpStream;
 import com.radaee.util.PDFThumbView;
+import com.radaee.util.RDRecent;
 import com.radaee.util.RadaeePluginCallback;
 import com.radaee.view.ILayoutView;
 import com.radaee.viewlib.R;
 
+import java.io.File;
 import java.io.FileOutputStream;
 
 public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListener {
@@ -51,7 +52,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     private RelativeLayout m_layout = null;
     private PDFLayoutView m_view = null;
     private PDFViewController m_controller = null;
-    private boolean need_save_doc = false;
+    private boolean m_save_doc_to_bundle = false;
 
     private void onFail(String msg)//treat open failed.
     {
@@ -76,7 +77,8 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
                 onFail(getString(R.string.failed_invalid_path));
                 break;
             case 0://succeeded, and continue
-                OpenTask task = new OpenTask(false);
+                m_save_doc_to_bundle = false;
+                OpenTask task = new OpenTask();
                 task.execute();
                 break;
             default://unknown error
@@ -85,23 +87,10 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
         }
     }
 
-    private class MyPDFFontDel implements Document.PDFFontDelegate {
-        @Override
-        public String GetExtFont(String collection, String fname, int flag, int[] ret_flags) {
-            Log.i("ExtFont", fname);
-            return null;
-        }
-    }
-
     private class OpenTask extends AsyncTask<Void, Integer, Integer> {
-        private boolean need_save;
         private ProgressDialog dlg;
         private Handler handler;
-        private Runnable runable;
-
-        OpenTask(boolean need_save) {
-            this.need_save = need_save;
-        }
+        private Runnable runnable;
 
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -111,13 +100,13 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
         @Override
         protected void onPreExecute() {
-            handler = new Handler();
-            runable = new Runnable() {
+            handler = new Handler(Looper.getMainLooper());
+            runnable = new Runnable() {
                 public void run() {
                     dlg = ProgressDialog.show(PDFViewAct.this, getString(R.string.please_wait), getString(R.string.loading_pdf), true);
                 }
             };
-            handler.postDelayed(runable, 1000);//delay 1 second to display progress dialog.
+            handler.postDelayed(runnable, 1000);//delay 1 second to display progress dialog.
         }
 
         @Override
@@ -135,32 +124,16 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
                     startActivityForResult(intent, 10000);
                 }
             });
-            need_save_doc = need_save;
-            if (dlg != null)
-                dlg.dismiss();
-            else
-                handler.removeCallbacks(runable);
+            if (dlg != null) dlg.dismiss();
+            else handler.removeCallbacks(runnable);
 
             int gotoPage = getIntent().getIntExtra("GOTO_PAGE", -1);
-            if (gotoPage > 0)
-                m_view.PDFGotoPage(gotoPage);
+            if (gotoPage > 0) m_view.PDFGotoPage(gotoPage);
         }
     }
 
-    private MyPDFFontDel m_font_del = new MyPDFFontDel();
-
-    @SuppressLint("InlinedApi")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        //plz set this line to Activity in AndroidManifes.xml:
-        //    android:configChanges="orientation|keyboardHidden|screenSize"
-        //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate.
-        Global.Init(this);
-        m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.pdf_layout, null);
-        m_view = (PDFLayoutView) m_layout.findViewById(R.id.pdf_view);
-
+    private void init_cordova()
+    {
         RadaeePluginCallback.getInstance().setActivityListener(new RadaeePluginCallback.PDFActivityListener() {
             @Override
             public void closeReader() {
@@ -169,7 +142,21 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
             }
         });
         RadaeePluginCallback.getInstance().willShowReader();
-        if (!Global.cacheEnabled)
+    }
+    @SuppressLint("InlinedApi")
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //plz set this line to Activity in AndroidManifes.xml:
+        //    android:configChanges="orientation|keyboardHidden|screenSize"
+        //otherwise, APP shall destroy this Activity and re-create a new Activity when rotate.
+        Global.Init(this);
+        m_layout = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.pdf_layout, null);
+        m_view = (PDFLayoutView) m_layout.findViewById(R.id.pdf_view);
+        show_progress = true;
+        init_cordova();
+
+        if (!Global.g_cache_enable)
             m_layout.findViewById(R.id.progress).setVisibility(View.GONE);
 
         Intent intent = getIntent();
@@ -180,62 +167,65 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
             else if (bmp_format.compareTo("ARGB_4444") == 0)
                 m_view.PDFSetBmpFormat(Bitmap.Config.ARGB_4444);
         }
-        if (ms_tran_doc != null) {
+        if (ms_tran_doc != null)//open from browser UI.
+        {
             m_doc = ms_tran_doc;
             m_path = ms_tran_path;
             ms_tran_doc = null;
             ms_tran_path = null;
-            //m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
-            //m_tmp_index++;
-            OpenTask task = new OpenTask(true);
+            m_save_doc_to_bundle = true;
+            OpenTask task = new OpenTask();
             task.execute();
-            /*
-            m_view.PDFOpen(m_doc, this);
-    		m_controller = new PDFViewController(m_layout, m_view);
-    		need_save_doc = true;
-    		*/
-        } else {
+        }
+        else
+        {
             String pdf_asset = intent.getStringExtra("PDFAsset");
             String pdf_path = intent.getStringExtra("PDFPath");
             String pdf_pswd = intent.getStringExtra("PDFPswd");
             String pdf_http = intent.getStringExtra("PDFHttp");
-            if (!TextUtils.isEmpty(pdf_http)) {
-                m_http_stream = new PDFHttpStream();
-                m_http_stream.open(pdf_http);
-                m_doc = new Document();
-                int ret = m_doc.OpenStream(m_http_stream, pdf_pswd);
-                /*
-                Page page = m_doc.GetPage(0);
-                Bitmap bmp;
-                bmp = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-                Matrix mat = new Matrix(0.5f, 0.5f, 0, 0);
-                page.RenderToBmp(bmp, mat);
-                try {
-                    FileOutputStream fo = new FileOutputStream("/sdcard/111.jpg");
-                    bmp.compress(Bitmap.CompressFormat.JPEG, 75, fo);
-                    fo.close();
-                    bmp.recycle();
-                }
-                catch (Exception e)
-                {
-                }
-                */
-                ProcessOpenResult(ret);
-            } else if (!TextUtils.isEmpty(pdf_asset)) {
+            if (!TextUtils.isEmpty(pdf_http))//open from url
+            {
+                //PDFHttpStream.open sometimes spend too long time, so, we open url in backing thread.
+                new Thread(){
+                    @Override
+                    public void run() {
+                        m_http_stream = new PDFHttpStream();
+                        m_http_stream.open(pdf_http);
+                        //after http link opened, open PDF in UI thread.
+                        m_layout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                m_doc = new Document();
+                                int ret = m_doc.OpenStream(m_http_stream, pdf_pswd);
+                                ProcessOpenResult(ret);
+                            }
+                        });
+                    }
+                }.start();
+            }
+            else if (!TextUtils.isEmpty(pdf_asset))//open from assets(readonly)
+            {
                 m_asset_stream = new PDFAssetStream();
                 m_asset_stream.open(getAssets(), pdf_asset);
                 m_doc = new Document();
                 m_path = pdf_asset;
                 int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
-
                 ProcessOpenResult(ret);
-            } else if (!TextUtils.isEmpty(pdf_path)) {
-				m_path = pdf_path;
+            }
+            else if (!TextUtils.isEmpty(pdf_path))//open from path.
+            {
                 m_doc = new Document();
                 int ret = m_doc.Open(pdf_path, pdf_pswd);
-                //m_doc.SetCache(String.format("%s/temp%08x.dat", Global.tmp_path, m_tmp_index));//set temporary cache for editing.
-                //m_tmp_index++;
-                //m_doc.SetFontDel(m_font_del);
+                m_path = pdf_path;
+                ProcessOpenResult(ret);
+            }
+            else//this shall never happen.
+            {
+                m_asset_stream = new PDFAssetStream();
+                m_asset_stream.open(getAssets(), "eula.pdf");
+                m_doc = new Document();
+                m_path = pdf_asset;
+                int ret = m_doc.OpenStream(m_asset_stream, pdf_pswd);
                 ProcessOpenResult(ret);
             }
         }
@@ -243,23 +233,10 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        m_controller.onConfigChanged();
-        super.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (m_doc == null)
-            m_doc = m_view.PDFGetDoc();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         m_view.BundleSavePos(savedInstanceState);
-        if (need_save_doc && m_doc != null) {
+        if (m_save_doc_to_bundle && m_doc != null) {
             Document.BundleSave(savedInstanceState, m_doc);//save Document object
             m_doc = null;
         }
@@ -281,7 +258,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
                     startActivityForResult(intent, 10000);
                 }
             });
-            need_save_doc = true;
+            m_save_doc_to_bundle = true;
         }
         m_view.BundleRestorePos(savedInstanceState);
     }
@@ -293,8 +270,14 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     }
 
     private void onClose(final boolean onBackPressed) {
-        if (getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
-            if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false) || Global.g_save_doc) {
+        if (m_path != null && !m_path.isEmpty() && m_asset_stream == null && m_http_stream == null) {
+            RDRecent recent = new RDRecent(this);
+            recent.insert(m_path, m_view.PDFGetPos(0, 0).pageno, m_view.PDFGetView());
+            recent.Close();
+        }
+        if (m_controller == null) return;
+        if (m_controller.getFileState() == PDFViewController.MODIFIED_NOT_SAVED) {
+            if (getIntent().getBooleanExtra("AUTOMATIC_SAVE", false) || Global.g_auto_save_doc) {
                 if (m_controller != null) m_controller.savePDF();
                 if(onBackPressed) super.onBackPressed();
             } else {
@@ -320,24 +303,35 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     protected void onDestroy() {
         RadaeePluginCallback.getInstance().willCloseReader();
 
-        if (m_controller != null)
-            m_controller.onDestroy();
-        if (m_doc != null) {
-            m_view.PDFClose();
-            m_doc.Close();
-            m_doc = null;
+        final PDFViewController vctrl = m_controller;
+        final Document doc = m_doc;
+        final PDFLayoutView view = m_view;
+        final PDFAssetStream astr = m_asset_stream;
+        final PDFHttpStream hstr = m_http_stream;
+        m_controller = null;
+        m_doc = null;
+        m_view = null;
+        m_asset_stream = null;
+        m_http_stream = null;
+        view.PDFCloseOnUI();
+        new Thread(){
+            @Override
+            public void run() {
+                if (vctrl != null) vctrl.onDestroy();
+                if (view != null) view.PDFClose();
+                if (doc != null) doc.Close();
+                if (astr != null) astr.close();
+                if (hstr != null) hstr.close();
+                Global.RemoveTmp();
+                synchronized (PDFViewAct.this) { PDFViewAct.this.notify(); }
+            }
+        }.start();
+        synchronized (this)
+        {
+            try { wait(1500); }
+            catch(Exception ignored) { }
         }
-        if (m_asset_stream != null) {
-            m_asset_stream.close();
-            m_asset_stream = null;
-        }
-        if (m_http_stream != null) {
-            m_http_stream.close();
-            m_http_stream = null;
-        }
-        Global.RemoveTmp();
         super.onDestroy();
-
         RadaeePluginCallback.getInstance().didCloseReader();
     }
 
@@ -346,8 +340,11 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
         if (m_controller != null) m_controller.onPageModified(pageno);
     }
 
+    private int m_cur_page = 0;
     @Override
-    public void OnPDFPageChanged(int pageno) {
+    public void OnPDFPageChanged(int pageno)
+    {
+        m_cur_page = pageno;
         if (m_controller != null)
             m_controller.OnPageChanged(pageno);
         RadaeePluginCallback.getInstance().didChangePage(pageno);
@@ -361,15 +358,15 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
                 return;
         }
         if (m_controller != null)
-            m_controller.OnAnnotTapped(annot);
+            m_controller.OnAnnotTapped(pageno, annot);
 
     }
 
     @Override
-    public void OnPDFBlankTapped() {
+    public void OnPDFBlankTapped(int pageno) {
         if (m_controller != null)
             m_controller.OnBlankTapped();
-        RadaeePluginCallback.getInstance().onBlankTapped(m_view.PDFGetCurrPage());
+        RadaeePluginCallback.getInstance().onBlankTapped(pageno);
     }
 
     @Override
@@ -378,8 +375,8 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
         if(requestCode != 10000) return;
         if(resultCode != 1) return;
 
-        boolean removal[] = data.getBooleanArrayExtra("removal");
-        int rotate[] = data.getIntArrayExtra("rotate");
+        boolean[] removal = data.getBooleanArrayExtra("removal");
+        int[] rotate = data.getIntArrayExtra("rotate");
         if (removal == null || rotate == null) return;
 
         PDFThumbView thumb = m_controller.GetThumbView();
@@ -388,8 +385,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
         Document doc = m_view.PDFGetDoc();
 
-        int pcnt = removal.length;
-        int pcur = pcnt;
+        int pcur = removal.length;
         while(pcur > 0)
         {
             pcur--;
@@ -482,6 +478,10 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     }
 
     @Override
+    public void OnPDFOpenRendition(String path) {
+    }
+
+    @Override
     public void OnPDFOpen3D(String path) {
         Toast.makeText(PDFViewAct.this, R.string.todo_3d, Toast.LENGTH_SHORT).show();
     }
@@ -495,31 +495,35 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
     }
 
     @Override
-    public boolean OnPDFDoubleTapped(float x, float y) {
+    public boolean OnPDFDoubleTapped(int pageno, float x, float y) {
         float mCurZoomLevel = m_view.PDFGetZoom();
         if (m_view.PDFGetScale() <= m_view.PDFGetMinScale())
-            Global.zoomStep = 1;
-        if ((mCurZoomLevel > Global.zoomLevel && Global.zoomStep > 0) ||
-                (mCurZoomLevel == 1 && Global.zoomStep < 0)) //reverse zoom step
-            Global.zoomStep *= -1;
+            Global.g_zoom_step = 1;
+        if ((mCurZoomLevel > Global.g_layout_zoom_level && Global.g_zoom_step > 0) ||
+                (mCurZoomLevel == 1 && Global.g_zoom_step < 0)) //reverse zoom step
+            Global.g_zoom_step *= -1;
 
-        m_view.PDFSetZoom((int) x, (int) y, m_view.PDFGetPos((int) x, (int) y), mCurZoomLevel + Global.zoomStep);
-        RadaeePluginCallback.getInstance().onDoubleTapped(m_view.PDFGetCurrPage(), x, y);
+        m_view.PDFSetZoom((int) x, (int) y, m_view.PDFGetPos((int) x, (int) y), mCurZoomLevel + Global.g_zoom_step);
+        RadaeePluginCallback.getInstance().onDoubleTapped(pageno, x, y);
         return true;
     }
 
     @Override
-    public void OnPDFLongPressed(float x, float y) {
-        RadaeePluginCallback.getInstance().onLongPressed(m_view.PDFGetCurrPage(), x, y);
+    public void OnPDFLongPressed(int pageno, float x, float y) {
+        RadaeePluginCallback.getInstance().onLongPressed(pageno, x, y);
     }
 
+    private boolean show_progress = true;
     @Override
     public void OnPDFPageRendered(ILayoutView.IVPage vpage) {
         if (!mDidShowReader) {
             RadaeePluginCallback.getInstance().didShowReader();
             mDidShowReader = true;
         }
-        findViewById(R.id.progress).setVisibility(View.GONE);
+        if (show_progress) {
+            findViewById(R.id.progress).setVisibility(View.GONE);
+            show_progress = false;
+        }
     }
 
     @Override
@@ -553,7 +557,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
      */
     public int getCurrentPage() {
         if (m_view != null)
-            return m_view.PDFGetCurrPage();
+            return m_cur_page;
         return -1;
     }
 
@@ -589,7 +593,7 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
             fo.close();
             bmp.recycle();
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {
         }
     }

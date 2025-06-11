@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/lay_panel"
+        android:background="@color/tab_bg_color"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.radaee.util.RDExpView
+            android:id="@+id/txt_head"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+        <TextView
+            android:textColor="@color/tab_text_color"
+            android:id="@+id/txt_name"
+            android:gravity="center_vertical"
+            android:layout_toEndOf="@id/txt_head"
+            android:layout_alignParentEnd="true"
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
+    </RelativeLayout>
+    <com.radaee.util.RDLinearLayout
+        android:id="@+id/lst_files"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

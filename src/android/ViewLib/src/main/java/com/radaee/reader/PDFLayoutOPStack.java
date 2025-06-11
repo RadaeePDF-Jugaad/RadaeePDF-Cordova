@@ -79,9 +79,9 @@ class OPMove extends OPItem
 {
     int m_pageno0;
     int m_pageno1;
-    float m_rect0[] = new float[4];
-    float m_rect1[] = new float[4];
-    OPMove(int src_pageno, float src_rect[], int dst_pageno, int dst_idx, float dst_rect[])
+    float[] m_rect0 = new float[4];
+    float[] m_rect1 = new float[4];
+    OPMove(int src_pageno, float[] src_rect, int dst_pageno, int dst_idx, float[] dst_rect)
     {
         super(-1, dst_idx);
         m_pageno0 = src_pageno;
@@ -157,7 +157,7 @@ class OPMove extends OPItem
 
 public class PDFLayoutOPStack
 {
-    private Vector<OPItem> m_stack = new Vector<OPItem>();
+    private final Vector<OPItem> m_stack = new Vector<OPItem>();
     private int m_pos = -1;
     public void push(OPItem op)
     {
@@ -176,8 +176,7 @@ public class PDFLayoutOPStack
     {
         if(m_pos > m_stack.size() - 2) return null;
         m_pos++;
-        OPItem ret = m_stack.get(m_pos);
-        return ret;
+        return m_stack.get(m_pos);
     }
     public boolean can_undo()
     {

@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.widget.Scroller;
 
 import com.radaee.pdf.BMP;
@@ -17,7 +17,7 @@ import com.radaee.pdf.VNCache;
 
 @SuppressWarnings("WeakerAccess")
 abstract public class PDFLayout {
-    public class PDFPos {
+    public static class PDFPos {
         public float x = 0;
         public float y = 0;
         public int pageno = 0;
@@ -34,18 +34,18 @@ abstract public class PDFLayout {
          *
          * @param pageno pageno.<br/>
          */
-        public void OnPageChanged(int pageno);
+        void OnPageChanged(int pageno);
 
-        public void OnPageRendered(int pageno);
+        void OnPageRendered(int pageno);
 
-        public void OnCacheRendered(int pageno);
+        void OnCacheRendered(int pageno);
 
         /**
          * fired when searching end.
          *
          * @param found true if found, otherwise pass false.
          */
-        public void OnFound(boolean found);
+        void OnFound(boolean found);
 
         /**
          * fired when a page displayed.
@@ -53,15 +53,15 @@ abstract public class PDFLayout {
          * @param canvas canvas to draw.
          * @param vpage  VPage object
          */
-        public void OnPageDisplayed(Canvas canvas, VPage vpage);
+        void OnPageDisplayed(Canvas canvas, VPage vpage);
 
-        public void OnTimer();
+        void OnTimer();
     }
 
     protected Config m_bmp_format = Config.ARGB_8888;
     protected Bitmap m_bmp = null;
     protected Document m_doc = null;
-    protected VPage m_pages[] = null;
+    protected VPage[] m_pages = null;
     protected VThread m_thread = null;
     protected VFinder m_finder = null;
     protected int m_w = 0;
@@ -71,25 +71,25 @@ abstract public class PDFLayout {
     protected float m_scale = 0;
     protected float m_scale_min = 1;
     protected float m_scale_max = 1;
-    protected float m_zoom_level = Global.layoutZoomLevel;
-    protected float m_zoom_level_clip = Global.layoutZoomLevelClip;
+    protected float m_zoom_level = Global.g_layout_zoom_level;
+    protected float m_zoom_level_clip = Global.g_layout_zoom_clip;
     protected int m_disp_page1 = 0;
     protected int m_disp_page2 = 0;
     protected int m_cache_page1 = 0;
     protected int m_cache_page2 = 0;
     protected int m_page_gap = 4;
-    protected int m_back_color = Global.readerViewBgColor;
+    protected int m_back_color = Global.g_readerview_bg_color;
     protected float m_page_maxw;
     protected float m_page_maxh;
     protected LayoutListener m_listener = null;
     protected Scroller m_scroller = null;
-    protected Handler m_hand_ui = new Handler() {
+    protected Handler m_hand_ui = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if(m_thread == null) return;
             switch (msg.what) {
                 case 0: //render finished.
-                    long cache = (((long) msg.arg1) << 32) | (((long) msg.arg2) & 0xffffffffl);
+                    long cache = (((long) msg.arg1) << 32) | (((long) msg.arg2) & 0xffffffffL);
                     if (m_listener != null) m_listener.OnCacheRendered(VNCache.getNO(cache));
                     break;
                 case 1://find operation returned.
@@ -104,7 +104,7 @@ abstract public class PDFLayout {
                     }
                     break;
                 case 2: //cache finished
-                    long blk = (((long) msg.arg1) << 32) | (((long) msg.arg2) & 0xffffffffl);
+                    long blk = (((long) msg.arg1) << 32) | (((long) msg.arg2) & 0xffffffffL);
                     //if (m_listener != null) m_listener.OnCacheRendered(VNBlock.getPageNO(blk));
                     if (m_listener != null) m_listener.OnPageRendered(VNBlock.getPageNO(blk));
                     break;
@@ -115,10 +115,10 @@ abstract public class PDFLayout {
             super.handleMessage(msg);
         }
     };
-    private Context m_ctx;
+    private final Context m_ctx;
 
-    protected float m_scales[] = null;
-    protected float m_scales_min[] = null;
+    protected float[] m_scales = null;
+    protected float[] m_scales_min = null;
 
     protected PDFLayout(Context context) {
         m_ctx = context;
@@ -159,6 +159,7 @@ abstract public class PDFLayout {
     public final void vScrollAbort() {
         if (m_doc != null) {
             if (!m_scroller.isFinished() && m_listener != null) {
+                m_scroller.computeScrollOffset();
                 Scroller scroller = new Scroller(m_ctx);
                 scroller.setFinalX(m_scroller.getCurrX());
                 scroller.setFinalY(m_scroller.getCurrY());
@@ -172,19 +173,39 @@ abstract public class PDFLayout {
         return m_doc != null && m_scroller.computeScrollOffset();
     }
 
-    private BMP m_dbmp = new BMP();
+    private final BMP m_dbmp = new BMP();
 
     private void vDrawZoom(Canvas canvas, int x, int y) {
         int pageno0 = m_disp_page1;
         int pageno1 = m_disp_page2;
-        if (Global.dark_mode) {
-            m_bmp.eraseColor(m_back_color);
+        if (Global.g_dark_mode) {
+            if (m_bmp.getConfig() == Config.ARGB_8888)
+            {
+                //for ARGB_8888, using SIMD to enhance speed.
+                m_dbmp.Create(m_bmp);
+                if (((m_back_color >> 24) & 255) == 0)
+                    m_dbmp.DrawRect(0xFFFFFF, 0, 0, m_w, m_h, 1);
+                else
+                    m_dbmp.DrawRect(m_back_color, 0, 0, m_w, m_h, 1);
+                m_dbmp.Free(m_bmp);
+            }
+            else
+            {
+                if (((m_back_color >> 24) & 255) == 0)
+                    m_bmp.eraseColor(-1);
+                else
+                    m_bmp.eraseColor(m_back_color);
+            }
             Canvas bcan = new Canvas(m_bmp);
             while (pageno0 < pageno1) {
                 m_pages[pageno0].vDraw(m_thread, bcan, x, y);
                 pageno0++;
             }
             m_dbmp.Create(m_bmp);
+            //if (((m_back_color >> 24) & 255) == 0)
+            //    m_dbmp.DrawRect(0xFFFFFF, 0, 0, m_w, m_h, 1);
+            //else
+            //    m_dbmp.DrawRect(m_back_color, 0, 0, m_w, m_h, 1);
             m_dbmp.Invert();
             m_dbmp.Free(m_bmp);
             canvas.drawBitmap(m_bmp, 0, 0, null);
@@ -202,18 +223,22 @@ abstract public class PDFLayout {
         int pageno1 = m_disp_page2;
         boolean clip = m_scale > m_zoom_level_clip * m_scale_min;
         VPage vp;
-        m_bmp.eraseColor(m_back_color);
+        //m_bmp.eraseColor(m_back_color);
         m_dbmp.Create(m_bmp);
+        if (Global.g_dark_mode && ((m_back_color >> 24) & 255) == 0)
+            m_dbmp.DrawRect(0xFFFFFF, 0, 0, m_w, m_h, 1);
+        else
+            m_dbmp.DrawRect(m_back_color, 0, 0, m_w, m_h, 1);
         while (pageno0 < pageno1)//first step: only draw finished block.
         {
-            boolean clipPage = Global.fit_different_page_size ? m_scales[pageno0] / m_scales_min[pageno0] > m_zoom_level_clip : clip;
+            boolean clipPage = Global.g_auto_scale ? m_scales[pageno0] / m_scales_min[pageno0] > m_zoom_level_clip : clip;
             vp = m_pages[pageno0++];
             vp.vClips(m_thread, clipPage);//clip to blocks.
             vp.vDraw(m_thread, m_dbmp, x, y);
         }
-        if (Global.dark_mode)//dark mode.
+        if (Global.g_dark_mode)//dark mode.
         {
-            if (Global.cacheEnabled)//zoom cache to bitmap
+            if (Global.g_cache_enable)//zoom cache to bitmap
             {
                 m_dbmp.Free(m_bmp);
                 Canvas bcan = new Canvas(m_bmp);
@@ -237,7 +262,7 @@ abstract public class PDFLayout {
             m_dbmp.Free(m_bmp);
             canvas.drawBitmap(m_bmp, 0, 0, null);
         } else {
-            if (Global.cacheEnabled)//zoom cache to canvas directly.
+            if (Global.g_cache_enable)//zoom cache to canvas directly.
             {
                 m_dbmp.Free(m_bmp);
                 canvas.drawBitmap(m_bmp, 0, 0, null);
@@ -357,8 +382,9 @@ abstract public class PDFLayout {
 
     public void vGotoPage(int pageno) {
         if (m_pages == null || pageno < 0 || pageno >= m_pages.length) return;
-        float x = m_pages[pageno].GetX() - m_page_gap / 2;
-        float y = m_pages[pageno].GetY() - m_page_gap / 2;
+        int hgap = (m_page_gap >> 1);
+        float x = m_pages[pageno].GetX() - hgap;
+        float y = m_pages[pageno].GetY() - hgap;
         if (x > m_tw - m_w) x = m_tw - m_w;
         if (x < 0) x = 0;
         if (y > m_th - m_h) y = m_th - m_h;
@@ -366,12 +392,15 @@ abstract public class PDFLayout {
         m_scroller.setFinalX((int) x);
         m_scroller.setFinalY((int) y);
         m_scroller.computeScrollOffset();
+        if (m_scroller.isFinished())//let next computeScrollOffset return true. and ensure that flush range will run normally.
+            m_scroller.setFinalY(m_scroller.getCurrY());//make isFinished false.
     }
 
     public void vScrolltoPage(int pageno) {
         if (m_pages == null || pageno < 0 || pageno >= m_pages.length) return;
-        float x = m_pages[pageno].GetX() - m_page_gap / 2;
-        float y = m_pages[pageno].GetY() - m_page_gap / 2;
+        int hgap = (m_page_gap >> 1);
+        float x = m_pages[pageno].GetX() - hgap;
+        float y = m_pages[pageno].GetY() - hgap;
         if (x > m_tw - m_w) x = m_tw - m_w;
         if (x < 0) x = 0;
         if (y > m_th - m_h) y = m_th - m_h;
@@ -444,7 +473,7 @@ abstract public class PDFLayout {
         if (cnt <= 0) return;
         m_listener = listener;
         m_doc = doc;
-        float max[] = m_doc.GetPagesMaxSize();
+        float[] max = m_doc.GetPagesMaxSize();
         m_page_maxw = max[0];
         m_page_maxh = max[1];
         m_finder = new VFinder();
@@ -516,12 +545,12 @@ abstract public class PDFLayout {
     }
 
     public final float vGetZoom() {
-        return Global.fit_different_page_size && m_pageno < m_scales.length ? m_scales[m_pageno] / m_scales_min[m_pageno] : m_scale / m_scale_min;
+        return Global.g_auto_scale && m_pageno < m_scales.length ? m_scales[m_pageno] / m_scales_min[m_pageno] : m_scale / m_scale_min;
     }
 
     public void vZoomSet(int vx, int vy, PDFPos pos, float zoom) {
         m_scale = zoom * m_scale_min;
-        if(Global.fit_different_page_size) {
+        if(Global.g_auto_scale) {
             int cnt = m_doc.GetPageCount();
             for(int i = 0; i < cnt; i++) {
                 float newScale = zoom * m_scales_min[i];
@@ -551,16 +580,21 @@ abstract public class PDFLayout {
         if (pg < 0 || pg >= m_doc.GetPageCount()) return;
         int x = vGetX();
         int y = vGetY();
-        float pos[] = m_finder.find_get_pos();
+        float[] pos = m_finder.find_get_pos();
         if (pos == null) return;
-        pos[0] = m_pages[pg].ToDIBX(pos[0]) + m_pages[pg].GetX();
-        pos[1] = m_pages[pg].ToDIBY(pos[1]) + m_pages[pg].GetY();
-        pos[2] = m_pages[pg].ToDIBX(pos[2]) + m_pages[pg].GetX();
-        pos[3] = m_pages[pg].ToDIBY(pos[3]) + m_pages[pg].GetY();
-        if (x > pos[0] - m_w / 8) x = (int) pos[0] - m_w / 8;
-        if (x < pos[2] - m_w * 7 / 8) x = (int) pos[2] - m_w * 7 / 8;
-        if (y > pos[1] - m_h / 8) y = (int) pos[1] - m_h / 8;
-        if (y < pos[3] - m_h * 7 / 8) y = (int) pos[3] - m_h * 7 / 8;
+        VPage vp = m_pages[pg];
+        pos[0] = vp.ToDIBX(pos[0]) + vp.GetX();
+        pos[1] = vp.ToDIBY(pos[1]) + vp.GetY();
+        pos[2] = vp.ToDIBX(pos[2]) + vp.GetX();
+        pos[3] = vp.ToDIBY(pos[3]) + vp.GetY();
+        int mw0 = (m_w >> 3);
+        int mw1 = m_w - mw0;
+        int mh0 = (m_h >> 3);
+        int mh1 = m_h - mw0;
+        if (x > pos[0] - mw0) x = (int) pos[0] - mw0;
+        if (x < pos[2] - mw1) x = (int) pos[2] - mw1;
+        if (y > pos[1] - mh0) y = (int) pos[1] - mh0;
+        if (y < pos[3] - mh1) y = (int) pos[3] - mh1;
         if (x > m_tw - m_w) x = m_tw - m_w;
         if (x < 0) x = 0;
         if (y > m_th - m_h) y = m_th - m_h;
@@ -568,7 +602,8 @@ abstract public class PDFLayout {
         vScrollAbort();
         m_scroller.setFinalX(x);
         m_scroller.setFinalY(y);
-        if (this instanceof PDFLayoutDual) vGotoPage(pg);
+        //we have override vFindGoto method in PDFLayoutDual class.
+        //if (this instanceof PDFLayoutDual) vGotoPage(pg);
     }
 
     public int vFind(int dir) {
@@ -595,6 +630,7 @@ abstract public class PDFLayout {
     }
 
     public final int vGetX() {
+        m_scroller.computeScrollOffset();
         int x = m_scroller.getCurrX();
         if (x > m_tw - m_w) x = m_tw - m_w;
         if (x < 0) x = 0;
@@ -608,6 +644,7 @@ abstract public class PDFLayout {
     }
 
     public final int vGetY() {
+        m_scroller.computeScrollOffset();
         int y = m_scroller.getCurrY();
         if (y > m_th - m_h) y = m_th - m_h;
         if (y < 0) y = 0;
@@ -631,7 +668,7 @@ abstract public class PDFLayout {
 
     protected void vFlushCacheRange() {
         //float mul = m_scale / m_scale_min;
-        float mul = Global.fit_different_page_size ? m_scales[m_pageno] / m_scales_min[m_pageno] : m_scale / m_scale_min;
+        float mul = Global.g_auto_scale ? m_scales[m_pageno] / m_scales_min[m_pageno] : m_scale / m_scale_min;
         PDFPos pos1 = vGetPos((int) (-m_w * mul), (int) (-m_h * mul));
         PDFPos pos2 = vGetPos(m_w + (int) (m_w * mul), m_h + (int) (m_h * mul));
         if (pos1 == null || pos2 == null) return;
@@ -768,7 +805,7 @@ abstract public class PDFLayout {
         m_disp_page2 = pageno2;
         if (m_listener != null && (pageno1 = vGetPage(m_w / 4, m_h / 4)) != m_pageno)
             m_listener.OnPageChanged(m_pageno = pageno1);
-        if (Global.cacheEnabled)
+        if (Global.g_cache_enable)
             vFlushCacheRange();
     }
 
@@ -801,11 +838,11 @@ abstract public class PDFLayout {
     }
 
     public final float vGetMinScale() {
-        return Global.fit_different_page_size && m_scales_min != null && m_pageno > -1 ? m_scales_min[m_pageno] : m_scale_min;
+        return Global.g_auto_scale && m_scales_min != null && m_pageno > -1 ? m_scales_min[m_pageno] : m_scale_min;
     }
 
     public final float vGetScale() {
-        return Global.fit_different_page_size && m_scales != null && m_pageno > -1 ? m_scales[m_pageno] : m_scale;
+        return Global.g_auto_scale && m_scales != null && m_pageno > -1 ? m_scales[m_pageno] : m_scale;
     }
 
     public final float vGetMaxScale() {

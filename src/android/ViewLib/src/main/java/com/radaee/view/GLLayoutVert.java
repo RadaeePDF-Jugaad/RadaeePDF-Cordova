@@ -6,8 +6,8 @@ public class GLLayoutVert extends GLLayout {
     public static final int ALIGN_CENTER = 0;
     public static final int ALIGN_LEFT = 1;
     public static final int ALIGN_RIGHT = 2;
-    private int m_align;
-    private boolean m_same_width;
+    private final int m_align;
+    private final boolean m_same_width;
     public GLLayoutVert(Context context, int align, boolean same_width)
     {
         super(context);

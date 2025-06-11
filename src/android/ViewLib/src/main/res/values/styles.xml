@@ -19,4 +19,8 @@
 
     <style name="ProgressBar" parent="android:Widget.DeviceDefault.ProgressBar"/>
 
+    <style name="popup_anim" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/anim_popup_start</item>
+        <item name="android:windowExitAnimation">@anim/anim_popup_end</item>
+    </style>
 </resources>

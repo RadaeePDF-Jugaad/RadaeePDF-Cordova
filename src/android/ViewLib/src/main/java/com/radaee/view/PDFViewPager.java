@@ -7,8 +7,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,9 +22,9 @@ import com.radaee.pdf.VNCache;
  */
 @TargetApi(Build.VERSION_CODES.GINGERBREAD)
 public class PDFViewPager extends ViewPager {
-    private PDFPageView m_pages[] = null;
+    private PDFPageView[] m_pages = null;
     private VThread m_thread;
-    private Handler m_hand_ui = new Handler(Looper.myLooper()) {
+    private final Handler m_hand_ui = new Handler(Looper.myLooper()) {
         public void handleMessage(Message msg) {
             PDFPageView pagev;
             int pageno;
@@ -33,7 +33,7 @@ public class PDFViewPager extends ViewPager {
                 case 0:
                     //if(m_listener != null) m_listener.OnPageRendered(((VCache)msg.obj).vGetPageNO());
                     if (m_pages != null) {
-                        long cache = (((long)msg.arg1) << 32) | (((long)msg.arg2)&0xffffffffl);
+                        long cache = (((long)msg.arg1) << 32) | (((long)msg.arg2)& 0xffffffffL);
                         pageno = VNCache.getNO(cache);
                         if(pageno >= m_pages.length || pageno < 0) return;
                         pagev = m_pages[pageno];
@@ -66,8 +66,8 @@ public class PDFViewPager extends ViewPager {
     };
 
     private class PDFPageAdapter extends PagerAdapter {
-        private Document m_doc;
-        private Context m_ctx;
+        private final Document m_doc;
+        private final Context m_ctx;
 
         public PDFPageAdapter(Context ctx, Document doc) {
             m_doc = doc;

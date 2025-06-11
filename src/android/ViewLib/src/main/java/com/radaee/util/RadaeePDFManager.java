@@ -1,6 +1,7 @@
 package com.radaee.util;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
@@ -50,7 +51,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
     }
 
     public RadaeePDFManager(RadaeePluginCallback.PDFReaderListener listener) {
-        Global.navigationMode = 0; //thumbnail navigation mode
+        Global.g_navigation_mode = 0; //thumbnail navigation mode
         if(listener != null)
             mListener = listener;
         RadaeePluginCallback.getInstance().setListener(this);
@@ -61,18 +62,15 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * Should be called before show, open methods
      *
      * @param context Context object must be derived from CoontextWrapper
-     * @param licenseType 0: standard license, 1: professional license, 2: premium license.
-     * @param companyName company name (not package name)
-     * @param mail mail
      * @param key the license activation key
      * @return true if the license was activated correctly, false otherwise
      */
-    public boolean activateLicense(Context context, int licenseType, String companyName, String mail, String key) {
+    public boolean activateLicense(Context context, String company, String email, String key) {
+        //Global.mSerial = key;
+        Global.mCompany = company;
+        Global.mEmail = email;
         Global.mKey = key;
-        Global.mEmail = mail;
-        Global.mCompany = companyName;
-        Global.mLicenseType = licenseType;
-        return Global.Init(context);
+        return Global.Init((ContextWrapper)context);
     }
 
     /**
@@ -113,7 +111,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
                 name = "PDFPath";
             } else
                 name = "PDFPath";
-            Global.sAnnotAuthor = author;
+            Global.g_annot_def_author = author;
             Intent intent = new Intent(context, mLayoutType == GPU_BASED_LAYOUT ? PDFGLViewAct.class : PDFViewAct.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra( name, url);
@@ -178,7 +176,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * Changes the Reader's view mode
      * Should be called before show, open methods
      *
-     * @param viewMode 0:vertical 3:single 4:Dual 6:Dual with cover(1st page single)
+     * @param viewMode 0:vertical 3:single 4:dual 6:Dual with cover(1st page single)
      */
     public void setReaderViewMode(int viewMode) {
         mViewMode = viewMode;
@@ -191,7 +189,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param color format as 0xAARRGGBB
      */
     public void setReaderBGColor(int color) {
-        Global.readerViewBgColor = color;
+        Global.g_readerview_bg_color = color;
     }
 
     /**
@@ -201,7 +199,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param color format as 0xAARRGGBB
      */
     public void setThumbnailBGColor(int color) {
-        Global.thumbViewBgColor = color;
+        Global.g_thumbview_bg_color = color;
     }
 
     /**
@@ -211,7 +209,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param height height in dp, i.e. 100 = 100dp
      */
     public void setThumbHeight(int height) {
-        if(height > 0) Global.thumbViewHeight = height;
+        if(height > 0) Global.g_thumbview_height = height;
     }
 
     /**
@@ -231,7 +229,8 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param firstPageCover if true the first page will be single, if false it will be dual (same as view_mode = 4)
      */
     public void setFirstPageCover(boolean firstPageCover) {
-        mViewMode = firstPageCover ? 6 : 4;
+        if(!firstPageCover)
+            mViewMode = 4;
     }
 
     /**
@@ -369,8 +368,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @return a string that indicates the result
      */
     public String addToBookmarks(Context mContext, String filePath, int page, String bookmarkLabel) {
-        if(!Global.isLicenseActivated())
-            Global.Init(mContext);
+        Global.Init((ContextWrapper)mContext);
 
         if(URLUtil.isFileUrl(filePath)) {
             String prefix = "file://";
@@ -500,7 +498,7 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
 
     @Override
     public void willShowReader() {
-        Global.def_view = mViewMode;
+        Global.g_view_mode = mViewMode;
         if(mListener != null) mListener.willShowReader();
     }
 

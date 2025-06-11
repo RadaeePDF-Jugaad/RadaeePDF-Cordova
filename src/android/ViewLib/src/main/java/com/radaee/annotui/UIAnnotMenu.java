@@ -11,7 +11,7 @@ import com.radaee.viewlib.R;
 
 public class UIAnnotMenu {
 
-    private LinearLayout m_view;
+    private final LinearLayout m_view;
     private Page.Annotation m_annot;
     private Boolean m_has_perform;
     private Boolean m_has_edit;
@@ -120,12 +120,12 @@ public class UIAnnotMenu {
         m_callback = callback;
         int atype = annot.GetType();
         boolean is_show = (atype != 20 && atype != 3);
-        m_has_perform = (atype == 2 || atype == 17 || atype == 18 || atype == 19 || atype == 25 || atype == 26);
+        m_has_perform = (atype == 2 || atype == 17 || atype == 18 || atype == 19 || atype == 21 || atype == 25 || atype == 26);
         m_has_edit = (atype == 1 || atype == 4 || atype == 5 || atype == 6 ||
                 atype == 7 || atype == 8 || atype == 9 || atype == 10 ||
                 atype == 11 || atype == 12 || atype == 13 || atype == 15);
         m_has_remove = (atype != 0);
-        m_has_property = (atype != 0 && atype != 2 && atype != 13 && atype != 26);
+        m_has_property = (atype != 0 && atype != 2 && atype != 13);
 
         int btnsCount = 0;
         if (m_has_perform) {

@@ -1,14 +1,11 @@
 package com.radaee.reader;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Toast;
-
-import com.radaee.view.GLLayout;
 
 public class GLCanvas extends View
 {

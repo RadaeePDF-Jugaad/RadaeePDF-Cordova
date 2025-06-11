@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import com.radaee.viewlib.R;
+
 public class PDFMenu implements PopupWindow.OnDismissListener {
     private PopupWindow m_popup = null;
     private View m_parent = null;
@@ -24,6 +26,7 @@ public class PDFMenu implements PopupWindow.OnDismissListener {
         final float scale = parent.getContext().getResources().getDisplayMetrics().density;
         m_popup.setWidth((int) (width * scale));
         m_popup.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        m_popup.setAnimationStyle(R.style.popup_anim);
         m_parent = parent;
     }
 
@@ -36,7 +39,7 @@ public class PDFMenu implements PopupWindow.OnDismissListener {
             int[] location = new int[2];
             m_parent.getLocationOnScreen(location);
             m_popup.showAtLocation(m_parent, Gravity.NO_GRAVITY, x + location[0], y + location[1]);
-        } catch (Exception exc) {
+        } catch (Exception ignored) {
         }
     }
 

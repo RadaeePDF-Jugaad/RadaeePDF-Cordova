@@ -7,21 +7,16 @@ import android.opengl.GLUtils;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Scroller;
 import com.radaee.pdf.Document;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
+import com.radaee.pdf.Global;
 
 import javax.microedition.khronos.opengles.GL10;
 
 abstract public class GLLayout {
-    protected static float m_max_zoom = 10;
+    protected static float m_max_zoom = Global.g_layout_zoom_level;
     /**
      * call-back listener classv
      * @author radaee
@@ -30,17 +25,18 @@ abstract public class GLLayout {
     {
         void OnBlockRendered(int pageno);
         void OnFound(boolean found);
+        void OnRedraw();
     }
 
     protected Context m_ctx;
     protected Scroller m_scroller;
-    protected GLPage m_pages[];
+    protected GLPage[] m_pages;
     protected int m_page_gap;
     protected int m_page_cnt;
     protected Document m_doc;
     protected VFinder m_finder;
     protected GLListener m_listener;
-    private Handler m_hand_gl = new Handler(Looper.getMainLooper())
+    private final Handler m_hand_gl = new Handler(Looper.getMainLooper())
     {
         @Override
         public void handleMessage(Message msg)
@@ -98,8 +94,8 @@ abstract public class GLLayout {
             wm.getDefaultDisplay().getMetrics(dm);
             GLBlock.m_cell_size = dm.widthPixels;
             if(GLBlock.m_cell_size > dm.heightPixels) GLBlock.m_cell_size = dm.heightPixels;
-            if(GLBlock.m_cell_size > 1024) GLBlock.m_cell_size = 1024;
-            else GLBlock.m_cell_size = 512;
+            //if(GLBlock.m_cell_size > 1024) GLBlock.m_cell_size = 1024;
+            //else GLBlock.m_cell_size = 512;
         }
     }
     public void vOpen(Document doc, GLListener listener, int page_gap)
@@ -125,7 +121,7 @@ abstract public class GLLayout {
             gl10.glDeleteTextures(1, new int[]{m_def_text}, 0);
             m_def_text = 0;
         }
-        int textures[] = new int[1];
+        int[] textures = new int[1];
         Bitmap bmp = Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888);
         bmp.eraseColor(-1);
         gl10.glGenTextures(1, textures, 0);
@@ -179,6 +175,10 @@ abstract public class GLLayout {
         m_layh = 0;
         m_vw = 0;
         m_vh = 0;
+    }
+    public final boolean gl_is_scroll_finished()
+    {
+        return m_scroller.isFinished();
     }
     protected void gl_flush_range(GL10 gl10)
     {
@@ -249,7 +249,25 @@ abstract public class GLLayout {
         for(int pcur = m_pageno1; pcur < m_pageno2; pcur++)
             m_pages[pcur].gl_draw(gl10, m_thread, m_def_text, vx, vy, m_vw, m_vh);
     }
-    public class PDFPos
+    public void gl_sync() {
+        if (m_doc == null) return;
+        m_scroller.computeScrollOffset();
+        int pageno1 = vGetPage(-GLBlock.m_cell_size, -GLBlock.m_cell_size);
+        int pageno2 = vGetPage(m_vw + GLBlock.m_cell_size, m_vh + GLBlock.m_cell_size);
+        if (pageno1 >= 0 && pageno2 >= 0) {
+            if (pageno1 > pageno2) {
+                int tmp = pageno1;
+                pageno1 = pageno2;
+                pageno2 = tmp;            }
+            pageno2++;
+        }
+        int vx = vGetX();
+        int vy = vGetY();
+        for (int pcur = pageno1; pcur < pageno2; pcur++)
+            m_pages[pcur].gl_sync(vx, vy, m_vw, m_vh);
+        m_scroller.forceFinished(false);
+    }
+    public static class PDFPos
     {
         public float x = 0;
         public float y = 0;
@@ -312,6 +330,7 @@ abstract public class GLLayout {
         if(m_doc == null) return;
         if(m_scroller.isFinished()) return;
         Scroller scroller = new Scroller(m_ctx);
+        m_scroller.computeScrollOffset();
         scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, 0, 0);
         m_scroller = scroller;
         m_scroller.computeScrollOffset();
@@ -339,6 +358,7 @@ abstract public class GLLayout {
     }
     public final int vGetX()
     {
+        m_scroller.computeScrollOffset();
         int x = m_scroller.getCurrX();
         if(x > m_layw - m_vw) x = m_layw - m_vw;
         if(x < 0) x = 0;
@@ -352,6 +372,7 @@ abstract public class GLLayout {
     }
     public final int vGetY()
     {
+        m_scroller.computeScrollOffset();
         int y = m_scroller.getCurrY();
         if(y > m_layh - m_vh) y = m_layh - m_vh;
         if(y < 0) y = 0;
@@ -400,6 +421,17 @@ abstract public class GLLayout {
         if( m_pages == null || page == null ) return;
         page.gl_set_dirty();
     }
+
+    /**
+     * render page again for a dirty bounding box, after page modified.
+     * @param page page object obtained by vGetPage()
+     * @param pdf_rect dirty bounding box, must 4 elements as [left, top, right, bottom]
+     */
+    public void gl_render(GLPage page, float[] pdf_rect)
+    {
+        if( m_pages == null || page == null ) return;
+        page.gl_set_dirty(pdf_rect[0], pdf_rect[1], pdf_rect[2], pdf_rect[3]);
+    }
     public void vGotoPage( int pageno )
     {
         if( m_pages == null || pageno < 0 || pageno >= m_pages.length ) return;
@@ -411,6 +443,9 @@ abstract public class GLLayout {
         if( y < 0 ) y = 0;
         m_scroller.setFinalX((int)x);
         m_scroller.setFinalY((int)y);
+        m_scroller.computeScrollOffset();
+        if (m_scroller.isFinished())//let next computeScrollOffset return true. and ensure that flush range will run normally.
+            m_scroller.setFinalY(m_scroller.getCurrY());//make isFinished false.
     }
     public void vScrolltoPage( int pageno )
     {
@@ -421,6 +456,7 @@ abstract public class GLLayout {
         if( x < 0 ) x = 0;
         if( y > m_layh - m_vh ) y = m_layh - m_vh;
         if( y < 0 ) y = 0;
+        m_scroller.computeScrollOffset();
         int oldx = m_scroller.getCurrX();
         int oldy = m_scroller.getCurrY();
         m_scroller.startScroll(oldx, oldy, x - oldx, y - oldy);
@@ -439,7 +475,7 @@ abstract public class GLLayout {
         if( pg < 0 || pg >= m_doc.GetPageCount() ) return;
         int x = vGetX();
         int y = vGetY();
-        float pos[] = m_finder.find_get_pos();
+        float[] pos = m_finder.find_get_pos();
         if( pos == null ) return;
         pos[0] = m_pages[pg].GetVX(pos[0]);
         pos[1] = m_pages[pg].GetVY(pos[1]);
@@ -507,5 +543,15 @@ abstract public class GLLayout {
         GLBlock.drawQuadColor(gl10, 0, 0, 0, m_vw << 16, 0, 0, m_vh << 16, m_vw << 16, m_vh << 16,
                 ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, (color & 0xff) / 255.0f);
         gl10.glBindTexture(GL10.GL_TEXTURE_2D, 0);
+    }
+    public final boolean vRenderFinished() {
+        int pageno0 = m_pageno1;
+        int pageno1 = m_pageno2;
+        if (pageno0 < 0 || pageno1 < 0) return true;
+        while (pageno0 < pageno1) {
+            if (!m_pages[pageno0].vFinished()) return false;
+            pageno0++;
+        }
+        return true;
     }
 }

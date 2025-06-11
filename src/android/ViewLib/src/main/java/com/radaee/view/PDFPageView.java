@@ -53,7 +53,7 @@ public class PDFPageView extends View
     protected interface PageListener
     {
     }
-    private final void init()
+    private void init()
     {
         m_scroller = new Scroller(getContext());
         m_gesture = new GestureDetector(getContext(), new PDFGestureListener());
@@ -70,7 +70,7 @@ public class PDFPageView extends View
         m_thread = null;
     }
     private ActivityManager m_amgr;
-    private ActivityManager.MemoryInfo m_info = new ActivityManager.MemoryInfo();
+    private final ActivityManager.MemoryInfo m_info = new ActivityManager.MemoryInfo();
     private Paint m_info_paint = new Paint();
     public PDFPageView(Context context)
     {
@@ -152,7 +152,7 @@ public class PDFPageView extends View
     {
         if(m_vpage != null)
         {
-            m_vpage.vCacheEnd(m_thread_cache);;
+            m_vpage.vCacheEnd(m_thread_cache);
             m_vpage.vDestroy(m_thread);
             m_vpage = null;
         }
@@ -268,7 +268,7 @@ public class PDFPageView extends View
         m_h = h;
         if(m_vpage != null)
         {
-            m_vpage.vCacheEnd(m_thread_cache);;
+            m_vpage.vCacheEnd(m_thread_cache);
             m_vpage.vDestroy(m_thread);
             m_vpage = null;
         }
@@ -279,7 +279,7 @@ public class PDFPageView extends View
     {
         Canvas bcan = new Canvas(m_bmp);
         m_vpage.vDraw(m_thread, bcan, x, y);
-        if(Global.dark_mode)
+        if(Global.g_dark_mode)
         {
             BMP bmp = new BMP();
             bmp.Create(m_bmp);
@@ -299,7 +299,7 @@ public class PDFPageView extends View
         bmp.Create(m_bmp);
 
         m_vpage.vDrawStep2(bmp);
-        if (Global.dark_mode) {
+        if (Global.g_dark_mode) {
             bmp.Invert();
         }
         bmp.Free(m_bmp);
@@ -329,7 +329,7 @@ public class PDFPageView extends View
             /*
             Canvas bcan = new Canvas(m_bmp);
             m_vpage.vDraw(bcan, m_x, m_y);
-            if(Global.dark_mode)
+            if(Global.g_dark_mode)
             {
                 BMP bmp = new BMP();
                 bmp.Create(m_bmp);

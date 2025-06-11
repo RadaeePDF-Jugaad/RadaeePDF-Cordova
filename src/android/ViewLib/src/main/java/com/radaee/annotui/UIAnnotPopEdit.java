@@ -19,13 +19,13 @@ import com.radaee.viewlib.R;
 
 public class UIAnnotPopEdit extends UIAnnotPop {
 
-    private EditText m_edit;
+    private final EditText m_edit;
     public UIAnnotPopEdit(View parent)
     {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.pop_edit, null));
         m_edit = (EditText) findView(R.id.annot_text);
     }
-    public void update(Page.Annotation annot, float annot_rect[], float scale)
+    public void update(Page.Annotation annot, float[] annot_rect, float scale)
     {
         setFocusable(true);
         setTouchable(true);

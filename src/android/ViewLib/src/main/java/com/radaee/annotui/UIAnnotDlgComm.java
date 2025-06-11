@@ -16,8 +16,7 @@ import com.radaee.pdf.Page;
 import com.radaee.viewlib.R;
 
 public class UIAnnotDlgComm extends UIAnnotDlg {
-    public UIAnnotDlgComm(Context ctx)
-    {
+    public UIAnnotDlgComm(Context ctx) {
         super((RelativeLayout) LayoutInflater.from(ctx).inflate(R.layout.dlg_annot_prop_comm, null));
         setCancelable(false);
         setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -27,10 +26,16 @@ public class UIAnnotDlgComm extends UIAnnotDlg {
 
                 if (m_annot.IsLocked()) {
                     Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    EditText num_lwidth = m_layout.findViewById(R.id.edit_lwidth);
-                    m_annot.SetStrokeWidth(Float.parseFloat(num_lwidth.getText().toString()));
+                } else {
+                    float width;
+                    try {
+                        EditText num_lwidth = m_layout.findViewById(R.id.edit_lwidth);
+                        width = Float.parseFloat(num_lwidth.getText().toString());
+                    } catch (NumberFormatException ignored) {
+                        width = -1f;
+                    }
+                    if (width > 0)
+                        m_annot.SetStrokeWidth(width);
                     UILStyleButton btn_lstyle = m_layout.findViewById(R.id.btn_lstyle);
                     m_annot.SetStrokeDash(btn_lstyle.getDash());
 
@@ -54,7 +59,7 @@ public class UIAnnotDlgComm extends UIAnnotDlg {
                 CheckBox chk_lock = m_layout.findViewById(R.id.chk_lock);
                 m_annot.SetLocked(chk_lock.isChecked());
 
-                if(m_callback != null)
+                if (m_callback != null)
                     m_callback.onUpdate();
             }
         });
@@ -62,13 +67,13 @@ public class UIAnnotDlgComm extends UIAnnotDlg {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                if(m_callback != null)
+                if (m_callback != null)
                     m_callback.onCancel();
             }
         });
     }
-    void show(Page.Annotation annot, boolean has_fill, UIAnnotMenu.IMemnuCallback calllback)
-    {
+
+    void show(Page.Annotation annot, boolean has_fill, UIAnnotMenu.IMemnuCallback calllback) {
         setTitle("Annotation Property");
         m_annot = annot;
         m_callback = calllback;
@@ -87,15 +92,13 @@ public class UIAnnotDlgComm extends UIAnnotDlg {
         btn_lcolor.setColorMode(true);
 
         UIColorButton btn_fcolor = m_layout.findViewById(R.id.btn_fcolor);
-        if(has_fill) {
+        if (has_fill) {
             color = m_annot.GetFillColor();
-            if(color != 0) color |= 0xff000000;
+            if (color != 0) color |= 0xff000000;
             btn_fcolor.setColor(color);
             btn_fcolor.setColorEnable(color != 0);
             btn_fcolor.setColorMode(false);
-        }
-        else
-        {
+        } else {
             TextView txt_fcolor = m_layout.findViewById(R.id.txt_fcolor);
             txt_fcolor.setVisibility(View.GONE);
             btn_fcolor.setVisibility(View.GONE);
@@ -111,9 +114,11 @@ public class UIAnnotDlgComm extends UIAnnotDlg {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 txt_alpha.setText(String.format("%d", progress));
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }

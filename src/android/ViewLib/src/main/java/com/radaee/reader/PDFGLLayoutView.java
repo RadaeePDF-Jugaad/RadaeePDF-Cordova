@@ -9,7 +9,6 @@ import com.radaee.annotui.UIAnnotMenu;
 import com.radaee.pdf.Document;
 import com.radaee.view.GLLayout;
 import com.radaee.view.ILayoutView;
-import com.radaee.view.PDFLayout;
 
 public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public PDFGLLayoutView(Context context) {
@@ -43,7 +42,11 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public void PDFSetView(int vmode) {
         m_view.PDFSetView(vmode);
     }
+    public int PDFGetView() { return m_view.PDFGetView(); }
 
+    public void PDFCloseOnUI() {
+        m_view.PDFCloseOnUI();
+    }
     public void PDFClose() {
         m_view.PDFClose();
     }
@@ -52,12 +55,10 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetInk(code);
     }
 
-    @Override
     public void PDFSetPolygon(int code) {
         m_view.PDFSetPolygon(code);
     }
 
-    @Override
     public void PDFSetPolyline(int code) {
         m_view.PDFSetPolyline(code);
     }
@@ -91,8 +92,8 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFSetEditbox(code);
     }
     @Override
-    public boolean PDFSetAttachment(String attachmentPath) {
-        return m_view.PDFSetAttachment(attachmentPath);
+    public boolean PDFSetAttachment(String attachmentPath) { //TODO
+        return false;
     }
 
     public void PDFCancelAnnot() {
@@ -168,27 +169,22 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         return m_view.PDFSave();
     }
 
-    @Override
-    public void PDFUpdateCurrPage()
+    public void PDFUpdatePage(int pageno)
     {
-        m_view.PDFUpdateCurrPage();
-    }
-
-    @Override
-    public int PDFGetCurrPage() {
-        return m_view.PDFGetCurrPage();
+        m_view.PDFUpdatePage(pageno);
     }
 
     public void PDFSetBGColor(int color) {
         m_view.PDFSetBGColor(color);
     }
 
+    /*
     @Override
     public void PDFAddAnnotRect(float x, float y, float width, float height, int p)
     {
         m_view.PDFAddAnnotRect(x, y, width, height, p);
     }
-
+    */
     @Override
     public int GetScreenX(float pdfX, int pageno) {
         return 0;
@@ -215,11 +211,17 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     {
         m_view.PDFRestoreView();
     }
-
-
     public final GLLayout.PDFPos PDFGetPos(int x, int y) {
         if (m_view != null)
             return m_view.PDFGetPos(x, y);
         else return null;
+    }
+    public void onPause()
+    {
+        m_view.onPause();
+    }
+    public void onResume()
+    {
+        m_view.onResume();
     }
 }

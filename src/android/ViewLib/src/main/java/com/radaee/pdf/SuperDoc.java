@@ -8,122 +8,99 @@ import android.graphics.Bitmap;
  */
 public class SuperDoc extends Document
 {
-	private static native long create(String paths[], String passwords[]);
-	private static native void destroy(long hand);
-	private static native long getPage(long hand, int pageno);
-	private static native int getPageCount(long hand);
-	private static native float getPageWidth(long hand, int pageno);
-	private static native float getPageHeight(long hand, int pageno);
-	private static native float[] getPagesMaxSize(long hand);
-
-	private class DocInfo
+	static public class PageInfo
 	{
-		String path;
-		String password;
-		Document doc;
-		int page_start;
-		int page_count;
+		public float width;
+		public float height;
 	}
-	private DocInfo m_docs[] = null;
+	static public class DocInfo
+	{
+		public DocInfo()
+		{
+			m_path = null;
+			m_pswd = null;
+			m_pages = null;
+			m_doc = null;
+			m_ref = 0;
+			m_pstart = 0;
+		}
+		public String m_path;//path to PDF file, it can reference to PDF file not exists, but will created later outer.
+		public String m_pswd;//password to PDF file.
+		public PageInfo[] m_pages;//all page information.
+		protected void DecRef()
+		{
+			m_ref--;
+			if(m_ref == 0)
+			{
+				m_doc.Close();
+				m_doc = null;
+			}
+		}
+		private int cmp_no(int pageno)
+		{
+			if (pageno < m_pstart) return pageno - m_pstart;
+			int plast = m_pstart + m_pages.length - 1;
+			if(pageno > plast) return pageno - plast;
+			return 0;
+		}
+		private void GetMaxPageSize(PageInfo size)
+		{
+			int pcnt = m_pages.length;
+			for(int pcur = 0; pcur < pcnt; pcur++)
+			{
+				PageInfo pi = m_pages[pcur];
+				if(size.width < pi.width) size.width = pi.width;
+				if(size.height < pi.height) size.height = pi.height;
+			}
+		}
+		private int m_pstart;
+		private Document m_doc;//Document object, it is null if the path not loaded yet.
+		private int m_ref;//reference count of Document object.
+	}
 
+	private DocInfo[] m_pdfs;
 	/**
 	 * Initialize SuperDoc object
-	 * @param paths all full path list, it is better: length of list does not exceed 2048
-	 * @param passwords password list, passwords[index] is used for paths[index].<br>
-	 * 	this can be null, if all documents has no password.
+	 * @param pdfs all information of PDF files.
+	 * @param legacy is legacy mode? in legacy mode, all documents will open in constructor, and keep document objects till close().<br/>
+	 *               if not in legacy mode, document objects will load in dynamic way, that mean less memory cost, but may slower that legacy mode.
 	 */
-	public SuperDoc(String paths[], String passwords[])
+	public SuperDoc(DocInfo[] pdfs, boolean legacy)
 	{
-		hand_val = create(paths, passwords);
-	}
-
-	/**
-	 * Initialize SuperDoc object
-	 * @param paths all full path list, it is better: length of list does not exceed 2048
-	 * @param passwords password list, passwords[index] is used for paths[index].<br>
-	 * 	this can be null, if all documents has no password.
-	 */
-	public void SuperDocInfo(String paths[], String passwords[])
-	{
-		if(paths != null)
+		m_pdfs = pdfs;
+		int dcnt = m_pdfs.length;
+		DocInfo diprev = m_pdfs[0];
+		if (legacy)
 		{
-			int cnt = paths.length;
-			m_docs = new DocInfo[cnt];
-			int cur = 0;
-			int page_cnt = 0;
-			while( cur < cnt )
+			diprev.m_doc = new Document();
+			diprev.m_doc.Open(diprev.m_path, diprev.m_pswd);
+			diprev.m_ref = 1;
+			for(int dcur = 1; dcur < dcnt; dcur++)
 			{
-				DocInfo di = new DocInfo();
-				di.path = paths[cur];
-				if(passwords != null)
-				{
-					if( passwords.length > cur )
-						di.password = passwords[cur];
-				}
-				di.doc = new Document();
-				di.page_start = page_cnt;
-				di.doc.Open(di.path, di.password);
-				di.page_count = di.doc.GetPageCount();//if open failed, return 0.
-				m_docs[cur] = di;
-				page_cnt += di.page_count;
-				cur++;
+				DocInfo dicur = m_pdfs[dcur];
+				dicur.m_pstart = diprev.m_pstart + diprev.m_pages.length;
+				dicur.m_doc = new Document();
+				dicur.m_doc.Open(dicur.m_path, dicur.m_pswd);
+				dicur.m_ref = 1;
+				diprev = dicur;
+			}
+		}
+		else
+		{
+			for (int dcur = 1; dcur < dcnt; dcur++) {
+				DocInfo dicur = m_pdfs[dcur];
+				dicur.m_pstart = diprev.m_pstart + diprev.m_pages.length;
+				diprev = dicur;
 			}
 		}
 	}
-
-	public SuperDoc(Document[] documents)
-	{
-		if(documents != null)
-		{
-			int cnt = documents.length;
-			m_docs = new DocInfo[cnt];
-			int cur = 0;
-			int page_cnt = 0;
-			while( cur < cnt )
-			{
-				DocInfo di = new DocInfo();
-				if(documents[cur] != null) {
-					di.doc = documents[cur];
-					di.page_start = page_cnt;
-
-					di.page_count = di.doc.GetPageCount();//if open failed, return 0.
-					m_docs[cur] = di;
-					page_cnt += di.page_count;
-				}
-				cur++;
-			}
-		}
-	}
-
-	private final int lookup_doc(int pageno)
-	{
-		int left = 0;
-		int right = m_docs.length - 1;
-		while(left <= right)
-		{
-			int mid = (left + right)>>1;
-			if(pageno >= m_docs[mid].page_start && pageno < m_docs[mid].page_start + m_docs[mid].page_count)
-			{
-				while(m_docs[mid].page_count == 0 && mid < m_docs.length)//skip all invalid Documents.
-					mid++;
-				if(mid >= m_docs.length) return -1;
-				return mid;
-			}
-			else if( pageno < m_docs[mid].page_start )
-				right = mid - 1;
-			else
-				left = mid + 1;
-		}
-		return -1;
-	}
-
 	/**
 	 * check if opened.
 	 * @return true or false.
 	 */
 	public boolean IsOpened()
 	{
-		return (hand_val != 0) || (m_docs != null);
+		return (m_pdfs != null);
 	}
 	/**
 	 * create a empty PDF document
@@ -250,20 +227,34 @@ public class SuperDoc extends Document
 	 */
 	public void Close()
 	{
-		if(m_docs != null) {
-			int cur = 0;
-			int cnt = m_docs.length;
-			while (cur < cnt) {
-				m_docs[cur].doc.Close();
-				cur++;
+		if(m_pdfs == null) return;
+		int dcnt = m_pdfs.length;
+		for(int dcur = 0; dcur < dcnt; dcur++)
+		{
+			DocInfo di = m_pdfs[dcur];
+			if(di.m_doc != null)
+			{
+				di.m_doc.Close();
+				di.m_ref = 0;
+				di.m_doc = null;
 			}
-			m_docs = null;
 		}
-
-		if(hand_val != 0) {
-			destroy(hand_val);
-			hand_val = 0;
+		hand_val = 0;
+	}
+	private int locate_page(int pageno)
+	{
+		int left = 0;
+		int right = m_pdfs.length - 1;
+		while(left <= right)
+		{
+			int mid = (left + right) >> 1;
+			DocInfo dimid = m_pdfs[mid];
+			int iret = dimid.cmp_no(pageno);
+			if (iret > 0) left = mid + 1;
+			else if(iret < 0) right = mid - 1;
+			else return mid;
 		}
+		return -1;
 	}
 	/**
 	 * get a Page object for page NO.
@@ -272,20 +263,18 @@ public class SuperDoc extends Document
 	 */
 	public Page GetPage( int pageno )
 	{
-		if(hand_val != 0) {
-			long page_hand = getPage(hand_val, pageno);
-			if (page_hand == 0) return null;
-			Page page = new Page();
-			if (page != null) {
-				page.hand = page_hand;
-				page.m_doc = this;
-			}
-			return page;
+		int idx = locate_page(pageno);
+		if(idx < 0) return null;
+		DocInfo dinfo = m_pdfs[idx];
+		int pno = pageno - dinfo.m_pstart;
+		if (dinfo.m_doc == null)
+		{
+			Document doc = new Document();
+			if(doc.Open(dinfo.m_path, dinfo.m_pswd) != 0) return null;
+			dinfo.m_doc = doc;
 		}
-		if(m_docs == null) return null;
-		int index = lookup_doc(pageno);
-		if( index < 0 ) return null;
-		return m_docs[index].doc.GetPage(pageno - m_docs[index].page_start);
+		dinfo.m_ref++;
+		return new SuperPage(dinfo.m_doc.GetPage(pno), dinfo);
 	}
 	/**
 	 * get pages count.
@@ -293,11 +282,10 @@ public class SuperDoc extends Document
 	 */
 	public int GetPageCount()
 	{
-		if(hand_val != 0)
-			return getPageCount(hand_val);
-		if(m_docs == null) return 0;
-		int index = m_docs.length - 1;
-		return m_docs[index].page_start + m_docs[index].page_count;
+		if(m_pdfs == null) return 0;
+		int last = m_pdfs.length - 1;
+		DocInfo dinfo = m_pdfs[last];
+		return dinfo.m_pstart + dinfo.m_pages.length;
 	}
 	/**
 	 * get page width by page NO.
@@ -306,12 +294,11 @@ public class SuperDoc extends Document
 	 */
 	public float GetPageWidth( int pageno )
 	{
-		if(hand_val != 0)
-			return getPageWidth(hand_val, pageno);
-		if(m_docs == null) return 0;
-		int index = lookup_doc(pageno);
-		if( index < 0 ) return 0;
-		return m_docs[index].doc.GetPageWidth(pageno - m_docs[index].page_start);
+		int idx = locate_page(pageno);
+		if(idx < 0) return 0;
+		DocInfo dinfo = m_pdfs[idx];
+		int pno = pageno - dinfo.m_pstart;
+		return dinfo.m_pages[pno].width;
 	}
 	/**
 	 * get page height by page NO.
@@ -320,12 +307,11 @@ public class SuperDoc extends Document
 	 */
 	public float GetPageHeight( int pageno )
 	{
-		if(hand_val != 0)
-			return getPageHeight(hand_val, pageno);
-		if(m_docs == null) return 0;
-		int index = lookup_doc(pageno);
-		if( index < 0 ) return 0;
-		return m_docs[index].doc.GetPageHeight(pageno - m_docs[index].page_start);
+		int idx = locate_page(pageno);
+		if(idx < 0) return 0;
+		DocInfo dinfo = m_pdfs[idx];
+		int pno = pageno - dinfo.m_pstart;
+		return dinfo.m_pages[pno].height;
 	}
 	/**
 	 * get meta data of document.
@@ -646,20 +632,17 @@ public class SuperDoc extends Document
 
 	public float[] GetPagesMaxSize()
 	{
-		if(hand_val != 0)
-			return getPagesMaxSize(hand_val);
-		if(m_docs == null) return null;
-		float [] max = m_docs[0].doc.GetPagesMaxSize();
-		int cur = 1;
-		int cnt = m_docs.length;
-		while(cur < cnt)
+		int dcnt = m_pdfs.length;
+		PageInfo psize = new PageInfo();
+		float[] msize = new float[2];
+		for(int dcur = 0; dcur < dcnt; dcur++)
 		{
-			float[] cs1 = m_docs[cur].doc.GetPagesMaxSize();
-			if(max[0] < cs1[0]) max[0] = cs1[0];
-			if(max[1] < cs1[1]) max[1] = cs1[1];
-			cur++;
+			DocInfo di = m_pdfs[dcur];
+			di.GetMaxPageSize(psize);
+			if(msize[0] < psize.width) msize[0] = psize.width;
+			if(msize[1] < psize.height) msize[1] = psize.height;
 		}
-		return max;
+		return msize;
 	}
 	public Page GetPage0()
 	{
@@ -668,12 +651,19 @@ public class SuperDoc extends Document
 	@Override
 	public long CreateVNPage(int pageno, int cw, int ch, Bitmap.Config format)
 	{
-		if(hand_val != 0)
-			return VNPage.createFromSuperDoc(hand_val, pageno, cw, ch, format);
-		if(m_docs == null) return 0;
-		int index = lookup_doc(pageno);
-		if( index < 0 ) return 0;
-		return m_docs[index].doc.CreateVNPage(pageno - m_docs[index].page_start, cw,ch, format);
+		int idx = locate_page(pageno);
+		if(idx < 0) return 0;
+		DocInfo dinfo = m_pdfs[idx];
+		int pno = pageno - dinfo.m_pstart;
+		Document doc;
+		if (dinfo.m_doc == null)
+		{
+			doc = new Document();
+			if(doc.Open(dinfo.m_path, dinfo.m_pswd) != 0) return 0;
+			dinfo.m_doc = doc;
+		}
+		doc = dinfo.m_doc;
+		return VNPage.create(doc.hand_val, pno, cw, ch, format);
 	}
 	@Override
 	protected void finalize() throws Throwable

@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="annot_menu_bg_color">#202020</color>
-    <color name="btn_pressed_color">#80FF8000</color>
-    <color name="btn_disabled_color">#80888888</color>
-
+    <color name="annot_menu_bg_color">#280B08</color>
+    <color name="btn_disabled_color">#80050505</color>
+    <color name="btn_pressed_color">#FFFFFF</color>
+    <color name="toolbar_bg_color">#280B08</color>
+    <color name="toolbar_icon_color">#FF9040</color>
+    <color name="gridview_icon_color">#FF9040</color>
+    <color name="tab_bg_color">#E0E0E0</color>
+    <color name="tab_text_color">#202020</color>
+    <color name="menu_bg_color">#E0E0E0</color>
+    <color name="menu_text_color">#202020</color>
+    <color name="bar_bg_color">#F0F0F0</color>
+    <color name="bar_text_color">#202020</color>
+    <color name="panel_bg_color">#202020</color>
+    <color name="panel_text_color">#E0E0E0</color>
+    <color name="cdv_splashscreen_background">#FFFFFF</color>
 </resources>

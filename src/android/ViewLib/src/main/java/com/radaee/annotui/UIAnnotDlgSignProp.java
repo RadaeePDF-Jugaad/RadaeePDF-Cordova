@@ -3,22 +3,13 @@ package com.radaee.annotui;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Sign;
-
 import com.radaee.viewlib.R;
 
 public class UIAnnotDlgSignProp extends UIAnnotDlg {
@@ -52,28 +43,19 @@ public class UIAnnotDlgSignProp extends UIAnnotDlg {
         TextView txt_verify = m_layout.findViewById(R.id.txt_verify);
 
         Sign sign = m_annot.GetSign();
-        txt_issue.setText("Issue: " + sign.GetIssue());
-        txt_subj.setText("Subject: " + sign.GetSubject());
-        txt_ver.setText("Version: " + sign.GetVersion());
-        txt_reason.setText("Reason: " + sign.GetReason());
-        txt_location.setText("Location: " + sign.GetLocation());
-        txt_contact.setText("Contact: " + sign.GetContact());
-        txt_mod.setText("SignTime: " + sign.GetModDateTime());
+        txt_issue.setText("Issue:" + sign.GetIssue());
+        txt_subj.setText("Subject:" + sign.GetSubject());
+        txt_ver.setText("Version:" + sign.GetVersion());
+        txt_reason.setText("Reason:" + sign.GetReason());
+        txt_location.setText("Location:" + sign.GetLocation());
+        txt_contact.setText("Contact:" + sign.GetContact());
+        txt_mod.setText("SignTime:" + sign.GetModDateTime());
         int iret = m_doc.VerifySign(sign);
         if (iret== 0)
-            txt_verify.setText("Verify: OK");
+            txt_verify.setText("Verify:OK");
         else
-            txt_verify.setText("Verify: Changed");
+            txt_verify.setText("Verify:Changed");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialogInterface) {
-                    if(m_callback != null)
-                        m_callback.onCancel();
-                }
-            });
-        }
         AlertDialog dlg = create();
         dlg.show();
     }

@@ -10,15 +10,16 @@ import com.radaee.pdf.Global;
  * Created by Nermeen on 06/12/2017.
  */
 public class PDFLayoutHorz extends PDFLayout {
-
-    public PDFLayoutHorz(Context context) {
+    private boolean m_rtol;
+    public PDFLayoutHorz(Context context, boolean rtol) {
         super(context);
+        m_rtol = rtol;
     }
 
     @Override
     public void vOpen(Document doc, LayoutListener listener) {
         super.vOpen(doc, listener);
-        if(Global.rtol) {
+        if(m_rtol) {
             m_scroller.setFinalX(m_tw);
             m_scroller.computeScrollOffset();
         }
@@ -26,7 +27,7 @@ public class PDFLayoutHorz extends PDFLayout {
 
     @Override
     public void vResize(int cx, int cy) {
-        boolean set = (Global.rtol && (m_w <=0 || m_h <= 0));
+        boolean set = (m_rtol && (m_w <=0 || m_h <= 0));
         super.vResize(cx, cy);
         if( set ) {
             m_scroller.setFinalX(m_tw);
@@ -41,8 +42,8 @@ public class PDFLayoutHorz extends PDFLayout {
         int cnt = m_doc.GetPageCount();
         int cur;
 
-        if(Global.fit_different_page_size && m_scales == null) m_scales = new float[cnt];
-        if(Global.fit_different_page_size && m_scales_min == null) m_scales_min = new float[cnt];
+        if(Global.g_auto_scale && m_scales == null) m_scales = new float[cnt];
+        if(Global.g_auto_scale && m_scales_min == null) m_scales_min = new float[cnt];
 
         m_scale_min = (m_h - m_page_gap) / m_page_maxh;
         m_scale_max = m_scale_min * m_zoom_level;
@@ -53,31 +54,31 @@ public class PDFLayoutHorz extends PDFLayout {
         m_th = (int) (m_page_maxh * m_scale);
         m_tw = 0;
         int x = m_page_gap >> 1;
-        if(Global.rtol) {
+        if(m_rtol) {
             for (cur = cnt - 1; cur >= 0; cur--) {
-                if(Global.fit_different_page_size && m_scales[cur] == 0) {
+                if(Global.g_auto_scale && m_scales[cur] == 0) {
                     m_scales[cur] = ((float)(m_h - m_page_gap)) / m_doc.GetPageHeight(cur);
                     m_scales_min[cur] = ((float)(m_h - m_page_gap)) / m_doc.GetPageHeight(cur);
                 }
-                float pageScale = Global.fit_different_page_size ? m_scales[cur] : m_scale;
+                float pageScale = Global.g_auto_scale ? m_scales[cur] : m_scale;
                 int w = (int) (m_doc.GetPageWidth(cur) * pageScale);
                 int h = (int) (m_doc.GetPageHeight(cur) * pageScale);
-                int y = Global.fit_different_page_size ? m_page_gap >> 1 : ((int) (m_page_maxh * pageScale) + m_page_gap - h) >> 1;
-                boolean clipPage = Global.fit_different_page_size ? pageScale / m_scales_min[cur] > m_zoom_level_clip : clip;
+                int y = Global.g_auto_scale ? m_page_gap >> 1 : ((int) (m_page_maxh * pageScale) + m_page_gap - h) >> 1;
+                boolean clipPage = Global.g_auto_scale ? pageScale / m_scales_min[cur] > m_zoom_level_clip : clip;
                 m_pages[cur].vLayout(x, y, pageScale, clipPage);
                 x += w + m_page_gap;
             }
         } else {
             for (cur = 0; cur < cnt; cur++) {
-                if(Global.fit_different_page_size && m_scales[cur] == 0) {
+                if(Global.g_auto_scale && m_scales[cur] == 0) {
                     m_scales[cur] = ((float)(m_h - m_page_gap)) / m_doc.GetPageHeight(cur);
                     m_scales_min[cur] = ((float)(m_h - m_page_gap)) / m_doc.GetPageHeight(cur);
                 }
-                float pageScale = Global.fit_different_page_size ? m_scales[cur] : m_scale;
+                float pageScale = Global.g_auto_scale ? m_scales[cur] : m_scale;
                 int w = (int) (m_doc.GetPageWidth(cur) * pageScale);
                 int h = (int) (m_doc.GetPageHeight(cur) * pageScale);
-                int y = Global.fit_different_page_size ? m_page_gap >> 1 : ((int) (m_page_maxh * pageScale) + m_page_gap - h) >> 1;
-                boolean clipPage = Global.fit_different_page_size ? pageScale / m_scales_min[cur] > m_zoom_level_clip : clip;
+                int y = Global.g_auto_scale ? m_page_gap >> 1 : ((int) (m_page_maxh * pageScale) + m_page_gap - h) >> 1;
+                boolean clipPage = Global.g_auto_scale ? pageScale / m_scales_min[cur] > m_zoom_level_clip : clip;
                 m_pages[cur].vLayout(x, y, pageScale, clipPage);
                 x += w + m_page_gap;
             }
@@ -92,7 +93,7 @@ public class PDFLayoutHorz extends PDFLayout {
         int left = 0;
         int right = m_pages.length - 1;
         VPage vpage;
-        if(!Global.rtol) {
+        if(!m_rtol) {
             if (vx < m_pages[0].GetX())
                 return 0;
             else if (vx > m_pages[right].GetX())
@@ -104,13 +105,13 @@ public class PDFLayoutHorz extends PDFLayout {
             vpage = m_pages[mid];
             switch (vpage.LocHorz(vx, m_page_gap >> 1)) {
                 case -1:
-                    if(Global.rtol)
+                    if(m_rtol)
                         left = mid + 1;
                     else
                         right = mid - 1;
                     break;
                 case 1:
-                    if(Global.rtol)
+                    if(m_rtol)
                         right = mid - 1;
                     else
                         left = mid + 1;

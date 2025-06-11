@@ -32,7 +32,7 @@ public interface ILayoutView {
         /**
          * call when blank tapped on page, this mean not annotation tapped.
          */
-        void OnPDFBlankTapped();
+        void OnPDFBlankTapped(int pagebo);
 
         /**
          * call select status end.
@@ -45,6 +45,7 @@ public interface ILayoutView {
         void OnPDFOpenMovie(String path);
         void OnPDFOpenSound(int[] paras, String path);
         void OnPDFOpenAttachment(String path);
+        void OnPDFOpenRendition(String path);
         void OnPDFOpen3D(String path);
 
         /**
@@ -56,8 +57,8 @@ public interface ILayoutView {
          * call when zoom end
          */
         void OnPDFZoomEnd();
-        boolean OnPDFDoubleTapped(float x, float y);
-        void OnPDFLongPressed(float x, float y);
+        boolean OnPDFDoubleTapped(int pagebo, float x, float y);
+        void OnPDFLongPressed(int pagebo, float x, float y);
 
         /**
          * call when search finished. each search shall call back each time.
@@ -107,9 +108,9 @@ public interface ILayoutView {
      * 1:horizon<br/>
      * 2:curl effect(opengl only)<br/>
      * 3:single<br/>
-     * 4:Dual<br/>
+     * 4:SingleEx<br/>
      * 5:Reflow(opengl only)<br/>
-     * 6:Dual with cover(1st page single) in landscape mode
+     * 6:show 2 page as 1 page in land scape mode
      */
     void PDFSetView(int vmode);
 
@@ -121,23 +122,7 @@ public interface ILayoutView {
      * 2: cancel Ink status
      */
     void PDFSetInk(int code);
-
-    /**
-     * set Polygon status.
-     * @param code <br/>
-     * 0: set to Polygon status<br/>
-     * 1: end and confirm Polygon status<br/>
-     * 2: cancel Polygon status
-     */
     void PDFSetPolygon(int code);
-
-    /**
-     * set Polyline status.
-     * @param code <br/>
-     * 0: set to Polyline status<br/>
-     * 1: end and confirm Polyline status<br/>
-     * 2: cancel Polyline status
-     */
     void PDFSetPolyline(int code);
 
     /**
@@ -218,10 +203,11 @@ public interface ILayoutView {
     void PDFRedo();
     boolean PDFCanSave();
     boolean PDFSave();
-    void PDFUpdateCurrPage();
-    int PDFGetCurrPage();
-    void PDFAddAnnotRect(float x, float y, float width, float height, int p);
+    void PDFUpdatePage(int pageno);
+    //void PDFAddAnnotRect(float x, float y, float width, float height, int p);
+
 
     int GetScreenX(float pdfX, int pageno);
     int GetScreenY(float pdfY, int pageno);
+
 }

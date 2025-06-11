@@ -27,7 +27,7 @@
         android:clickable="true" >
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/view_vert_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/btn_view_vert" />
@@ -48,7 +48,7 @@
         android:clickable="true" >
 
         <ImageView
-            android:id="@+id/horz"
+            android:id="@+id/view_horz_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/btn_view_horz" />
@@ -69,7 +69,7 @@
         android:clickable="true" >
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/view_single_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/btn_view_single" />
@@ -91,7 +91,7 @@
         android:clickable="true" >
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/view_dual_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/btn_view_dual" />

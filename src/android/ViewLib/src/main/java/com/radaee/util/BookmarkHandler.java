@@ -200,7 +200,7 @@ public class BookmarkHandler {
 
     private static void showPopupMenu(final Context mContext, final AlertDialog mAlertDialog, final BookmarkAdapter adapterView, final View parent,
                                       final int position, final String pdfPath) {
-        View mPopupView = LayoutInflater.from(mContext).inflate(R.layout.bookmark_popup_menu, null);
+        View mPopupView = LayoutInflater.from(mContext).inflate(R.layout.pop_bookmark_menu, null);
         final PopupWindow mPopup = new PopupWindow(mPopupView);
         mPopup.setOutsideTouchable(true);
         final float scale = mContext.getResources().getDisplayMetrics().density;
@@ -258,7 +258,7 @@ public class BookmarkHandler {
             ViewHolder holder;
 
             if (convertView == null) {
-                convertView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.bookmark_row,
+                convertView = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.item_bookmark,
                         viewGroup, false);
                 holder = new ViewHolder();
                 holder.label = (TextView) convertView.findViewById(R.id.label);

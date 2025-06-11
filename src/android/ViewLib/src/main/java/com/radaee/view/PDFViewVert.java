@@ -30,7 +30,7 @@ public class PDFViewVert extends PDFView
         float[] size = m_doc.GetPagesMaxSize();
         float maxw = size[0];
 		m_scale_min = ((float)(m_w - m_page_gap)) / maxw;
-		m_scale_max = m_scale_min * Global.zoomLevel;
+		m_scale_max = m_scale_min * Global.g_view_zoom_level;
 		if( m_scale < m_scale_min ) m_scale = m_scale_min;
 		if( m_scale > m_scale_max ) m_scale = m_scale_max;
 

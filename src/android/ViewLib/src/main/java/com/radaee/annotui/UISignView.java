@@ -3,15 +3,11 @@ package com.radaee.annotui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Matrix;
@@ -23,7 +19,7 @@ public class UISignView extends View {
         super(context);
         init();
     }
-    public UISignView(Context context, @Nullable AttributeSet attrs) {
+    public UISignView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
@@ -31,18 +27,24 @@ public class UISignView extends View {
     private android.graphics.Path m_path_a;
     private Paint m_paint;
     private Paint m_paint_border;
+
     private void init()
     {
         m_path_r = new com.radaee.pdf.Path();
         m_path_a = new android.graphics.Path();
         m_paint = new Paint();
-        m_paint.setColor(0xFF000000);
+
+        int cBack = Color.BLUE;
+        int cBorder = Color.BLACK;
+
+        m_paint.setColor(cBack);
+        m_paint.setAlpha(255);
         m_paint.setStyle(Paint.Style.STROKE);
         m_paint.setStrokeWidth(2);
         m_paint.setStrokeJoin(Paint.Join.ROUND);
         m_paint.setStrokeCap(Paint.Cap.ROUND);
         m_paint_border = new Paint();
-        m_paint_border.setColor(0xFF000000);
+        m_paint_border.setColor(cBorder);
         m_paint_border.setStyle(Paint.Style.STROKE);
         m_paint_border.setStrokeWidth(1);
     }
@@ -60,12 +62,14 @@ public class UISignView extends View {
     {
         return m_path_r;
     }
+
     public Bitmap SignGetBmp()
     {
         Bitmap bmp = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         draw(new Canvas(bmp));
         return bmp;
     }
+
     public Document.DocForm SignMakeForm(Document doc, Page.Annotation annot)
     {
         if (m_path_a.isEmpty()) return null;

@@ -7,7 +7,7 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +69,7 @@ public class UILStyleButton extends Button {
         vw_lstyle.setDash(new float[]{16, 2, 4, 2});
         vw_lstyle.setOnClickListener(listener);
 
-        m_popup = new UIAnnotPop(m_layout, Dp2Px(120), Dp2Px(m_layout.getChildCount() * 30));
+        m_popup = new UIAnnotPop(m_layout, Dp2Px(90), Dp2Px(m_layout.getChildCount() * 25));
         m_popup.setFocusable(true);
         m_popup.setTouchable(true);
         m_popup.setBackgroundDrawable(new ColorDrawable(0));

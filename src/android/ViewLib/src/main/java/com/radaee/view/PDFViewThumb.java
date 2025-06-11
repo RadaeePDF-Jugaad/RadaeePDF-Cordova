@@ -23,7 +23,7 @@ public class PDFViewThumb extends PDFView {
     private int m_orientation = 0;
     private int m_sel = 0;
     private int mThumbHeight = 0;
-    private Paint m_sel_paint = new Paint();//to avoid allocation.
+    private final Paint m_sel_paint = new Paint();//to avoid allocation.
     private PDFThumbListener m_tlistener;
 
     @Override
@@ -88,34 +88,33 @@ public class PDFViewThumb extends PDFView {
     @Override
     protected void vLayout() {
         if (m_doc == null || m_w <= m_page_gap || m_h <= m_page_gap) return;
-        int cur = 0;
+        int cur;
         int cnt = m_doc.GetPageCount();
         float[] size = m_doc.GetPagesMaxSize();
         if (m_orientation == 0)//horz
         {
             float maxh = size[1];
             m_scale_min = ((float) (m_h - m_page_gap)) / maxh;
-            m_scale_max = m_scale_min * Global.zoomLevel;
+            m_scale_max = m_scale_min * Global.g_view_zoom_level;
             m_scale = m_scale_min;
 
             if (m_pages == null) m_pages = new PDFVPage[cnt];
             int left = m_w / 2;
             int top = m_page_gap / 2;
-            cur = 0;
             m_docw = 0;
             m_doch = 0;
-            while (cur < cnt) {
+            for (cur = 0; cur < cnt; cur++) {
                 if (m_pages[cur] == null) m_pages[cur] = new PDFVPage(m_doc, cur);
-                m_pages[cur].SetRect(left, top, m_scale);
-                left += m_pages[cur].GetWidth() + m_page_gap;
-                if (m_doch < m_pages[cur].GetHeight()) m_doch = m_pages[cur].GetHeight();
-                cur++;
+                PDFVPage vp = m_pages[cur];
+                vp.SetRect(left, top, m_scale);
+                left += vp.GetWidth() + m_page_gap;
+                if (m_doch < vp.GetHeight()) m_doch = vp.GetHeight();
             }
             m_docw = left + m_w / 2;
         } else if (m_orientation == 2) { //RTOL horizontal
             float maxh = size[1];
             m_scale_min = ((float) (m_h - m_page_gap)) / maxh;
-            m_scale_max = m_scale_min * Global.zoomLevel;
+            m_scale_max = m_scale_min * Global.g_view_zoom_level;
             m_scale = m_scale_min;
 
             if (m_pages == null) m_pages = new PDFVPage[cnt];
@@ -126,9 +125,10 @@ public class PDFViewThumb extends PDFView {
             m_doch = 0;
             while (cur >= 0) {
                 if (m_pages[cur] == null) m_pages[cur] = new PDFVPage(m_doc, cur);
-                m_pages[cur].SetRect(left, top, m_scale);
-                left += m_pages[cur].GetWidth() + m_page_gap;
-                if (m_doch < m_pages[cur].GetHeight()) m_doch = m_pages[cur].GetHeight();
+                PDFVPage vp = m_pages[cur];
+                vp.SetRect(left, top, m_scale);
+                left += vp.GetWidth() + m_page_gap;
+                if (m_doch < vp.GetHeight()) m_doch = vp.GetHeight();
                 cur--;
             }
             m_docw = left + m_w / 2;
@@ -136,27 +136,26 @@ public class PDFViewThumb extends PDFView {
         {
             float maxw = size[0];
             m_scale_min = ((float) (m_w - m_page_gap)) / maxw;
-            m_scale_max = m_scale_min * Global.zoomLevel;
+            m_scale_max = m_scale_min * Global.g_view_zoom_level;
             m_scale = m_scale_min;
 
             if (m_pages == null) m_pages = new PDFVPage[cnt];
             int left = m_page_gap / 2;
             int top = m_h / 2;
-            cur = 0;
             m_docw = 0;
             m_doch = 0;
-            while (cur < cnt) {
+            for (cur = 0; cur < cnt; cur++) {
                 if (m_pages[cur] == null) m_pages[cur] = new PDFVPage(m_doc, cur);
-                m_pages[cur].SetRect(left, top, m_scale);
-                top += m_pages[cur].GetHeight() + m_page_gap;
-                if (m_docw < m_pages[cur].GetWidth()) m_docw = m_pages[cur].GetWidth();
-                cur++;
+                PDFVPage vp = m_pages[cur];
+                vp.SetRect(left, top, m_scale);
+                top += vp.GetHeight() + m_page_gap;
+                if (m_docw < vp.GetWidth()) m_docw = vp.GetWidth();
             }
             m_doch = top + m_h / 2;
         } else if (m_orientation == 3) { //Grid
             float maxh = size[1];
             m_scale_min = mThumbHeight / maxh;
-            m_scale_max = m_scale_min * Global.zoomLevel;
+            m_scale_max = m_scale_min * Global.g_view_zoom_level;
             m_scale = m_scale_min;
 
             if (m_pages == null) m_pages = new PDFVPage[cnt];
@@ -168,20 +167,19 @@ public class PDFViewThumb extends PDFView {
 
             int left = x;
             int top = m_page_gap / 2;
-            cur = 0;
             m_docw = 0;
             m_doch = 0;
-            while (cur < cnt) {
+            for (cur = 0; cur < cnt; cur++) {
                 if (m_pages[cur] == null) m_pages[cur] = new PDFVPage(m_doc, cur);
-                m_pages[cur].SetRect(left, top, m_scale);
-                if (left + m_pages[cur].GetWidth() + m_page_gap > columnWidth * columns + x) {
-                    top += m_pages[cur].GetHeight() + m_page_gap;
+                PDFVPage vp = m_pages[cur];
+                vp.SetRect(left, top, m_scale);
+                if (left + vp.GetWidth() + m_page_gap > columnWidth * columns + x) {
+                    top += vp.GetHeight() + m_page_gap;
                     left = x;
                 } else
-                    left += m_pages[cur].GetWidth() + m_page_gap;
+                    left += vp.GetWidth() + m_page_gap;
 
-                if (m_docw < m_pages[cur].GetWidth()) m_docw = m_pages[cur].GetWidth();
-                cur++;
+                if (m_docw < vp.GetWidth()) m_docw = vp.GetWidth();
             }
             if (cnt % columns != 0 && columns < cnt)
                 top += maxh + m_page_gap;
@@ -193,11 +191,12 @@ public class PDFViewThumb extends PDFView {
     @Override
     protected int vGetPage(int vx, int vy) {
         if (m_pages == null || m_pages.length <= 0) return -1;
+        int curx = m_scroller.getCurrX();
         if (m_orientation == 0)//ltor
         {
             int left = 0;
             int right = m_pages.length - 1;
-            int x = m_scroller.getCurrX() + vx;
+            int x = curx + vx;
             int gap = m_page_gap >> 1;
             while (left <= right) {
                 int mid = (left + right) >> 1;
@@ -216,7 +215,7 @@ public class PDFViewThumb extends PDFView {
         {
             int left = 0;
             int right = m_pages.length - 1;
-            int x = m_scroller.getCurrX() + vx;
+            int x = curx + vx;
             int gap = m_page_gap >> 1;
             while (left <= right) {
                 int mid = (left + right) >> 1;
@@ -239,7 +238,7 @@ public class PDFViewThumb extends PDFView {
 
             int left = 0;
             int right = m_pages.length - 1;
-            int x = m_scroller.getCurrX() + vx;
+            int x = curx + vx;
             if (x == 0) x = startX;
             int y = m_scroller.getCurrY() + vy;
             int gap = m_page_gap >> 1;
@@ -264,7 +263,7 @@ public class PDFViewThumb extends PDFView {
         } else {
             int left = 0;
             int right = m_pages.length - 1;
-            int y = m_scroller.getCurrY() + vy;
+            int y = curx + vy;
             int gap = m_page_gap >> 1;
             while (left <= right) {
                 int mid = (left + right) >> 1;
@@ -282,132 +281,171 @@ public class PDFViewThumb extends PDFView {
         }
     }
 
+    private int getDuration2(int dis)
+    {
+        int dur = (dis > 0) ? dis : (-dis);
+        if (dur < 100) return 100;
+        if (dur > 3000) return 3000;
+        return dur;
+    }
     @Override
     protected boolean vOnFling(float dx, float dy, float velocityX, float velocityY) {
         if (m_pages == null) return false;
         int x = m_scroller.getCurrX();
         int y = m_scroller.getCurrY();
-        x -= velocityX * Global.fling_dis / 2;
-        y -= velocityY * Global.fling_dis / 2;
+        x -= velocityX * Global.fling_dis * 0.5f;//to avoid divide
+        y -= velocityY * Global.fling_dis * 0.5f;//to avoid divide
         int pcur = 0;
         if (m_orientation == 0) {
             while (pcur < m_pages.length) {
-                if (x < m_pages[pcur].m_x + m_pages[pcur].m_w) {
-                    x = m_pages[pcur].m_x + m_pages[pcur].m_w / 2 - m_w / 2;
+                PDFVPage vp = m_pages[pcur];
+                if (x < vp.m_x + vp.m_w) {
+                    x = vp.m_x + vp.m_w / 2 - m_w / 2;
                     x -= m_scroller.getCurrX();
-                    m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, 3000);
+                    m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, getDuration2(x));
                     break;
                 }
                 pcur++;
             }
             if (pcur == m_pages.length) {
                 pcur--;
-                x = m_pages[pcur].m_x + m_pages[pcur].m_w / 2 - m_w / 2;
+                PDFVPage vp = m_pages[pcur];
+                x = vp.m_x + vp.m_w / 2 - m_w / 2;
                 x -= m_scroller.getCurrX();
-                m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, 3000);
+                m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, getDuration2(x));
             }
-            y = 0;
         } else if (m_orientation == 2) {
             while (pcur < m_pages.length) {
-                if (x > m_pages[pcur].m_x) {
-                    x = m_pages[pcur].m_x + m_pages[pcur].m_w / 2 - m_w / 2;
+                PDFVPage vp = m_pages[pcur];
+                if (x > vp.m_x) {
+                    x = vp.m_x + vp.m_w / 2 - m_w / 2;
                     x -= m_scroller.getCurrX();
-                    m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, 3000);
+                    m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, getDuration2(x));
                     break;
                 }
                 pcur++;
             }
             if (pcur == m_pages.length) {
                 pcur--;
-                x = m_pages[pcur].m_x + m_pages[pcur].m_w / 2 - m_w / 2;
+                PDFVPage vp = m_pages[pcur];
+                x = vp.m_x + vp.m_w / 2 - m_w / 2;
                 x -= m_scroller.getCurrX();
-                m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, 3000);
+                m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), x, 0, getDuration2(x));
             }
-            y = 0;
         } else {
             while (pcur < m_pages.length) {
-                if (y < m_pages[pcur].m_y + m_pages[pcur].m_h) {
-                    y = m_pages[pcur].m_y + m_pages[pcur].m_h / 2 - m_h / 2;
+                PDFVPage vp = m_pages[pcur];
+                if (y < vp.m_y + vp.m_h) {
+                    y = vp.m_y + vp.m_h / 2 - m_h / 2;
                     y -= m_scroller.getCurrY();
-                    m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, y, 3000);
+                    m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, y, getDuration2(y));
                     break;
                 }
                 pcur++;
             }
             if (pcur == m_pages.length) {
                 pcur--;
-                y = m_pages[pcur].m_y + m_pages[pcur].m_h / 2 - m_h / 2;
+                PDFVPage vp = m_pages[pcur];
+                y = vp.m_y + vp.m_h / 2 - m_h / 2;
                 y -= m_scroller.getCurrY();
-                m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, y, 3000);
+                m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, y, getDuration2(y));
             }
-            x = 0;
         }
         return true;
     }
-
+    private int getDuration(int dis)
+    {
+        int dur = (dis > 0) ? dis >> 1 : (-dis) >> 1;
+        if (dur < 100) return 100;
+        if (dur > 1000) return 1000;
+        return dur;
+    }
     @Override
     protected void vOnMoveEnd(int x, int y) {
-        int pageno = vGetPage(m_w / 2, m_h / 2);
+        int pageno = vGetPage(m_w >> 1, m_h >> 1);
         if (m_pages == null) return;
+        PDFVPage vp = m_pages[pageno];
         if (m_orientation == 0 || m_orientation == 2) {
-            int nx = m_pages[pageno].m_x + m_pages[pageno].m_w / 2 - m_w / 2;
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), nx - x, 0, 1000);
+            int nx = vp.m_x + ((vp.m_w - m_w) >> 1);
+            int dx = nx - x;
+            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), nx - x, 0, getDuration(dx));
 
         } else if (m_orientation == 1) {
-            int ny = m_pages[pageno].m_y + m_pages[pageno].m_h / 2 - m_h / 2;
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - y, 1000);
+            int ny = vp.m_y + ((vp.m_h - m_h) >> 1);
+            int dy = ny - y;
+            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - y, getDuration(dy));
         }
     }
-
     @Override
-    protected void vSingleTap(float x, float y) {
-        if (m_doc == null || m_pages == null) return;
+    protected boolean vSingleTap(float x, float y) {
+        if (m_doc == null || m_pages == null) return false;
         int pageno = vGetPage((int) x, (int) y);
-        if ((x < m_pages[pageno].m_x || x > m_pages[pageno].m_x + m_pages[pageno].m_w) && m_orientation == 3)
-            return;
+        PDFVPage vp = m_pages[pageno];
+        if (m_orientation == 3 && (x < vp.m_x || x > vp.m_x + vp.m_w)) return false;
         m_sel = pageno;
-        if (m_tlistener != null)
-            m_tlistener.OnPageClicked(m_sel);
+        if (m_tlistener != null) m_tlistener.OnPageClicked(m_sel);
         if (m_orientation == 0 || m_orientation == 2) {
-            int nx = m_pages[pageno].m_x + m_pages[pageno].m_w / 2 - m_w / 2;
+            int nx = vp.m_x + ((vp.m_w - m_w) >> 1);
             int oldx = m_scroller.getCurrX();
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), nx - oldx, 0, 1000);
+            int dx = nx - oldx;
+            m_scroller.startScroll(oldx, m_scroller.getCurrY(), dx, 0, getDuration(dx));
         } else if (m_orientation == 3) {
-            int ny = m_pages[pageno].m_y + m_pages[pageno].m_h / 2 - m_h / 2;
+            int ny = vp.m_y + ((vp.m_h - m_h) >> 1);
             int oldy = m_scroller.getCurrY();
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - oldy, 1000);
+            int dy = ny - oldy;
+            m_scroller.startScroll(m_scroller.getCurrX(), oldy, 0, dy, getDuration(dy));
         } else if (m_orientation == 1) {
-            int ny = m_pages[pageno].m_y + m_pages[pageno].m_h / 2 - m_h / 2;
+            int ny = vp.m_y + ((vp.m_h - m_h) >> 1);
             int oldy = m_scroller.getCurrY();
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - oldy, 1000);
+            int dy = ny - oldy;
+            m_scroller.startScroll(m_scroller.getCurrX(), oldy, 0, dy, getDuration(dy));
         }
         if (m_listener != null)
             m_listener.OnPDFInvalidate(false);
+        return true;
     }
 
     /**
      * set selected page, and then scroll to this page.
      *
-     * @param pageno
+     * @param pageno 0 baed page NO.
      */
-    public void vSetSel(int pageno) {
+    public void vSetSel(int pageno, boolean is_shown) {
         if (m_pages == null) return;
         if (pageno < 0) pageno = 0;
         if (pageno >= m_pages.length) pageno = m_pages.length - 1;
         m_sel = pageno;
+        PDFVPage vp = m_pages[pageno];
         if (m_orientation == 0 || m_orientation == 2) {
-            int nx = m_pages[pageno].m_x + m_pages[pageno].m_w / 2 - m_w / 2;
+            int nx = vp.m_x + ((vp.m_w - m_w) >> 1);
             int oldx = m_scroller.getCurrX();
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), nx - oldx, 0, 1000);
-
+            if (!is_shown)
+            {
+                m_scroller.startScroll(0,0,0,0, 0);
+                m_scroller.computeScrollOffset();
+                m_scroller.setFinalX(nx);
+            }
+            else m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), nx - oldx, 0, 1000);
         } else if (m_orientation == 3) {
-            int ny = m_pages[pageno].m_y + m_pages[pageno].m_h / 2 - m_h / 2;
+            int ny = vp.m_y + ((vp.m_h - m_h) >> 1);
             int oldy = m_scroller.getCurrY();
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - oldy, 1000);
+            if (!is_shown)
+            {
+                m_scroller.startScroll(0,0,0,0, 0);
+                m_scroller.computeScrollOffset();
+                m_scroller.setFinalY(ny);
+            }
+            else m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - oldy, 1000);
         } else if (m_orientation == 1) {
-            int ny = m_pages[pageno].m_y + m_pages[pageno].m_h / 2 - m_h / 2;
+            int ny = vp.m_y + ((vp.m_h - m_h) >> 1);
             int oldy = m_scroller.getCurrY();
-            m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - oldy, 1000);
+            if (!is_shown)
+            {
+                m_scroller.startScroll(0,0,0,0, 0);
+                m_scroller.computeScrollOffset();
+                m_scroller.setFinalY(ny);
+            }
+            else m_scroller.startScroll(m_scroller.getCurrX(), m_scroller.getCurrY(), 0, ny - oldy, 1000);
         }
         if (m_listener != null)
             m_listener.OnPDFInvalidate(false);
@@ -461,7 +499,7 @@ public class PDFViewThumb extends PDFView {
     @Override
     public void vDraw(Canvas canvas) {
         if (m_pages == null) return;
-        m_sel_paint.setColor(Global.selColor);
+        m_sel_paint.setColor(Global.g_sel_color);
         int left = m_scroller.getCurrX();
         int top = m_scroller.getCurrY();
         int left1 = left;
@@ -478,8 +516,6 @@ public class PDFViewThumb extends PDFView {
             m_scroller.setFinalY(top1);
             top = top1;
         }
-        int right = left + m_w;
-        int bottom = top + m_h;
         vFlushRange();
         int cur = m_prange_start;
         int end = m_prange_end;
@@ -492,17 +528,18 @@ public class PDFViewThumb extends PDFView {
             vpage.Draw(m_draw_bmp, left, top);
             cur++;
         }
-        if (Global.dark_mode) {
+        if (Global.g_dark_mode) {
             m_draw_bmp.Invert();
         }
         m_draw_bmp.Free(m_bmp);
         canvas.drawBitmap(m_bmp, 0, 0, null);
 
         if (m_pages == null || m_sel < 0 || m_sel >= m_pages.length) return;
-        left = m_pages[m_sel].GetVX(m_scroller.getCurrX());
-        top = m_pages[m_sel].GetVY(m_scroller.getCurrY());
-        right = left + m_pages[m_sel].GetWidth();
-        bottom = top + m_pages[m_sel].GetHeight();
+        PDFVPage vp = m_pages[m_sel];
+        left = vp.GetVX(m_scroller.getCurrX());
+        top = vp.GetVY(m_scroller.getCurrY());
+        int right = left + vp.GetWidth();
+        int bottom = top + vp.GetHeight();
         canvas.drawRect(left, top, right, bottom, m_sel_paint);
         if (m_listener != null) {
             cur = m_prange_start;

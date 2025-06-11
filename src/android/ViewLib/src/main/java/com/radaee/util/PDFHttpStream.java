@@ -179,12 +179,12 @@ public class PDFHttpStream implements PDFStream
 	Inner class.<br/>
 	developer should not use this.
 	*/
-	protected class HttpThread extends Thread
+	protected static class HttpThread extends Thread
 	{
 		private Handler m_hand = null;
 		private boolean is_notified = false;
 		private boolean is_waitting = false;
-		private class OP
+		private static class OP
 		{
 			PDFHttpStream stream;
 			int para1;

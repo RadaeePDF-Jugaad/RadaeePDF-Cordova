@@ -28,10 +28,10 @@ public class Ink
 	 * constructor for ink.
 	 * @param line_w width of line.
 	 */
-	public Ink( float line_w )
+	public Ink( float line_w, int ink_color )
 	{
 		width = line_w;
-		color = Global.inkColor;
+		color = ink_color;
 		hand = create( line_w, color, 1 );
         m_paint.setStrokeCap(Cap.ROUND);
         m_paint.setStrokeJoin(Join.ROUND);

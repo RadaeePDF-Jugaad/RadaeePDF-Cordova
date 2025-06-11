@@ -2,7 +2,6 @@ package com.radaee.pdf;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.radaee.pdf.adv.Obj;
 import com.radaee.pdf.adv.Ref;
@@ -27,7 +26,7 @@ public class Document
 		 * (ret_flag[0]&2) tell native library to apply italic effect by program.<br/>
 		 * @return full path name to font file, or null if using native default font.
 		 */
-		public String GetExtFont(String collection, String fname, int flag, int[] ret_flags);
+		String GetExtFont(String collection, String fname, int flag, int[] ret_flags);
 	}
 	public interface PDFJSDelegate
 	{
@@ -83,29 +82,29 @@ public class Document
 		 * check whether the stream is writable 
 		 * @return true or false
 		 */
-		public boolean writeable();
+		boolean writeable();
 		/**
 		 * get stream length.
 		 * @return
 		 */
-		public int get_size();
+		int get_size();
 		/**
 		 * read data from stream
 		 * @param data output values.
 		 * @return bytes read
 		 */
-		public int read( byte[] data );
+		int read( byte[] data );
 		/**
 		 * write data to stream
 		 * @param data data to write
 		 * @return bytes written
 		 */
-		public int write( byte[] data );
+		int write( byte[] data );
 		/**
 		 * seek to position
 		 * @param pos position from begin of the stream
 		 */
-		public void seek( int pos );
+		void seek( int pos );
 		/**
 		 * tell current position
 		 * @return position from begin of the stream
@@ -118,6 +117,19 @@ public class Document
 		{
 			hand = value;
 			m_doc = doc;
+		}
+		/**
+		 * import a page to the document.<br/>
+		 * a premium license is required for this method.<br/>
+		 * do not forget to invoke ImportContext.Destroy() after all pages are imported.
+		 * @param srcno 0 based page NO. from source Document that passed to ImportStart.
+		 * @param dstno 0 based page NO. to insert in this document object.
+		 * @return true or false.
+		 */
+		public boolean ImportPage( int srcno, int dstno )
+		{
+			if (hand == 0) return false;
+			return Document.importPage(m_doc.hand_val, hand, srcno, dstno);
 		}
 		/**
 		 * Destroy context object and free memory used.
@@ -239,16 +251,16 @@ public class Document
 	protected long hand_val = 0;
 	private static native void setOpenFlag(int flag);
 	private static native long create( String path );
-	private static native long createForStream( PDFStream stream ) throws Exception;
-	private static native long open( String path, String password ) throws Exception;
-	private static native long openMem( byte[] data, String password ) throws Exception;
-	private static native long openStream( PDFStream stream, String password ) throws Exception;
-	private static native long openWithCert( String path, String cert_file, String password ) throws Exception;
-	private static native long openMemWithCert( byte[] data, String cert_file, String password ) throws Exception;
-	private static native long openStreamWithCert( PDFStream stream, String cert_file, String password ) throws Exception;
+	private static native long createForStream( PDFStream stream );
+	private static native long open( String path, String password );
+	private static native long openMem( byte[] data, String password );
+	private static native long openStream( PDFStream stream, String password );
+	private static native long openWithCert( String path, String cert_file, String password );
+	private static native long openMemWithCert( byte[] data, String cert_file, String password );
+	private static native long openStreamWithCert( PDFStream stream, String cert_file, String password );
 	private static native int getLinearizedStatus(long hand);
 	private static native boolean setCache( long hand, String path );
-	private static native boolean runJS(long hand, String js, PDFJSDelegate del) throws Exception;
+	private static native boolean runJS(long hand, String js, PDFJSDelegate del);
 	private static native void setFontDel( long hand, PDFFontDelegate del );
 	private static native int getEFCount( long hand );
 	private static native String getEFName( long hand, int index );
@@ -286,13 +298,13 @@ public class Document
 	private static native String getXMP(long hand);
 	private static native boolean setXMP(long hand, String xmp);
 	private static native boolean canSave( long hand );
-	private static native boolean save( long hand ) throws Exception;
-	private static native boolean saveAs( long hand, String dst, boolean rem_sec ) throws Exception;//remove security info and save to another file.
-	private static native boolean encryptAs( long hand, String dst, String upswd, String opswd, int perm, int method, byte[] id) throws Exception;
+	private static native boolean save( long hand );
+	private static native boolean saveAs( long hand, String dst, boolean rem_sec );//remove security info and save to another file.
+	private static native boolean encryptAs( long hand, String dst, String upswd, String opswd, int perm, int method, byte[] id);
 	private static native boolean isEncrypted( long hand );
 
 	private static native long importStart( long hand, long hand_src );
-	private static native boolean importPage( long hand, long ctx, int srcno, int dstno ) throws Exception;
+	private static native boolean importPage( long hand, long ctx, int srcno, int dstno );
 	private static native void importEnd( long hand, long ctx );
 	private static native long newPage( long hand, int pageno, float w, float h );
 	private static native boolean removePage( long hand, int pageno );
@@ -307,6 +319,7 @@ public class Document
 	private static native boolean setGStateStrokeDash(long hand, long gstate, float[] dash, float phase);
 	private static native boolean setGStateBlendMode(long hand, long state, int bmode);
 	private static native long newImage( long hand, Bitmap bmp, boolean has_alpha );
+	private static native long newImage2( long hand, Bitmap bmp, int matte );
 	private static native long newImageJPEG( long hand, String path );
 	private static native long newImageJPEGByArray( long hand, byte[] data, int length );
 	private static native long newImageJPX( long hand, String path );
@@ -333,7 +346,7 @@ public class Document
 		if(ret == 0) return null;
 		return new Ref(ret);
 	}
-	static private final Obj adv_create_obj(long ret)
+	static private Obj adv_create_obj(long ret)
 	{
 		if(ret == 0) return null;
 		return new Obj(ret);
@@ -1293,29 +1306,6 @@ public class Document
 		else return null;
 	}
 	/**
-	 * import a page to the document.<br/>
-	 * a premium license is required for this method.<br/>
-	 * do not forget to invoke ImportContext.Destroy() after all pages are imported.
-	 * @param ctx context object created from ImportStart
-	 * @param srcno 0 based page NO. from source Document that passed to ImportStart.
-	 * @param dstno 0 based page NO. to insert in this document object.
-	 * @return true or false.
-	 */
-	public boolean ImportPage( ImportContext ctx, int srcno, int dstno )
-	{
-		if( ctx == null ) return false;
-		try {
-			boolean ret = importPage(hand_val, ctx.hand, srcno, dstno);
-			//modified by radaee.
-			return ret;
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			return false;
-		}
-	}
-	/**
 	 * insert a page to Document<br/>
 	 * if pagheno >= page_count, it do same as append.<br/>
 	 * otherwise, insert to pageno.<br/>
@@ -1410,6 +1400,25 @@ public class Document
 	public DocImage NewImage( Bitmap bmp, boolean has_alpha )
 	{
 		long ret = newImage(hand_val, bmp, has_alpha);
+		if( ret != 0 )
+		{
+			DocImage img = new DocImage();
+			img.hand = ret;
+			return img;
+		}
+		else return null;
+	}
+
+	/**
+	 * create an image from Bitmap object.<br/>
+	 * this method will generate an image with alpha channel.
+	 * @param bmp Bitmap object in ARGB_8888/ARGB_4444 format
+	 * @param matte matte value.
+	 * @return DocImage object or null.
+	 */
+	public DocImage NewImage( Bitmap bmp, int matte )
+	{
+		long ret = newImage2(hand_val, bmp, matte);
 		if( ret != 0 )
 		{
 			DocImage img = new DocImage();

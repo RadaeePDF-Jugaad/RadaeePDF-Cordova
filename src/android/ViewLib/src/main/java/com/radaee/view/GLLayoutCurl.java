@@ -134,6 +134,8 @@ public class GLLayoutCurl extends GLLayout {
                         m_timer = null;
                         ttmp.cancel();
                     }
+                    if (m_listener != null)
+                        m_listener.OnRedraw();
                 }
             }, 20, 20);
         }

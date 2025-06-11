@@ -376,7 +376,7 @@ public class PDFViewCurl extends PDFView
 					m_finder.find_draw(m_draw_bmp, m_pages[cur], 0, 0);
 				cur++;
 			}
-			if( Global.dark_mode ) m_draw_bmp.Invert();
+			if( Global.g_dark_mode ) m_draw_bmp.Invert();
 			m_draw_bmp.Free(m_bmp);
 			disp_end = cur;
 			int cnt = m_pages.length;
@@ -445,7 +445,7 @@ public class PDFViewCurl extends PDFView
 						m_finder.find_draw_to_dib(m_dib2, m_pages[cur], 0, 0);
 					cur++;
 				}
-				if( Global.dark_mode )
+				if( Global.g_dark_mode )
 					Global.DrawScroll(m_bmp, m_dib1, m_dib2, (int)m_holdx, (int)m_holdy, -m_hold_style, mBackSideClr);
 				else
 					Global.DrawScroll(m_bmp, m_dib1, m_dib2, (int)m_holdx, (int)m_holdy, m_hold_style, mBackSideClr);
@@ -454,7 +454,7 @@ public class PDFViewCurl extends PDFView
 			{
 				m_draw_bmp.Create(m_bmp);
 				m_dib1.DrawToBmp(m_draw_bmp, 0, 0);
-		        if( Global.dark_mode ) m_draw_bmp.Invert();
+		        if( Global.g_dark_mode ) m_draw_bmp.Invert();
 		        m_draw_bmp.Free(m_bmp);
 			}
 			disp_end = cur;

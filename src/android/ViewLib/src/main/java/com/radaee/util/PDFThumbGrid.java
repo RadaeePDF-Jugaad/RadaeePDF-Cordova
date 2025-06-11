@@ -2,7 +2,7 @@ package com.radaee.util;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
@@ -20,7 +20,7 @@ public class PDFThumbGrid extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.thumb_grid_view);
+        setContentView(R.layout.pdf_thumb_grid_view);
 
         PDFThumbView mThumbView = findViewById(R.id.thumb_view);
         mThumbView.thumbOpen(mDoc, new PDFViewThumb.PDFThumbListener() {

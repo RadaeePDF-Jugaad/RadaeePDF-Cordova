@@ -10,15 +10,15 @@ import com.radaee.util.ComboList;
 import com.radaee.viewlib.R;
 
 public class UIAnnotPopCombo extends UIAnnotPop {
-    private ComboList m_combo;
+    private final ComboList m_combo;
     private int m_combo_item;
     public UIAnnotPopCombo(View parent) {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.pop_combo, null));
         m_combo = (ComboList) findView(R.id.annot_combo);
     }
-    public void update(Page.Annotation annot, float annot_rect[])
+    public void update(Page.Annotation annot, float[] annot_rect)
     {
-        String opts[] = new String[annot.GetComboItemCount()];
+        String[] opts = new String[annot.GetComboItemCount()];
         int cur = 0;
         while (cur < opts.length) {
             opts[cur] = annot.GetComboItem(cur);

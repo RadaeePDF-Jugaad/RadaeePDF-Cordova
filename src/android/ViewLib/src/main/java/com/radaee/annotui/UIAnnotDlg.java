@@ -1,7 +1,6 @@
 package com.radaee.annotui;
 
 import android.app.AlertDialog;
-import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.radaee.pdf.Page;

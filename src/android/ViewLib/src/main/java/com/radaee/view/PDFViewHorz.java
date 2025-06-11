@@ -47,7 +47,7 @@ public class PDFViewHorz extends PDFView
         float[] size = m_doc.GetPagesMaxSize();
 		float maxh = size[1];
 		m_scale_min = ((float)(m_h - m_page_gap)) / maxh;
-		m_scale_max = m_scale_min * Global.zoomLevel;
+		m_scale_max = m_scale_min * Global.g_view_zoom_level;
 		if( m_scale < m_scale_min ) m_scale = m_scale_min;
 		if( m_scale > m_scale_max ) m_scale = m_scale_max;
 

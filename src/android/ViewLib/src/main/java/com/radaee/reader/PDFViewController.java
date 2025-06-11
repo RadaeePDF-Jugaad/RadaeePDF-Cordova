@@ -3,6 +3,7 @@ package com.radaee.reader;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
@@ -27,7 +28,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Page;
 import com.radaee.pdf.Page.Annotation;
@@ -59,62 +59,62 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     static final public int NOT_MODIFIED = 0;
     static final public int MODIFIED_NOT_SAVED = 1;
     static final public int MODIFIED_AND_SAVED = 2;
-    static private int sFileState = NOT_MODIFIED;
     static public final int BAR_NONE = 0;
     static public final int BAR_CMD = 1;
     static public final int BAR_ANNOT = 2;
     static public final int BAR_FIND = 3;
     static public final int NAVIGATION_THUMBS = 0;
     static public final int NAVIGATION_SEEK = 1;
+    static private int sFileState = NOT_MODIFIED;
     private int m_bar_status = 0;
-    private int mNavigationMode = Global.navigationMode;
-    private RelativeLayout m_parent;
-    private ILayoutView m_view;
-    private PDFTopBar m_bar_cmd;
-    private PDFTopBar m_bar_find;
-    private PDFTopBar m_bar_annot;
+    private int mNavigationMode = Global.g_navigation_mode;
+    private final RelativeLayout m_parent;
+    private final ILayoutView m_view;
+    private final PDFTopBar m_bar_cmd;
+    private final PDFTopBar m_bar_find;
+    private final PDFTopBar m_bar_annot;
     private PDFBotBar m_bar_seek;
     private PDFBotBar m_thumb_view;
-    private PDFMenu m_menu_view;
-    private PDFMenu m_menu_more;
-    private ImageView btn_view;
-    private ImageView btn_find;
-    private ImageView btn_annot;
-    private ImageView btn_select;
-    private ImageView btn_outline;
-    private ImageView btn_undo;
-    private ImageView btn_redo;
-    private ImageView btn_more;
-    private View btn_pages_list;
-    private View btn_add_bookmark;
-    private View btn_show_bookmarks;
-    private View btn_save;
-    private View btn_print;
-    private View btn_share;
-    private ImageView btn_find_back;
-    private ImageView btn_find_prev;
-    private ImageView btn_find_next;
-    private ImageView btn_annot_back;
-    private ImageView btn_annot_ink;
-    private ImageView btn_annot_line;
-    private ImageView btn_annot_rect;
-    private ImageView btn_annot_oval;
-    private ImageView btn_annot_stamp;
-    private ImageView btn_annot_note;
-    private ImageView btn_annot_editbox;
-    private ImageView btn_annot_polygon;
-    private ImageView btn_annot_polyline;
-    private EditText edit_find;
+    private final PDFMenu m_menu_view;
+    private final PDFMenu m_menu_more;
+    private final ImageView btn_view;
+    private final ImageView btn_find;
+    private final ImageView btn_annot;
+    private final ImageView btn_select;
+    private final ImageView btn_outline;
+    private final ImageView btn_undo;
+    private final ImageView btn_redo;
+    private final ImageView btn_more;
+    private final View btn_pages_list;
+    private final View btn_add_bookmark;
+    private final View btn_show_bookmarks;
+    private final View btn_save;
+    private final View btn_print;
+    private final View btn_share;
+    private final ImageView btn_find_back;
+    private final ImageView btn_find_prev;
+    private final ImageView btn_find_next;
+    private final ImageView btn_annot_back;
+    private final ImageView btn_annot_ink;
+    private final ImageView btn_annot_line;
+    private final ImageView btn_annot_rect;
+    private final ImageView btn_annot_oval;
+    private final ImageView btn_annot_stamp;
+    private final ImageView btn_annot_note;
+    private final ImageView btn_annot_editbox;
+    private final ImageView btn_annot_polygon;
+    private final ImageView btn_annot_polyline;
+    private final EditText edit_find;
     private SeekBar seek_page;
     private TextView lab_page;
-    private View view_vert;
-    private View view_horz;
-    private View view_single;
-    private View view_dual;
+    private final View view_vert;
+    private final View view_horz;
+    private final View view_single;
+    private final View view_dual;
     private boolean m_set = false;
     private PDFThumbView mThumbView;
-    private boolean m_isAsset;
-    private String m_docPath;
+    private final boolean m_isAsset;
+    private final String m_docPath;
     public PDFViewController(RelativeLayout parent, ILayoutView view, String docPath, boolean isAsset) {
         m_parent = parent;
         m_view = view;
@@ -164,6 +164,42 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         btn_add_bookmark = moreLayout.findViewById(R.id.add_bookmark);
         btn_show_bookmarks = moreLayout.findViewById(R.id.show_bookmarks);
 
+        /*
+        set toolbar Icon colors from Global.toolbar_icon_color
+         */
+        btn_view.setColorFilter(Global.toolbar_icon_color);
+        btn_find.setColorFilter(Global.toolbar_icon_color);
+        btn_annot.setColorFilter(Global.toolbar_icon_color);
+        btn_select.setColorFilter(Global.toolbar_icon_color);
+        btn_outline.setColorFilter(Global.toolbar_icon_color);
+        btn_undo.setColorFilter(Global.toolbar_icon_color);
+        btn_redo.setColorFilter(Global.toolbar_icon_color);
+        btn_more.setColorFilter(Global.toolbar_icon_color);
+        btn_find_back.setColorFilter(Global.toolbar_icon_color);
+        btn_find_prev.setColorFilter(Global.toolbar_icon_color);
+        btn_find_next.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_back.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_ink.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_polygon.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_polyline.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_line.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_rect.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_oval.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_stamp.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_note.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_editbox.setColorFilter(Global.toolbar_icon_color);
+        btn_annot_note.setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) view_vert.findViewById(R.id.view_vert_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) view_horz.findViewById(R.id.view_horz_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) view_single.findViewById(R.id.view_single_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) view_dual.findViewById(R.id.view_dual_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) btn_pages_list.findViewById(R.id.edit_pages_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) btn_add_bookmark.findViewById(R.id.add_bookmark_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) btn_show_bookmarks.findViewById(R.id.show_bookmarks_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) btn_save.findViewById(R.id.save_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) btn_print.findViewById(R.id.print_icon)).setColorFilter(Global.toolbar_icon_color);
+        ((ImageView) btn_share.findViewById(R.id.share_icon)).setColorFilter(Global.toolbar_icon_color);
+
         btn_view.setOnClickListener(this);
         btn_find.setOnClickListener(this);
         btn_annot.setOnClickListener(this);
@@ -197,18 +233,14 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         SetBtnEnabled(btn_annot, m_view.PDFCanSave());
         SetBtnEnabled(btn_save, m_view.PDFCanSave());
         SetBtnEnabled(btn_print, m_view.PDFCanSave() || m_isAsset);
+        SetBtnEnabled(btn_select, m_view.PDFCanSave());
+        SetBtnEnabled(btn_undo, m_view.PDFCanSave());
+        SetBtnEnabled(btn_redo, m_view.PDFCanSave());
+        SetBtnEnabled(btn_pages_list, m_view.PDFCanSave());
         //SetBtnEnabled(btn_share, m_view.PDFCanSave());
 
-        //Nermeen, show/hide buttons based on license type
-        if (Global.isLicenseActivated()) {
-            if (Global.mLicenseType == 0) {
-                btn_annot.setVisibility(View.GONE);
-                btn_select.setVisibility(View.GONE);
-                btn_undo.setVisibility(View.GONE);
-                btn_redo.setVisibility(View.GONE);
-            }
-        } else {
-            btn_find.setVisibility(View.GONE);
+        //show/hide buttons based on writable
+        if (!m_view.PDFCanSave()) {
             btn_annot.setVisibility(View.GONE);
             btn_select.setVisibility(View.GONE);
             btn_undo.setVisibility(View.GONE);
@@ -221,7 +253,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             btn_print.setVisibility(View.GONE);
 
         if (mNavigationMode == NAVIGATION_THUMBS) {
-            m_thumb_view = new PDFBotBar(m_parent, R.layout.thumb_view);
+            m_thumb_view = new PDFBotBar(m_parent, R.layout.bar_thumb_view);
             mThumbView = m_thumb_view.BarGetView().findViewById(R.id.thumb_view);
 
             mThumbView.thumbOpen(m_view.PDFGetDoc(), new PDFViewThumb.PDFThumbListener() {
@@ -229,7 +261,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 public void OnPageClicked(int pageno) {
                     m_view.PDFGotoPage(pageno);
                 }
-            }, Global.rtol);
+            }, Global.g_layout_rtol);
         } else if (mNavigationMode == NAVIGATION_SEEK) {
             m_bar_seek = new PDFBotBar(m_parent, R.layout.bar_seek);
             layout = (RelativeLayout) m_bar_seek.BarGetView();
@@ -280,6 +312,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     public static int getFileState() {
         return sFileState;
     }
+
     public PDFThumbView GetThumbView()
     {
         return mThumbView;
@@ -292,17 +325,25 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         if (enable) {
             btn.setEnabled(true);
             btn.setBackgroundColor(0);
+
+            btn.setAlpha(1.0f);
         } else {
             btn.setEnabled(false);
             btn.setBackgroundResource(R.color.btn_disabled_color);
+            btn.setAlpha(0.3f);
         }
     }
 
     private void SetBtnChecked(ImageView btn, boolean check) {
-        if (check)
-            btn.setBackgroundResource(R.color.btn_pressed_color);
-        else
+        if (check) {
+            btn.setColorFilter(Color.WHITE);
+            btn.setBackgroundResource(R.color.annot_menu_bg_color);
+            btn.setAlpha(1.0f);
+        }else{
+            btn.setColorFilter(Global.toolbar_icon_color);
             btn.setBackgroundColor(0);
+            btn.setAlpha(1.0f);
+        }
         m_set = check;
     }
 
@@ -317,9 +358,31 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         mNavigationMode = navigationMode;
     }
 
-    public void OnAnnotTapped(Annotation annot) {
+    public void OnAnnotTapped(int pageno, Annotation annot) {
         switch (m_bar_status) {
             case BAR_NONE:
+                if (pageno < 0 && annot == null)
+                {
+                    SetBtnEnabled(btn_annot_ink, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_oval, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
+                    SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
+
+                    SetBtnChecked(btn_annot_ink, false);
+                    SetBtnChecked(btn_annot_line, false);
+                    SetBtnChecked(btn_annot_rect, false);
+                    SetBtnChecked(btn_annot_oval, false);
+                    SetBtnChecked(btn_annot_stamp, false);
+                    SetBtnChecked(btn_annot_note, false);
+                    SetBtnChecked(btn_annot_editbox, false);
+                    SetBtnChecked(btn_annot_polygon, false);
+                    SetBtnChecked(btn_annot_polyline, false);
+                }
                 break;
             case BAR_CMD:
                 if (annot != null) {
@@ -387,6 +450,9 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         SetBtnChecked(btn_select, false);
         SetBtnEnabled(btn_view, true);
         SetBtnEnabled(btn_find, true);
+        SetBtnEnabled(btn_outline, true);
+        SetBtnEnabled(btn_undo, true);
+        SetBtnEnabled(btn_redo, true);
         SetBtnEnabled(btn_annot, m_view.PDFCanSave());
     }
 
@@ -403,8 +469,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     public void onStopTrackingTouch(SeekBar arg0) {
         m_view.PDFGotoPage(arg0.getProgress());
     }
-
-    public void OnPageChanged(int pageno) {
+    private int m_cur_page = 0;
+    public void OnPageChanged(int pageno)
+    {
+        m_cur_page = pageno;
         if (mNavigationMode == NAVIGATION_SEEK) {
             lab_page.setText(String.format(Locale.ENGLISH, "%d", pageno + 1));
             seek_page.setProgress(pageno);
@@ -416,9 +484,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         sFileState = MODIFIED_NOT_SAVED;
         if (mNavigationMode == NAVIGATION_THUMBS)
             mThumbView.thumbUpdatePage(pageno);
-    }
-
-    public void onConfigChanged() {
     }
 
     public boolean OnBackPressed() {
@@ -459,6 +524,16 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                     SetBtnEnabled(btn_annot_stamp, can_save);
                     SetBtnEnabled(btn_annot_note, can_save);
                     SetBtnEnabled(btn_annot_editbox, can_save);
+
+                    SetBtnChecked(btn_annot_ink, false);
+                    SetBtnChecked(btn_annot_line, false);
+                    SetBtnChecked(btn_annot_rect, false);
+                    SetBtnChecked(btn_annot_oval, false);
+                    SetBtnChecked(btn_annot_stamp, false);
+                    SetBtnChecked(btn_annot_note, false);
+                    SetBtnChecked(btn_annot_editbox, false);
+                    SetBtnChecked(btn_annot_polygon, false);
+                    SetBtnChecked(btn_annot_polyline, false);
                 }
                 m_bar_annot.BarHide();
                 m_bar_status = BAR_NONE;
@@ -490,6 +565,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 SetBtnEnabled(btn_view, false);
                 SetBtnEnabled(btn_find, false);
                 SetBtnEnabled(btn_annot, false);
+
+                SetBtnEnabled(btn_outline, false);
+                SetBtnEnabled(btn_undo, false);
+                SetBtnEnabled(btn_redo, false);
             }
         } else if (arg0 == btn_outline) {
             CommonUtil.showPDFOutlines(m_view, m_parent.getContext());
@@ -537,15 +616,16 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         } else if (arg0 == btn_annot_ink) {
             if (m_set) {
                 m_view.PDFSetInk(1);
-                SetBtnEnabled(btn_annot_polygon, m_view.PDFCanSave());
-                SetBtnEnabled(btn_annot_polyline, m_view.PDFCanSave());
+                boolean can_save = m_view.PDFCanSave();
+                SetBtnEnabled(btn_annot_polygon, can_save);
+                SetBtnEnabled(btn_annot_polyline, can_save);
                 SetBtnChecked(btn_annot_ink, false);
-                SetBtnEnabled(btn_annot_line, m_view.PDFCanSave());
-                SetBtnEnabled(btn_annot_rect, m_view.PDFCanSave());
-                SetBtnEnabled(btn_annot_oval, m_view.PDFCanSave());
-                SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
-                SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
-                SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
+                SetBtnEnabled(btn_annot_line, can_save);
+                SetBtnEnabled(btn_annot_rect, can_save);
+                SetBtnEnabled(btn_annot_oval, can_save);
+                SetBtnEnabled(btn_annot_stamp, can_save);
+                SetBtnEnabled(btn_annot_note, can_save);
+                SetBtnEnabled(btn_annot_editbox, can_save);
             } else {
                 m_view.PDFSetInk(0);
                 SetBtnEnabled(btn_annot_polygon, false);
@@ -762,6 +842,17 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             SetBtnEnabled(btn_annot_stamp, m_view.PDFCanSave());
             SetBtnEnabled(btn_annot_note, m_view.PDFCanSave());
             SetBtnEnabled(btn_annot_editbox, m_view.PDFCanSave());
+
+            SetBtnChecked(btn_annot_ink, false);
+            SetBtnChecked(btn_annot_line, false);
+            SetBtnChecked(btn_annot_rect, false);
+            SetBtnChecked(btn_annot_oval, false);
+            SetBtnChecked(btn_annot_stamp, false);
+            SetBtnChecked(btn_annot_note, false);
+            SetBtnChecked(btn_annot_editbox, false);
+            SetBtnChecked(btn_annot_polygon, false);
+            SetBtnChecked(btn_annot_polyline, false);
+
             m_bar_annot.BarSwitch(m_bar_cmd);
 
             if (mNavigationMode == NAVIGATION_THUMBS)
@@ -782,15 +873,19 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             m_find_str = null;
             m_view.PDFFindEnd();
         } else if (arg0 == view_vert) {
+            Global.g_view_mode = 0;
             m_view.PDFSetView(0);
             m_menu_view.MenuDismiss();
         } else if (arg0 == view_horz) {
+            Global.g_view_mode = 1;
             m_view.PDFSetView(1);
             m_menu_view.MenuDismiss();
         } else if (arg0 == view_single) {
+            Global.g_view_mode = 3;
             m_view.PDFSetView(3);
             m_menu_view.MenuDismiss();
         } else if (arg0 == view_dual) {
+            Global.g_view_mode = 6;
             m_view.PDFSetView(6);
             m_menu_view.MenuDismiss();
         }
@@ -920,7 +1015,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     }
 
     private String bidiFormatCheck(String input) {
-        if (Global.selRTOL) { //selection is right to left, check case of mixed text
+        if (Global.g_sel_rtol) { //selection is right to left, check case of mixed text
             Bidi bidi = new Bidi(input, Bidi.DIRECTION_DEFAULT_RIGHT_TO_LEFT);
             if (bidi.isMixed() || bidi.isLeftToRight()) { //we need to reverse mixed text
                 String reversedVal = "", toBeReversed = "";
@@ -950,10 +1045,10 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
     private void addToBookmarks() {
         try {
             if (!TextUtils.isEmpty(m_docPath)) {
-                String bookmarkLabel = m_parent.getContext().getString(R.string.bookmark_label, m_view.PDFGetCurrPage() + 1);
+                String bookmarkLabel = m_parent.getContext().getString(R.string.bookmark_label, m_cur_page + 1);
                 RadaeePDFManager mPDFManager = new RadaeePDFManager();
                 Toast.makeText(m_parent.getContext(), mPDFManager.addToBookmarks(m_parent.getContext(), m_docPath,
-                        m_view.PDFGetCurrPage(), bookmarkLabel), Toast.LENGTH_SHORT).show();
+                        m_cur_page, bookmarkLabel), Toast.LENGTH_SHORT).show();
             } else
                 Toast.makeText(m_parent.getContext(), R.string.bookmark_error, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -972,12 +1067,11 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
         else
             Toast.makeText(m_parent.getContext(), R.string.bookmark_error, Toast.LENGTH_SHORT).show();
     }
-
-    private RadaeePluginCallback.PDFControllerListener mControllerListner = new RadaeePluginCallback.PDFControllerListener() {
-
+    private final RadaeePluginCallback.PDFControllerListener mControllerListner = new RadaeePluginCallback.PDFControllerListener() {
         @Override
         public void onSetIconsBGColor(int color) {
             try {
+                Global.toolbar_icon_color = color;
                 btn_view.setColorFilter(color);
                 btn_find.setColorFilter(color);
                 btn_find_back.setColorFilter(color);
@@ -999,20 +1093,20 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 btn_annot_stamp.setColorFilter(color);
                 btn_annot_note.setColorFilter(color);
                 btn_annot_editbox.setColorFilter(color);
-                ((ImageView) view_vert.findViewById(R.id.imageView1)).setColorFilter(color);
-                ((ImageView) view_horz.findViewById(R.id.horz)).setColorFilter(color);
-                ((ImageView) view_single.findViewById(R.id.imageView2)).setColorFilter(color);
-                ((ImageView) view_dual.findViewById(R.id.imageView3)).setColorFilter(color);
+                ((ImageView) view_vert.findViewById(R.id.view_vert_icon)).setColorFilter(color);
+                ((ImageView) view_horz.findViewById(R.id.view_horz_icon)).setColorFilter(color);
+                ((ImageView) view_single.findViewById(R.id.view_single_icon)).setColorFilter(color);
+                ((ImageView) view_dual.findViewById(R.id.view_dual_icon)).setColorFilter(color);
+                ((ImageView) btn_pages_list.findViewById(R.id.edit_pages_icon)).setColorFilter(color);
                 ((ImageView) btn_add_bookmark.findViewById(R.id.add_bookmark_icon)).setColorFilter(color);
                 ((ImageView) btn_show_bookmarks.findViewById(R.id.show_bookmarks_icon)).setColorFilter(color);
                 ((ImageView) btn_save.findViewById(R.id.save_icon)).setColorFilter(color);
                 ((ImageView) btn_print.findViewById(R.id.print_icon)).setColorFilter(color);
                 ((ImageView) btn_share.findViewById(R.id.share_icon)).setColorFilter(color);
             } catch (Exception e) {
-                e.getMessage();
+                e.printStackTrace();
             }
         }
-
         @Override
         public void onSetToolbarBGColor(int color) {
             try {
@@ -1021,17 +1115,15 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 m_menu_view.MenuGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                 m_menu_more.MenuGetView().getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);
             } catch (Exception e) {
-                e.getMessage();
+                e.printStackTrace();
             }
         }
-
         @Override
         public void onSetImmersive(boolean immersive) {
             switch (m_bar_status) {
                 case BAR_NONE:
                     if (!immersive) {
                         m_bar_cmd.BarShow();
-
                         if (mNavigationMode == NAVIGATION_THUMBS)
                             m_thumb_view.BarShow();
                         else if (mNavigationMode == NAVIGATION_SEEK)
@@ -1044,7 +1136,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                         m_menu_view.MenuDismiss();
                         m_menu_more.MenuDismiss();
                         m_bar_cmd.BarHide();
-
                         if (mNavigationMode == NAVIGATION_THUMBS)
                             m_thumb_view.BarHide();
                         else if (mNavigationMode == NAVIGATION_SEEK)
@@ -1075,7 +1166,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                     break;
             }
         }
-
         @Override
         public String onGetJsonFormFields() {
             try {
@@ -1102,7 +1192,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             }
             return "ERROR";
         }
-
         @Override
         public String onGetJsonFormFieldsAtPage(int pageno) {
             if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened())
@@ -1117,7 +1206,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             else
                 return "";
         }
-
         @Override
         public String onSetFormFieldsWithJSON(String json) {
             if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened())
@@ -1130,7 +1218,7 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                     for (int i = 0; i < pagesArray.length(); i++) {
                         CommonUtil.parsePageJsonFormFields(pagesArray.getJSONObject(i), m_view.PDFGetDoc());
                     }
-                    m_view.PDFUpdateCurrPage();
+                    m_view.PDFUpdatePage(m_cur_page);
                     return "property set successfully";
                 } else return "\"Pages\" attribute is missing";
             } catch (Exception e) {
@@ -1138,14 +1226,12 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             }
             return "ERROR";
         }
-
         @Override
         public int onGetPageCount() {
             if (m_view.PDFGetDoc() != null && m_view.PDFGetDoc().IsOpened())
                 return m_view.PDFGetDoc().GetPageCount();
             return -1;
         }
-
         @Override
         public String onGetPageText(int pageno) {
             if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened())
@@ -1153,19 +1239,16 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             if (pageno >= m_view.PDFGetDoc().GetPageCount()) return "Page index error";
             return CommonUtil.getPageText(m_view.PDFGetDoc(), pageno);
         }
-
         @Override
         public boolean onEncryptDocAs(String dst, String upswd, String opswd, int perm, int method, byte[] id) {
             return !(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened())
                     && m_view.PDFGetDoc().EncryptAs(dst, upswd, opswd, perm, method, id);
         }
-
         @Override
         public boolean onAddAnnotAttachment(String attachmentPath) {
             return !(m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened() || !m_view.PDFCanSave())
                     && m_view.PDFSetAttachment(attachmentPath);
         }
-
         @Override
         public String renderAnnotToFile(int page, int annotIndex, String renderPath, int bitmapWidth, int bitmapHeight) {
             if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened())
@@ -1173,51 +1256,33 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             if (page >= m_view.PDFGetDoc().GetPageCount()) return "Page index error";
             return CommonUtil.renderAnnotToFile(m_view.PDFGetDoc(), page, annotIndex, renderPath, bitmapWidth, bitmapHeight);
         }
-
-        private boolean flatAnnotsAtPage(Document document, int pageNo) {
-            if(document == null || !document.IsOpened()) return false;
-            if (pageNo < 0 || pageNo >= document.GetPageCount()) return false;
-            Page page = document.GetPage(pageNo);
-            if (page != null) {
-                page.ObjsStart();
-                if(page.FlatAnnots()) {
-                    if (m_view != null && pageNo == m_view.PDFGetCurrPage())
-                        m_view.PDFUpdateCurrPage();
-                    return document.Save();
+        @Override
+        public boolean flatAnnotAtPage(int page) {
+            if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+            if (page >= m_view.PDFGetDoc().GetPageCount()) return false;
+            Page ppage = m_view.PDFGetDoc().GetPage(page);
+            if (ppage != null) {
+                boolean res = ppage.FlatAnnots();
+                if (res && page == m_cur_page) {
+                    m_view.PDFUpdatePage(m_cur_page);
+                    return true;
                 }
             }
             return false;
         }
-
-        @Override
-        public boolean flatAnnotAtPage(int page) {
-            Document document = m_view.PDFGetDoc();
-            if (m_view.PDFGetDoc() == null && !TextUtils.isEmpty(m_docPath)) { //try to re-open the document
-                document = new Document();
-                document.Open(m_docPath, "");
-            }
-            return flatAnnotsAtPage(document, page);
-        }
-
         @Override
         public boolean flatAnnots() {
-            Document document = m_view.PDFGetDoc();
-            if (m_view.PDFGetDoc() == null && !TextUtils.isEmpty(m_docPath)) { //try to re-open the document
-                document = new Document();
-                document.Open(m_docPath, "");
-            }
-            if(document == null || !document.IsOpened()) return false;
-            for (int i = 0; i < document.GetPageCount(); i++) {
-                if (!flatAnnotsAtPage(document, i))
+            if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
+            for (int i = 0; i < m_view.PDFGetDoc().GetPageCount(); i++) {
+                if (!this.flatAnnotAtPage(i))
                     return false;
             }
             return true;
         }
-
         @Override
         public boolean saveDocumentToPath(String path, String pswd) {
             String prefix = "file://";
-            if (path.indexOf(prefix) != -1) {
+            if (path.contains(prefix)) {
                 path = path.substring(path.indexOf(prefix) + prefix.length());
             }
             if (m_view.PDFGetDoc() == null || !m_view.PDFGetDoc().IsOpened()) return false;
@@ -1228,7 +1293,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                 return m_view.PDFGetDoc().SaveAs(path, false);
             }
         }
-
         @Override
         public String onGetTextAnnotationDetails(int pageno) {
             Page page = m_view.PDFGetDoc().GetPage(pageno);
@@ -1253,7 +1317,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             page.Close();
             return jsonArray.toString();
         }
-
         @Override
         public String onGetMarkupAnnotationDetails(int pageno) {
             Page page = m_view.PDFGetDoc().GetPage(pageno);
@@ -1274,11 +1337,9 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
                     }
                 }
             }
-
             page.Close();
             return jsonArray.toString();
         }
-
         @Override
         public int onGetCharIndex(int pageno, float x, float y) {
             Page page = m_view.PDFGetDoc().GetPage(pageno);
@@ -1288,7 +1349,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             page.Close();
             return result;
         }
-
         @Override
         public void onAddTextAnnotation(int pageno, float x, float y, String text, String subject) {
             Page page = m_view.PDFGetDoc().GetPage(pageno);
@@ -1298,18 +1358,16 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             annotation.SetPopupText(text);
             annotation.SetPopupSubject(subject);
             page.Close();
-            m_view.PDFUpdateCurrPage();
+            m_view.PDFUpdatePage(pageno);
         }
-
         @Override
         public void onAddMarkupAnnotation(int pageno, int type, int index1, int index2) {
             Page page = m_view.PDFGetDoc().GetPage(pageno);
             page.ObjsStart();
             boolean success = page.AddAnnotMarkup(index1, index2, type);
             page.Close();
-            m_view.PDFUpdateCurrPage();
+            if(success) m_view.PDFUpdatePage(pageno);
         }
-
         @Override
         public String onGetPDFCoordinates(int x, int y) {
             JSONObject jsonObject = new JSONObject();
@@ -1342,7 +1400,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             }
             return jsonObject.toString();
         }
-
         @Override
         public String onGetScreenCoordinates(int pageno, float x, float y) {
             int screenX = m_view.GetScreenX(x,pageno) ;
@@ -1359,7 +1416,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             return jsonObject.toString();
 
         }
-
         @Override
         public String onGetScreenRect(int pageno, float left, float top, float right, float bottom) {
             int screenLeft = m_view.GetScreenX(left,pageno) ;
@@ -1379,7 +1435,6 @@ public class PDFViewController implements OnClickListener, SeekBar.OnSeekBarChan
             }
             return jsonObject.toString();
         }
-
         @Override
         public String onGetPDFRect(int left, int top, int right, int bottom) {
             JSONObject jsonObject = new JSONObject();

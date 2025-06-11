@@ -17,7 +17,8 @@ import com.radaee.viewlib.R;
 @SuppressLint("AppCompatCustomView")
 public class UIColorButton extends Button {
 
-    private static float POPUP_HEIGHT = 160;
+    private static float POPUP_HEIGHT = 200;
+    private static float POPUP_WIDTH = 160;
     private boolean m_enable;
     private boolean m_enable_mode;
     private int m_color = 0xFF000000;
@@ -116,7 +117,7 @@ public class UIColorButton extends Button {
             }
         });
 
-        m_popup = new UIAnnotPop(m_layout, Dp2Px(120), Dp2Px(POPUP_HEIGHT));
+        m_popup = new UIAnnotPop(m_layout, Dp2Px(POPUP_WIDTH), Dp2Px(POPUP_HEIGHT));
         m_popup.setFocusable(true);
         m_popup.setTouchable(true);
         m_popup.setBackgroundDrawable(new ColorDrawable(0));

@@ -30,12 +30,9 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_margin="2dp"
         android:layout_toRightOf="@+id/btn_find"
-        android:clickable="true"
+	    android:clickable="true"
         android:src="@drawable/btn_annots" />
 
     <ImageView
@@ -53,7 +50,10 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentTop="true"
-        android:layout_margin="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="2dp"
         android:layout_toRightOf="@+id/btn_select"
         android:clickable="true"
         android:src="@drawable/btn_outline" />

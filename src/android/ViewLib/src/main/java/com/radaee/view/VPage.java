@@ -14,9 +14,10 @@ public class VPage implements ILayoutView.IVPage
 {
 	private Bitmap m_zoom_bmp;
     private long m_vpage;
-    private float m_pw;
-    private float m_ph;
+    private final float m_pw;
+    private final float m_ph;
     private long m_result;
+    private float m_scale;
 	protected VPage(Document doc, int pageno, int cw, int ch, Bitmap.Config bmp_format)
 	{
 		m_zoom_bmp = null;
@@ -24,6 +25,7 @@ public class VPage implements ILayoutView.IVPage
         m_vpage = doc.CreateVNPage(pageno, cw, ch, bmp_format);
         m_pw = doc.GetPageWidth(pageno);
         m_ph = doc.GetPageHeight(pageno);
+		m_scale = 0;
 	}
 	protected final int GetX() {return VNPage.getX(m_vpage);}
 	protected final void SetX(int x){VNPage.setX(m_vpage, x);}
@@ -42,7 +44,15 @@ public class VPage implements ILayoutView.IVPage
 		VNPage.destroy(m_vpage, callback);
         m_vpage = 0;
 	}
-	protected void vLayout(int x, int y, float scale, boolean clip) {VNPage.layout(m_vpage, x, y, scale, clip);}
+	protected void vLayout(int x, int y, float scale, boolean clip)
+	{
+		VNPage.layout(m_vpage, x, y, scale, clip);
+		m_scale = scale;
+	}
+	public float vGetScale()
+	{
+		return m_scale;
+	}
     protected void vClips(VNPage.VNPageListener callback, boolean clip) {VNPage.clips(m_vpage, callback, clip);}
 	protected void vEndPage(VNPage.VNPageListener callback)
 	{
@@ -74,7 +84,7 @@ public class VPage implements ILayoutView.IVPage
     protected boolean vDrawStep1(VNPage.VNPageListener callback, Canvas canvas) {return VNPage.drawStep1(m_vpage, callback, canvas, m_result);}
     protected void vDrawStep2(BMP bmp) {VNPage.DrawStep2(m_vpage, bmp, m_result);}
     protected void vDrawEnd(){VNPage.resultDestroy(m_result);m_result = 0;}
-    private Rect m_rect = new Rect();
+    private final Rect m_rect = new Rect();
 	protected void vDraw(VNPage.VNPageListener callback, Canvas canvas, int vx, int vy)
 	{
         if(!VNPage.blkDraw(m_vpage, callback, canvas, 0, m_ph, m_pw, 0, GetX() - vx, GetY() - vy))

@@ -10,7 +10,7 @@ public class VNBlock {
     private static native void render(long block, int quality);
     public static void Render(long block)
     {
-        render(block, Global.render_mode);
+        render(block, Global.g_render_quality);
     }
     public static native Bitmap bmp(long block);
     public static native int getSta(long block);

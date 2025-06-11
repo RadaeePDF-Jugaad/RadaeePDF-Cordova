@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -42,10 +43,6 @@ public class PDFView
 	protected boolean m_drawbmp = false;
     private GestureDetector m_gesture = null;
     protected PDFViewListener m_listener = null;
-	protected int m_selx1;
-	protected int m_sely1;
-	protected int m_selx2;
-	protected int m_sely2;
     /**
      * call-back listener class
      * @author radaee
@@ -56,70 +53,70 @@ public class PDFView
     	 * fired when page changed.
     	 * @param pageno 0 based pageno.<br/>
     	 */
-    	public void OnPDFPageChanged(int pageno);
+    	void OnPDFPageChanged(int pageno);
     	/**
     	 * fired when double tapped.
     	 * @param x x coordinate
     	 * @param y y coordinate
     	 * @return true, if process it, or skipped.
     	 */
-    	public boolean OnPDFDoubleTapped( float x, float y );
+    	boolean OnPDFDoubleTapped( float x, float y );
     	/**
     	 * fired when single tapped.
     	 * @param x x coordinate
     	 * @param y y coordinate
     	 * @return true, if process it, or skipped.
     	 */
-    	public boolean OnPDFSingleTapped( float x, float y );
+    	boolean OnPDFSingleTapped( float x, float y );
     	/**
     	 * fired when long pressed.
     	 * @param x x coordinate
     	 * @param y y coordinate
     	 */
-    	public void OnPDFLongPressed( float x, float y );
+    	void OnPDFLongPressed( float x, float y );
     	/**
     	 * fired when tapped without moving.
     	 * @param x x coordinate
     	 * @param y y coordinate
     	 */
-    	public void OnPDFShowPressed( float x, float y );
+    	void OnPDFShowPressed( float x, float y );
     	/**
     	 * fired when text selecting end.
     	 */
-    	public void OnPDFSelectEnd();
+    	void OnPDFSelectEnd();
     	/**
     	 * fired when searching end.
     	 * @param found true if found, otherwise pass false.
     	 */
-    	public void OnPDFFound(boolean found);
+    	void OnPDFFound(boolean found);
     	/**
     	 * notify to redraw the view
     	 * @param post whether post invalidate?
     	 */
-    	public void OnPDFInvalidate(boolean post);
+    	void OnPDFInvalidate(boolean post);
     	/**
     	 * fired when a page displayed.
     	 * @param vpage
     	 */
-    	public void OnPDFPageDisplayed( Canvas canvas, PDFVPage vpage );
+    	void OnPDFPageDisplayed( Canvas canvas, PDFVPage vpage );
     	/**
     	 * fired when selecting.
     	 * @param canvas Canvas object to draw.
     	 * @param rect1 first char's location, in Canvas coordinate.
     	 * @param rect2 last char's location, in Canvas coordinate.
     	 */
-    	public void OnPDFSelecting( Canvas canvas, int[] rect1, int[] rect2 );
-        public void OnPDFZoomStart();
-        public void OnPDFZoomEnd();
+    	void OnPDFSelecting( Canvas canvas, int[] rect1, int[] rect2 );
+        void OnPDFZoomStart();
+        void OnPDFZoomEnd();
 		void OnPDFPageRendered(int pageno);
-    };
-    public class PDFPos
+    }
+    public static class PDFPos
     {
     	public int pageno;
     	public float x;
     	public float y;
-    };
-	protected Handler m_hand_ui = new Handler()
+    }
+	protected Handler m_hand_ui = new Handler(Looper.getMainLooper())
 	{
     	@Override
     	public void handleMessage(Message msg)
@@ -192,8 +189,10 @@ public class PDFView
 			}
 		}
 	}
+	private final Context m_ctx;
 	public PDFView(Context context)
 	{
+		m_ctx = context;
 		m_scroller = new Scroller(context);
     	m_gesture = new GestureDetector( context, new PDFGestureListener() );
 	}
@@ -324,11 +323,11 @@ public class PDFView
 		vFlushRange();
 		int cur = m_prange_start;
 		int end = m_prange_end;
-		int sel_rect1[] = null;
-		int sel_rect2[] = null;
+		int[] sel_rect1 = null;
+		int[] sel_rect2 = null;
 		if( m_drawbmp )
 		{
-			if( Global.dark_mode )
+			if( Global.g_dark_mode )
 			{
 				m_bmp.eraseColor(m_back);
 				Canvas bcan = new Canvas(m_bmp);
@@ -391,7 +390,7 @@ public class PDFView
 					m_finder.find_draw(m_draw_bmp, vpage, left, top);
 				cur++;
 			}
-			if( Global.dark_mode ) {
+			if( Global.g_dark_mode ) {
 				m_draw_bmp.Invert();
 			}
 			m_draw_bmp.Free(m_bmp);
@@ -550,27 +549,30 @@ public class PDFView
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e)
         {
-        	return false;
+        	return true;
         }
         @Override
         public boolean onSingleTapUp(MotionEvent e)
         {
-        	vSingleTap( e.getX(), e.getY() );
-    		if( m_listener != null && m_status == STA_MOVING )
-    		{
-    			if( m_listener.OnPDFSingleTapped(e.getX(), e.getY()) )
-    			{
-    				m_status = STA_NONE;
-    				return true;
-    			}
-    			else
-    				return false;
-    		}
-    		else
-    			return false;
+			boolean ret = vSingleTap( e.getX(), e.getY() );
+			if( m_listener != null && m_status == STA_MOVING )
+			{
+				if( m_listener.OnPDFSingleTapped(e.getX(), e.getY()) )
+				{
+					m_status = STA_NONE;
+					return true;
+				}
+				else
+				{
+					if (ret) m_status = STA_NONE;
+					return ret;
+				}
+			}
+			else
+				return ret;
         }
     }
-    protected void vSingleTap( float x, float y ){}
+    protected boolean vSingleTap( float x, float y ){ return false; }
     private boolean motionZoom(MotionEvent event)
     {
 		switch(event.getActionMasked())
@@ -625,12 +627,16 @@ public class PDFView
 		case MotionEvent.ACTION_DOWN:
 			if( m_status == STA_NONE )
 			{
-				m_scroller.forceFinished(true);
-	        	m_scroller.abortAnimation();
+				Scroller scroller = new Scroller(m_ctx);
+				m_scroller.computeScrollOffset();
 				m_holdsx = m_scroller.getCurrX();
 				m_holdsy = m_scroller.getCurrY();
 				m_holdx = event.getX();
 				m_holdy = event.getY();
+				scroller.setFinalX((int)m_holdsx);
+				scroller.setFinalY((int)m_holdsy);
+				scroller.computeScrollOffset();
+				m_scroller = scroller;
 				m_status = STA_MOVING;
 			}
 			break;
@@ -751,8 +757,8 @@ public class PDFView
 	/**
 	 * get Position from point in view coordinate, implement in derived class.<br/>
 	 * pass (0,0) to get position of left-top corner 
-	 * @param vx
-	 * @param vy
+	 * @param vx x in view coordinate
+	 * @param vy y in view coordinate
 	 * @return position in PDF coordinate.
 	 */
 	public PDFPos vGetPos( int vx, int vy )
@@ -770,8 +776,8 @@ public class PDFView
 	 * set Position to point in view coordinate, implement in derived class.<br/>
 	 * pass (0,0) to set position to left-top corner. 
 	 * @param pos position in PDF coordinate.
-	 * @param vx
-	 * @param vy
+	 * @param vx x in view coordinate
+	 * @param vy y in view coordinate
 	 */
 	public void vSetPos( PDFPos pos, int vx, int vy )
 	{
@@ -987,12 +993,13 @@ public class PDFView
 		if( m_pages == null ) return;
 		int pg = m_finder.find_get_page();
     	if( pg < 0 || pg >= m_doc.GetPageCount() ) return;
-		float pos[] = m_finder.find_get_pos();
+		float[] pos = m_finder.find_get_pos();
 		if( pos == null ) return;
 		pos[0] = m_pages[pg].ToDIBX(pos[0]) + m_pages[pg].GetX();
 		pos[1] = m_pages[pg].ToDIBY(pos[1]) + m_pages[pg].GetY();
 		pos[2] = m_pages[pg].ToDIBX(pos[2]) + m_pages[pg].GetX();
 		pos[3] = m_pages[pg].ToDIBY(pos[3]) + m_pages[pg].GetY();
+		m_scroller.computeScrollOffset();
 		float x = m_scroller.getCurrX();
 		float y = m_scroller.getCurrY();
 		if( x > pos[0] - m_w/8 ) x = pos[0] - m_w/8;

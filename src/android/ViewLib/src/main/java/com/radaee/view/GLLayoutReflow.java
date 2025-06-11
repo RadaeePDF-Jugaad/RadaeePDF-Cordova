@@ -29,7 +29,7 @@ public class GLLayoutReflow extends GLLayout
         if( m_doc == null || m_vw <= m_page_gap || m_vh <= m_page_gap ) return;
         m_scale_min = (m_vw - m_page_gap) / m_doc.GetPageWidth(m_cur_page);
         if(scale < m_scale_min) scale = m_scale_min;
-        if(scale > m_scale_min * Global.zoomLevel) scale = m_scale_min * Global.zoomLevel;
+        if(scale > m_scale_min * Global.g_view_zoom_level) scale = m_scale_min * Global.g_view_zoom_level;
         if(!vSupportZoom()) scale = m_scale_min * 2;
         m_scale = scale;
 
@@ -115,7 +115,7 @@ public class GLLayoutReflow extends GLLayout
         int vy = vGetY();
         m_cur_layout.gl_draw(gl10, m_thread, m_def_text, vy, m_vh);
 
-        int vect[] = new int[8];
+        int[] vect = new int[8];
         gl10.glBindTexture(GL10.GL_TEXTURE_2D, 0);//bind texture
         gl10.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
         vect[0] = 4 << 16;

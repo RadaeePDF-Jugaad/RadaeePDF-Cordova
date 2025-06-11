@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,9 +16,7 @@ import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
 import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
-import com.radaee.reader.R;
-
-import java.io.File;
+import com.radaee.viewlib.R;
 
 public class PDFGridItem extends LinearLayout
 {
@@ -95,19 +94,20 @@ public class PDFGridItem extends LinearLayout
 		m_name.setGravity(Gravity.CENTER_HORIZONTAL);
 		m_name.setTextColor(TEXT_COLOR);
 		m_image = new ImageView(getContext());
-		if( name == "." )
+		if(name.equals("."))
 			m_bmp = m_def_refresh_icon;
-		else if( name == ".." )
+		else if(name.equals(".."))
 			m_bmp = m_def_up_icon;
 		else
 			m_bmp = m_def_dir_icon;
 		m_image.setImageBitmap(m_bmp);
 		m_image.setPadding(2, 2, 2, 2);
+		m_image.setColorFilter(Global.gridview_icon_color);
 		m_name.setWidth(m_image.getWidth());
 		this.addView(m_image);
 		this.addView(m_name);
 	}
-	protected void set_file( PDFGridThread thread, String name, String path )
+	protected void set_file(PDFGridView.PDFGridThread thread, String name, String path )
 	{
 		m_path = path;
 		m_name = new TextView(getContext());
@@ -119,6 +119,7 @@ public class PDFGridItem extends LinearLayout
 		m_bmp = m_def_pdf_icon;
 		m_image.setImageBitmap(m_bmp);
 		m_image.setPadding(2, 2, 2, 2);
+		m_image.setColorFilter(Global.gridview_icon_color);
 		m_name.setWidth(m_image.getWidth());
 		this.addView(m_image);
 		this.addView(m_name);
@@ -134,7 +135,7 @@ public class PDFGridItem extends LinearLayout
 		if( m_cancel ) return false;
 		String thumbName = null;
 		Bitmap bmp = null;
-		if(Global.save_thumb_in_cache)
+		if(Global.g_save_thumb_in_cache)
 		{
 			thumbName = CommonUtil.getThumbName(m_path);
 			if(thumbName != null)
@@ -184,14 +185,16 @@ public class PDFGridItem extends LinearLayout
 						bmp.recycle();
 						bmp = null;
 					}
-					else if(Global.save_thumb_in_cache) {
+					else if(Global.g_save_thumb_in_cache) {
 						CommonUtil.saveThumb(bmp, CommonUtil.getOutputMediaFile(getContext(), thumbName));
 					}
 				}
-				set_page( null, bmp );
 			}
 			catch(Exception e)
-			{ e.getMessage(); }
+			{
+				Log.e("RERR:", e.getMessage());
+			}
+			set_page( null, bmp );
 			page.Close();
 			doc.Close();
 		}

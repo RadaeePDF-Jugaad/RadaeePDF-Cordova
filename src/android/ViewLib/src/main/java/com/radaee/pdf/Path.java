@@ -89,14 +89,14 @@ public class Path
 	 * 3: curve to, index, index + 1, index + 2 are all data<br/>
 	 * 4: close operation<br/>
 	 */
-	public final int GetNode( int index, float pt[] )
+	public final int GetNode(int index, float[] pt)
 	{
 		return getNode( m_hand, index, pt );
 	}
 	private android.graphics.Path toSysPath(int cnt, float orgx, float orgy)
 	{
 		int index = 0;
-		float pt1[] = new float[2];
+		float[] pt1 = new float[2];
 		android.graphics.Path path = new android.graphics.Path();
 		while( index < cnt )
 		{
@@ -130,7 +130,7 @@ public class Path
 		if(canvas == null) return;
 		int cnt = getNodeCount(m_hand);
 		int index = 0;
-		float pt1[] = new float[2];
+		float[] pt1 = new float[2];
 		android.graphics.Path path = new android.graphics.Path();
 		while( index < cnt )
 		{

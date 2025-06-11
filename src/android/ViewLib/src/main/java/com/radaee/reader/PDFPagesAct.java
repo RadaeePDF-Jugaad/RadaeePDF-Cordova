@@ -52,7 +52,8 @@ public class PDFPagesAct extends Activity {
     }
     protected void onDestroy()
     {
-        m_view.PDFClose();
+        if (m_view != null) m_view.PDFClose();
+        if (m_doc != null) m_doc.Close();
         super.onDestroy();
     }
 }

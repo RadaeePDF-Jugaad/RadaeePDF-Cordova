@@ -25,6 +25,7 @@ public class PDFAssetStream implements PDFStream
 			stream.reset();
 			m_buf = new byte[m_len];
 			stream.read(m_buf);
+			stream.close();
 			return true;
 		}
 		catch( Exception e )

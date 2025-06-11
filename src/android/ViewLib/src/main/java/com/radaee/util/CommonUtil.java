@@ -2,14 +2,24 @@ package com.radaee.util;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
@@ -29,6 +39,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -46,6 +57,54 @@ public class CommonUtil {
 
     private static final String TAG = "RadaeeCommonUtil";
     private static final int CACHE_LIMIT = 1024;
+
+    public static boolean nigthMode(Context context) {
+
+        boolean bNight;
+
+        int nightModeFlags = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch(nightModeFlags)
+        {
+            case Configuration.UI_MODE_NIGHT_YES:
+                bNight = true;
+                break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                bNight = false;
+                break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                bNight = false;
+                break;
+            default:
+                bNight = false;
+        }
+        return bNight;
+
+    }
+
+    public static void copyFiletoExternalStorage(int resourceId, String resourceName, Context context){
+        String pathSDCard = Global.tmp_path + "/" + resourceName;
+        try{
+            InputStream in = context.getResources().openRawResource(resourceId);
+            FileOutputStream out = null;
+            out = new FileOutputStream(pathSDCard);
+            byte[] buff = new byte[1024];
+            int read = 0;
+            try {
+                while ((read = in.read(buff)) > 0) {
+                    out.write(buff, 0, read);
+                }
+            } finally {
+                in.close();
+                out.close();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public static String getThumbName(String path) {
         try {
@@ -295,7 +354,7 @@ public class CommonUtil {
             AdapterView.OnItemClickListener item_clk = new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    OutlineListAdt.outline_ui_item item = mOutlineList.GetItem(i);
+                    OutlineList.OutlineListAdt.outline_ui_item item = mOutlineList.GetItem(i);
                     mPdfLayoutView.PDFGotoPage(item.GetPageNO());
                     mAlertDialog.dismiss();
                 }
@@ -389,6 +448,65 @@ public class CommonUtil {
         return "D:" + date.substring(0, date.length() - 3) + "'" + date.substring(date.length() - 3);
     }
 
+    /**
+     * it is fake sign method(graphic sign only), if you want a real sign feature, please using Annotation.SignField()
+     * @param document document object
+     * @param field_name field name of unsigned signature field.
+     * @param image Bitmap object.
+     * @return true or false.
+     */
+    public static boolean signField(Document document, String field_name, Bitmap image)
+    {
+        int pcnt = document.GetPageCount();
+        for(int pcur = 0; pcur < pcnt; pcur++)//loop all pages
+        {
+            Page page = document.GetPage(pcur);
+            if (page == null) continue;
+            page.ObjsStart();
+            int acnt = page.GetAnnotCount();
+            for(int acur = 0; acur < acnt; acur++)//loop all annotations
+            {
+                Page.Annotation annot = page.GetAnnot(acur);
+                if (annot == null) continue;
+                String fname = annot.GetFieldName();
+                if (annot.GetFieldType() == 4 && annot.GetSignStatus() == 0 && field_name.compareTo(fname) == 0)//match field name.
+                {
+                    boolean ret = signField(document, annot, image);
+                    page.Close();
+                    return ret;
+                }
+            }
+            page.Close();
+        }
+        return false;//field name not matched.
+    }
+
+    /**
+     * it is fake sign method(graphic sign only), if you want a real sign feature, please using Annotation.SignField()
+     * @param document document object
+     * @param annot annotation object of unsigned signature field.
+     * @param image Bitmap object.
+     * @return true or false.
+     */
+    public static boolean signField(Document document, Page.Annotation annot, Bitmap image)
+    {
+        if (document == null || annot == null || image == null) return false;
+        if (annot.GetFieldType() != 4 || annot.GetSignStatus() != 0) return false;
+        //it must unsigned signature field.
+        float[] rect = annot.GetRect();
+        float width = rect[2] - rect[0];
+        float height = rect[3] - rect[1];
+        Document.DocForm form = createImageForm(document, image, width, height);
+        return annot.SetIcon("", form);//make fake sign(graphic sign).
+    }
+    /**
+     * create DocForm object from image, and scale image to (width, height)
+     * @param document Document object
+     * @param image bitmap object.
+     * @param width form width
+     * @param height form height
+     * @return DocForm object.
+     */
     public static Document.DocForm createImageForm(Document document, Bitmap image, float width, float height) {
         Document.DocForm form = document.NewForm();
         if (form != null) {
@@ -396,19 +514,23 @@ public class CommonUtil {
             content.Create();
             content.GSSave();
 
+            content.GSSave();
             float originalWidth = image.getWidth(), originalHeight = image.getHeight();
             float scale = height / originalHeight;
             float scaleW = width / originalWidth;
             if (scaleW < scale) scale = scaleW;
 
-            float xTranslation = (width - originalWidth * scale) / 2.0f, yTranslation = (height - originalHeight * scale) / 2.0f;
+            float xTranslation = (width - originalWidth * scale) * 0.5f;
+            float yTranslation = (height - originalHeight * scale) * 0.5f;
 
-            Document.DocImage dimg = document.NewImage(image, true);
+            Document.DocImage dimg = document.NewImage(image, 0);//Bitmap object for Android must be support matte, that not loss color.
             ResImage rimg = form.AddResImage(dimg);
             Matrix mat = new Matrix(scale * originalWidth, scale * originalHeight, xTranslation, yTranslation);
             content.GSSetMatrix(mat);
             mat.Destroy();
             content.DrawImage(rimg);
+            content.GSRestore();
+
             content.GSRestore();
 
             form.SetContent(content, 0, 0, width, height);
@@ -425,7 +547,7 @@ public class CommonUtil {
             Bitmap bitmap = Bitmap.createBitmap((int) annotWidth, (int) annotHeight, Bitmap.Config.ARGB_8888);
             Global.setAnnotTransparency(0x00000000);
             signAnnot.RenderToBmp(bitmap);
-            Global.setAnnotTransparency(Global.annotTransparencyColor);
+            Global.setAnnotTransparency(Global.g_annot_transparency);
             Bitmap emptyBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
             boolean empty = bitmap.sameAs(emptyBitmap);
             bitmap.recycle();
@@ -451,7 +573,7 @@ public class CommonUtil {
                 Bitmap bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
                 Global.setAnnotTransparency(0x00000000);
                 signAnnot.RenderToBmp(bitmap);
-                Global.setAnnotTransparency(Global.annotTransparencyColor);
+                Global.setAnnotTransparency(Global.g_annot_transparency);
                 Bitmap emptyBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
                 if(bitmap.sameAs(emptyBitmap))
                     result = "Empty Annot";
@@ -466,9 +588,5 @@ public class CommonUtil {
         } else result = "Cannot get indicated page";
 
         return result;
-    }
-
-    public static int dp2px(Context context, float dpValue) {
-        return (int)(dpValue * context.getResources().getDisplayMetrics().density);
     }
 }

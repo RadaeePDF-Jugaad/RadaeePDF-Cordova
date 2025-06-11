@@ -58,6 +58,7 @@
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/PageContent.java" target-dir="src/com/radaee/pdf" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/Path.java" target-dir="src/com/radaee/pdf" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/SuperDoc.java" target-dir="src/com/radaee/pdf" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/SuperPage.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResFont.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResForm.java" target-dir="src/com/radaee/pdf" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/pdf/ResGState.java" target-dir="src/com/radaee/pdf" />
@@ -71,6 +72,7 @@
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFBotBar.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFLayoutOPStack.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFLayoutView.java" target-dir="src/com/radaee/reader" />
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFMainAct.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFMenu.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFTopBar.java" target-dir="src/com/radaee/reader" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/reader/PDFNavAct.java" target-dir="src/com/radaee/reader" />
@@ -96,7 +98,6 @@
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFAESStream.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFAssetStream.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFFileStream.java" target-dir="src/com/radaee/util" />
-        <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridAdt.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridItem.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridThread.java" target-dir="src/com/radaee/util" />
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PDFGridView.java" target-dir="src/com/radaee/util" />
@@ -109,16 +110,33 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/PopupEditAct.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePDFManager.java" target-dir="src/com/radaee/util" />
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RadaeePluginCallback.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDBGView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDExpView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDFilesItem.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDFilesView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDGridItem.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDGridView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDImgView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDLinearLayout.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDLockerSet.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRecent.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRecentItem.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRecentView.java" target-dir="src/com/radaee/util" />
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/util/RDRelativeLayout.java" target-dir="src/com/radaee/util" />
 
 		<!-- Radaee source - java.com.radaee.view -->
         <source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLBlock.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayout.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutCurl.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual2.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDualV.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutHorz.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutReflow.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutVert.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLPage.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowBlock.java" target-dir="src/com/radaee/view"/>
+		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowCanvas.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLThread.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/ILayoutView.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/PDFLayout.java" target-dir="src/com/radaee/view"/>
@@ -143,30 +161,27 @@
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VPage.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VSel.java" target-dir="src/com/radaee/view"/>
 		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/VThread.java" target-dir="src/com/radaee/view"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowBlock.java" target-dir="src/com/radaee/view"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLReflowCanvas.java" target-dir="src/com/radaee/view"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/view/GLLayoutDual2.java" target-dir="src/com/radaee/view"/>
 
-		<!-- Annot UI -->
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlg.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgComm.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgIcon.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgLine.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgMarkup.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgPopup.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSign.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSignProp.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotMenu.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPop.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopCombo.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopEdit.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIColorButton.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIIconButton.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadButton.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadView.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleButton.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleView.java" target-dir="src/com/radaee/annotui"/>
-		<source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UISignView.java" target-dir="src/com/radaee/annotui"/>
+        <!-- Annot UI -->
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlg.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgComm.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgIcon.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgLine.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgMarkup.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgPopup.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSign.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotDlgSignProp.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotMenu.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPop.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopCombo.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIAnnotPopEdit.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIColorButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UIIconButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILHeadView.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleButton.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UILStyleView.java" target-dir="src/com/radaee/annotui"/>
+        <source-file src="src/android/ViewLib/src/main/java/com/radaee/annotui/UISignView.java" target-dir="src/com/radaee/annotui"/>
 
         <!-- Radaee source - java.com.radaee.util -->
 
@@ -221,6 +236,19 @@
 		<source-file src="src/android/ViewLib/src/main/res/layout/signature_pad.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_grid_view.xml" target-dir="res/layout" />
 		<source-file src="src/android/ViewLib/src/main/res/layout/thumb_view.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_dir_list.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_file_list.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_thumb_grid_view.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pop_bookmark_menu.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_menu_file.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_recent.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_menu_recent.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_main.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/bar_thumb_view.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_file_grid.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/item_bookmark.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_files.xml" target-dir="res/layout" />
+        <source-file src="src/android/ViewLib/src/main/res/layout/pdf_navigate.xml" target-dir="res/layout" />
 
         <!-- Radaee raw -->
         <source-file src="src/android/ViewLib/src/main/res/raw/amiri_regular" target-dir="res/raw" />
@@ -241,6 +269,7 @@
         <source-file src="src/android/ViewLib/src/main/res/raw/texgyi.otf" target-dir="res/raw" />
         <source-file src="src/android/ViewLib/src/main/res/raw/symbol" target-dir="res/raw" />
 		<source-file src="src/android/ViewLib/src/main/res/raw/umaps.dat" target-dir="res/raw" />
+        <source-file src="src/android/ViewLib/src/main/res/raw/radaee_test.pfx" target-dir="res/raw" />
 
         <!-- Project drawable -->
         <source-file src="src/android/res/drawable/bar_back_image.png" target-dir="res/drawable" />
@@ -303,8 +332,10 @@
 		<source-file src="src/android/ViewLib/src/main/res/values-it/strings.xml" target-dir="res/values-it" />
 		<source-file src="src/android/ViewLib/src/main/res/values-sw600dp/bools.xml" target-dir="res/values-sw600dp" />
 		<source-file src="src/android/ViewLib/src/main/res/values-xlarge/bools.xml" target-dir="res/values-xlarge" />
-		<source-file src="src/android/ViewLib/src/main/res/values/colors.xml" target-dir="res/values" />
+		<!-- <source-file src="src/android/ViewLib/src/main/res/values/colors.xml" target-dir="res/values" /> -->
 		<source-file src="src/android/ViewLib/src/main/res/values/dimens.xml" target-dir="res/values" />
+        <source-file src="src/android/ViewLib/src/main/res/anim/anim_popup_end.xml" target-dir="res/anim" />
+        <source-file src="src/android/ViewLib/src/main/res/anim/anim_popup_start.xml" target-dir="res/anim" />
 
 		<!-- Radaee res -->
 		<source-file src="src/android/ViewLib/src/main/res/AMIRI_LICENSE.txt" target-dir="res" />
@@ -320,6 +351,23 @@
         <source-file src="fonts/Roboto-Medium.ttf" target-dir="assets/fonts" />
         <source-file src="fonts/Roboto-Regular.ttf" target-dir="assets/fonts" />
         <source-file src="fonts/Roboto-RegularItalic.ttf" target-dir="assets/fonts" />
+
+        <config-file target="res/values/colors.xml" parent="/resources">
+            <color name="annot_menu_bg_color">#280B08</color>
+            <color name="btn_disabled_color">#80050505</color>
+            <color name="btn_pressed_color">#FFFFFF</color>
+            <color name="toolbar_bg_color">#280B08</color>
+            <color name="toolbar_icon_color">#FF9040</color>
+            <color name="gridview_icon_color">#FF9040</color>
+            <color name="tab_bg_color">#E0E0E0</color>
+            <color name="tab_text_color">#202020</color>
+            <color name="menu_bg_color">#E0E0E0</color>
+            <color name="menu_text_color">#202020</color>
+            <color name="bar_bg_color">#F0F0F0</color>
+            <color name="bar_text_color">#202020</color>
+            <color name="panel_bg_color">#202020</color>
+            <color name="panel_text_color">#E0E0E0</color>
+        </config-file>
 
 		<!-- plugman cannot merge - prepare manual merge -->
         <config-file target="res/values/strings.xml" parent="/resources">
@@ -351,7 +399,7 @@
             <string name="vertical">Vertical</string>
             <string name="horizontal">Horizontal</string>
             <string name="dual_page">Dual Page</string>
-            <string name="curl">Curl</string>
+            <string name="curl" translatable="false">Curl</string>
             <string name="reflow">Text reflow</string>
             <string name="save_msg">Document modified.\nDo you want to save it?</string>
             <string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
@@ -363,13 +411,13 @@
             <string name="show_password">Show password</string>
             <string name="input_password">Input Password</string>
             <string name="loading_pdf">Loading PDF file…</string>
-            <string name="browse_open_file">Browse And Open File</string>
+            <string name="browse_open_file">Browse And Open File(CPU)</string>
             <string name="view_pager">ViewPager</string>
             <string name="open_asset">Open From Assets (ReadOnly)</string>
             <string name="open_sdcard">Open From sdcard</string>
             <string name="open_http">Open Http Link (INTERNET access)</string>
-            <string name="using_RGB_565">Using RGB_565</string>
-            <string name="using_RGB_4444">Using RGB_4444</string>
+            <string name="using_RGB_565">RGB_565 (CPU)</string>
+            <string name="using_RGB_4444">RGB_4444 (CPU)</string>
             <string name="simple_open_gl">Simple OpenGL</string>
             <string name="curl_pages">Curl Pages</string>
             <string name="advance">Advance</string>
@@ -435,6 +483,28 @@
             <string name="annot_lock">Lock</string>
             <string name="alpha">Alpha</string>
 
+            <string name="sign_certificate_hand" translatable="false">Handwrite</string>
+            <string name="sign_certificate_password" translatable="false">Password:</string>
+            <string name="sign_certificate" translatable="false">Certificate:</string>
+            <string name="sign_certificate_select" translatable="false">Open</string>
+            <string name="browser_file_delete_confirm" translatable="false">Do you want to delete file</string>
+            <string name="browser_file_delete" translatable="false">Delete File</string>
+            <string name="browser_file_delete_recent" translatable="false">Remove from recent</string>
+            <string name="browser_file_share" translatable="false">Share file</string>
+            <string name="tag_recent">Recent</string>
+            <string name="tag_files">Files</string>
+            <string name="tag_navigate">Navigate</string>
+            <string name="txt_no_recent">There is no recent files.</string>
+            <string name="browser_file_recent" translatable="false">Recent file:</string>
+            <string name="browser_file_delete_recent_list_confirm" translatable="false">Do you want to clear recent list?</string>
+            <string name="sign_select_certificate" translatable="false">Please select cert file:</string>
+            <string name="sign_certificate_filetype" translatable="false">File type p12 or pfx</string>
+            <string name="sign_error_fail_certificate" translatable="false">Sign failed, can\'t open the certificate file.</string>
+            <string name="sign_error_fail" translatable="false">Sign failed. General error.</string>
+            <string name="txt_no_files">There is no files on storage.</string>
+            <string name="txt_files_title">Files on Device:</string>
+            <!-- <string name="activity_name">Radaee PDF Reader</string> -->
+            <!-- <string name="launcher_name">Radaee PDF Reader</string> -->
 		</config-file>
 
         <!-- Hooks -->
@@ -463,7 +533,7 @@
         <header-file src="src/ios/PDFViewer/RDToolBar.h" target-dir="ios/PDFViewer"/>
         <source-file src="src/ios/PDFViewer/RDToolBar.m" target-dir="ios/PDFViewer"/>
         <header-file src="src/ios/PDFViewer/RDMenu.h" target-dir="ios/PDFViewer"/>
-        <source-file src="src/ios/PDFViewer/RDMenu.m" target-dir="ios/PDFViewer" />
+        <source-file src="src/ios/PDFViewer/RDMenu.m" target-dir="ios/PDFViewer"/>
         <header-file src="src/ios/PDFViewer/UILElement.h" target-dir="ios/PDFViewer"/>
         <source-file src="src/ios/PDFViewer/UILElement.m" target-dir="ios/PDFViewer"/>
         <header-file src="src/ios/PDFViewer/UILShadowView.h" target-dir="ios/PDFViewer"/>

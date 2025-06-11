@@ -3,8 +3,8 @@ package com.radaee.view;
 import android.content.Context;
 
 public class GLLayoutHorz extends GLLayout {
-    private boolean m_rtol;
-    private boolean m_same_height;
+    private final boolean m_rtol;
+    private final boolean m_same_height;
 
     public GLLayoutHorz(Context context, boolean rtol, boolean same_height)
     {
@@ -30,7 +30,6 @@ public class GLLayoutHorz extends GLLayout {
                     pl = mid + 1;
                 else return mid;
             }
-            return (pr < 0) ? 0 : pr;
         }
         else {
             while (pr >= pl) {
@@ -42,8 +41,8 @@ public class GLLayoutHorz extends GLLayout {
                     pr = mid - 1;
                 else return mid;
             }
-            return (pr < 0) ? 0 : pr;
         }
+        return (pr < 0) ? 0 : pr;
     }
 
     private void layout_ltor(float scale, boolean zoom)

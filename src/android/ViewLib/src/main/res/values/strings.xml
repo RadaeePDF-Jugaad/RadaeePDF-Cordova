@@ -1,5 +1,7 @@
 <resources>
 
+    <string name="activity_name">Radaee PDF Reader</string>
+    <string name="launcher_name">Radaee PDF Reader</string>
     <string name="app_name" translatable="false">Radaee Reader</string>
 
     <string name="failed_invalid_password">Open Failed: Invalid Password</string>
@@ -30,7 +32,7 @@
     <string name="vertical">Vertical</string>
     <string name="horizontal">Horizontal</string>
     <string name="dual_page">Dual Page</string>
-    <string name="curl">Curl</string>
+    <string name="curl" translatable="false">Curl</string>
     <string name="reflow">Text reflow</string>
     <string name="save_msg">Document modified.\nDo you want to save it?</string>
     <string name="page_change_block">You cannot change page while page is zoomed, Zoom out first!</string>
@@ -42,13 +44,14 @@
     <string name="show_password">Show password</string>
     <string name="input_password">Input Password</string>
     <string name="loading_pdf">Loading PDF file…</string>
-    <string name="browse_open_file">Browse And Open File (CPU)</string>
+    <string name="browse_open_glfile">Browse And Open File(OpenGL)</string>
+    <string name="browse_open_file">Browse And Open File(CPU)</string>
     <string name="view_pager">ViewPager</string>
     <string name="open_asset">Open From Assets (ReadOnly)</string>
     <string name="open_sdcard">Open From sdcard</string>
     <string name="open_http">Open Http Link (INTERNET access)</string>
-    <string name="using_RGB_565">Using RGB_565 (CPU)</string>
-    <string name="using_RGB_4444">Using RGB_4444 (CPU)</string>
+    <string name="using_RGB_565">RGB_565 (CPU)</string>
+    <string name="using_RGB_4444">RGB_4444 (CPU)</string>
     <string name="simple_open_gl">Simple OpenGL</string>
     <string name="curl_pages">Curl Pages</string>
     <string name="advance">Advance</string>
@@ -68,6 +71,14 @@
     <string name="file_not_opened">Cannot open %1$s.</string>
     <string name="catalog_not_found">Catalog object is not a dictionary.</string>
     <string name="edit_catalog_failed">Edit catalog failed.</string>
+
+    <string name="browser_file_recent" translatable="false">Recent file:</string>
+    <string name="browser_file_delete" translatable="false">Delete File</string>
+    <string name="browser_file_delete_recent" translatable="false">Remove from recent</string>
+    <string name="browser_file_share" translatable="false">Share file</string>
+    <string name="browser_file_delete_confirm" translatable="false">Do you want to delete file</string>
+    <string name="browser_file_delete_recent_list_confirm" translatable="false">Do you want to clear recent list?</string>
+
 
     <string name="no_pdf_outlines">PDF does not contain outlines</string>
     <string name="pdf_print_not_available">PDF File is not available for print.</string>
@@ -99,6 +110,18 @@
     <string name="warning">Warning</string>
     <string name="no_search_reflow">Search not supported in Reflow mode!</string>
 
+    <string name="sign_title" translatable="false">Set your signature</string>
+    <string name="sign_certificate_hand" translatable="false">Handwrite</string>
+    <string name="sign_certificate" translatable="false">Certificate:</string>
+    <string name="sign_certificate_select" translatable="false">Open</string>
+    <string name="sign_certificate_password" translatable="false">Password:</string>
+    <string name="sign_select_certificate" translatable="false">Please select cert file:</string>
+    <string name="sign_certificate_filetype" translatable="false">File type p12 or pfx</string>
+    <string name="sign_is_empty" translatable="false">Signature is empty</string>
+    <string name="sign_error_fail_certificate" translatable="false">Sign failed, can\'t open the certificate file.</string>
+    <string name="sign_error_fail" translatable="false">Sign failed. General error.</string>
+
+
     <string name="annot_perform">Perform</string>
     <string name="annot_edit">poptext</string>
     <string name="annot_remove">remove</string>
@@ -114,4 +137,15 @@
     <string name="annot_lock">Lock</string>
     <string name="alpha">Alpha</string>
 
+    <string name="tag_recent">Recent</string>
+    <string name="tag_files">Files</string>
+    <string name="tag_navigate">Navigate</string>
+    <string name="txt_no_recent">There is no recent files.</string>
+    <string name="txt_files_title">Files on Device:</string>
+    <string name="txt_no_files">There is no files on storage.</string>
+    <string name="button_ok_label">OK</string>
+    <string name="text_cancel_label">Cancel</string>
+    <string name="permission_dialog_title">Permission required</string>
+    <string name="permission_dialog_content">Due to privacy policy update after Android 11, we also need to update our storage access permission to browse document files. Please click on OK button to authorize us.</string>
+    <string name="permission_denied_content">Sorry without necessary permission, some functionalities may be unavailable.</string>
 </resources>

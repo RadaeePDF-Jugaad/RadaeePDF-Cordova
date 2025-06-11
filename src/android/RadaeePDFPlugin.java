@@ -183,7 +183,7 @@ public class RadaeePDFPlugin extends CordovaPlugin implements RadaeePluginCallba
             case "activateLicense":  //activate the license
                 params = args.getJSONObject(0);
 
-                if (mPdfManager.activateLicense(cordova.getActivity(), params.optInt("licenseType"), params.optString("company"),
+                if (mPdfManager.activateLicense(cordova.getActivity(), params.optString("company"),
                         params.optString("email"), params.optString("key")))
                     callbackContext.success("License activated successfully.");
                 else

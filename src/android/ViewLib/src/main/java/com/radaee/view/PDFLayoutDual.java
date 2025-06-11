@@ -7,19 +7,19 @@ import com.radaee.pdf.Global;
 
 public class PDFLayoutDual extends PDFLayout
 {
-    private boolean m_vert_dual[];
-    private boolean m_horz_dual[];
+    private boolean[] m_vert_dual;
+    private boolean[] m_horz_dual;
     private boolean m_rtol = false;
     private boolean m_rtol_init = false;
     private boolean m_page_align_top = true;
-    protected class PDFCell
+    protected static class PDFCell
     {
         public int left;
         public int right;
         int page_left;
         int page_right;
     }
-    protected PDFCell m_cells[];
+    protected PDFCell[] m_cells;
     public PDFLayoutDual(Context context)
     {
         super(context);
@@ -31,8 +31,8 @@ public class PDFLayoutDual extends PDFLayout
     }
     protected void do_scroll(int x, int y, int dx, int dy)
     {
-        float secx = dx * 1000 / m_w;
-        float secy = dy * 1000 / m_h;
+        float secx = (float)dx * 1000 / m_w;
+        float secy = (float)dy * 1000 / m_h;
         int sec = (int)Global.sqrtf(secx * secx + secy * secy);
         m_scroller.startScroll(x, y, dx, dy, sec);
     }
@@ -142,10 +142,15 @@ public class PDFLayoutDual extends PDFLayout
         int ccnt = 0;
         float max_w = 0;
         float max_h = 0;
-        float maxPageScale = m_scale;
-        if(Global.fit_different_page_size && m_scales == null) m_scales = new float[pcnt];
-        if(Global.fit_different_page_size && m_scales_min == null) m_scales_min = new float[pcnt];
-        int clipw = (m_w > m_h) ? m_h : m_w;
+        float max_sh = 0;
+        if(Global.g_auto_scale)
+        {
+            if (m_scales == null)
+                m_scales = new float[pcnt];
+            if (m_scales_min == null)
+                m_scales_min = new float[pcnt];
+        }
+        //int clipw = (m_w > m_h) ? m_h : m_w;
         if( m_h > m_w ) //portrait
         {
             while( pcur < pcnt )
@@ -154,25 +159,26 @@ public class PDFLayoutDual extends PDFLayout
                 {
                     float w = m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1);
                     if( max_w < w ) max_w = w;
-                    float h = m_doc.GetPageHeight(pcur);
-                    if( max_h < h ) max_h = h;
-                    h = m_doc.GetPageHeight(pcur + 1);
-                    if( max_h < h ) max_h = h;
-                    if(Global.fit_different_page_size) {
-                        if(m_scales[pcur] == 0) {
+                    float h0 = m_doc.GetPageHeight(pcur);
+                    if( max_h < h0 ) max_h = h0;
+                    float h1 = m_doc.GetPageHeight(pcur + 1);
+                    if( max_h < h1 ) max_h = h1;
+                    if(Global.g_auto_scale)
+                    {
+                        if(m_scales[pcur] == 0)
+                        {
                             float minScale = (m_w - m_page_gap) / w;
-                            float scale = ((float) (m_h - m_page_gap)) / m_doc.GetPageHeight(pcur);
+                            float maxh = h0;
+                            if (maxh < h1) maxh = h1;
+                            float scale = ((float) (m_h - m_page_gap)) / maxh;
                             if (minScale > scale) minScale = scale;
                             m_scales[pcur] = minScale;
                             m_scales_min[pcur] = minScale;
-
-                            scale = ((float) (m_h - m_page_gap)) / m_doc.GetPageHeight(pcur + 1);
-                            if (minScale > scale) minScale = scale;
                             m_scales[pcur + 1] = minScale;
                             m_scales_min[pcur + 1] = minScale;
                         }
-                        if(maxPageScale < m_scales[pcur]) maxPageScale = m_scales[pcur];
-                        if(maxPageScale < m_scales[pcur + 1]) maxPageScale = m_scales[pcur + 1];
+                        if(max_sh < m_scales[pcur] * h0) max_sh = m_scales[pcur] * h0;
+                        if(max_sh < m_scales[pcur + 1] * h1) max_sh = m_scales[pcur + 1] * h1;
                     }
                     pcur += 2;
                 }
@@ -182,12 +188,16 @@ public class PDFLayoutDual extends PDFLayout
                     if( max_w < w ) max_w = w;
                     float h = m_doc.GetPageHeight(pcur);
                     if( max_h < h ) max_h = h;
-                    if(Global.fit_different_page_size) {
+                    if(Global.g_auto_scale)
+                    {
                         if(m_scales[pcur] == 0) {
-                            m_scales[pcur] = ((float) (m_w - m_page_gap)) / w;
-                            m_scales_min[pcur] = ((float) (m_w - m_page_gap)) / w;
+                            float minScale = (m_w - m_page_gap) / w;
+                            float scale = ((float) (m_h - m_page_gap)) / h;
+                            if (minScale > scale) minScale = scale;
+                            m_scales[pcur] = minScale;
+                            m_scales_min[pcur] = minScale;
                         }
-                        if(maxPageScale < m_scales[pcur]) maxPageScale = m_scales[pcur];
+                        if(max_sh < m_scales[pcur] * h) max_sh = m_scales[pcur] * h;
                     }
                     pcur++;
                 }
@@ -200,8 +210,7 @@ public class PDFLayoutDual extends PDFLayout
             if( m_scale < m_scale_min ) m_scale = m_scale_min;
             if( m_scale > m_scale_max ) m_scale = m_scale_max;
             boolean clip = m_scale / m_scale_min > m_zoom_level_clip;
-            if(!Global.fit_different_page_size) maxPageScale = m_scale;
-            m_th = Global.fit_different_page_size && vGetScale() == vGetMinScale() ? m_h : (int)(max_h * maxPageScale) + m_page_gap;
+            m_th = (Global.g_auto_scale ? (int)max_sh : (int)(max_h * m_scale)) + m_page_gap;
             if( m_th < m_h ) m_th = m_h;
             m_cells = new PDFCell[ccnt];
             pcur = 0;
@@ -212,12 +221,12 @@ public class PDFLayoutDual extends PDFLayout
                 PDFCell cell = new PDFCell();
                 int w = 0;
                 int cw = 0;
-                boolean clipPage = Global.fit_different_page_size ? m_scales[pcur] / m_scales_min[pcur] > m_zoom_level_clip : clip;
-                float pageScale = Global.fit_different_page_size ? m_scales[pcur] : m_scale;
+                boolean clipPage = Global.g_auto_scale ? m_scales[pcur] / m_scales_min[pcur] > m_zoom_level_clip : clip;
+                float pageScale = Global.g_auto_scale ? m_scales[pcur] : m_scale;
                 if( m_vert_dual != null && ccur < m_vert_dual.length && m_vert_dual[ccur] && pcur < pcnt - 1 )
                 {
-                    float pageScale2 = Global.fit_different_page_size ? m_scales[pcur + 1] : m_scale;
-                    w = Global.fit_different_page_size ? (int)( (m_doc.GetPageWidth(pcur) * pageScale) + (m_doc.GetPageWidth(pcur + 1)
+                    float pageScale2 = Global.g_auto_scale ? m_scales[pcur + 1] : m_scale;
+                    w = Global.g_auto_scale ? (int)( (m_doc.GetPageWidth(pcur) * pageScale) + (m_doc.GetPageWidth(pcur + 1)
                             * pageScale2)) : (int)( (m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1)) * pageScale);
                     if( w + m_page_gap < m_w ) cw = m_w;
                     else cw = w + m_page_gap;
@@ -264,38 +273,30 @@ public class PDFLayoutDual extends PDFLayout
         {
             while( pcur < pcnt )
             {
-                if( (m_horz_dual == null || ccnt >= m_horz_dual.length/* || m_horz_dual[ccnt]*/) && pcur == 0 )
-                {
-                    float w = m_doc.GetPageWidth(pcur);
-                    if( max_w < w ) max_w = w;
-                    float h = m_doc.GetPageHeight(pcur);
-                    if( max_h < h ) max_h = h;
-                    if(Global.fit_different_page_size && m_scales[pcur] == 0) {
-                        m_scales[pcur] = ((float)(m_h - m_page_gap)) / h;
-                        m_scales_min[pcur] = ((float)(m_h - m_page_gap)) / h;
-                    }
-                    pcur++;
-                }
-                else
-                if( (m_horz_dual == null || ccnt >= m_horz_dual.length || m_horz_dual[ccnt]) && pcur < pcnt - 1 )
+                if( (m_horz_dual == null || ccnt >= m_horz_dual.length || (m_horz_dual[ccnt]) && pcur < pcnt - 1) )
                 {
                     float w = m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1);
                     if( max_w < w ) max_w = w;
-                    float h = m_doc.GetPageHeight(pcur);
-                    if( max_h < h ) max_h = h;
-                    h = m_doc.GetPageHeight(pcur + 1);
-                    if( max_h < h ) max_h = h;
-                    if(Global.fit_different_page_size && m_scales[pcur] == 0) {
-                        float minScale = (m_w - m_page_gap) / w;
-                        float scale = ((float)(m_h - m_page_gap)) / m_doc.GetPageHeight(pcur);
-                        if( minScale > scale ) minScale = scale;
-                        m_scales[pcur] = minScale;
-                        m_scales_min[pcur] = minScale;
-
-                        scale = ((float)(m_h - m_page_gap)) / m_doc.GetPageHeight(pcur + 1);
-                        if( minScale > scale ) minScale = scale;
-                        m_scales[pcur + 1] = minScale;
-                        m_scales_min[pcur + 1] = minScale;
+                    float h0 = m_doc.GetPageHeight(pcur);
+                    if( max_h < h0 ) max_h = h0;
+                    float h1 = m_doc.GetPageHeight(pcur + 1);
+                    if( max_h < h1 ) max_h = h1;
+                    if(Global.g_auto_scale)
+                    {
+                        if (m_scales[pcur] == 0)
+                        {
+                            float minScale = (m_w - m_page_gap) / w;
+                            float maxh = h0;
+                            if (maxh < h1) maxh = h1;
+                            float scale = ((float) (m_h - m_page_gap)) / maxh;
+                            if (minScale > scale) minScale = scale;
+                            m_scales[pcur] = minScale;
+                            m_scales_min[pcur] = minScale;
+                            m_scales[pcur + 1] = minScale;
+                            m_scales_min[pcur + 1] = minScale;
+                        }
+                        if(max_sh < m_scales[pcur] * h0) max_sh = m_scales[pcur] * h0;
+                        if(max_sh < m_scales[pcur + 1] * h1) max_sh = m_scales[pcur + 1] * h1;
                     }
                     pcur += 2;
                 }
@@ -305,9 +306,17 @@ public class PDFLayoutDual extends PDFLayout
                     if( max_w < w ) max_w = w;
                     float h = m_doc.GetPageHeight(pcur);
                     if( max_h < h ) max_h = h;
-                    if(Global.fit_different_page_size && m_scales[pcur] == 0) {
-                        m_scales[pcur] = ((float)(m_h - m_page_gap)) / h;
-                        m_scales_min[pcur] = ((float)(m_h - m_page_gap)) / h;
+                    if(Global.g_auto_scale)
+                    {
+                        if(m_scales[pcur] == 0)
+                        {
+                            float minScale = (m_w - m_page_gap) / w;
+                            float scale = ((float) (m_h - m_page_gap)) / h;
+                            if (minScale > scale) minScale = scale;
+                            m_scales[pcur] = minScale;
+                            m_scales_min[pcur] = minScale;
+                        }
+                        if(max_sh < m_scales[pcur] * h) max_sh = m_scales[pcur] * h;
                     }
                     pcur++;
                 }
@@ -320,7 +329,7 @@ public class PDFLayoutDual extends PDFLayout
             if( m_scale < m_scale_min ) m_scale = m_scale_min;
             if( m_scale > m_scale_max ) m_scale = m_scale_max;
             boolean clip = m_scale / m_scale_min > m_zoom_level_clip;
-            m_th = Global.fit_different_page_size && vGetScale() == vGetMinScale() ? m_h : (int)(max_h * m_scale) + m_page_gap;
+            m_th = (Global.g_auto_scale ? (int)max_sh : (int)(max_h * m_scale)) + m_page_gap;
             if( m_th < m_h ) m_th = m_h;
             m_cells = new PDFCell[ccnt];
             pcur = 0;
@@ -331,8 +340,8 @@ public class PDFLayoutDual extends PDFLayout
                 PDFCell cell = new PDFCell();
                 int w = 0;
                 int cw = 0;
-                boolean clipPage = Global.fit_different_page_size ? m_scales[pcur] / m_scales_min[pcur] > m_zoom_level_clip : clip;
-                float pageScale = Global.fit_different_page_size ? m_scales[pcur] : m_scale;
+                boolean clipPage = Global.g_auto_scale ? m_scales[pcur] / m_scales_min[pcur] > m_zoom_level_clip : clip;
+                float pageScale = Global.g_auto_scale ? m_scales[pcur] : m_scale;
                 if ((m_horz_dual == null || ccur >= m_horz_dual.length ) && pcur == 0 )
                 {
                     w = (int)( m_doc.GetPageWidth(pcur) * pageScale );
@@ -353,8 +362,8 @@ public class PDFLayoutDual extends PDFLayout
                 }
                 else if( (m_horz_dual == null || ccur >= m_horz_dual.length || m_horz_dual[ccur]) && pcur < pcnt - 1 )
                 {
-                    float pageScale2 = Global.fit_different_page_size ? m_scales[pcur + 1] : m_scale;
-                    w = Global.fit_different_page_size ? (int)( (m_doc.GetPageWidth(pcur) * pageScale) + (m_doc.GetPageWidth(pcur + 1)
+                    float pageScale2 = Global.g_auto_scale ? m_scales[pcur + 1] : m_scale;
+                    w = Global.g_auto_scale ? (int)( (m_doc.GetPageWidth(pcur) * pageScale) + (m_doc.GetPageWidth(pcur + 1)
                             * pageScale2)) : (int)( (m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1)) * pageScale);
                     if( w + m_page_gap < m_w ) cw = m_w;
                     else cw = w + m_page_gap;
@@ -627,6 +636,8 @@ public class PDFLayoutDual extends PDFLayout
                 int w = m_cells[ccur].right - left;
                 int x = left + (w - m_w)/2;
                 m_scroller.setFinalX(x);
+                m_scroller.computeScrollOffset();
+                m_scroller.setFinalX(x);
                 break;
             }
             ccur++;
@@ -646,6 +657,7 @@ public class PDFLayoutDual extends PDFLayout
                 int left = m_cells[ccur].left;
                 int w = m_cells[ccur].right - left;
                 int x = left + (w - m_w)/2;
+                m_scroller.computeScrollOffset();
                 float oldx = m_scroller.getCurrX();
                 float oldy = m_scroller.getCurrY();
                 m_scroller.startScroll((int)oldx, (int)oldy, (int)(x - oldx), 0);
@@ -654,12 +666,37 @@ public class PDFLayoutDual extends PDFLayout
             ccur++;
         }
     }
-    public void vSetLayoutPara( boolean verts[], boolean horzs[], boolean rtol, boolean pages_align_top )
+    public void vSetLayoutPara( boolean[] verts, boolean[] horzs, boolean rtol, boolean pages_align_top )
     {
         m_vert_dual = verts;
         m_horz_dual = horzs;
         m_rtol = rtol;
         m_page_align_top = pages_align_top;
         vLayout();
+    }
+    protected void vFindGoto() {
+        if (m_pages == null) return;
+        int pg = m_finder.find_get_page();
+        if (pg < 0 || pg >= m_doc.GetPageCount()) return;
+        int x = vGetX();
+        int y = vGetY();
+        float[] pos = m_finder.find_get_pos();
+        if (pos == null) return;
+        pos[0] = m_pages[pg].ToDIBX(pos[0]) + m_pages[pg].GetX();
+        pos[1] = m_pages[pg].ToDIBY(pos[1]) + m_pages[pg].GetY();
+        pos[2] = m_pages[pg].ToDIBX(pos[2]) + m_pages[pg].GetX();
+        pos[3] = m_pages[pg].ToDIBY(pos[3]) + m_pages[pg].GetY();
+        if (x > pos[0] - m_w / 8) x = (int) pos[0] - m_w / 8;
+        if (x < pos[2] - m_w * 7 / 8) x = (int) pos[2] - m_w * 7 / 8;
+        if (y > pos[1] - m_h / 8) y = (int) pos[1] - m_h / 8;
+        if (y < pos[3] - m_h * 7 / 8) y = (int) pos[3] - m_h * 7 / 8;
+        if (x > m_tw - m_w) x = m_tw - m_w;
+        if (x < 0) x = 0;
+        if (y > m_th - m_h) y = m_th - m_h;
+        if (y < 0) y = 0;
+        vScrollAbort();
+        m_scroller.setFinalX(x);
+        m_scroller.setFinalY(y);
+        vGotoPage(pg);
     }
 }

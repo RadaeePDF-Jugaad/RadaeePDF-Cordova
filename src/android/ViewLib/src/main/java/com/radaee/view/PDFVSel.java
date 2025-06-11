@@ -36,12 +36,12 @@ public class PDFVSel
 	protected int[] GetRect1(float scale, float page_height, int orgx, int orgy)
 	{
 		if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return null;
-		float rect[] = new float[4];
+		float[] rect = new float[4];
 		if( m_swiped )
 			m_page.ObjsGetCharRect(m_index2, rect);
 		else
 			m_page.ObjsGetCharRect(m_index1, rect);
-		int rect_draw[] = new int[4];
+		int[] rect_draw = new int[4];
 		rect_draw[0] = (int)(rect[0] * scale) + orgx;
 		rect_draw[1] = (int)((page_height - rect[3]) * scale) + orgy;
 		rect_draw[2] = (int)(rect[2] * scale) + orgx;
@@ -51,12 +51,12 @@ public class PDFVSel
 	protected int[] GetRect2(float scale, float page_height, int orgx, int orgy)
 	{
 		if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return null;
-		float rect[] = new float[4];
+		float[] rect = new float[4];
 		if( m_swiped )
 			m_page.ObjsGetCharRect(m_index1, rect);
 		else
 			m_page.ObjsGetCharRect(m_index2, rect);
-		int rect_draw[] = new int[4];
+		int[] rect_draw = new int[4];
 		rect_draw[0] = (int)(rect[0] * scale) + orgx;
 		rect_draw[1] = (int)((page_height - rect[3]) * scale) + orgy;
 		rect_draw[2] = (int)(rect[2] * scale) + orgx;
@@ -70,7 +70,7 @@ public class PDFVSel
 			m_page.ObjsStart();
 			m_ok = true;
 		}
-		float pt[] = new float[2];
+		float[] pt = new float[2];
 		pt[0] = x1;
 		pt[1] = y1;
 		m_index1 = m_page.ObjsGetCharIndex(pt);
@@ -102,10 +102,10 @@ public class PDFVSel
 	protected void DrawSel( Canvas canvas, float scale, float page_height, int orgx, int orgy )
 	{
 		if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return;
-		float rect[] = new float[4];
-		float rect_word[] = new float[4];
-		float rect_draw[] = new float[4];
-		m_paint.setARGB((Global.selColor>>24)&0xFF, (Global.selColor>>16)&0xFF, (Global.selColor>>8)&0xFF, Global.selColor&0xFF );
+		float[] rect = new float[4];
+		float[] rect_word = new float[4];
+		float[] rect_draw = new float[4];
+		m_paint.setColor(Global.g_sel_color);
 		m_page.ObjsGetCharRect(m_index1, rect);
 		rect_word[0] = rect[0];
 		rect_word[1] = rect[1];
@@ -145,9 +145,9 @@ public class PDFVSel
 	protected void DrawSel( BMP bmp, float scale, float page_height, int orgx, int orgy )
 	{
 		if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return;
-		float rect[] = new float[4];
-		float rect_word[] = new float[4];
-		float rect_draw[] = new float[4];
+		float[] rect = new float[4];
+		float[] rect_word = new float[4];
+		float[] rect_draw = new float[4];
 		m_page.ObjsGetCharRect(m_index1, rect);
 		rect_word[0] = rect[0];
 		rect_word[1] = rect[1];
@@ -170,7 +170,7 @@ public class PDFVSel
 				rect_draw[1] = (page_height - rect_word[3]) * scale;
 				rect_draw[2] = rect_word[2] * scale;
 				rect_draw[3] = (page_height - rect_word[1]) * scale;
-				bmp.DrawRect(Global.selColor, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
+				bmp.DrawRect(Global.g_sel_color, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
 				rect_word[0] = rect[0];
 				rect_word[1] = rect[1];
 				rect_word[2] = rect[2];
@@ -182,14 +182,14 @@ public class PDFVSel
 		rect_draw[1] = (page_height - rect_word[3]) * scale;
 		rect_draw[2] = rect_word[2] * scale;
 		rect_draw[3] = (page_height - rect_word[1]) * scale;
-		bmp.DrawRect(Global.selColor, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
+		bmp.DrawRect(Global.g_sel_color, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
 	}
 	protected void DrawSelToDIB( DIB dib, float scale, float page_height, int orgx, int orgy )
 	{
 		if( m_index1 < 0 || m_index2 < 0 || !m_ok ) return;
-		float rect[] = new float[4];
-		float rect_word[] = new float[4];
-		float rect_draw[] = new float[4];
+		float[] rect = new float[4];
+		float[] rect_word = new float[4];
+		float[] rect_draw = new float[4];
 		m_page.ObjsGetCharRect(m_index1, rect);
 		rect_word[0] = rect[0];
 		rect_word[1] = rect[1];
@@ -212,7 +212,7 @@ public class PDFVSel
 				rect_draw[1] = (page_height - rect_word[3]) * scale;
 				rect_draw[2] = rect_word[2] * scale;
 				rect_draw[3] = (page_height - rect_word[1]) * scale;
-				dib.DrawRect(Global.selColor, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
+				dib.DrawRect(Global.g_sel_color, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
 				rect_word[0] = rect[0];
 				rect_word[1] = rect[1];
 				rect_word[2] = rect[2];
@@ -224,6 +224,6 @@ public class PDFVSel
 		rect_draw[1] = (page_height - rect_word[3]) * scale;
 		rect_draw[2] = rect_word[2] * scale;
 		rect_draw[3] = (page_height - rect_word[1]) * scale;
-		dib.DrawRect(Global.selColor, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
+		dib.DrawRect(Global.g_sel_color, (int)(orgx + rect_draw[0]), (int)(orgy + rect_draw[1]), (int)(rect_draw[2] - rect_draw[0]), (int)(rect_draw[3] - rect_draw[1]), 0);
 	}
 }

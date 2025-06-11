@@ -1,9 +1,6 @@
 package com.radaee.view;
 
 import android.graphics.Bitmap;
-import android.opengl.GLUtils;
-import android.os.SystemClock;
-import android.util.Log;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Matrix;
@@ -12,8 +9,8 @@ import com.radaee.pdf.Page;
 import javax.microedition.khronos.opengles.GL10;
 
 public class GLPage implements ILayoutView.IVPage{
-    private Document m_doc;
-    private int m_pageno;
+    private final Document m_doc;
+    private final int m_pageno;
     private int m_left;
     private int m_top;
     private int m_right;
@@ -23,8 +20,8 @@ public class GLPage implements ILayoutView.IVPage{
     private float m_scale;
     private boolean m_dirty;
     private boolean m_curl;
-    private GLBlock m_blks[];
-    private GLBlock m_blks_zoom[];
+    private GLBlock[] m_blks;
+    private GLBlock[] m_blks_zoom;
     public GLPage(Document doc, int pageno)
     {
         m_doc = doc;
@@ -89,9 +86,50 @@ public class GLPage implements ILayoutView.IVPage{
             m_blks[0] = new GLBlock(m_doc, m_pageno, m_scale, 0, 0, m_right - m_left, m_bottom - m_top, height);
         }
     }
+    /**
+     * set whole page as dirty
+     */
     protected void gl_set_dirty()
     {
         m_dirty = true;
+    }
+    /**
+     * set dirty for a area
+     * @param pdfl left of dirty bounding box
+     * @param pdft top of dirty bounding box
+     * @param pdfr right of dirty bounding box
+     * @param pdfb bottom of dirty bounding box
+     */
+    protected void gl_set_dirty(float pdfl, float pdft, float pdfr, float pdfb)
+    {
+        int dibl = (int)(pdfl * m_scale);
+        int dibt = m_ph - (int)(pdfb * m_scale);
+        int dibr = (int)(pdfr * m_scale);
+        int dibb = m_ph - (int)(pdft * m_scale);
+        if (m_blks_zoom != null)
+        {
+            GLBlock glb = m_blks_zoom[m_blks_zoom.length - 1];
+            int srcw = glb.GetRight();
+            int srch = glb.GetBottom();
+            if (srcw != m_pw || srch != m_ph) return;
+        }
+        if (m_blks_zoom == null) m_blks_zoom = new GLBlock[m_blks.length];
+        for (int idx = 0; idx < m_blks.length; idx++)
+        {
+            GLBlock glb = m_blks[idx];
+            if (glb.isCross(dibl, dibt, dibr, dibb))
+            {
+                if (m_blks_zoom[idx] == null || !m_blks_zoom[idx].has_render()) {
+                    m_blks_zoom[idx] = glb;
+                    m_blks[idx] = new GLBlock(m_doc, m_pageno, m_scale, glb.GetX(), glb.GetY(), glb.GetW(), glb.GetH(), m_ph);
+                }
+            }
+            else
+            {
+                if (m_blks_zoom[idx] == null)
+                    m_blks_zoom[idx] = new GLBlock(m_doc, m_pageno, m_scale, glb.GetX(), glb.GetY(), glb.GetW(), glb.GetH(), m_ph);
+            }
+        }
     }
     public final void gl_render(GL10 gl10, GLThread thread)
     {
@@ -129,14 +167,14 @@ public class GLPage implements ILayoutView.IVPage{
             int srch = glb.GetBottom();
             int dstw = m_right - m_left;
             int dsth = m_bottom - m_top;
-            for (int ibb = 0; ibb < m_blks_zoom.length; ibb++) {
-                glb = m_blks_zoom[ibb];
+            for (GLBlock glBlock : m_blks_zoom) {
+                glb = glBlock;
                 bl = left + glb.GetX() * dstw / srcw;
                 bt = top + glb.GetY() * dsth / srch;
                 br = left + glb.GetRight() * dstw / srcw;
                 bb = top + glb.GetBottom() * dsth / srch;
                 if (br <= 0 || bl >= w || bb <= 0 || bt >= h) continue;
-                if(glb.gl_make_text()) glb.gl_draw(gl10, -1, bl, bt, br, bb);
+                if (glb.gl_make_text()) glb.gl_draw(gl10, -1, bl, bt, br, bb);
             }
         }
         if(m_blks == null) return;//then draw the blocks.
@@ -145,24 +183,111 @@ public class GLPage implements ILayoutView.IVPage{
         bt = -top - GLBlock.m_cell_size;
         br = w - left + GLBlock.m_cell_size;
         bb = h - top + GLBlock.m_cell_size;
-        for(int ib = 0; ib < m_blks.length; ib++)
-        {
-            GLBlock glb = m_blks[ib];
-            if(glb.isCross(bl, bt, br, bb))
-            {
-                if(!glb.gl_make_text())
-                {
+        for (GLBlock glb : m_blks) {
+            if (glb.isCross(bl, bt, br, bb)) {
+                if (!glb.gl_make_text()) {
                     all_ok = false;
                     thread.render_start(glb);
-                    if(m_blks_zoom == null)//not in zooming status.
+                    if (m_blks_zoom == null)//not in zooming status.
                         glb.gl_draw(gl10, def_text, left + glb.GetX(), top + glb.GetY(), left + glb.GetRight(), top + glb.GetBottom());
-                }
-                else//texture is ready
+                } else//texture is ready
                     glb.gl_draw(gl10, def_text, left + glb.GetX(), top + glb.GetY(), left + glb.GetRight(), top + glb.GetBottom());
-            }
-            else thread.render_end(gl10, glb);
+            } else thread.render_end(gl10, glb);
         }
         if(all_ok) gl_end_zoom(gl10, thread);//destroy zoom cache and draw blk.
+    }
+    /**
+     * draw page with more cache.
+     * @param gl10
+     * @param thread
+     * @param def_text
+     * @param orgx
+     * @param orgy
+     * @param w
+     * @param h
+     */
+    public final void gl_draw2(GL10 gl10, GLThread thread, int def_text, int orgx, int orgy, int w, int h) {
+        if (m_dirty) {
+            m_dirty = false;
+            gl_zoom_start(gl10, thread);
+            gl_alloc();
+        }
+        int bl = m_left - orgx;
+        int bt = m_top - orgy;
+        int br = m_right - orgx;
+        int bb = m_bottom - orgy;
+        if (bl < 0) bl = 0;
+        if (bt < 0) bt = 0;
+        if (br > w) br = w;
+        if (bb > h) bb = h;
+        if (br > bl && bb > bt)
+            GLBlock.drawQuadColor(gl10, def_text, bl << 16, bt << 16, br << 16, bt << 16, bl << 16, bb << 16, br << 16, bb << 16, 1, 1, 1);
+        int left = m_left - orgx;
+        int top = m_top - orgy;
+        if (m_blks_zoom != null)//draw zoom cache first.
+        {
+            GLBlock glb = m_blks_zoom[m_blks_zoom.length - 1];
+            int srcw = glb.GetRight();
+            int srch = glb.GetBottom();
+            int dstw = m_right - m_left;
+            int dsth = m_bottom - m_top;
+            for (GLBlock glBlock : m_blks_zoom) {
+                glb = glBlock;
+                bl = left + glb.GetX() * dstw / srcw;
+                bt = top + glb.GetY() * dsth / srch;
+                br = left + glb.GetRight() * dstw / srcw;
+                bb = top + glb.GetBottom() * dsth / srch;
+                if (br <= 0 || bl >= w || bb <= 0 || bt >= h) continue;
+                if (glb.gl_make_text()) glb.gl_draw(gl10, -1, bl, bt, br, bb);
+            }
+        }
+        if (m_blks == null) return;//then draw the blocks.
+        boolean all_ok = true;
+        bl = -left;
+        bt = -top;
+        br = w - left;
+        bb = h - top;
+        int bl1 = -left - w - GLBlock.m_cell_size;
+        int bt1 = -top - GLBlock.m_cell_size;
+        int br1 = w - left + w + GLBlock.m_cell_size;
+        int bb1 = h - top + GLBlock.m_cell_size;
+        for (GLBlock glb : m_blks) {
+            if (glb.isCross(bl1, bt1, br1, bb1))//in cache area?
+            {
+                if (glb.isCross(bl, bt, br, bb))//in display area?
+                {
+                    if (!glb.gl_make_text()) {
+                        all_ok = false;
+                        thread.render_start(glb);
+                        if (m_blks_zoom == null)//not in zooming status.
+                            glb.gl_draw(gl10, def_text, left + glb.GetX(), top + glb.GetY(), left + glb.GetRight(), top + glb.GetBottom());
+                    } else//texture is ready
+                        glb.gl_draw(gl10, def_text, left + glb.GetX(), top + glb.GetY(), left + glb.GetRight(), top + glb.GetBottom());
+                } else
+                    thread.render_start(glb);
+            } else thread.render_end(gl10, glb);
+        }
+        if (all_ok) gl_end_zoom(gl10, thread);//destroy zoom cache and draw blk.
+    }
+    public final void gl_sync(int orgx, int orgy, int w, int h) {
+        if (m_blks == null) {
+            gl_alloc();
+        }
+        int left = m_left - orgx;
+        int top = m_top - orgy;
+        if (m_blks == null) return;//then draw the blocks.
+        int bl = -left - GLBlock.m_cell_size;
+        int bt = -top - GLBlock.m_cell_size;
+        int br = w - left + GLBlock.m_cell_size;
+        int bb = h - top + GLBlock.m_cell_size;
+        for (GLBlock glb : m_blks) {
+            if (glb.isCross(bl, bt, br, bb)) {
+                if (!glb.gl_make_text() && !glb.has_render()) {
+                    glb.gl_start();
+                    glb.bk_render();
+                }
+            }
+        }
     }
     public final void gl_end(GL10 gl10, GLThread thread)
     {
@@ -176,8 +301,7 @@ public class GLPage implements ILayoutView.IVPage{
     public final void gl_end_zoom(GL10 gl10, GLThread thread)
     {
         if(m_blks_zoom == null) return;
-        for(int cur = 0; cur < m_blks_zoom.length; cur++)
-            thread.render_end(gl10, m_blks_zoom[cur]);
+        for (GLBlock glBlock : m_blks_zoom) thread.render_end(gl10, glBlock);
         m_blks_zoom = null;
     }
     protected final void gl_zoom_start(GL10 gl10, GLThread thread)
@@ -186,9 +310,7 @@ public class GLPage implements ILayoutView.IVPage{
         {
             if(m_blks != null)
             {
-                for(int cur = 0; cur < m_blks.length; cur++)
-                {
-                    GLBlock glb = m_blks[cur];
+                for (GLBlock glb : m_blks) {
                     thread.render_end(gl10, glb);
                 }
                 m_blks = null;
@@ -197,7 +319,6 @@ public class GLPage implements ILayoutView.IVPage{
         }
         m_blks_zoom = m_blks;
         m_blks = null;
-        return;
     }
     public final int GetPageNo(){return m_pageno;}
     protected final int GetLeft(){return m_left;}
@@ -288,5 +409,13 @@ public class GLPage implements ILayoutView.IVPage{
         page.ReflowToBmp(bmp, 0, 0);
         page.Close();
         return bmp;
+    }
+    public boolean vFinished()
+    {
+        if (m_blks == null) return true;
+        for (GLBlock blk : m_blks) {
+            if (blk != null && blk.is_rendering()) return false;
+        }
+        return true;
     }
 }

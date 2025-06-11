@@ -31,9 +31,9 @@
     <com.radaee.annotui.UILStyleButton
         android:id="@+id/btn_lstyle"
         android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_height="20dp"
         android:layout_below="@id/txt_lwidth"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:layout_toRightOf="@id/txt_lstyle"
         android:background="#000000"
         android:textSize="10sp" />
@@ -49,9 +49,9 @@
     <com.radaee.annotui.UIColorButton
         android:id="@+id/btn_lcolor"
         android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_height="20dp"
         android:layout_below="@id/txt_lstyle"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:layout_toRightOf="@id/txt_icon"
         android:background="#000000"
         android:textSize="10sp" />
@@ -67,9 +67,9 @@
     <com.radaee.annotui.UIColorButton
         android:id="@+id/btn_fcolor"
         android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_height="20dp"
         android:layout_below="@id/txt_icon"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:layout_toRightOf="@id/txt_fcolor"
         android:background="#000000"
         android:textSize="10sp" />
@@ -85,9 +85,9 @@
     <com.radaee.annotui.UILHeadButton
         android:id="@+id/btn_lhead1"
         android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_height="20dp"
         android:layout_below="@id/txt_fcolor"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:layout_toRightOf="@id/txt_lhead1"
         android:background="#000000"
         android:textSize="10sp" />
@@ -103,9 +103,9 @@
     <com.radaee.annotui.UILHeadButton
         android:id="@+id/btn_lhead2"
         android:layout_width="80dp"
-        android:layout_height="30dp"
+        android:layout_height="20dp"
         android:layout_below="@id/txt_lhead1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:layout_toRightOf="@id/txt_lhead2"
         android:background="#000000"
         android:textSize="10sp" />
@@ -121,12 +121,12 @@
     <SeekBar
         android:id="@+id/seek_alpha"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:layout_below="@id/txt_lhead2"
         android:layout_marginTop="18dp"
-        android:layout_toRightOf="@id/txt_alpha"
         android:layout_toLeftOf="@+id/txt_alpha_val"
-        android:paddingStart="7dp"/>
+        android:layout_toRightOf="@id/txt_alpha"
+        android:paddingStart="7dp" />
 
     <TextView
         android:id="@+id/txt_alpha_val"

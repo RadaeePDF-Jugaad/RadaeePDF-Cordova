@@ -208,6 +208,7 @@ public class RadaeePluginCallback {
     }
 
     /**
+     * this interface is only used in cordova plugin.
      * Interface to help pass events to the PDFViewController
      */
     public interface PDFControllerListener {

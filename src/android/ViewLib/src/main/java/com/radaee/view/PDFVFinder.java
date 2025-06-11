@@ -29,11 +29,10 @@ public class PDFVFinder
 	private boolean is_cancel = true;
 	private boolean is_notified = false;
 	private boolean is_waitting = false;
-	private Paint m_paint = new Paint();
+	private final Paint m_paint = new Paint();
 	protected PDFVFinder()
 	{
-		m_paint.setARGB((Global.findPrimaryColor>>24)&0xFF, (Global.findPrimaryColor>>16)&0xFF, (Global.findPrimaryColor>>8)&0xFF,
-				Global.findPrimaryColor&0xFF );
+		m_paint.setColor(Global.g_find_primary_color);
 		m_paint.setStyle(Style.FILL);
 	}
 	private synchronized void eve_reset()
@@ -54,7 +53,7 @@ public class PDFVFinder
 				is_waitting = false;
 			}
 		}
-		catch(Exception e)
+		catch(Exception ignored)
 		{
 		}
 	}
@@ -235,7 +234,7 @@ public class PDFVFinder
 		{
 			int ichar = m_finder.GetFirstChar(m_page_find_index);
 			if( ichar < 0 ) return null;
-			float rect[] = new float[4];
+			float[] rect = new float[4];
 			m_page.ObjsGetCharRect(ichar, rect);
 			return rect;
 		}
@@ -254,9 +253,9 @@ public class PDFVFinder
 		{
 			int ichar = m_finder.GetFirstChar(m_page_find_index);
 			int ichar_end = ichar + m_str.length();
-			float rect[] = new float[4];
-			float rect_word[] = new float[4];
-			float rect_draw[] = new float[4];
+			float[] rect = new float[4];
+			float[] rect_word = new float[4];
+			float[] rect_draw = new float[4];
 			m_page.ObjsGetCharRect(ichar, rect);
 			rect_word[0] = rect[0];
 			rect_word[1] = rect[1];
@@ -306,9 +305,9 @@ public class PDFVFinder
 		{
 			int ichar = m_finder.GetFirstChar(m_page_find_index);
 			int ichar_end = ichar + m_str.length();
-			float rect[] = new float[4];
-			float rect_word[] = new float[4];
-			float rect_draw[] = new float[4];
+			float[] rect = new float[4];
+			float[] rect_word = new float[4];
+			float[] rect_draw = new float[4];
 			m_page.ObjsGetCharRect(ichar, rect);
 			rect_word[0] = rect[0];
 			rect_word[1] = rect[1];
@@ -358,9 +357,9 @@ public class PDFVFinder
 		{
 			int ichar = m_finder.GetFirstChar(m_page_find_index);
 			int ichar_end = ichar + m_str.length();
-			float rect[] = new float[4];
-			float rect_word[] = new float[4];
-			float rect_draw[] = new float[4];
+			float[] rect = new float[4];
+			float[] rect_word = new float[4];
+			float[] rect_draw = new float[4];
 			m_page.ObjsGetCharRect(ichar, rect);
 			rect_word[0] = rect[0];
 			rect_word[1] = rect[1];

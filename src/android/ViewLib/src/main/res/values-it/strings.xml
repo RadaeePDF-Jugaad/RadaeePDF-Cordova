@@ -69,6 +69,17 @@
     <string name="catalog_not_found">Oggetto catalogo non è un dizionario.</string>
     <string name="edit_catalog_failed">Modifica catalogo fallito.</string>
 
+    <string name="sign_title">Firma il documento</string>
+    <string name="sign_certificate_hand">Firma autografa</string>
+    <string name="sign_certificate">Certificato:</string>
+    <string name="sign_certificate_select">Apri</string>
+    <string name="sign_certificate_password">Password:</string>
+    <string name="sign_select_certificate">Scegli il certificato di firma:</string>
+    <string name="sign_certificate_filetype">Certificati di tipo p12 o pfx</string>
+    <string name="sign_is_empty">La firma è vuota</string>
+    <string name="sign_error_fail_certificate">Non è stato possibile firmare il documento\nper un problema sul certificato.</string>
+    <string name="sign_error_fail" translatable="false">Non è stato possibile firmare il documento.</string>
+
     <string name="no_pdf_outlines">Il file non contiene un elenco di contenuti</string>
     <string name="pdf_print_not_available">File PDF non è disponibile per la stampa.</string>
     <string name="pdf_print_calculation_failed">Impossibile contare le pagine.</string>
@@ -80,5 +91,32 @@
     <string name="saved_message">Documento salvato</string>
     <string name="delete_signature_message">È già presente una firma, vuoi cancellarla?</string>
     <string name="warning">Avviso</string>
+
+    <string name="annot_perform">Applica</string>
+    <string name="annot_edit">poptext</string>
+    <string name="annot_remove">rimuovi</string>
+    <string name="annot_property">proprietà</string>
+    <string name="line_width">Spessore</string>
+    <string name="line_style">Stile</string>
+    <string name="line_color">Colore</string>
+    <string name="line_start">Inizio</string>
+    <string name="line_end">Fine</string>
+    <string name="fill_color">Riempimento</string>
+    <string name="annot_color">Colore</string>
+    <string name="icon">icona</string>
+    <string name="annot_lock">Blocca</string>
+    <string name="alpha">Trasparenza</string>
+
+    <string name="tag_recent">Recenti</string>
+    <string name="tag_files">File</string>
+    <string name="tag_navigate">Naviga</string>
+    <string name="txt_no_recent">Non ci sono file recenti.</string>
+    <string name="txt_files_title">File sul dispositivo:</string>
+    <string name="txt_no_files">Non ci sono file riconosciuti.</string>
+    <string name="button_ok_label">OK</string>
+    <string name="text_cancel_label">Annulla</string>
+    <string name="permission_dialog_title">E\' necessaria l\'autorizzazione</string>
+    <string name="permission_dialog_content">Per motivi di privacy, a partire da Android 11 è necessario autorizzare l\'accesso all\'applicazione. Cortesemente, premi OK e autorizza l\'applicazione.</string>
+    <string name="permission_denied_content">Senza le autorizzazioni di accesso l\'applicazione è limitata.</string>
 
 </resources>

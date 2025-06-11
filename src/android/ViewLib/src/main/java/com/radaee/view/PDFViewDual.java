@@ -8,18 +8,18 @@ import com.radaee.pdf.Global;
 @Deprecated
 public class PDFViewDual extends PDFView
 {
-	private boolean m_vert_dual[];
-	private boolean m_horz_dual[];
+	private boolean[] m_vert_dual;
+	private boolean[] m_horz_dual;
 	private boolean m_rtol = false;
     private boolean m_page_align_top = true;
-	protected class PDFCell
+	protected static class PDFCell
 	{
 		public int left;
 		public int right;
 		public int page_left;
 		public int page_right;
 	}
-	protected PDFCell m_cells[];
+	protected PDFCell[] m_cells;
 	public PDFViewDual(Context context)
 	{
 		super(context);
@@ -39,7 +39,7 @@ public class PDFViewDual extends PDFView
      * @param rtol right scroll to left page mode?.<br/>
      * @param page_align_top pages align to top? if false, pages were vertically centered.
      */
-	public void vSetLayoutPara( boolean verts[], boolean horzs[], boolean rtol, boolean page_align_top )
+	public void vSetLayoutPara(boolean[] verts, boolean[] horzs, boolean rtol, boolean page_align_top )
 	{
 		m_vert_dual = verts;
 		m_horz_dual = horzs;
@@ -113,7 +113,7 @@ public class PDFViewDual extends PDFView
             m_scale_min = ((float)(m_w - m_page_gap)) / max_w;
             float scale = ((float)(m_h - m_page_gap)) / max_h;
             if( m_scale_min > scale ) m_scale_min = scale;
-            m_scale_max = m_scale_min * Global.zoomLevel;
+            m_scale_max = m_scale_min * Global.g_view_zoom_level;
 			if( m_scale < m_scale_min ) m_scale = m_scale_min;
 			if( m_scale > m_scale_max ) m_scale = m_scale_max;
 			m_doch = (int)(max_h * m_scale) + m_page_gap;
@@ -207,7 +207,7 @@ public class PDFViewDual extends PDFView
 			m_scale_min = ((float)(m_w - m_page_gap)) / max_w;
 			float scale = ((float)(m_h - m_page_gap)) / max_h;
 			if( m_scale_min > scale ) m_scale_min = scale;
-			m_scale_max = m_scale_min * Global.zoomLevel;
+			m_scale_max = m_scale_min * Global.g_view_zoom_level;
 			if( m_scale < m_scale_min ) m_scale = m_scale_min;
 			if( m_scale > m_scale_max ) m_scale = m_scale_max;
 			m_doch = (int)(max_h * m_scale) + m_page_gap;
@@ -458,7 +458,7 @@ public class PDFViewDual extends PDFView
             int minX = 0, maxX = m_docw - m_w, minY = 0, maxY = m_doch - m_h;
 
             int index = m_pageno;
-            if (Global.def_view == 6 && m_w > m_h && (m_horz_dual != null || (m_horz_dual != null && m_horz_dual[m_pageno])))
+            if (Global.g_view_mode == 6 && m_w > m_h && (m_horz_dual != null && m_horz_dual[m_pageno]))
                 index = (m_pageno + 1) / 2;
             if (index < m_cells.length) {
                 minX = m_cells[index].left;

@@ -38,7 +38,7 @@ public class VThread extends HandlerThread implements VNPage.VNPageListener
 				is_waitting = false;
 			}
 		}
-		catch(Exception e)
+		catch(Exception ignored)
 		{
 		}
 	}
@@ -77,7 +77,7 @@ public class VThread extends HandlerThread implements VNPage.VNPageListener
 				{
 					if( msg.what == 0 )//render function
 					{
-						long cache = (((long)msg.arg1) << 32) | (((long)msg.arg2)&0xffffffffl);
+						long cache = (((long)msg.arg1) << 32) | (((long)msg.arg2)& 0xffffffffL);
 						VNCache.render(cache, false);
 						m_handUI.sendMessage(m_handUI.obtainMessage(0, msg.arg1, msg.arg2 ));
 						msg.obj = null;
@@ -85,7 +85,7 @@ public class VThread extends HandlerThread implements VNPage.VNPageListener
 					}
 					else if( msg.what == 1 )
 					{
-						long cache = (((long)msg.arg1) << 32) | (((long)msg.arg2)&0xffffffffl);
+						long cache = (((long)msg.arg1) << 32) | (((long)msg.arg2)& 0xffffffffL);
 						VNCache.destroy(cache);
 						msg.obj = null;
 						super.handleMessage(msg);
@@ -99,14 +99,14 @@ public class VThread extends HandlerThread implements VNPage.VNPageListener
 					}
 					else if( msg.what == 3 )
 					{
-						long blk = (((long)msg.arg1) << 32) | (((long)msg.arg2)&0xffffffffl);
+						long blk = (((long)msg.arg1) << 32) | (((long)msg.arg2)& 0xffffffffL);
 						VNBlock.Render(blk);
 						m_handUI.sendMessage( m_handUI.obtainMessage(2, msg.arg1, msg.arg2) );
 						super.handleMessage(msg);
 					}
 					else if( msg.what == 4 )
 					{
-						long blk = (((long)msg.arg1) << 32) | (((long)msg.arg2)&0xffffffffl);
+						long blk = (((long)msg.arg1) << 32) | (((long)msg.arg2)& 0xffffffffL);
 						VNBlock.destroy(blk);
 						super.handleMessage(msg);
 					}
@@ -191,8 +191,8 @@ public class VThread extends HandlerThread implements VNPage.VNPageListener
 			ex.printStackTrace();
 		}
 	}
-	private Rect m_src = new Rect();
-	private Rect m_dst = new Rect();
+	private final Rect m_src = new Rect();
+	private final Rect m_dst = new Rect();
 	private static Paint ms_paint = null;
 	@Override
 	public boolean Draw(long block, Canvas canvas, int src_left, int src_top, int src_right, int src_bottom, int dst_left, int dst_top, int dst_right, int dst_bottom)

@@ -87,8 +87,18 @@ module.exports = function (ctx) {
 		{filePath: prefix + 'com/radaee/reader/PDFPagerAct.java', importStatement: 'com.radaee.viewlib.R'},
 	    {filePath: prefix + 'com/radaee/annotui/UIAnnotDlgSign.java', importStatement: 'com.radaee.viewlib.R'},
         {filePath: prefix + 'com/radaee/annotui/UIAnnotDlgSignProp.java', importStatement: 'com.radaee.viewlib.R'},
-	    {filePath: prefix + 'com/radaee/util/FileBrowserAdt.java', importStatement: 'com.radaee.viewlib.R'}
-	
+	    {filePath: prefix + 'com/radaee/util/FileBrowserAdt.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/PDFPageGridView.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/RDGridItem.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/OutlineList.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/FileBrowserView.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/RDGridView.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/reader/PDFMenu.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/reader/PDFMainAct.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/RDFilesItem.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/RDExpView.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/RDRecentView.java', importStatement: 'com.radaee.viewlib.R'},
+		{filePath: prefix + 'com/radaee/util/RDRecentItem.java', importStatement: 'com.radaee.viewlib.R'}
     ];
 
 

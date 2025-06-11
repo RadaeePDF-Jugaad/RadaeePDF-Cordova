@@ -257,7 +257,7 @@ public class Page
 		 */
         final public float[] GetRect()
 		{
-			float rect[] = new float[4];
+			float[] rect = new float[4];
 			Page.getAnnotRect(page.hand, hand, rect);
 			return rect;
 		}
@@ -268,7 +268,7 @@ public class Page
 		 */
         final public void SetRect( float left, float top, float right, float bottom )
 		{
-			float rect[] = new float[4];
+			float[] rect = new float[4];
 			rect[0] = left;
 			rect[1] = top;
 			rect[2] = right;
@@ -519,6 +519,12 @@ public class Page
 		{
 			return Page.getAnnotAttachment(page.hand, hand);
 		}
+		/*
+		final public String GetRendition()
+		{
+			return Page.getAnnotRendition(page.hand, hand);
+		}
+		*/
 		/**
 		 * get annotation's 3D data. must be *.u3d format.<br/>
 		 * this method require professional or premium license
@@ -546,7 +552,7 @@ public class Page
 		 * @param save_file full path name to save data.
 		 * @return true if save_file created, or false.
 		 */
-        final public boolean GetSoundData( int paras[], String save_file )
+        final public boolean GetSoundData(int[] paras, String save_file )
 		{
 			return Page.getAnnotSoundData(page.hand, hand, paras, save_file);
 		}
@@ -559,6 +565,10 @@ public class Page
         final public boolean GetAttachmentData( String save_file )
 		{
 			return Page.getAnnotAttachmentData(page.hand, hand, save_file);
+		}
+		final public boolean GetRenditionData( String save_file )
+		{
+			return Page.getAnnotRenditionData(page.hand, hand, save_file);
 		}
 
 		/**
@@ -1329,7 +1339,7 @@ public class Page
 			return Page.setAnnotIcon(page.hand, hand, icon);
 		}
 		/**
-		 * set customized icon for  sticky text note/file attachment annotation.<br/>
+		 * set customized icon for: sticky text note/file attachment annotation, and unsigned signature field.<br/>
 		 * @param name customized icon name.
 		 * @param form DocForm object return from Document.NewForm();
 		 * @return true or false.
@@ -1429,6 +1439,7 @@ public class Page
 		 * @param form appearance icon for signature
 		 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
 		 * @param pswd password to open cert file.
+		 * @param name signer name string.
 		 * @param reason sign reason will write to signature.
 		 * @param location signature location will write to signature.
 		 * @param contact contact info will write to signature.
@@ -1501,13 +1512,13 @@ public class Page
 	static private native float[] getMediaBox( long hand );
 	static private native void close( long hand );
 	static private native void renderPrepare( long hand, long dib );
-	static private native boolean render( long hand, long dib, long matrix, int quality ) throws Exception;
-	static private native boolean renderToBmp( long hand, Bitmap bitmap, long matrix, int quality ) throws Exception;
-	static private native boolean renderToBuf( long hand, int[] data, int w, int h, long matrix, int quality) throws Exception;
+	static private native boolean render( long hand, long dib, long matrix, int quality );
+	static private native boolean renderToBmp( long hand, Bitmap bitmap, long matrix, int quality );
+	static private native boolean renderToBuf( long hand, int[] data, int w, int h, long matrix, int quality);
 	static private native void renderCancel(long hand);
-	static private native boolean renderThumb(long hand, Bitmap bmp) throws Exception;
-	static private native boolean renderThumbToDIB( long hand, long dib) throws Exception;
-	static private native boolean renderThumbToBuf( long hand, int[] data, int w, int h) throws Exception;
+	static private native boolean renderThumb(long hand, Bitmap bmp);
+	static private native boolean renderThumbToDIB( long hand, long dib);
+	static private native boolean renderThumbToBuf( long hand, int[] data, int w, int h);
 	static private native boolean renderIsFinished(long hand);
 	static private native float reflowStart( long hand, float width, float scale, boolean enable_images );
 	static private native boolean reflow( long hand, long dib, float orgx, float orgy );
@@ -1519,7 +1530,7 @@ public class Page
 	static private native int reflowGetCharColor( long hand, int iparagraph, int ichar );
 	static private native int reflowGetCharUnicode( long hand, int iparagraph, int ichar );
 	static private native String reflowGetCharFont( long hand, int iparagraph, int ichar );
-	static private native void reflowGetCharRect( long hand, int iparagraph, int ichar, float rect[] );
+	static private native void reflowGetCharRect(long hand, int iparagraph, int ichar, float[] rect);
 	static private native String reflowGetText( long hand, int iparagraph1, int ichar1, int iparagraph2, int ichar2 );
 
     static private native boolean flate(long hand);
@@ -1584,10 +1595,12 @@ public class Page
 	static private native String getAnnotMovie( long hand, long annot );
 	static private native String getAnnotSound( long hand, long annot );
 	static private native String getAnnotAttachment( long hand, long annot );
+	//static private native String getAnnotRendition( long hand, long annot );
 	static private native boolean getAnnot3DData( long hand, long annot, String save_file );
 	static private native boolean getAnnotMovieData( long hand, long annot, String save_file );
-	static private native boolean getAnnotSoundData( long hand, long annot, int paras[], String save_file );
+	static private native boolean getAnnotSoundData(long hand, long annot, int[] paras, String save_file );
 	static private native boolean getAnnotAttachmentData( long hand, long annot, String save_file );
+	static private native boolean getAnnotRenditionData( long hand, long annot, String save_file );
 
 	static private native boolean addAnnotRichMedia(long page, String path_player, String path_content, int type, long dimage, float[] rect);
 	static private native int getAnnotRichMediaItemCount(long page, long annot);
@@ -1751,7 +1764,7 @@ public class Page
 	 * @param rect rectangle for sign field
 	 * @param cert_file a cert file like .p12 or .pfx file, DER encoded cert file.
 	 * @param pswd password to open cert file.
-	 * @param name signer name.
+	 * @param name signer name string.
 	 * @param reason sign reason will write to signature.
 	 * @param location signature location will write to signature.
 	 * @param contact contact info will write to signature.
@@ -1770,18 +1783,18 @@ public class Page
 	/**
 	 * Close page object and free memory.
 	 */
-    final public void Close()
+    public void Close()
 	{
-			long hand_page = hand;
-			hand = 0;
-			if(m_doc != null)
-            {
-                if(m_doc.hand_val != 0)
-                    close( hand_page );
-                else
-                    Log.e("Bad Coding", "Document object closed, but Page object not closed, will cause memory leaks.");
-                m_doc = null;
-            }
+		long hand_page = hand;
+		hand = 0;
+		if(m_doc != null)
+		{
+			if(m_doc.hand_val != 0)
+				close( hand_page );
+			else
+				Log.e("Bad Coding", "Document object closed, but Page object not closed, will cause memory leaks.");
+			m_doc = null;
+		}
 	}
 	/**
 	 * prepare to render. it reset dib pixels to white value, and reset page status.<br/>
@@ -1815,7 +1828,7 @@ public class Page
 	{
         if(dib == null || mat == null) return  false;
         try {
-            return render(hand, dib.hand, mat.hand, Global.render_mode);
+            return render(hand, dib.hand, mat.hand, Global.g_render_quality);
         }
         catch (Exception e)
         {
@@ -1834,7 +1847,7 @@ public class Page
 	{
         if(bitmap == null || mat == null) return  false;
         try {
-            return renderToBmp(hand, bitmap, mat.hand, Global.render_mode);
+            return renderToBmp(hand, bitmap, mat.hand, Global.g_render_quality);
         }
         catch(Exception e)
         {
@@ -1855,7 +1868,7 @@ public class Page
 	{
         if(data == null || mat == null) return  false;
         try {
-            return renderToBuf(hand, data, w, h, mat.hand, Global.render_mode);
+            return renderToBuf(hand, data, w, h, mat.hand, Global.g_render_quality);
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -1947,7 +1960,7 @@ public class Page
 	 */
     final public void ObjsStart()
 	{
-		objsStart( hand, Global.selRTOL );
+		objsStart( hand, Global.g_sel_rtol );
 	}
 	/**
 	 * get string from range. this can be invoked after ObjsStart
@@ -2311,10 +2324,10 @@ public class Page
 	public boolean AddAnnotMarkup( Matrix mat, float[] rects, int type )
 	{
         if(mat == null) return false;
-        int color = Global.highlight_color;
-        if( type == 1 ) color = Global.underline_color;
-        if( type == 2 ) color = Global.strikeout_color;
-        if( type == 4 ) color = Global.squiggle_color;
+        int color = Global.g_annot_highlight_clr;
+        if( type == 1 ) color = Global.g_annot_underline_clr;
+        if( type == 2 ) color = Global.g_annot_strikeout_clr;
+        if( type == 4 ) color = Global.g_annot_squiggle_clr;
 		return addAnnotMarkup( hand, mat.hand, rects, color, type );
 	}
 	/**
@@ -2474,10 +2487,10 @@ public class Page
 	 */
 	public boolean AddAnnotMarkup( int cindex1, int cindex2, int type )
 	{
-		int color = Global.highlight_color;
-		if( type == 1 ) color = Global.underline_color;
-		if( type == 2 ) color = Global.strikeout_color;
-		if( type == 4 ) color = Global.squiggle_color;
+		int color = Global.g_annot_highlight_clr;
+		if( type == 1 ) color = Global.g_annot_underline_clr;
+		if( type == 2 ) color = Global.g_annot_strikeout_clr;
+		if( type == 4 ) color = Global.g_annot_squiggle_clr;
 		return addAnnotMarkup2( hand, cindex1, cindex2, color, type );
 	}
 	/**
@@ -2688,7 +2701,7 @@ public class Page
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @param rect output: 4 element as [left, top, right, bottom].
 	 */
-    final public void ReflowGetCharRect( int iparagraph, int ichar, float rect[] )
+    final public void ReflowGetCharRect(int iparagraph, int ichar, float[] rect)
 	{
 		if( ichar < 0 || ichar >= ReflowGetCharCount(iparagraph) ) return;
 		reflowGetCharRect( hand, iparagraph, ichar, rect );
@@ -2820,7 +2833,7 @@ public class Page
 	 * @param data data returned from Annotation.Export()
 	 * @return true or false.
 	 */
-    public boolean ImportAnnot(float rect[], byte data[])
+    public boolean ImportAnnot(float[] rect, byte[] data)
 	{
 		return importAnnot(hand, rect, data);
 	}

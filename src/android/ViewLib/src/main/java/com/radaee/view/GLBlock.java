@@ -1,17 +1,14 @@
 package com.radaee.view;
 
-import android.opengl.GLUtils;
 import android.util.Log;
 
 import com.radaee.pdf.DIB;
 import com.radaee.pdf.Document;
-import com.radaee.pdf.Global;
 import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -19,16 +16,16 @@ import javax.microedition.khronos.opengles.GL10;
 public class GLBlock {
     private static final int m_shadow_factor = 4;
     private static final int m_shadow_base = 100;
-    private int m_x;
-    private int m_y;
-    private int m_w;
-    private int m_h;
-    private int m_ph;
-    private float m_scale;
+    private final int m_x;
+    private final int m_y;
+    private final int m_w;
+    private final int m_h;
+    private final int m_ph;
+    private final float m_scale;
     private DIB m_dib;
     private DIB m_dib_tmp;
-    private Document m_doc;
-    private int m_pageno;
+    private final Document m_doc;
+    private final int m_pageno;
     private Page m_page;
     private int m_texture;
     private int m_status;
@@ -51,8 +48,8 @@ public class GLBlock {
         buffer.position(0);
         return buffer;
     }
-    static private IntBuffer m_text = create_buf(new int[]{0, 0, 1 << 16, 0, 0, 1 << 16, 1 << 16, 1 << 16});
-    private IntBuffer m_vect;
+    static private final IntBuffer m_text = create_buf(new int[]{0, 0, 1 << 16, 0, 0, 1 << 16, 1 << 16, 1 << 16});
+    private final IntBuffer m_vect;
     protected GLBlock(GLBlock src, Document doc)
     {
         m_doc = doc;
@@ -84,6 +81,14 @@ public class GLBlock {
         m_dib = null;
         m_texture = 0;
         m_status = 0;
+    }
+    protected final boolean has_render()
+    {
+        return (m_status > 0);
+    }
+    protected final boolean is_rendering()
+    {
+        return (m_status == 1);
     }
     protected final void bk_render()
     {
@@ -199,7 +204,7 @@ public class GLBlock {
     }
     public static void drawQuadColor(GL10 gl10, int text_white, int vx00, int vy00, int vx10, int vy10, int vx01, int vy01, int vx11, int vy11, float r, float g, float b)
     {
-        int vect[] = new int[8];
+        int[] vect = new int[8];
         vect[0] = vx00;
         vect[1] = vy00;
         vect[2] = vx10;
@@ -221,8 +226,8 @@ public class GLBlock {
     }
     public static void drawQuadFixed(GL10 gl10, int vx00, int vy00, int vx10, int vy10, int vx01, int vy01, int vx11, int vy11, int tx00, int ty00, int tx10, int ty10, int tx01, int ty01, int tx11, int ty11)
     {
-        int text[] = new int[8];
-        int vect[] = new int[8];
+        int[] text = new int[8];
+        int[] vect = new int[8];
         vect[0] = vx00;
         vect[1] = vy00;
         vect[2] = vx10;
@@ -247,8 +252,8 @@ public class GLBlock {
     }
     private void drawQuad(GL10 gl10, int x00, int y00, int x10, int y10, int x01, int y01, int x11, int y11)
     {
-        int text[] = new int[8];
-        int vect[] = new int[8];
+        int[] text = new int[8];
+        int[] vect = new int[8];
         vect[0] = x00 << 16;
         vect[1] = y00 << 16;
         vect[2] = x10 << 16;
@@ -273,8 +278,8 @@ public class GLBlock {
     }
     private void drawTrangle(GL10 gl10, int x00, int y00, int x10, int y10, int x01, int y01)
     {
-        int text[] = new int[6];
-        int vect[] = new int[6];
+        int[] text = new int[6];
+        int[] vect = new int[6];
         vect[0] = x00 << 16;
         vect[1] = y00 << 16;
         vect[2] = x10 << 16;
@@ -331,8 +336,8 @@ public class GLBlock {
         int midy = (0 + y)>>1;
         int c2x = (midx + x)>>1;
         int c2y = (midy + y)>>1;
-        int c1x = (midx + c2x)>>1;
-        int c1y = (midy + c2y)>>1;
+        //int c1x = (midx + c2x)>>1;
+        //int c1y = (midy + c2y)>>1;
 
         double a = (y <= 0) ? -100000 : (double)(m_w - x)/(0 - y);
         double b = (midy - 0) - a * (m_w - midx);
@@ -950,7 +955,7 @@ public class GLBlock {
             }
             gl10.glBindTexture(GL10.GL_TEXTURE_2D, text_white);//bind texture
             gl10.glColor4f(er, eg, eb, 1);
-            int vect[] = new int[6];
+            int[] vect = new int[6];
             vect[0] = (p12x << 16);
             vect[1] = (p12y << 16);
             vect[2] = x << 16;
