@@ -56,7 +56,6 @@ For iOS, you have to call it before calling any other interface.
 ```javascript
 RadaeePDFPlugin.activateLicense(
 	{
-		licenseType: 0, //0: for standard license, 1: for professional license, 2: for premium license
 		company: "", //the company name you entered during license activation
 		email: "", //the email you entered during license activation
 		key: "" //you license activation key
@@ -101,7 +100,7 @@ RadaeePDFPlugin.open(
 ```javascript
 RadaeePDFPlugin.openFromAssets(
 	{
-		url: "Test.PDF", //the pdf name
+		url: "test.pdf", //the pdf name
 		password: "" //password if needed
 	},
 	function(message) {

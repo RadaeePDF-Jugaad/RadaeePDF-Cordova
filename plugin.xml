@@ -352,6 +352,9 @@
         <source-file src="fonts/Roboto-Regular.ttf" target-dir="assets/fonts" />
         <source-file src="fonts/Roboto-RegularItalic.ttf" target-dir="assets/fonts" />
 
+        <!-- Radaee test document -->
+        <source-file src="src/android/ViewLib/src/main/assets/test.pdf" target-dir="assets" />
+
         <config-file target="res/values/colors.xml" parent="/resources">
             <color name="annot_menu_bg_color">#280B08</color>
             <color name="btn_disabled_color">#80050505</color>
