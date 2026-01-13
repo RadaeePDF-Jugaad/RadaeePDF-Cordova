@@ -1,15 +1,11 @@
-# **RadaeePDF SDK**
-
-## *END USER LICENSE AGREEMENT*
-
 # **Software License Agreement for RadaeePDF SDK**
+<img src="https://www.radaeepdf.com/images/logo/radaee_master_225x200.png" style="width:100px;"> 
 
 Subject to the terms below (hereafter known as the "Agreement"), "Radaee" (the joint venture company created by Radaee Studio \- a Chinese company based in Beijing \- and Jugaad s.r.l. \- an Italian company based in Montecchio Emilia, Via Luigi Reverberi 30/A, 42027, province of Reggio Emilia) hereby grants you a non-exclusive, non-transferable license for the use of the RadaeePDF SDK software library (hereafter known as the "Software") and its derivatives.
 
 This EULA applies to the product RadaeePDF SDK.
 
-|  |
-| :---- |
+
 
 ## **1\. GRANT OF LICENSE**
 
@@ -182,8 +178,7 @@ It is permitted to use, modify, and/or extract any part of the source code avail
 
 SDK packages and updates are released directly through the official RadaeePDF website or via public repositories (e.g., GitHub). Radaee reserves the right to select the distribution channel at its sole discretion, generally prioritizing platforms that ensure widespread adoption and ease of use for Licensees.
 
-|  |
-| :---- |
+
 
 ## **2\. OWNERSHIP**
 
@@ -195,8 +190,7 @@ This license does not transfer any title or ownership of the Software or its doc
 
 **Modifications:** You may not remove or alter any copyright, trademark, or other proprietary notices from the Software or its documentation.
 
-|  |
-| :---- |
+
 
 ## **3\. FEES AND PAYMENT**
 
@@ -208,8 +202,7 @@ The Licensee must pay the license fees according to the pricing schedule effecti
 
 All fees and pricing schedules are exclusive of any applicable taxes, duties, or levies (including VAT or sales tax). The Licensee is responsible for the payment of all such taxes arising from the purchase of the license.
 
-|  |
-| :---- |
+
 
 ## **4\. REFUND AND ACTIVATION KEY SUBSTITUTION POLICIES**
 
@@ -223,7 +216,7 @@ Please send a refund request to sales@radaeepdf.com stating the reason for your 
 
 ### **4.3 Active License (Key Generated) for Unpublished Applications**
 
-Requests for refund must be sent to sales@radaeepdf.com and must state the reason for the request and the order reference number. You must also attach a copy of the letter in Appendix 1 printed on your official company letter-headed paper. **Refunds for licenses already tied to an activation key, regardless of when the refund request is made, will be 40% of the license cost.**
+Requests for refund must be sent to sales@radaeepdf.com and must state the reason for the request and the order reference number. You must also attach a copy of the letter in Appendix 1 (EULA.pdf) printed on your official company letter-headed paper. **Refunds for licenses already tied to an activation key, regardless of when the refund request is made, will be 40% of the license cost.**
 
 ### **4.4 Active License Within Published Application**
 
@@ -242,7 +235,7 @@ If a refund request is for a partial order (i.e., multi-license purchase), the l
 
 ### **4.6 Activation Key Change Request**
 
-If you need to change the activation key due to application package name/bundle-id/uuid modification, you need to send a signed letter on your official company letter-headed paper to sales@radaeepdf.com (please see Appendix 1).
+If you need to change the activation key due to application package name/bundle-id/uuid modification, you need to send a signed letter on your official company letter-headed paper to sales@radaeepdf.com (please see Appendix 1 in EULA.pdf).
 
 ### **4.7 Terms of Activation Key Change**
 
@@ -256,8 +249,7 @@ You can only request to change the activation key one (1) time per license.
 
 Requests for a change to activation keys will be evaluated at the sole discretion of Radaee. Radaee reserves the right to deny the request if there is evidence of abuse, concurrent usage of both keys, or if the request is outside the permitted time window.
 
-|  |
-| :---- |
+
 
 ## **5\. TECHNICAL SUPPORT (SLA)**
 
@@ -291,8 +283,7 @@ Radaee commits to the following response times for valid support requests:
 * Issues arising from modifications made to the SDK source code by the Licensee  
 * Requests for specific modifications to the SDK core functions
 
-|  |
-| :---- |
+
 
 ## **6\. COPYRIGHT AND RESTRICTIONS**
 
@@ -318,8 +309,7 @@ The Software is licensed as a single product. Its component parts may not be sep
 
 You may not rent, lease, or lend the Software to third parties.
 
-|  |
-| :---- |
+
 
 ## **7\. TERM AND TERMINATION**
 
@@ -347,8 +337,7 @@ Upon termination, you must destroy the Software and all copies thereof.
 
 Radaee reserves the right to take legal action for damages in the event of termination due to the above causes.
 
-|  |
-| :---- |
+
 
 ## **8\. LIMITED WARRANTY AND DISCLAIMER**
 
@@ -364,8 +353,7 @@ In no event shall Radaee (Radaee Studio or Jugaad S.r.l.) be liable for any clai
 
 In any case, Radaee's entire liability under any provision of this Agreement shall be limited to the amount actually paid by you for the Software license.
 
-|  |
-| :---- |
+
 
 ## **9\. GOVERNING LAW AND GENERAL PROVISIONS**
 
@@ -408,8 +396,7 @@ Any requests or complaints should be addressed to Jugaad s.r.l.:
 * **Email:** radaee@jugaad.digital  
 * **Postal Address:** Via L. Reverberi 30/A \- 42027 \- Montecchio Emilia (RE) \- Italy
 
-|  |
-| :---- |
+
 
 ## **10\. SDK COMPONENTS AND CYBER RESILIENCE**
 
@@ -429,8 +416,7 @@ In compliance with the Cyber Resilience Act (CRA) and modern security standards,
 * **SBOM Availability:** Upon specific request by the Licensee, Radaee can provide a Software Bill of Materials (SBOM) in industry-standard formats (e.g., SPDX or CycloneDX).  
 * **Vulnerability Management:** The SBOM details the inventory of software components and dependencies to facilitate vulnerability management and risk assessment by the Licensee.
 
-|  |
-| :---- |
+
 
 ## **11\. THIRD-PARTY LICENSES**
 
@@ -438,10 +424,9 @@ The Software utilizes third-party libraries and open-source components. The use 
 
 **SBOM Reference:** The full list of dependencies and their specific version numbers is detailed in the Software Bill of Materials (SBOM) provided with the distribution package. Licensees are required to consult the SBOM for the most up-to-date dependency information.
 
-**Acknowledgment:** A list of third-party attributions and licenses is included in Appendix 2\. The Licensee agrees to comply with any applicable attribution requirements in their own application.
+**Acknowledgment:** A list of third-party attributions and licenses is included in Appendix. The Licensee agrees to comply with any applicable attribution requirements in their own application.
 
-|  |
-| :---- |
+
 
 ## **12\. SERVER INSTALLATION**
 
@@ -450,8 +435,7 @@ Installation of applications, command line executables, and/or services on a wor
 * The server license does not restrict concurrent processes or applications invoking the runtime of THE SDK.  
 * Each workstation or server is identified by a unique ID generated by the operating system during its first run.
 
-|  |
-| :---- |
+
 
 ## **13\. NOT-FOR-RESALE (NFR) LICENSES**
 
@@ -478,8 +462,7 @@ NFR licenses are priced at 15% of the standard license cost, based on the public
 
 NFR licenses are typically valid for a fixed period (e.g., 6 or 12 months) and do not automatically renew. Radaee reserves the right to revoke an NFR license at any time if misuse is detected.
 
-|  |
-| :---- |
+
 
 ## **14\. VOLUME LICENSING**
 
@@ -505,8 +488,7 @@ Larger volume requests require direct sales team contact. Custom pricing is avai
 * Enterprise Agreements  
 * Special deployment scenarios
 
-|  |
-| :---- |
+
 
 ## **15\. UPDATES TO TERMS**
 
@@ -520,77 +502,11 @@ Updates to usage terms, limitations, and price lists are:
 
 ## 
 
-## **APPENDIX 1: Activation Key Change Request Template**
-
-**\[TO BE PRINTED ON LICENSEE COMPANY LETTERHEAD\]**
-
-|  |
-| :---- |
-
-**Subject:** Activation Key Change Request
-
-**To:** sales@radaeepdf.com
-
-**Date:** \[Current Date\]
-
-**Order Reference Number:** \[Insert original order reference number\]
-
-|  |
-| :---- |
-
-### **1\. Current Application Details (OLD)**
-
-* **Package Name / Bundle ID:** \[Insert OLD identifier\]  
-* **Platform:** \[Android / iOS / Windows UWP\]  
-* **Activation Key Generation Date:** \[Insert Date\]
-
-### **2\. Requested Application Details (NEW)**
-
-* **New Package Name / Bundle ID:** \[Insert NEW identifier\]
-
-### **3\. Reason for Change**
-
-Please provide a detailed explanation for the change request:
-
-\[Insert explanation here\]
-
-### **4\. Declaration of Compliance**
-
-I, \[Insert Name\], representing \[Company Name\], hereby confirm that:
-
-1. We are the current legal licensee of the RadaeePDF SDK.  
-2. The activation key for the OLD package name is not, and will not be, included in any published application moving forward.  
-3. We will immediately cease use of the old activation key upon receipt of the new key.  
-4. We understand that unauthorized use of the old activation key constitutes a material breach of the EULA and is subject to legal action.  
-5. We acknowledge that this is our single permitted key change as per the EULA terms (Section 4.8).
-
-|  |
-| :---- |
-
-Yours Sincerely,
-
-**Signature:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-**Name:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-**Title:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-**Company:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-**Date:** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-**\[Company Stamp/Seal\]**
-
-## 
-
-## 
-
-## **APPENDIX 2: Third-Party Software Credits & Licenses**
+## **APPENDIX: Third-Party Software Credits & Licenses**
 
 RadaeePDF SDK contains code from the following third-party sources. Please refer to the SBOM file for specific version numbers.
 
-|  |
-| :---- |
+
 
 ### **Core Libraries**
 
@@ -633,8 +549,7 @@ The library is developed and maintained by the Communications and Remote Sensing
 * **License:** Zlib License  
 * **URL:** [http://zlib.net/](http://zlib.net/)
 
-|  |
-| :---- |
+
 
 ### **Development Components**
 
@@ -656,8 +571,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 CommonJS specification snapshots are included in the references directory. CommonJS is under the MIT license: [http://www.commonjs.org/](http://www.commonjs.org/)
 
-|  |
-| :---- |
+
 
 ### **Font Families**
 
@@ -691,8 +605,7 @@ CommonJS specification snapshots are included in the references directory. Commo
 * **License:** GUST Font License  
 * **URL:** [http://tug.org/fonts/licenses/GUST-FONT-LICENSE.txt](http://tug.org/fonts/licenses/GUST-FONT-LICENSE.txt)
 
-|  |
-| :---- |
+
 
 ### **Platform-Specific Components**
 
@@ -708,8 +621,7 @@ CommonJS specification snapshots are included in the references directory. Commo
 * **License:** MIT License  
 * **URL:** [https://github.com/vigneshuvi/iOS-Signature-Capture](https://github.com/vigneshuvi/iOS-Signature-Capture)
 
-|  |
-| :---- |
+
 
 ### **Framework Components**
 
@@ -730,7 +642,5 @@ CommonJS specification snapshots are included in the references directory. Commo
 * **Author:** Jugaad S.r.l.  
 * **License:** Apache 2.0 License  
 * **Note:** No longer maintained
-
-## 
 
 ## 
