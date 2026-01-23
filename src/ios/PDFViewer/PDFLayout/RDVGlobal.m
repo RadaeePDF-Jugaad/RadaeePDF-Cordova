@@ -7,9 +7,6 @@
 //
 #include "RDVGlobal.h"
 #import "PDFObjc.h"
-NSString *g_id = @"";
-NSString *g_company = @"";
-NSString *g_mail = @"";
 NSString *g_serial = @"";
 
 @implementation RDVLocker
@@ -46,11 +43,13 @@ NSString *g_serial = @"";
     }
     return self;
 }
+
 -(void)dealloc
 {
     pthread_cond_destroy( &m_event );
     pthread_mutex_destroy( &mutex );
 }
+
 -(void)reset
 {
     pthread_mutex_lock( &mutex );
@@ -62,10 +61,11 @@ NSString *g_serial = @"";
     pthread_mutex_lock( &mutex );
     if( flags & 2 )
         pthread_cond_signal( &m_event );
-        else
-            flags |= 1;
-            pthread_mutex_unlock( &mutex );
-            }
+    else
+        flags |= 1;
+    pthread_mutex_unlock( &mutex );
+}
+
 -(void)wait
 {
     pthread_mutex_lock( &mutex );
@@ -77,57 +77,38 @@ NSString *g_serial = @"";
     }
     else
         flags &= (~1);
-        pthread_mutex_unlock( &mutex );
-        }
+    pthread_mutex_unlock( &mutex );
+}
 @end
 
 @implementation RDVGlobal
-+ (RDVGlobal *)sharedInstance
-{
-    static RDVGlobal *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[RDVGlobal alloc] init];
-        // Do any other initialisation stuff here
-    });
-    return sharedInstance;
-}
 + (void)Init
 {
-    BOOL isActive = Global_activeStandard([g_id UTF8String], [g_company UTF8String], [g_mail UTF8String], [g_serial UTF8String]);
-    if(!isActive) isActive = Global_activeProfession([g_id UTF8String], [g_company UTF8String], [g_mail UTF8String], [g_serial UTF8String]);
-    if(!isActive) isActive = Global_activePremium([g_id UTF8String], [g_company UTF8String], [g_mail UTF8String], [g_serial UTF8String]);
-
+    BOOL isActive = (Global_active(g_serial) > 0);
     if (isActive)
         NSLog(@"License active");
     else
         NSLog(@"License not active");
-    
     [[NSUserDefaults standardUserDefaults] setBool:isActive forKey:@"actIsActive"];
-    
     NSString *cmaps_path = [[NSBundle mainBundle] pathForResource:@"cmaps" ofType:@"dat" inDirectory:@"PDFRes/cmaps"];
     NSString *umaps_path = [[NSBundle mainBundle] pathForResource:@"umaps" ofType:@"dat" inDirectory:@"PDFRes/cmaps"];
     NSString *cmyk_path = [[NSBundle mainBundle] pathForResource:@"cmyk_rgb" ofType:@"dat" inDirectory:@"PDFRes/cmaps"];
-    
     // check resources
     if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
         NSLog(@"Check resources files: cmaps.dat not found.");
         NSLog(@"Include fdat and cmaps folders as resources (like demo project)");
         return;
     }
-    
     if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
         NSLog(@"Check resources files: umaps.dat not found.");
         NSLog(@"Include fdat and cmaps folders as resources (like demo project)");
         return;
     }
-    
     if (![[NSFileManager defaultManager] fileExistsAtPath:cmaps_path]) {
         NSLog(@"Check resources files: cmyk_rgb.dat not found.");
         NSLog(@"Include fdat and cmaps folders as resources (like demo project)");
         return;
     }
-    
     Global_setCMapsPath([cmaps_path UTF8String], [umaps_path UTF8String]);
     Global_setCMYKProfile([cmyk_path UTF8String]);
     
@@ -143,6 +124,7 @@ NSString *g_serial = @"";
         }
     }
     Global_fontfileListEnd();
+    
     fontsFolder = [[NSBundle mainBundle] pathForResource:@"rdf008" ofType:@"dat" inDirectory:@"PDFRes/fonts"];
     Global_loadStdFont(8, [fontsFolder UTF8String]);
     fontsFolder = [[NSBundle mainBundle] pathForResource:@"rdf013" ofType:@"dat" inDirectory:@"PDFRes/fonts"];
@@ -278,9 +260,9 @@ NSString *g_serial = @"";
      */
     Global_setAnnotFont( "Helvetica" );
     
-    
     Global_setAnnotTransparency(0x200040FF);
-    [[RDVGlobal sharedInstance] setup];
+    GLOBAL = [[RDVGlobal alloc] init];
+    [GLOBAL setup];
 }
 
 - (void)setup {
@@ -363,3 +345,5 @@ NSString *g_serial = @"";
 }
 
 @end
+
+RDVGlobal *GLOBAL = nil;

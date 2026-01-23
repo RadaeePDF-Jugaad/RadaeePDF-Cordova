@@ -39,47 +39,40 @@
 }
 
 - (void)OnAnnotClicked:(RDPDFAnnot *)annot :(float)x :(float)y {
-    
 }
 
 - (void)OnAnnotCommboBox:(RDVPage *)vp :(NSArray *)dataArray selected:(int)index {
-    
 }
 
 - (void)OnAnnotEditBox:(CGRect)annotRect :(NSString *)editText :(float)textSize {
-    
 }
 
 - (void)OnAnnotEnd {
-    
 }
 
 - (void)OnAnnotGoto:(int)pageno {
-    
 }
 
 - (void)OnAnnotList:(RDVPage *)vp :(RDPDFAnnot *)annot items:(NSArray *)dataArray selectedIndexes:(NSArray *)indexes {
-    
 }
 
 - (void)OnAnnotMovie:(NSString *)fileName {
-    
 }
 
 - (void)OnAnnotOpenURL:(NSString *)url {
-    
 }
 
 - (void)OnAnnotPopup:(RDPDFAnnot *)annot {
-    
 }
 
 - (void)OnAnnotSignature:(RDVPage *)vp :(RDPDFAnnot *)annot {
-    
 }
 
 - (void)OnAnnotSound:(NSString *)fileName {
-    
+}
+
+- (void)OnAnnotRendition:(NSString *)_fileName
+{
 }
 
 - (void)OnDoubleTapped:(float)x :(float)y {

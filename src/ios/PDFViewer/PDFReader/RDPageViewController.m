@@ -8,7 +8,7 @@
 
 #import "RDPageViewController.h"
 #import "RDSinglePageViewController.h"
-#import "RDVGlobal.h"
+#import "../PDFLayout/RDVGlobal.h"
 
 @interface RDPageViewController ()
 {
@@ -33,10 +33,10 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
+    
     UIViewController *vc = [self viewControllerAtIndex:0];
     [self setViewControllers:@[vc] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
-
+    
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"btn_back"] style:UIBarButtonItemStyleDone target:self action:@selector(closeView)];
 }
 
@@ -86,7 +86,7 @@
 {
     return [doc pageCount];
 }
-
+ 
 - (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController
 {
     return 0;
@@ -95,23 +95,23 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
 {
     NSUInteger index = ((RDSinglePageViewController*) viewController).pageViewNo;
-
+    
     if ((index == 0) || (index == NSNotFound)) {
         return nil;
     }
-
+    
     index--;
     return [self viewControllerAtIndex:index];
 }
-
+ 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
 {
     NSUInteger index = ((RDSinglePageViewController*) viewController).pageViewNo;
-
+    
     if (index == NSNotFound) {
         return nil;
     }
-
+    
     index++;
     if (index == doc.pageCount) {
         return nil;
@@ -153,7 +153,7 @@
             [self closeViewController:v];
         }
     }
-
+    
     doc = NULL;
 }
 
@@ -229,7 +229,7 @@
 - (void)setImmersive:(BOOL)immersive
 {
     isImmersive = immersive;
-
+    
     if (isImmersive) {
         [self hideBars];
     } else {
@@ -270,7 +270,7 @@
     if([path containsString:@"file://"])
     {
         NSString *filePath = [path stringByReplacingOccurrencesOfString:@"file://" withString:@""];
-
+        
         if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];

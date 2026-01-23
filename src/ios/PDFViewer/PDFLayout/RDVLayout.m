@@ -254,22 +254,20 @@
     {
         vp = (RDVPage *)[m_pages objectAtIndex:pos->pageno];
     }
-    [self vMoveTo :[vp GetVX:pos->pdfx] - vx :[vp GetVY:pos->pdfy] - vy :pos->pageno];
+    [self vMoveTo :[vp GetVX:pos->pdfx] - vx :[vp GetVY:pos->pdfy] - vy];
 }
 
--(void)vMoveTo:(int)docx :(int)docy :(int)cur_page
+-(void)vMoveTo :(int)docx :(int)docy
 {
-    int doch = [self vGetDoch:cur_page];
-    
-    if(docx + m_w > m_docw)
-        docx = m_docw - m_w;
-    if(docy + m_h > doch)
-        docy = doch - m_h;
-    if(docx < 0) docx = 0;
-    if(docy < 0) docy = 0;
+	if(docx + m_w > m_docw)
+		docx = m_docw - m_w;
+	if(docy + m_h > m_doch)
+		docy = m_doch - m_h;
+	if(docx < 0) docx = 0;
+	if(docy < 0) docy = 0;
   
-    m_docx = docx;
-    m_docy = docy;
+	m_docx = docx;
+	m_docy = docy;
 }
 
 -(RDVPage *)vGetPage :(int)pageno
@@ -471,10 +469,6 @@
 -(bool)vCanPaging
 {
     return false;
-}
-
--(int)vGetDoch:(int)page {
-    return m_doch;
 }
 
 @end
@@ -1145,7 +1139,7 @@
                 cell->left = left;
                 cell->right = left + icw;
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout :left + ((icw - iw) >> 1): (int)([self vGetDoch:pageno] - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
+                [vp vLayout :left + ((icw - iw) >> 1): (int)(m_doch - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
                 pageno++;
             }
             if(m_cell_w < icw) m_cell_w = icw;
@@ -1267,8 +1261,8 @@
                 cell->left = left;
                 cell->right = left + icw;
                 RDVPage *vp = (RDVPage *)[m_pages objectAtIndex:pageno];
-                [vp vLayout :left + ((icw - iw) >> 1): (int)([self vGetDoch:pageno] - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
-                pageno++;
+                [vp vLayout :left + ((icw - iw) >> 1): (int)(m_doch - [m_doc pageHeight:pageno] * scale) / 2 :scale :true];
+                 pageno++;
             }
             if(m_cell_w < icw) m_cell_w = icw;
             left += icw;
@@ -1420,12 +1414,6 @@
 -(bool)vCanPaging
 {
     return (m_cell_w <= m_w);
-}
-
--(int)vGetDoch:(int)page {
-    int h = [[self vGetPage:page] GetHeight];
-    int doch = (h < m_h) ? m_h : h;
-    return doch;
 }
 @end
 

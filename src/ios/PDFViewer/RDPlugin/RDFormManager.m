@@ -8,6 +8,7 @@
 
 #import "RDFormManager.h"
 #import "PDFObjc.h"
+#import "../PDFLayout/RDVGlobal.h"
 
 @interface RDFormManager() {
     RDPDFDoc *currentDoc;
@@ -66,7 +67,7 @@
             
             if (index >= 0 && index < currentDoc.pageCount) {
                 RDPDFPage *page = [currentDoc page:index];
-                [page objsStart];
+                [page objsStart:GLOBAL.g_sel_rtol];
                 
                 for (NSDictionary *annot in annots) {
                     [self parseAnnot:annot atPage:page error:error];
@@ -301,7 +302,7 @@
     
     for (int i = 0; i < pageCount; i++) {
         RDPDFPage *page = [currentDoc page:i];
-        [page objsStart];
+        [page objsStart:GLOBAL.g_sel_rtol];
         if ([page annotCount] > 0) {
             [arr addObject:[self infoForPage:page number:i]];
         }

@@ -16,6 +16,8 @@
     FILE *m_file;
     bool m_writable;
 }
+-(void)open :(NSString *)filePath;
+-(void)close;
 -(bool)writeable;
 -(int)read: (void *)buf :(int)len;
 -(int)write:(const void *)buf :(int)len;

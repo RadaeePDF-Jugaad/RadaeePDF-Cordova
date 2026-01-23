@@ -8,11 +8,7 @@
 #pragma once
 #import <pthread.h>
 #import <UIKit/UIKit.h>
-#define GLOBAL [RDVGlobal sharedInstance]
 
-extern NSString *g_id;
-extern NSString *g_company;
-extern NSString *g_mail;
 extern NSString *g_serial;
 
 @interface RDVLocker :NSObject
@@ -102,10 +98,8 @@ extern NSString *g_serial;
 @property (nonatomic) int g_line_annot_style2;
 @property (nonatomic) int g_thumbview_height;
 
-+ (RDVGlobal *)sharedInstance;
 + (void)Init;
-
 - (void)setup;
-
 @end
 
+extern RDVGlobal *GLOBAL;

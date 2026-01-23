@@ -187,7 +187,7 @@
     if(page >= 0 && page < doc.pageCount)
     {
         RDPDFPage *ppage = [doc page:page];
-        [ppage objsStart];
+        [ppage objsStart:GLOBAL.g_sel_rtol];
         if ([ppage flatAnnots]) {
             return [doc save];
         }
@@ -790,6 +790,10 @@
             m_popup = [[PDFPopupCtrl alloc] init:view];
         }
         [self presentViewController:m_popup animated:YES completion:nil];
+    }
+    else
+    {
+        [self showBaseAlert:NSLocalizedString(@"Cannot edit.", nil)];
     }
 }
 
@@ -1490,6 +1494,12 @@
     //[tempfiles addObject:_fileName];
 }
 
+//this mehod fired only when vAnnotPerform method invoked.
+- (void)OnAnnotRendition:(NSString *)_fileName
+{
+    //[tempfiles addObject:_fileName];
+}
+
 - (void)OnAnnotEditBox:(RDPDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize
 {
     PDFPopupCtrl *pop;
@@ -1661,7 +1671,6 @@
 - (void)didSelectSelectSearchResult:(int)index
 {
     [self dismissViewControllerAnimated:YES completion:^{
-        [self searchProgress];
         [self goToSearchResult:index];
     }];
 }

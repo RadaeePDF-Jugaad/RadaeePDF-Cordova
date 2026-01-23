@@ -79,13 +79,7 @@
             }
         }
         else
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.cancelBlock(true);
-            });
             return 1;
-        }
-            
     }
     else
     {
@@ -103,13 +97,7 @@
             }
         }
         else
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.cancelBlock(true);
-            });
             return 1;
-        }
-            
     }
     return 0;
 }
@@ -126,7 +114,7 @@
             {
                 if( m_page_no >= pcnt ) m_page_no = pcnt - 1;
                 m_page = [m_doc page:m_page_no];
-                [m_page objsStart];
+                [m_page objsStart:GLOBAL.g_sel_rtol];
                 m_finder = [m_page find: m_str: m_case: m_whole];
                 if( m_finder == NULL ) m_page_find_cnt = 0;
                 else m_page_find_cnt = [m_finder count];
@@ -177,7 +165,7 @@
             {
                 if( m_page_no < 0 ) m_page_no = 0;
                 m_page = [m_doc page:m_page_no];
-                [m_page objsStart];
+                [m_page objsStart:GLOBAL.g_sel_rtol];
                 m_finder = [m_page find:m_str: m_case: m_whole];
                 if( m_finder == NULL ) m_page_find_cnt = 0;
                 else m_page_find_cnt = [m_finder count];

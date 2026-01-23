@@ -10,7 +10,7 @@
 #import "RDPDFView.h"
 #import "RDVPage.h"
 #import "RDVCanvas.h"
-#import "RDVGlobal.h"
+#import "../PDFLayout/RDVGlobal.h"
 
 @implementation PDFThumbView
 {
@@ -127,7 +127,7 @@
     float xpos = self.frame.size.width * m_scale_pix;
     [m_layout vSetPos:(xpos - vp.w) / 2 :0 :&pos];
     m_sel_pno = pageno;
-
+    
     CGPoint pt;
     pt.x = m_layout.docx / m_scale_pix;
     pt.y = m_layout.docy / m_scale_pix;
@@ -188,7 +188,7 @@
 - (void)PDFSetBGColor:(int)color
 {
     GLOBAL.g_thumbview_bg_color = color;
-
+    
     if (GLOBAL.g_thumbview_bg_color != 0) {
         self.backgroundColor = UIColorFromRGB(GLOBAL.g_thumbview_bg_color);
     }
