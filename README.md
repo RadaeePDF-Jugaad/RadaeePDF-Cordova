@@ -1,5 +1,5 @@
 # RadaeePDF SDK - Cordova Plugin
-<img src="https://www.radaeepdf.com/images/logo/logo-butterfly-only.png" style="width:100px;"> 
+<img src="https://www.radaeepdf.com/wp-content/uploads/2024/08/solo_butterly_midres.png" style="width:100px;"> 
 
 The repository has been moved to https://github.com/RadaeePDF-Jugaad/RadaeePDF-Cordova
 
