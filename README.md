@@ -143,7 +143,7 @@ RadaeePDF library version included:
 
 Original development: 
 - This plugin was created based on [PaoloMessina/RadaeeCordova](https://github.com/PaoloMessina/RadaeeCordova)  
-   www.paolomessina.it, email: paolo.messina.it@gmail.com
+  email: paolo.messina.it@gmail.com
 
 More information about RadaeePDF SDK on http://www.radaeepdf.com.  
-For guide please check [Knowledge Base articles](http://www.radaeepdf.com/support/knowledge-base?view=kb&catid=4)
+For guide please check [Knowledge Base articles](https://support.radaeepdf.com/kb)
