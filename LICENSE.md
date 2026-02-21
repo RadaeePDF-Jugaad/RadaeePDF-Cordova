@@ -1,5 +1,5 @@
 # **Software License Agreement for RadaeePDF SDK**
-<img src="https://www.radaeepdf.com/images/logo/logo-butterfly-only.png" style="width:100px;"> 
+<img src="https://www.radaeepdf.com/wp-content/uploads/2024/08/solo_butterly_midres.png" style="width:100px;"> 
 
 Subject to the terms below (hereafter known as the "Agreement"), "Radaee" (the joint venture company created by Radaee Studio \- a Chinese company based in Beijing \- and Jugaad s.r.l. \- an Italian company based in Montecchio Emilia, Via Luigi Reverberi 30/A, 42027, province of Reggio Emilia) hereby grants you a non-exclusive, non-transferable license for the use of the RadaeePDF SDK software library (hereafter known as the "Software") and its derivatives.
 
