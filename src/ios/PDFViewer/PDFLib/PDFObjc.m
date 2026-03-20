@@ -1,5 +1,5 @@
 //
-//  RDPDFDoc.m
+//  PDFDoc.m
 //  PDFViewer
 //
 //  Created by Radaee on 12-9-18.
@@ -7,7 +7,6 @@
 //
 
 #import "PDFObjc.h"
-#import "RDVGlobal.h"
 extern uint annotHighlightColor;
 extern uint annotUnderlineColor;
 extern uint annotStrikeoutColor;
@@ -773,6 +772,10 @@ extern uint annotStrikeoutColor;
 {
 	PageContent_setStrokeMiter( m_handle, miter );
 }
+-(void)setStrokeDash:(const float *)dash: (int)dash_cnt: (float)phase
+{
+	PageContent_setStrokeDash(m_handle, dash, dash_cnt, phase);
+}
 -(void)textSetCharSpace:(float) space
 {
 	PageContent_textSetCharSpace( m_handle, space );
@@ -1012,6 +1015,18 @@ extern uint annotStrikeoutColor;
     return Page_setAnnotLineStyle(m_page, m_handle, style);
 }
 
+-(PDF_POINT)getLinePoint:(int)idx
+{
+	PDF_POINT pt;
+	pt.x = 0;
+	pt.y = 0;
+	Page_getAnnotLinePoint(m_page, m_handle, idx, &pt);
+	return pt;
+}
+-(bool)setLinePoint:(float) x1 :(float) y1 :(float) x2 :(float) y2
+{
+	return Page_setAnnotLinePoint(m_page, m_handle, x1, y1, x2, y2);
+}
 
 -(int)getFillColor
 {
@@ -1092,6 +1107,10 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotAttachment( m_page, m_handle );
 }
+-(NSString *)getRendition
+{
+	return Page_getAnnotRendition( m_page, m_handle );
+}
 -(bool)get3DData:(NSString *)save_file
 {
 	return Page_getAnnot3DData( m_page, m_handle, [save_file UTF8String] );
@@ -1107,6 +1126,10 @@ extern uint annotStrikeoutColor;
 -(bool)getAttachmentData:(NSString *)save_file
 {
 	return Page_getAnnotAttachmentData( m_page, m_handle, [save_file UTF8String] );
+}
+-(bool)getRenditionData:(NSString *)save_file
+{
+	return Page_getAnnotRenditionData( m_page, m_handle, [save_file UTF8String] );
 }
 
 
@@ -1164,6 +1187,19 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getAnnotPopupOpen(m_page, m_handle);
 }
+
+-(int)getReplyCount
+{
+    return Page_getAnnotReplyCount(m_page, m_handle);
+}
+
+-(RDPDFAnnot*)getReply :(int)idx
+{
+    PDF_ANNOT annot = Page_getAnnotReply(m_page, m_handle, idx);
+    if(!annot) return nil;
+    return [[RDPDFAnnot alloc] init:m_page :annot];
+}
+
 -(NSString *)getPopupSubject
 {
     return Page_getAnnotPopupSubject( m_page, m_handle );
@@ -1352,23 +1388,8 @@ extern uint annotStrikeoutColor;
 
 - (BOOL)canMoveAnnot
 {
-    return (self.type == 4 || self.type == 5 || self.type == 6 || self.type == 13 || self.type == 15 || self.type == 1) && ![self isAnnotLocked];
-}
-
-- (BOOL)isAnnotLocked
-{
-    if ([self isLocked])
-        return YES;
-
-    return NO;
-}
-
-- (BOOL)isAnnotReadOnly
-{
-    if (GLOBAL.g_annot_readonly && [self isReadonly])
-        return YES;
-
-    return NO;
+    int type = self.type;
+    return (type != 2 && type != 9 && type != 10 && type != 11 && type != 12 && type != 20);
 }
 
 -(PDF_OBJ_REF)getRef
@@ -1451,9 +1472,9 @@ extern uint annotStrikeoutColor;
 	return Page_sign(m_page, [appearence handle], box, [cert_file UTF8String], [pswd UTF8String], [name UTF8String], [reason UTF8String], [location UTF8String], [contact UTF8String]);
 }
 
--(void)objsStart
+-(void)objsStart:(bool)rtol
 {
-    Page_objsStart(m_page, GLOBAL.g_sel_rtol);
+    Page_objsStart(m_page, rtol);
 }
 -(int)objsCount
 {
@@ -1993,3 +2014,9 @@ extern uint annotStrikeoutColor;
 }
 
 @end
+
+
+
+
+
+

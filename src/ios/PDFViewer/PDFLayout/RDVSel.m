@@ -35,7 +35,7 @@
 {
     if( !m_ok )
     {
-        [m_page objsStart];
+        [m_page objsStart:GLOBAL.g_sel_rtol];
         m_ok = true;
     }
     m_index1 = [m_page objsGetCharIndex:x1 :y1];

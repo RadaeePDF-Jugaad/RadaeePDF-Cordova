@@ -27,7 +27,7 @@
 {
     return m_writable;
 }
--(void)close :(NSString *)filePath
+-(void)close
 {
     if( m_file )
         fclose(m_file);
@@ -67,6 +67,11 @@
     if( !m_file ) return false;
     fseek(m_file, (int)pos , SEEK_SET);
     return true;
+}
+
+-(void)dealloc
+{
+    [self close];
 }
 @end
 

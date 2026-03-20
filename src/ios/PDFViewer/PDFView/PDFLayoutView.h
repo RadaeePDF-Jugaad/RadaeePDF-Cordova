@@ -38,6 +38,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 - (void)OnAnnotMovie:(NSString *)fileName;
 //this mehod fired only when vAnnotPerform method invoked.
 - (void)OnAnnotSound:(NSString *)fileName;
+- (void)OnAnnotRendition:(NSString *)fileName;
 - (void)OnAnnotEditBox:(RDPDFAnnot *)annot :(CGRect)annotRect :(NSString *)editText :(float)textSize;
 - (void)OnAnnotCommboBox:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selected:(int)index;
 - (void)OnAnnotList:(RDVPage *)vp :(RDPDFAnnot *)annot :(CGRect)annotRect :(NSArray *)dataArray selectedIndexes:(NSArray *)indexes;
@@ -99,7 +100,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     RDPDFAnnot *m_annot;
     RDVPos m_annot_pos;
     PDF_RECT m_annot_rect;
-    
+
     int m_note_cur;
     
     PDF_POINT *m_lines;
@@ -118,9 +119,8 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     bool m_ellipse_drawing;
     
     BOOL readOnlyEnabled;
-    UIImageView *imgAnnot;
-    NSString *tmpImage;
-    double lastAngle;
+    UIImage *m_aimg;
+    RDPDFDocImage *m_dimg;
     
     BOOL isResizing;
     BOOL isRotating;

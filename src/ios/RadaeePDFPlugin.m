@@ -184,17 +184,9 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
 
     NSDictionary *params = (NSDictionary*) [cdv_command argumentAtIndex:0];
 
-    [[NSUserDefaults standardUserDefaults] setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"actBundleId"];
-    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"company"] forKey:@"actCompany"];
-    [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"email"] forKey:@"actEmail"];
     [[NSUserDefaults standardUserDefaults] setObject:[params objectForKey:@"key"] forKey:@"actSerial"];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:[[params objectForKey:@"licenseType"] intValue]] forKey:@"actActivationType"];
 
     [[NSUserDefaults standardUserDefaults] synchronize];
-
-    g_id = [[NSBundle mainBundle] bundleIdentifier];
-    g_company = [params objectForKey:@"company"];
-    g_mail = [params objectForKey:@"email"];
     g_serial = [params objectForKey:@"key"];
 
     [RDVGlobal Init];
@@ -607,7 +599,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
     }
 
     RDPDFPage *page = [doc page:pageNum];
-    [page objsStart];
+    [page objsStart:false];
 
     [self cdvOkWithMessage:[page objsString:0 :page.objsCount]];
 
@@ -1323,7 +1315,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
 
-    [page objsStart];
+    [page objsStart:false];
 
     for (int c = 0; c < [page annotCount]; c++) {
         RDPDFAnnot *annot = [page annotAtIndex:c];
@@ -1374,7 +1366,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
 
-    [page objsStart];
+    [page objsStart:false];
 
     for (int c = 0; c < [page annotCount]; c++) {
         RDPDFAnnot *annot = [page annotAtIndex:c];
@@ -1424,7 +1416,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
 
-    [page objsStart];
+    [page objsStart:false];
 
     PDF_POINT pt;
     pt.x = x;
@@ -1468,7 +1460,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
 
-    [page objsStart];
+    [page objsStart:false];
 
     [self cdvOkWithMessage:[NSString stringWithFormat:@"%i", [page objsGetCharIndex:x :y]]];
 }
@@ -1494,7 +1486,7 @@ alpha:((float)((rgbValue & 0xFF000000) >>  24))/255.0]
         return;
     }
 
-    [page objsStart];
+    [page objsStart:false];
 
     int color = GLOBAL.g_annot_highlight_clr;
     if( type == 1 ) color = GLOBAL.g_annot_underline_clr;

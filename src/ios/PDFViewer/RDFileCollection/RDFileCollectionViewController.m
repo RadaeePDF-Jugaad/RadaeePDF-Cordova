@@ -396,7 +396,8 @@ static NSString * const reuseIdentifier = @"Cell";
     httpStream = [[PDFHttpStream alloc] init];
     [httpStream open:url :testfile];
     RDPDFDoc *doc = [[RDPDFDoc alloc] init];
-    [RDPDFDoc setOpenFlag:3];
+    //set 3 will make all pages in same size, and effect all flags for follow open.
+    //[RDPDFDoc setOpenFlag:3];
     int error = [doc openStream:httpStream :@""];
     
     switch(error)

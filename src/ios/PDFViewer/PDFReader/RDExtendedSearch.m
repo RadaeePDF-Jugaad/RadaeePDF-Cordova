@@ -61,7 +61,7 @@
             if (self->m_doc) {
                 self->m_page = [self->m_doc page:i];
                 if (self->m_page) {
-                    [self->m_page objsStart];
+                    [self->m_page objsStart:GLOBAL.g_sel_rtol];
                     self->m_finder = [self->m_page find:text :GLOBAL.g_case_sensitive :GLOBAL.g_match_whole_word];
                     
                     if (self->m_finder.count > 0) {

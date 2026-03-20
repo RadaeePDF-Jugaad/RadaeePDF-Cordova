@@ -204,15 +204,10 @@
 }
 
 
-- (void)activateLicenseWithBundleId:(NSString *)bundleId company:(NSString *)company email:(NSString *)email key:(NSString *)key licenseType:(int)type
+- (void)activateLicenseWithBundleId:(NSString *)key
 {
     [self pluginInitialize];
-    
-    g_id = bundleId;
-    g_company = company;
-    g_mail = email;
     g_serial = key;
-        
     [RDVGlobal Init];
 }
 
@@ -404,7 +399,7 @@
     }
     
     RDPDFPage *page = [doc page:pageNum];
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     return [page objsString:0 :page.objsCount];
     
@@ -840,7 +835,7 @@
         return nil;
     }
     
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     for (int c = 0; c < [page annotCount]; c++) {
         RDPDFAnnot *annot = [page annotAtIndex:c];
@@ -885,7 +880,7 @@
         return nil;
     }
     
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     for (int c = 0; c < [page annotCount]; c++) {
         RDPDFAnnot *annot = [page annotAtIndex:c];
@@ -927,7 +922,7 @@
         return;
     }
     
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     PDF_POINT pt;
     pt.x = x;
@@ -959,7 +954,7 @@
         return 0;
     }
     
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     return [page objsGetCharIndex:x :y];
 }
@@ -978,7 +973,7 @@
         return;
     }
     
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     int color = GLOBAL.g_annot_highlight_clr;
     if( type == 1 ) color = GLOBAL.g_annot_underline_clr;

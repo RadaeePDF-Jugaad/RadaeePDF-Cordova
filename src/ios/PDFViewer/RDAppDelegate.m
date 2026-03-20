@@ -25,10 +25,11 @@
     [[UIImageView appearance] setTintColor:[RDUtils radaeeIconColor]];
     [[UITableViewCell appearance] setTintColor:[RDUtils radaeeIconColor]];
 
-    g_id = [[NSBundle mainBundle] bundleIdentifier];
-    g_company = @"radaee";
-    g_mail = @"radaeepdf@gmail.com";
-    g_serial = @"OBT5ZN-9SJHWQ-9ZOU9E-OQ31K2-5R5V9L-KM0Y1L";
+    g_serial = @"CA70EB5DDD2FFC67E6630B2F411875C0621366DE8732CEEE594770237EEEAE030910966E24891181C5DA63AC4A4C77EF";
+    //the key can active version before 2025
+    //you may using Global_getVerString to get version string to comnpare the key time.
+    //char sver[32];
+    //Global_getVerString(sver);
     [RDVGlobal Init];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

@@ -70,7 +70,7 @@ typedef struct _RDVPos
 -(void)vResize :(int)vw :(int)vh;
 -(void)vGetPos :(int)vx :(int)vy :(RDVPos *)pos;
 -(void)vSetPos :(int)vx :(int)vy :(const RDVPos *)pos;
--(void)vMoveTo :(int)docx :(int)docy :(int)cur_page;
+-(void)vMoveTo :(int)docx :(int)docy;
 -(RDVPage *)vGetPage :(int)pageno;
 -(void)vDraw :(RDVCanvas *)canvas;
 -(void)vZoomStart;
@@ -85,7 +85,6 @@ typedef struct _RDVPos
 -(void)vFindEnd;
 -(bool)vFindGoto;
 -(bool)vCanPaging;
--(int)vGetDoch:(int)page;
 @end
 
 typedef enum _PAGE_ALIGN

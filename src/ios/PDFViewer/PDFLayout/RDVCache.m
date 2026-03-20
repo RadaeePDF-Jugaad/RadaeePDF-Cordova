@@ -173,10 +173,10 @@ extern void rdcpy_ints(unsigned int *dst, const unsigned int *src, int len);
     CGImageRef img = CGImageCreate( m_dibw, m_dibh, 8, 32, m_dibw<<2, cs,
                                    kCGBitmapByteOrder32Little|kCGImageAlphaNoneSkipFirst,
                                    provider, NULL, FALSE, kCGRenderingIntentDefault );
-
+    
     CGColorSpaceRelease(cs);
     CGDataProviderRelease(provider);
-
+    
     m_layer = [[CALayer alloc] init];
     [m_layer removeAllAnimations];
     m_layer.contents = (__bridge id)img;
@@ -266,7 +266,7 @@ extern void rdcpy_ints(unsigned int *dst, const unsigned int *src, int len);
     NSMutableArray *colo = (NSMutableArray *)[m_dat objectAtIndex :col];
     return (RDVCache *)[colo objectAtIndex :row];
 }
-
+                                             
 -(void)set :(int)col :(int) row :(RDVCache *)cache
 {
     NSMutableArray *colo = (NSMutableArray *)[m_dat objectAtIndex :col];
@@ -275,3 +275,4 @@ extern void rdcpy_ints(unsigned int *dst, const unsigned int *src, int len);
 }
 
 @end
+

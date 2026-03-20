@@ -19,6 +19,8 @@
 
 #define TEMP_SIGNATURE @"radaee_signature_temp.png"
 #define TEMP_SIGNATURE_EMPTY @"radaee_empty_signature_temp.png"
+#define BLK_GAP 5
+
 
 @class RDVLayoutDual;
 @interface PDFLayoutView () {
@@ -31,6 +33,16 @@
 {
     RDVPos m_save_pos;
     int m_save_vmode;
+    int m_aop_type;
+    int m_aop_node;
+    bool m_aop_attached;
+    PDF_RECT m_aop_rect;//adjust size rect
+    PDF_POINT m_aop_pt0[2];
+    PDF_POINT m_aop_pts[2];
+    int m_annot_type;
+    PDF_POINT *m_aop_ppts;
+    PDF_POINT *m_aop_ppt0;
+    int m_aop_ppts_cnt;
 }
 -(id)initWithFrame:(CGRect)frame
 {
@@ -46,6 +58,8 @@
         m_cur_page = -1;
         m_save_vmode = 0;
         m_doubleTapCount = 0;
+        m_aimg = nil;
+        m_dimg = nil;
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = YES;
         self.alwaysBounceHorizontal = NO;
@@ -133,7 +147,9 @@
     [self clean];
     m_canvas = canvas;
     m_del = del;
-    
+    if (!m_aimg)
+        m_aimg = [UIImage imageNamed:@"btn_annot_stamp"];
+    m_dimg = nil;
     // Zoom action on double tap
     // 1: default zoom
     // 2: smart zoom
@@ -386,26 +402,12 @@
 - (void)setModified:(BOOL)modified force:(BOOL)force
 {
     if(m_modified == modified) return;
-    if (!m_modified) {
+    if (!m_modified)
         m_modified = modified;
-    }
-    
-    if (force) {
+    if (force)
         m_modified = modified;
-    }
-    
-    if (m_modified) {
+    if (m_modified)
         [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:1] forKey:@"fileStat"];
-    }
-}
-
-- (void)updateLastAnnotInfoAtPage:(RDPDFPage *)page
-{
-    RDPDFAnnot *annot = [page annotAtIndex:(page.annotCount - 1)];
-    if (annot) {
-        [self setAuthorForAnnot:annot];
-        [self setModifyDateForAnnot:annot];
-    }
 }
 
 - (void)setAuthorForAnnot:(RDPDFAnnot *)annot
@@ -420,9 +422,8 @@
 
 - (void)setUUIDMeta
 {
-    if ([m_doc meta:UUID].length == 0) {
+    if ([m_doc meta:UUID].length == 0)
         [m_doc setMeta:UUID :[RDUtils getPDFIDForDoc:m_doc]];
-    }
 }
 
 - (BOOL)saveImageFromAnnotAtIndex:(int)index atPage:(int)pageno savePath:(NSString *)path size:(CGSize )size
@@ -444,19 +445,16 @@
         [[NSFileManager defaultManager] moveItemAtPath:annotPath toPath:path error:nil];
         [[NSFileManager defaultManager] removeItemAtPath:annotPath error:nil];
         return YES;
-    } else {
+    } else
         resizedImage = [self imageWithImage:img scaledToSize:size];
-    }
-    
+
     if(resizedImage)
     {
         // Save image.
         [UIImagePNGRepresentation(resizedImage) writeToFile:path atomically:YES];
         [[NSFileManager defaultManager] removeItemAtPath:annotPath error:nil];
-        
         return [[NSFileManager defaultManager] fileExistsAtPath:path];
     }
-    
     return NO;
 }
 
@@ -476,10 +474,8 @@
     // Create path.
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
-    
     // Save image.
     [UIImagePNGRepresentation(img) writeToFile:filePath atomically:YES];
-    
     return filePath;
 }
 
@@ -496,14 +492,11 @@
     RDPDFDIB *emptyDib = [[RDPDFDIB alloc] init:size.width : size.height];
     [emptyDib erase:0xffffffff];
     UIImage *emptyImg = [UIImage imageWithCGImage:[emptyDib image]];
-    
     // Create path.
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE_EMPTY];
-    
     // Save image.
     [UIImagePNGRepresentation(emptyImg) writeToFile:filePath atomically:YES];
-    
     return filePath;
 }
 
@@ -518,8 +511,8 @@
     return newImage;
 }
 
-- (void)imageFromPage:(int)index inPDFRect:(CGRect )rect withScale:(float)scale {
-    
+- (void)imageFromPage:(int)index inPDFRect:(CGRect )rect withScale:(float)scale
+{
     // Get the page
     RDPDFPage *page = [m_doc page:index];
     
@@ -568,21 +561,18 @@
     if([[NSFileManager defaultManager] fileExistsAtPath:path])
     {
         RDPDFPage *page = [m_doc page:pageno];
-        BOOL res = [page addAnnotAttachment:path :0 :&rect];
-        
-        if(res)
+        if([page addAnnotAttachment:path :0 :&rect])
         {
             [self setModified:YES force:NO];
             [self autoSave];
-            
             return YES;
         }
     }
-    
     return NO;
 }
 
-- (void)autoSave {
+- (void)autoSave
+{
     if(GLOBAL.g_auto_save_doc && m_modified)
     {
         [m_doc save];
@@ -597,15 +587,13 @@
         [m_doc save];
         [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:2] forKey:@"fileStat"];
     }
-    
     if(m_timer)
     {
         [m_timer invalidate];
         m_timer = NULL;
     }
     m_doc = nil;
-    if(m_layout)
-        [m_layout vClose];
+    if(m_layout) [m_layout vClose];
     m_layout = nil;
     m_sel = nil;
     m_cur_page = -1;
@@ -629,7 +617,6 @@
 
 - (void)RDVOnPageRendered:(int)pageno
 {
-
 }
 
 -(void)RDVOnFound :(RDVFinder *)finder
@@ -656,20 +643,140 @@
     [self setNeedsDisplay];
 }
 
++(void)osDrawBlk:(CGContextRef)context :(float)x :(float)y
+{
+    CGRect rect = CGRectMake(x - BLK_GAP, y - BLK_GAP, BLK_GAP * 2, BLK_GAP * 2);
+    CGContextFillRect(context, rect);
+    CGContextStrokeRect(context, rect);
+}
+
++(void)osDrawLine:(CGContextRef)context :(float)x1 :(float)y1 :(float)x2 :(float)y2
+{
+    CGContextBeginPath( context );
+    CGContextMoveToPoint(context, x1, y1);
+    CGContextAddLineToPoint(context, x2, y2);
+    CGContextStrokePath(context);
+}
+
++(bool)vOnBlk:(float)x :(float)y :(float)xb :(float)yb :(float)scale
+{
+    float gap = scale * BLK_GAP;
+    return (x >= xb - gap && x <= xb + gap &&
+            y >= yb - gap && y <= yb + gap);
+}
++(bool)vInRect:(float)x :(float)y :(PDF_RECT)rect
+{
+    return (x >= rect.left && x <= rect.right &&
+            y >= rect.top && y <= rect.bottom);
+}
+
+-(void)osDrawAnnotNormal:(CGContextRef)context
+{
+    CGContextSetLineWidth(context, 1);
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+    float scale = 1.0f / m_scale_pix;
+    CGRect rect1 = CGRectMake(m_aop_rect.left * scale,
+                              m_aop_rect.top * scale,
+                              (m_aop_rect.right - m_aop_rect.left) * scale,
+                              (m_aop_rect.bottom - m_aop_rect.top) * scale);
+    CGContextStrokeRect(context, rect1);
+}
+
+-(void)osDrawAnnotResize:(CGContextRef)context
+{
+    CGContextSetLineWidth(context, 1);
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+    float scale = 1.0f / m_scale_pix;
+    CGRect rect1 = CGRectMake(m_aop_rect.left * scale,
+                              m_aop_rect.top * scale,
+                              (m_aop_rect.right - m_aop_rect.left) * scale,
+                              (m_aop_rect.bottom - m_aop_rect.top) * scale);
+    CGContextStrokeRect(context, rect1);
+    CGContextSetRGBFillColor(context, 1, 1, 1, 1);
+    float l = rect1.origin.x;
+    float t = rect1.origin.y;
+    float r = l + rect1.size.width;
+    float b = t + rect1.size.height;
+    float mx = (l + r) * 0.5f;
+    float my = (t + b) * 0.5f;
+    [PDFLayoutView osDrawBlk:context :l :t];
+    [PDFLayoutView osDrawBlk:context :mx :t];
+    [PDFLayoutView osDrawBlk:context :r :t];
+    [PDFLayoutView osDrawBlk:context :r :my];
+    [PDFLayoutView osDrawBlk:context :r :b];
+    [PDFLayoutView osDrawBlk:context :mx :b];
+    [PDFLayoutView osDrawBlk:context :l :b];
+    [PDFLayoutView osDrawBlk:context :l :my];
+}
+
+-(void)osDrawAnnotLine:(CGContextRef)context
+{
+    [self OnAnnotLoadLine];
+    CGContextSetLineWidth(context, 1);
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+    float scale = 1.0f / m_scale_pix;
+    CGRect rect1 = CGRectMake(m_aop_rect.left * scale,
+                              m_aop_rect.top * scale,
+                              (m_aop_rect.right - m_aop_rect.left) * scale,
+                              (m_aop_rect.bottom - m_aop_rect.top) * scale);
+    CGContextStrokeRect(context, rect1);
+    CGContextSetRGBStrokeColor(context, 0, 0, 1, 0.25f);
+    [PDFLayoutView osDrawLine :context
+                              :m_aop_pts[0].x * scale
+                              :m_aop_pts[0].y * scale
+                              :m_aop_pts[1].x * scale
+                              :m_aop_pts[1].y * scale];
+
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+    CGContextSetRGBFillColor(context, 1, 1, 1, 1);
+    [PDFLayoutView osDrawBlk:context :m_aop_pts[0].x * scale :m_aop_pts[0].y * scale];
+    [PDFLayoutView osDrawBlk:context :m_aop_pts[1].x * scale :m_aop_pts[1].y * scale];
+}
+
+-(void)osDrawAnnotPoly:(CGContextRef)context
+{
+    [self OnAnnotLoadPath];
+    CGContextSetLineWidth(context, 1);
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+    float scale = 1.0f / m_scale_pix;
+    CGRect rect1 = CGRectMake(m_aop_rect.left * scale,
+                              m_aop_rect.top * scale,
+                              (m_aop_rect.right - m_aop_rect.left) * scale,
+                              (m_aop_rect.bottom - m_aop_rect.top) * scale);
+    CGContextStrokeRect(context, rect1);
+    if (!m_aop_ppts) return;
+    CGContextSetRGBStrokeColor(context, 0, 0, 1, 0.25f);
+    PDF_POINT *pend = m_aop_ppts + m_aop_ppts_cnt;
+    CGContextBeginPath( context );
+    PDF_POINT *pcur = m_aop_ppts;
+    CGContextMoveToPoint(context, pcur->x * scale, pcur->y * scale);
+    for (pcur++; pcur < pend; pcur++)
+    {
+        CGContextAddLineToPoint(context, pcur->x * scale, pcur->y * scale);
+    }
+    if (m_annot_type == 7) CGContextClosePath(context);
+    CGContextStrokePath(context);
+
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+    CGContextSetRGBFillColor(context, 1, 1, 1, 1);
+    for (pcur = m_aop_ppts; pcur < pend; pcur++)
+    {
+        [PDFLayoutView osDrawBlk:context :pcur->x * scale :pcur->y * scale];
+    }
+}
+
 -(void)osDrawAnnot:(CGContextRef)context
 {
     if( m_status == sta_annot && GLOBAL.g_highlight_annotation)
     {
-        int dx = (m_tx - m_px) / m_scale_pix;
-        int dy = (m_ty - m_py) / m_scale_pix;
-        CGContextSetLineWidth(context, 1);
-        CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
-        float scale = 1.0f / m_scale_pix;
-        CGRect rect1 = CGRectMake(m_annot_rect.left * scale + dx,
-                                  m_annot_rect.top * scale + dy,
-                                  (m_annot_rect.right - m_annot_rect.left) * scale,
-                                  (m_annot_rect.bottom - m_annot_rect.top) * scale);
-        CGContextStrokeRect(context, rect1);
+        if (m_aop_type == 1)
+            [self osDrawAnnotResize:context];
+        else if (m_aop_type == 2)
+            [self osDrawAnnotLine:context];
+        else if (m_aop_type == 3)
+            [self osDrawAnnotPoly:context];
+        else
+            [self osDrawAnnotNormal:context];
     }
 }
 
@@ -921,6 +1028,50 @@
     }
 }
 
+-(void)osDrawImages:(CGContextRef)context
+{
+    if( m_status == sta_image && (m_rects_cnt || m_rects_drawing) )
+    {
+        PDF_POINT *pt_cur = m_rects;
+        PDF_POINT *pt_end = m_rects + (m_rects_cnt<<1);
+        if( m_rects_drawing ) pt_end += 2;
+        while( pt_cur < pt_end )
+        {
+            PDF_RECT rect;
+            if( pt_cur->x > pt_cur[1].x )
+            {
+                rect.right = pt_cur->x;
+                rect.left = pt_cur[1].x;
+            }
+            else
+            {
+                rect.left = pt_cur->x;
+                rect.right = pt_cur[1].x;
+            }
+            if( pt_cur->y > pt_cur[1].y )
+            {
+                rect.bottom = pt_cur->y;
+                rect.top = pt_cur[1].y;
+            }
+            else
+            {
+                rect.top = pt_cur->y;
+                rect.bottom = pt_cur[1].y;
+            }
+            CGRect rect1 = CGRectMake(rect.left/m_scale_pix,
+                                      rect.bottom/m_scale_pix,
+                                      (rect.right - rect.left)/m_scale_pix,
+                                      (rect.bottom - rect.top)/m_scale_pix);
+            CGContextSaveGState(context);
+            CGAffineTransform tran = CGAffineTransformMake(1, 0, 0, -1, 0, rect.bottom);
+            CGContextConcatCTM(context, tran);
+            CGContextDrawImage(context, rect1, m_aimg.CGImage);
+            CGContextRestoreGState(context);
+            pt_cur += 2;
+        }
+    }
+}
+
 -(void)osDrawEllipse:(CGContextRef)context
 {
     if( m_status == sta_ellipse && (m_ellipse_cnt || m_ellipse_drawing) )
@@ -1063,6 +1214,7 @@
     [self osDrawInk:ctx];
     [self osDrawLines:ctx];
     [self osDrawRects:ctx];
+    [self osDrawImages:ctx];
     [self osDrawEllipse:ctx];
     [self osDrawEditbox:ctx];
     [self osDrawPolygon:ctx];
@@ -1085,11 +1237,10 @@
     {
         self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
         [self setNeedsDisplay];
-        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix :m_cur_page];
+        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
     }
     else
     {
-        self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout vGetDoch:m_cur_page]/m_scale_pix);
         if(singlePage && GLOBAL.g_paging_enabled)
         {
             if(m_zoom > 1)
@@ -1162,7 +1313,7 @@
                         {
                             if(xval < 0) xval = 0;
                             if(yval < 0) yval = 0;
-                            [m_layout vMoveTo:xval :yval :m_cur_page];
+                            [m_layout vMoveTo:xval :yval];
                         }
                     }
                     if ((screenHeight) < [m_layout vGetPage:m_cur_page].GetHeight)
@@ -1180,7 +1331,7 @@
                     }
                 }
                 [self setNeedsDisplay];
-                [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix :m_cur_page];
+                [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
                 
             }
             else
@@ -1195,7 +1346,7 @@
                 {
                     if(xval < 0) xval = 0;
                     if(yval < 0) yval = 0;
-                    [m_layout vMoveTo:xval :yval :m_cur_page];
+                    [m_layout vMoveTo:xval :yval];
                 }
                 else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
                 [self setNeedsDisplay];
@@ -1461,7 +1612,7 @@
                         {
                             if(xval < 0) xval = 0;
                             if(yval < 0) yval = 0;
-                            [m_layout vMoveTo:xval :yval :m_cur_page];
+                            [m_layout vMoveTo:xval :yval];
                         }
                     }
                     if ((screenHeight) < doublePageHeight)
@@ -1479,7 +1630,7 @@
                     }
                 }
                 [self setNeedsDisplay];
-                [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix :m_cur_page];
+                [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
             }
             else
             {
@@ -1493,7 +1644,7 @@
                 {
                     if(xval < 0) xval = 0;
                     if(yval < 0) yval = 0;
-                    [m_layout vMoveTo:xval :yval :m_cur_page];
+                    [m_layout vMoveTo:xval :yval];
                 }
                 else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
                 [self setNeedsDisplay];
@@ -1511,7 +1662,7 @@
             {
                 if(xval < 0) xval = 0;
                 if(yval < 0) yval = 0;
-                [m_layout vMoveTo:xval :yval :m_cur_page];
+                [m_layout vMoveTo:xval :yval];
             }
             else self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
             [self setNeedsDisplay];
@@ -1564,7 +1715,6 @@
     float speed_to_change_page = 500;
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
     bool m_layout_rtol = GLOBAL.g_layout_rtol;
-    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout vGetDoch:m_cur_page]/m_scale_pix);
     if((singlePage || (doublePage && orientation == UIInterfaceOrientationPortrait)) && GLOBAL.g_paging_enabled)
     {
         isDecelerating = false;
@@ -1659,16 +1809,7 @@
                     {
                         if(touchEndPoint.x < touchBeginPoint.x && speed > speed_to_change_page)
                         {
-                            if([m_layout vGetPage:begin_touch_page + 1].GetWidth > screenWidth)
-                            {
-                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
-                            }
-                            else
-                            {
-                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page + 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
-                                [self setContentOffset:animatePoint animated:YES];
-                                isAnimating = true;
-                            }
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page + 1].GetX / m_scale_pix), self.contentOffset.y);
                             
                         }
                         else
@@ -1683,14 +1824,7 @@
                     {
                         if(touchEndPoint.x > touchBeginPoint.x && speed > speed_to_change_page)
                         {
-                            if([m_layout vGetPage:begin_touch_page - 1].GetWidth > screenWidth)
-                            {
-                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
-                            }
-                            else
-                            {
-                                animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX - ((screenWidth - [m_layout vGetPage:begin_touch_page - 1].GetWidth) / 2)) / m_scale_pix , self.contentOffset.y);
-                            }
+                            animatePoint = CGPointMake(([m_layout vGetPage:begin_touch_page - 1].GetX + [m_layout vGetPage:begin_touch_page - 1].GetWidth - screenWidth) / m_scale_pix , self.contentOffset.y);
                         }
                         else
                         {
@@ -1733,7 +1867,7 @@
                 }
             }
         }
-        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix :m_cur_page];
+        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
         [self ProRedrawOS];
     }
     else if(doublePage && GLOBAL.g_paging_enabled)
@@ -2308,7 +2442,7 @@
                 }
             }
         }
-        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix :m_cur_page];
+        [m_layout vMoveTo:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
         [self ProRedrawOS];
     }
 }
@@ -2364,7 +2498,7 @@
     }
     
     [m_layout vZooming:m_zoom];
-    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout vGetDoch:m_cur_page]/m_scale_pix);
+    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
     [m_layout vSetPos:(point.x - (zoomPoint.x * m_zoom)) * m_scale_pix :(point.y - (zoomPoint.y * m_zoom)) * m_scale_pix :&m_zoom_pos];
     self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
     [self refresh];
@@ -2377,7 +2511,7 @@
     m_zoom = scale;
     [m_layout vZooming:m_zoom];
     [m_layout vZoomConfirm];
-    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout vGetDoch:m_cur_page]/m_scale_pix);
+    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
     self.contentOffset  = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
     //NSLog(@"ZPOS7:%f,%f", self.contentOffset.x, self.contentOffset.y);
     m_status = sta_none;
@@ -2396,7 +2530,7 @@
     [m_layout vZooming:scale];
     self.zoomScale = scale;
     m_zoom = scale;
-    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout vGetDoch:m_cur_page]/m_scale_pix);
+    self.contentSize = CGSizeMake([m_layout docw]/m_scale_pix, [m_layout doch]/m_scale_pix);
     [m_layout vSetPos:pt.x :pt.y :&m_zoom_pos];
     self.contentOffset = CGPointMake([m_layout docx]/m_scale_pix, [m_layout docy]/m_scale_pix);
     [m_layout vZoomConfirm];
@@ -2565,49 +2699,36 @@
         
         PDF_RECT rect;
         [m_annot getRect:&rect];
-        
-        /*
-        RDPDFPageContent *content = [[RDPDFPageContent alloc] init];
-        [content gsSave];
-        float width = (rect.right - rect.left);
-        float height = (rect.bottom - rect.top);
-         
-        float xTranslation = width / 2.0f;
-        float yTranslation = height / 2.0f;
 
-        //set the matrix 20x20
-        RDPDFMatrix *matrix = [[RDPDFMatrix alloc] init:width :height :xTranslation :yTranslation];
-        [content gsCatMatrix:matrix];
-        matrix = nil;
-        
-        [content drawText:@"Testo di prova" :0 :50.0];
-        [content gsRestore];
-        content = nil;
-        */
-        
         m_annot_idx = [m_annot getIndex];
-        
         if(m_del && [m_del respondsToSelector:@selector(OnAnnotTapped:atPage:atPoint:)])
-        {
             [m_del OnAnnotTapped:m_annot atPage:m_cur_page atPoint:CGPointMake(x, y)];
-        }
         
-        if (![self canSaveDocument] && m_annot.type != 1) {
+        int atype = m_annot.type;
+        if ((![self canSaveDocument] || (GLOBAL.g_annot_readonly && [m_annot isReadonly])) && !([self isReadOnlyAnnotEnabled:m_annot]))
+        {
             if (m_del) [m_del OnSingleTapped:x:y];
             return;
         }
-        
-        if ([m_annot isAnnotReadOnly] && !([self isReadOnlyAnnotEnabled:m_annot]))
-            return;
-        
         self.scrollEnabled = false;
         m_status = sta_annot;
+        m_aop_attached = false;
+        if (atype == 5 || atype == 6 || atype == 16)//it can resize
+            m_aop_type = 1;
+        else if (atype == 4)
+            m_aop_type = 2;
+        else if (atype == 7 || atype == 8)
+            m_aop_type = 3;
+        else
+            m_aop_type = 0;
+        
         [m_annot getRect:&m_annot_rect];
         m_annot_rect.left = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.left];
         m_annot_rect.right = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.right];
         float tmp = m_annot_rect.top;
         m_annot_rect.top = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:m_annot_rect.bottom];
         m_annot_rect.bottom = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:tmp];
+        m_aop_rect = m_annot_rect;
         [self ProRedrawOS];
         
         int nu = [m_annot getCheckStatus];
@@ -2639,9 +2760,7 @@
                 NSString *str = [m_annot getComboItem:i];
                 [arr addObject:str];
             }
-            
             [self executeAnnotJS];
-            
             if (m_del){
                 [m_del OnAnnotCommboBox :vpage :m_annot :[self annotRect] :arr selected:[m_annot getComboSel]];
             }
@@ -2649,18 +2768,14 @@
         }
         
         nu = [m_annot getListItemCount];
-        if (nu != -1){
-            
+        if (nu != -1)
+        {
             //BOOL multi = [m_annot isMultiSel];
-            
             NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:0];
             for (int i = 0; i < nu; i++) {
-                NSString *str = [m_annot getListItem:i];
-                [arr addObject:str];
+                [arr addObject:[m_annot getListItem:i]];
             }
-            
             // GET SELECTED ITEMS
-            
             int sels[16]; //custom this number of sels
             int count = [m_annot getListSels:sels :16]; //count is how many cell had been selected
             int *cur = sels;
@@ -2671,23 +2786,17 @@
                 [selected_items addObject:[NSNumber numberWithInt:*cur]]; //selected cell index
                 cur++;
             }
-            
-            if (m_del){
-                [m_del OnAnnotList :vpage :m_annot :[self annotRect] :arr selectedIndexes:selected_items];// Modified method
-            }
+            if (m_del) [m_del OnAnnotList :vpage :m_annot :[self annotRect] :arr selectedIndexes:selected_items];// Modified method
             return;
         }
         
-        int type = [m_annot getEditType];
-        if (type > 0) {
-            if (m_del) {
+        if ([m_annot getEditType] > 0) {
+            if (m_del)
                 [m_del OnAnnotEditBox:m_annot :[self annotRect] :[m_annot getEditText] :([m_annot getEditTextSize] / m_scale_pix) * vpage.scale];
-            }
             return ;
         }
         
         NSString *nuri = [m_annot getURI];
-        nuri = [m_annot getURI];
         if(nuri)//open url
         {
             if( GLOBAL.g_auto_launch_link)
@@ -2698,13 +2807,12 @@
             }
         }
         
-        if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
-            if (m_del && GLOBAL.g_hand_signature) {
+        if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0)
+        {
+            if (m_del && GLOBAL.g_hand_signature)
                 [m_del OnAnnotSignature :vpage :m_annot];
-            }
             return;
         }
-        
         if(m_del) [m_del OnAnnotClicked:m_annot :[self annotRect] :x :y];
     }
     else
@@ -2723,13 +2831,6 @@
 {
     enum LAYOUT_STATUS save_status = m_status;
     [self zoomPageToScale:1.0 atPoint:CGPointMake([m_layout vw] / (m_scale_pix * 2), [m_layout vh] / (m_scale_pix * 2))];
-    
-    if ([imgAnnot isDescendantOfView:self]) {
-        CGPoint center = self.center;
-        center.x += self.contentOffset.x;
-        center.y += self.contentOffset.y;
-        imgAnnot.center = center;
-    }
     m_status = save_status;
 }
 
@@ -2751,7 +2852,6 @@
     m_tx = point.x * m_scale_pix;
     m_ty = point.y * m_scale_pix;
     [m_layout vGetPos : m_tx: m_ty :&m_sel_pos];
-    
     m_sel = [[RDVSel alloc] init:[m_doc page :m_sel_pos.pageno] :m_sel_pos.pageno];
     if( m_del )
         [m_del OnSelStart:point.x: point.y];
@@ -2765,7 +2865,6 @@
     float pdfx = [vp GetPDFX :[m_layout docx] + point.x * m_scale_pix];
     float pdfy = [vp GetPDFY :[m_layout docy] + point.y * m_scale_pix];
     [m_sel SetSel :m_sel_pos.pdfx :m_sel_pos.pdfy :pdfx :pdfy];
-    
     [self ProRedrawOS];
     return true;
 }
@@ -2773,80 +2872,401 @@
 -(bool)OnSelTouchEnd:(CGPoint)point
 {
     if( m_status != sta_sel ) return false;
-
     if( m_del )
         [m_del OnSelEnd :m_tx/m_scale_pix :m_ty/m_scale_pix :point.x :point.y];
     return true;
 }
 
+-(void)OnATouchBegNormal
+{
+}
+
+-(void)OnATouchBegResize
+{
+    float mx = (m_annot_rect.left + m_annot_rect.right) * 0.5f;
+    float my = (m_annot_rect.top + m_annot_rect.bottom) * 0.5f;
+    if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_annot_rect.left :m_annot_rect.top :m_scale_pix])
+        m_aop_node = 1;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :mx :m_annot_rect.top :m_scale_pix])
+        m_aop_node = 2;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_annot_rect.right :m_annot_rect.top :m_scale_pix])
+        m_aop_node = 3;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_annot_rect.right :my :m_scale_pix])
+        m_aop_node = 4;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_annot_rect.right :m_annot_rect.bottom :m_scale_pix])
+        m_aop_node = 5;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :mx :m_annot_rect.bottom :m_scale_pix])
+        m_aop_node = 6;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_annot_rect.left :m_annot_rect.bottom :m_scale_pix])
+        m_aop_node = 7;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_annot_rect.left :my :m_scale_pix])
+        m_aop_node = 8;
+    else if ([PDFLayoutView vInRect:m_tx :m_ty :m_annot_rect])
+        m_aop_node = 9;
+    else
+        m_aop_node = -1;
+}
+
+-(void)OnAnnotLoadLine
+{
+    if (m_aop_attached) return;
+    RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+    m_aop_pt0[0] = [m_annot getLinePoint:0];
+    m_aop_pt0[1] = [m_annot getLinePoint:1];
+    m_aop_pt0[0].x = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_aop_pt0[0].x];
+    m_aop_pt0[0].y = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:m_aop_pt0[0].y];
+    m_aop_pt0[1].x = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_aop_pt0[1].x];
+    m_aop_pt0[1].y = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:m_aop_pt0[1].y];
+    m_aop_pts[0] = m_aop_pt0[0];
+    m_aop_pts[1] = m_aop_pt0[1];
+    m_aop_attached = true;
+}
+-(void)OnATouchBegLine
+{
+    [self OnAnnotLoadLine];
+    if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_aop_pts[0].x :m_aop_pts[0].y :m_scale_pix])
+        m_aop_node = 1;
+    else if ([PDFLayoutView vOnBlk:m_tx :m_ty :m_aop_pts[1].x :m_aop_pts[1].y :m_scale_pix])
+        m_aop_node = 2;
+    else if ([PDFLayoutView vInRect:m_tx :m_ty :m_annot_rect])
+        m_aop_node = 3;
+    else
+        m_aop_node = -1;
+}
+
+-(void)OnAnnotLoadPath
+{
+    if (m_aop_attached) return;
+    RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+    m_annot_type = m_annot.type;
+    RDPDFPath *path = nil;
+    if (m_annot_type == 7)
+    {
+        path = [m_annot getPolygonPath];
+        m_aop_ppts_cnt = [path nodesCount] - 1;
+    }
+    else if(m_annot_type == 8)
+    {
+        path = [m_annot getPolylinePath];
+        m_aop_ppts_cnt = [path nodesCount];
+    }
+    m_aop_ppt0 = (PDF_POINT *)malloc(sizeof(PDF_POINT) * m_aop_ppts_cnt * 2);
+    m_aop_ppts = m_aop_ppt0 + m_aop_ppts_cnt;
+    PDF_POINT *pcur = m_aop_ppt0;
+    for (int cur = 0; cur < m_aop_ppts_cnt; cur++)
+    {
+        [path node:cur :pcur];
+        pcur->x = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:pcur->x];
+        pcur->y = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:pcur->y];
+        pcur++;
+    }
+    memcpy(m_aop_ppts, m_aop_ppt0, sizeof(PDF_POINT) * m_aop_ppts_cnt);
+    m_aop_attached = true;
+}
+
+-(void)OnATouchBegPoly
+{
+    [self OnAnnotLoadPath];
+    
+    PDF_POINT *pend = m_aop_ppts + m_aop_ppts_cnt;
+    m_aop_node = -1;
+    for (PDF_POINT *pcur = m_aop_ppts; pcur < pend; pcur++)
+    {
+        if ([PDFLayoutView vOnBlk:m_tx :m_ty :pcur->x :pcur->y :m_scale_pix])
+            m_aop_node = (int)(pcur - m_aop_ppts);
+    }
+    if (m_aop_node < 0)
+    {
+        free(m_aop_ppt0);
+        m_aop_ppt0 = NULL;
+        m_aop_ppts = NULL;
+        if ([PDFLayoutView vInRect:m_tx :m_ty :m_annot_rect])
+            m_aop_node = 0;
+        else
+            m_aop_node = -1;
+    }
+}
+
 -(bool)OnAnnotTouchBegin:(CGPoint)point
 {
     if (m_status != sta_annot) return false;
-    if (![m_annot canMoveAnnot]) return false;
+    if (![m_annot canMoveAnnot] || (GLOBAL.g_annot_lock && [m_annot isLocked]) || (GLOBAL.g_annot_readonly && [m_annot isReadonly])) return false;
     m_px = point.x * m_scale_pix;
     m_py = point.y * m_scale_pix;
     m_tx = m_px;
     m_ty = m_py;
+    if (m_aop_type == 1)
+        [self OnATouchBegResize];
+    else if (m_aop_type == 2)
+        [self OnATouchBegLine];
+    else if (m_aop_type == 3)
+        [self OnATouchBegPoly];
+    else
+        [self OnATouchBegNormal];
     return true;
+}
+
+-(void)OnATouchMoveNormal
+{
+    float dx = m_tx - m_px;
+    float dy = m_ty - m_py;
+    m_aop_rect.left = m_annot_rect.left + dx;
+    m_aop_rect.top = m_annot_rect.top + dy;
+    m_aop_rect.right = m_annot_rect.right + dx;
+    m_aop_rect.bottom = m_annot_rect.bottom + dy;
+}
+
+-(void)OnATouchMoveResize
+{
+    if (m_aop_node < 0) return;
+    float dx = m_tx - m_px;
+    float dy = m_ty - m_py;
+    switch(m_aop_node)
+    {
+        case 1:
+            m_aop_rect.left = m_annot_rect.left + dx;
+            m_aop_rect.top = m_annot_rect.top + dy;
+            break;
+        case 2:
+            m_aop_rect.top = m_annot_rect.top + dy;
+            break;
+        case 3:
+            m_aop_rect.right = m_annot_rect.right + dx;
+            m_aop_rect.top = m_annot_rect.top + dy;
+            break;
+        case 4:
+            m_aop_rect.right = m_annot_rect.right + dx;
+            break;
+        case 5:
+            m_aop_rect.right = m_annot_rect.right + dx;
+            m_aop_rect.bottom += m_annot_rect.right + dy;
+            break;
+        case 6:
+            m_aop_rect.bottom += m_annot_rect.right + dy;
+            break;
+        case 7:
+            m_aop_rect.left = m_annot_rect.left + dx;
+            m_aop_rect.bottom += m_annot_rect.right + dy;
+            break;
+        case 8:
+            m_aop_rect.left = m_annot_rect.left + dx;
+            break;
+        default:
+            m_aop_rect.left = m_annot_rect.left + dx;
+            m_aop_rect.top = m_annot_rect.top + dy;
+            m_aop_rect.right = m_annot_rect.right + dx;
+            m_aop_rect.bottom = m_annot_rect.bottom + dy;
+            break;
+    }
+}
+
+-(void)OnATouchMoveLine
+{
+    if (m_aop_node < 0) return;
+    float dx = m_tx - m_px;
+    float dy = m_ty - m_py;
+    switch(m_aop_node)
+    {
+        case 1:
+            m_aop_pts[0].x = m_aop_pt0[0].x + dx;
+            m_aop_pts[0].y = m_aop_pt0[0].y + dy;
+            if (m_aop_pts[0].x > m_aop_pts[1].x)
+            {
+                m_aop_rect.left = m_aop_pts[1].x;
+                m_aop_rect.right = m_aop_pts[0].x;
+            }
+            else
+            {
+                m_aop_rect.left = m_aop_pts[0].x;
+                m_aop_rect.right = m_aop_pts[1].x;
+            }
+            if (m_aop_pts[0].y > m_aop_pts[1].y)
+            {
+                m_aop_rect.top = m_aop_pts[1].y;
+                m_aop_rect.bottom = m_aop_pts[0].y;
+            }
+            else
+            {
+                m_aop_rect.top = m_aop_pts[0].y;
+                m_aop_rect.bottom = m_aop_pts[1].y;
+            }
+            break;
+        case 2:
+            m_aop_pts[1].x = m_aop_pt0[1].x + dx;
+            m_aop_pts[1].y = m_aop_pt0[1].y + dy;
+            if (m_aop_pts[0].x > m_aop_pts[1].x)
+            {
+                m_aop_rect.left = m_aop_pts[1].x;
+                m_aop_rect.right = m_aop_pts[0].x;
+            }
+            else
+            {
+                m_aop_rect.left = m_aop_pts[0].x;
+                m_aop_rect.right = m_aop_pts[1].x;
+            }
+            if (m_aop_pts[0].y > m_aop_pts[1].y)
+            {
+                m_aop_rect.top = m_aop_pts[1].y;
+                m_aop_rect.bottom = m_aop_pts[0].y;
+            }
+            else
+            {
+                m_aop_rect.top = m_aop_pts[0].y;
+                m_aop_rect.bottom = m_aop_pts[1].y;
+            }
+            break;
+        default:
+            m_aop_pts[0].x = m_aop_pt0[0].x + dx;
+            m_aop_pts[0].y = m_aop_pt0[0].y + dy;
+            m_aop_pts[1].x = m_aop_pt0[1].x + dx;
+            m_aop_pts[1].y = m_aop_pt0[1].y + dy;
+            m_aop_rect.left = m_annot_rect.left + dx;
+            m_aop_rect.top = m_annot_rect.top + dy;
+            m_aop_rect.right = m_annot_rect.right + dx;
+            m_aop_rect.bottom = m_annot_rect.bottom + dy;
+            break;
+    }
+}
+
+-(void)OnATouchMovePoly
+{
+    if (m_aop_node < 0) return;
+    float dx = m_tx - m_px;
+    float dy = m_ty - m_py;
+    if (m_aop_ppt0)
+    {
+        PDF_POINT *pdst = m_aop_ppts + m_aop_node;
+        PDF_POINT *psrc = m_aop_ppt0 + m_aop_node;
+        pdst->x = psrc->x + dx;
+        pdst->y = psrc->y + dy;
+        //update bounding
+        m_aop_rect.left = pdst->x;
+        m_aop_rect.top = pdst->y;
+        m_aop_rect.right = m_aop_rect.left;
+        m_aop_rect.bottom = m_aop_rect.top;
+        PDF_POINT *pend = m_aop_ppts + m_aop_ppts_cnt;
+        for (PDF_POINT *pcur = m_aop_ppts; pcur < pend; pcur++)
+        {
+            if (m_aop_rect.left > pcur->x) m_aop_rect.left = pcur->x;
+            else if (m_aop_rect.right < pcur->x) m_aop_rect.right = pcur->x;
+            if (m_aop_rect.top > pcur->y) m_aop_rect.top = pcur->y;
+            else if (m_aop_rect.bottom < pcur->y) m_aop_rect.bottom = pcur->y;
+        }
+    }
+    else
+    {
+        m_aop_rect.left = m_annot_rect.left + dx;
+        m_aop_rect.top = m_annot_rect.top + dy;
+        m_aop_rect.right = m_annot_rect.right + dx;
+        m_aop_rect.bottom = m_annot_rect.bottom + dy;
+    }
 }
 
 -(bool)OnAnnotTouchMove:(CGPoint)point
 {
     if (m_status != sta_annot) return false;
-    if (![m_annot canMoveAnnot]) return false;
-    if([self canSaveDocument])
-    {
-        m_tx = point.x * m_scale_pix;
-        m_ty = point.y * m_scale_pix;
-    }
+    if (![m_annot canMoveAnnot] || (GLOBAL.g_annot_lock && [m_annot isLocked]) || (GLOBAL.g_annot_readonly && [m_annot isReadonly])) return false;
+    m_tx = point.x * m_scale_pix;
+    m_ty = point.y * m_scale_pix;
+    if (m_aop_type == 1)
+        [self OnATouchMoveResize];
+    else if (m_aop_type == 2)
+        [self OnATouchMoveLine];
+    else if (m_aop_type == 3)
+        [self OnATouchMovePoly];
+    else
+        [self OnATouchMoveNormal];
     [self ProRedrawOS];
     return true;
 }
 
--(bool)OnAnnotTouchEnd:(CGPoint)point
+-(void)OnATouchEndNormal
 {
-    if (m_status != sta_annot) return false;
-    if (m_annot.type == 20) { // EditText
-        if (m_del) {
-            [m_del OnAnnotEnd];
+    m_annot_rect.left += (m_tx - m_px);
+    m_annot_rect.top += (m_ty - m_py);
+    m_annot_rect.right += (m_tx - m_px);
+    m_annot_rect.bottom += (m_ty - m_py);
+    RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+    RDVPos pos;
+    [m_layout vGetPos :m_tx :m_ty :&pos];
+    if( pos.pageno == m_annot_pos.pageno )
+    {
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+        [mat transformRect:&m_annot_rect];
+        //Action Stack Manger
+        PDF_RECT rect;
+        [m_annot getRect:&rect];
+        [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot_idx ref:[m_annot getRef]]];
+        [m_annot setRect:&m_annot_rect];
+        [self setModifyDateForAnnot:m_annot];
+        [self ProUpdatePage :m_annot_pos.pageno];
+    }
+    else if (m_tx != m_px && m_ty != m_py)
+    {
+        RDVPage *vdest = [m_layout vGetPage:pos.pageno];
+        RDPDFPage *dpage = [vdest GetPage];
+        if( dpage )
+        {
+            RDPDFMatrix *mat = [vdest CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+            [mat transformRect :&m_annot_rect];
+            
+            //Action Stack Manger
+            PDF_RECT rect;
+            [m_annot getRect:&rect];
+            PDF_OBJ_REF ref = [m_annot getRef];
+            [m_annot MoveToPage :dpage :&m_annot_rect];
+            [self setModifyDateForAnnot:m_annot];
+            [self ProUpdatePage :m_annot_pos.pageno];
+            [self ProUpdatePage :pos.pageno];
+            ASMove *item = [[ASMove alloc] initWithPage:m_annot_pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:([dpage annotCount] - 1) ref:ref];
+            [actionManger push:item];
+            item.m_pageno = item.m_pageno0;
+            [actionManger orderOnDel:item];
+            item.m_pageno = item.m_pageno1;
+            [actionManger orderIndexes:item];
         }
     }
-    
-    if (![m_annot canMoveAnnot]) {
-        [self vAnnotEnd];
-        return false;
-    }
-    if([self canSaveDocument])
+}
+
+-(void)OnATouchEndResize
+{
+    if (m_aop_node < 0) return;
+    if (m_aop_node != 9)
     {
-        [self setModified:YES force:NO];
-        
-        m_tx = point.x * m_scale_pix;
-        m_ty = point.y * m_scale_pix;
+        m_annot_rect = m_aop_rect;
+        RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+        RDVPos pos;
+        [m_layout vGetPos :m_tx :m_ty :&pos];
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+        [mat transformRect:&m_annot_rect];
+        //Action Stack Manger
+        PDF_RECT rect;
+        [m_annot getRect:&rect];
+        [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot_idx ref:[m_annot getRef]]];
+        [m_annot setRect:&m_annot_rect];
+        [self setModifyDateForAnnot:m_annot];
+        [self ProUpdatePage :m_annot_pos.pageno];
+    }
+    else
+    {
         m_annot_rect.left += (m_tx - m_px);
         m_annot_rect.top += (m_ty - m_py);
         m_annot_rect.right += (m_tx - m_px);
         m_annot_rect.bottom += (m_ty - m_py);
         RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
         RDVPos pos;
-        [m_layout vGetPos :point.x * m_scale_pix :point.y * m_scale_pix :&pos];
-        RDPDFPage *page = [vpage GetPage];
-        RDPDFAnnot *annot = [page annotAtIndex:m_annot_idx];
+        [m_layout vGetPos :m_tx :m_ty :&pos];
         if( pos.pageno == m_annot_pos.pageno )
         {
-            RDPDFMatrix *mat = [vpage CreateInvertMatrix
-                              :self.contentOffset.x * m_scale_pix
-                              :self.contentOffset.y * m_scale_pix];
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
             [mat transformRect:&m_annot_rect];
-            
             //Action Stack Manger
             PDF_RECT rect;
-            [annot getRect:&rect];
-            [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot_idx ref:[annot getRef]]];
-            
-            [annot setRect:&m_annot_rect];
+            [m_annot getRect:&rect];
+            [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot_idx ref:[m_annot getRef]]];
+            [m_annot setRect:&m_annot_rect];
+            [self setModifyDateForAnnot:m_annot];
             [self ProUpdatePage :m_annot_pos.pageno];
-            [self vAnnotEnd];
-            [self updateLastAnnotInfoAtPage:page];
         }
         else if (m_tx != m_px && m_ty != m_py)
         {
@@ -2854,37 +3274,204 @@
             RDPDFPage *dpage = [vdest GetPage];
             if( dpage )
             {
-                RDPDFMatrix *mat = [vdest CreateInvertMatrix
-                                  :self.contentOffset.x * m_scale_pix
-                                  :self.contentOffset.y * m_scale_pix];
+                RDPDFMatrix *mat = [vdest CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
                 [mat transformRect :&m_annot_rect];
                 
                 //Action Stack Manger
                 PDF_RECT rect;
                 [m_annot getRect:&rect];
-                
                 PDF_OBJ_REF ref = [m_annot getRef];
-                
-                [annot MoveToPage :dpage :&m_annot_rect];
+                [m_annot MoveToPage :dpage :&m_annot_rect];
+                [self setModifyDateForAnnot:m_annot];
                 [self ProUpdatePage :m_annot_pos.pageno];
                 [self ProUpdatePage :pos.pageno];
-                
                 ASMove *item = [[ASMove alloc] initWithPage:m_annot_pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:([dpage annotCount] - 1) ref:ref];
                 [actionManger push:item];
                 item.m_pageno = item.m_pageno0;
                 [actionManger orderOnDel:item];
                 item.m_pageno = item.m_pageno1;
                 [actionManger orderIndexes:item];
-                
-                [self vAnnotEnd];
-                [self updateLastAnnotInfoAtPage:dpage];
             }
-        } else {
-            [self vAnnotEnd];
         }
-        
-        [self autoSave];
     }
+    m_aop_node = -1;
+}
+
+-(void)OnATouchEndLine
+{
+    if (m_aop_node < 0) return;
+    if (m_aop_node != 3)
+    {
+        m_annot_rect = m_aop_rect;
+        RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+        RDVPos pos;
+        [m_layout vGetPos :m_tx :m_ty :&pos];
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+        [mat transformPoint:m_aop_pts];
+        [mat transformPoint:m_aop_pts + 1];
+        [m_annot setLinePoint:m_aop_pts[0].x :m_aop_pts[0].y :m_aop_pts[1].x :m_aop_pts[1].y];
+        [self setModifyDateForAnnot:m_annot];
+        [self ProUpdatePage :m_annot_pos.pageno];
+    }
+    else
+    {
+        m_annot_rect.left += (m_tx - m_px);
+        m_annot_rect.top += (m_ty - m_py);
+        m_annot_rect.right += (m_tx - m_px);
+        m_annot_rect.bottom += (m_ty - m_py);
+        RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+        RDVPos pos;
+        [m_layout vGetPos :m_tx :m_ty :&pos];
+        if( pos.pageno == m_annot_pos.pageno )
+        {
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+            [mat transformRect:&m_annot_rect];
+            //Action Stack Manger
+            PDF_RECT rect;
+            [m_annot getRect:&rect];
+            [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot_idx ref:[m_annot getRef]]];
+            [m_annot setRect:&m_annot_rect];
+            [self setModifyDateForAnnot:m_annot];
+            [self ProUpdatePage :m_annot_pos.pageno];
+        }
+        else if (m_tx != m_px && m_ty != m_py)
+        {
+            RDVPage *vdest = [m_layout vGetPage:pos.pageno];
+            RDPDFPage *dpage = [vdest GetPage];
+            if( dpage )
+            {
+                RDPDFMatrix *mat = [vdest CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+                [mat transformRect :&m_annot_rect];
+                
+                //Action Stack Manger
+                PDF_RECT rect;
+                [m_annot getRect:&rect];
+                PDF_OBJ_REF ref = [m_annot getRef];
+                [m_annot MoveToPage :dpage :&m_annot_rect];
+                [self setModifyDateForAnnot:m_annot];
+                [self ProUpdatePage :m_annot_pos.pageno];
+                [self ProUpdatePage :pos.pageno];
+                ASMove *item = [[ASMove alloc] initWithPage:m_annot_pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:([dpage annotCount] - 1) ref:ref];
+                [actionManger push:item];
+                item.m_pageno = item.m_pageno0;
+                [actionManger orderOnDel:item];
+                item.m_pageno = item.m_pageno1;
+                [actionManger orderIndexes:item];
+            }
+        }
+    }
+    m_aop_node = -1;
+}
+
+-(void)OnATouchEndPoly
+{
+    if (m_aop_node < 0) return;
+    if (m_aop_ppt0)
+    {
+        m_annot_rect = m_aop_rect;
+        RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+        RDVPos pos;
+        [m_layout vGetPos :m_tx :m_ty :&pos];
+        RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+
+        RDPDFPath *path = [[RDPDFPath alloc] init];
+        PDF_POINT *pcur = m_aop_ppts;
+        [mat transformPoint:pcur];
+        [path moveTo:pcur->x :pcur->y];
+        PDF_POINT *pend = m_aop_ppts + m_aop_ppts_cnt;
+        for (pcur++; pcur < pend; pcur++)
+        {
+            [mat transformPoint:pcur];
+            [path lineTo:pcur->x :pcur->y];
+        }
+        if (m_annot_type == 7)
+        {
+            [path closePath];
+            [m_annot setPolygonPath:path];
+        }
+        else
+            [m_annot setPolylinePath:path];
+        free(m_aop_ppt0);
+        m_aop_ppt0 = NULL;
+        m_aop_ppts = NULL;
+        
+        [self setModifyDateForAnnot:m_annot];
+        [self ProUpdatePage :m_annot_pos.pageno];
+    }
+    else
+    {
+        m_annot_rect.left += (m_tx - m_px);
+        m_annot_rect.top += (m_ty - m_py);
+        m_annot_rect.right += (m_tx - m_px);
+        m_annot_rect.bottom += (m_ty - m_py);
+        RDVPage *vpage = [m_layout vGetPage:m_annot_pos.pageno];
+        RDVPos pos;
+        [m_layout vGetPos :m_tx :m_ty :&pos];
+        if( pos.pageno == m_annot_pos.pageno )
+        {
+            RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+            [mat transformRect:&m_annot_rect];
+            //Action Stack Manger
+            PDF_RECT rect;
+            [m_annot getRect:&rect];
+            [actionManger push:[[ASMove alloc] initWithPage:pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:m_annot_idx ref:[m_annot getRef]]];
+            [m_annot setRect:&m_annot_rect];
+            [self setModifyDateForAnnot:m_annot];
+            [self ProUpdatePage :m_annot_pos.pageno];
+        }
+        else if (m_tx != m_px && m_ty != m_py)
+        {
+            RDVPage *vdest = [m_layout vGetPage:pos.pageno];
+            RDPDFPage *dpage = [vdest GetPage];
+            if( dpage )
+            {
+                RDPDFMatrix *mat = [vdest CreateInvertMatrix:self.contentOffset.x * m_scale_pix :self.contentOffset.y * m_scale_pix];
+                [mat transformRect :&m_annot_rect];
+                
+                //Action Stack Manger
+                PDF_RECT rect;
+                [m_annot getRect:&rect];
+                PDF_OBJ_REF ref = [m_annot getRef];
+                [m_annot MoveToPage :dpage :&m_annot_rect];
+                [self setModifyDateForAnnot:m_annot];
+                [self ProUpdatePage :m_annot_pos.pageno];
+                [self ProUpdatePage :pos.pageno];
+                ASMove *item = [[ASMove alloc] initWithPage:m_annot_pos.pageno initRect:rect destPage:pos.pageno destRect:m_annot_rect index:([dpage annotCount] - 1) ref:ref];
+                [actionManger push:item];
+                item.m_pageno = item.m_pageno0;
+                [actionManger orderOnDel:item];
+                item.m_pageno = item.m_pageno1;
+                [actionManger orderIndexes:item];
+            }
+        }
+    }
+    m_aop_node = -1;
+}
+
+-(bool)OnAnnotTouchEnd:(CGPoint)point
+{
+    if (m_status != sta_annot) return false;
+    if (![m_annot canMoveAnnot] || (GLOBAL.g_annot_lock && [m_annot isLocked]) || (GLOBAL.g_annot_readonly && [m_annot isReadonly]))
+    {
+        [self vAnnotEnd];
+        return false;
+    }
+    if (m_annot.type == 20) { // EditText
+        if (m_del) [m_del OnAnnotEnd];
+    }
+    [self setModified:YES force:NO];
+    m_tx = point.x * m_scale_pix;
+    m_ty = point.y * m_scale_pix;
+    if (m_aop_type == 1)
+        [self OnATouchEndResize];
+    else if (m_aop_type == 2)
+        [self OnATouchEndLine];
+    else if (m_aop_type == 3)
+        [self OnATouchEndPoly];
+    else
+        [self OnATouchEndNormal];
+    [self vAnnotEnd];
+    [self autoSave];
     return true;
 }
 
@@ -2917,13 +3504,10 @@
             pt.x = pos.pdfx;
             pt.y = pos.pdfy;
             [page addAnnotNote:&pt];
-            
+            [self setModifyDateForAnnot:[page annotAtIndex:(page.annotCount - 1)]];
+
             //Action Stack Manger
             [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
-            
-            // Set Author and Modify date
-            [self updateLastAnnotInfoAtPage:page];
-            
             [self ProUpdatePage :pos.pageno];
             [self setNeedsDisplay];
         }
@@ -3145,90 +3729,45 @@
 -(bool)OnImageTouchBegin:(CGPoint)point
 {
     if( m_status != sta_image ) return false;
-    
-    CGRect origin = imgAnnot.frame;
-    isResizing = !((self.contentOffset.x + point.x) < (origin.origin.x + origin.size.width) && self.contentOffset.y + point.y < (origin.origin.y + origin.size.height) && self.contentOffset.x + point.x > origin.origin.x && self.contentOffset.y + point.y > origin.origin.y);
-    /*
-     isRotating = !(self.contentOffset.x + point.x > origin.origin.x && self.contentOffset.y + point.y > origin.origin.y);
-     */
+    if( m_rects_cnt >= m_rects_max )
+    {
+        m_rects_max += 8;
+        m_rects = (PDF_POINT *)realloc(m_rects, (m_rects_max<<1) * sizeof(PDF_POINT));
+    }
+    m_tx = point.x * m_scale_pix;
+    m_ty = point.y * m_scale_pix;
+    PDF_POINT *pt_cur = &m_rects[m_rects_cnt<<1];
+    pt_cur->x = m_tx;
+    pt_cur->y = m_ty;
+    pt_cur[1].x = m_tx;
+    pt_cur[1].y = m_ty;
+    m_rects_drawing = true;
     return true;
 }
-#define DEGREES_TO_RADIANS(x) (M_PI * (x) / 180.0)
-#define ANG (M_PI / 2) / 180.0
+
 -(bool)OnImageTouchMove:(CGPoint)point
 {
     if( m_status != sta_image ) return false;
-    
-    if (!isResizing) {
-        CGPoint center = point;
-        center.x += self.contentOffset.x;
-        center.y += self.contentOffset.y;
-        imgAnnot.center = center;
-    } else {
-        
-        CGRect origin = imgAnnot.frame;
-        
-        float deltaMoveX = self.contentOffset.x + point.x - origin.origin.x - origin.size.width;
-        float deltaMoveY = self.contentOffset.y + point.y - origin.origin.y - origin.size.height;
-        float prop = imgAnnot.frame.size.width / imgAnnot.frame.size.height;
-        
-        if (!isRotating) {
-            float width = (deltaMoveX > deltaMoveY) ? self.contentOffset.x + point.x - origin.origin.x : (self.contentOffset.y + point.y - origin.origin.y) * prop;
-            float height = (deltaMoveX < deltaMoveY) ? self.contentOffset.y + point.y - origin.origin.y : (self.contentOffset.x + point.x - origin.origin.x) / prop;
-            if(width > 0 && height > 0)
-            {
-                [imgAnnot setFrame:CGRectMake(origin.origin.x, origin.origin.y, width, height)];
-            }
-            
-        } else {
-            double l1 = point.x - imgAnnot.center.x;
-            double l2 = imgAnnot.center.y - point.y;
-            double ip = sqrt(pow(l1, 2) + pow(l2, 2));
-            double arcsin = asin((double)(l2/ip));
-            
-            NSLog(@"l1: %f", l1);
-            NSLog(@"l2: %f", l2);
-            NSLog(@"ip: %f", ip);
-            
-            
-            if (l1 > 0) {
-                if (l2 > 0) {
-                    arcsin = (M_PI_2 * 2) - arcsin;
-                } else {
-                    arcsin = -(M_PI_2 * 2) - arcsin;
-                }
-            }
-            NSLog(@"arcsin: %f", arcsin);
-            
-            imgAnnot.transform = CGAffineTransformMakeRotation(arcsin);
-            lastAngle = arcsin;
-        }
-    }
-    
+    PDF_POINT *pt_cur = &m_rects[m_rects_cnt<<1];
+    pt_cur[1].x = point.x * m_scale_pix;
+    pt_cur[1].y = point.y * m_scale_pix;
+    [self ProRedrawOS];
     return true;
 }
 
 -(bool)OnImageTouchEnd:(CGPoint)point
 {
     if( m_status != sta_image ) return false;
-    
-    UIImage *tmpImg = imgAnnot.image;
-    [[NSFileManager defaultManager] removeItemAtPath:[tmpImage stringByAppendingString:@".bak"] error:nil];
-    [[NSFileManager defaultManager] createFileAtPath:[tmpImage stringByAppendingString:@".bak"] contents:[self rotateImage:tmpImg] attributes:nil];
-    //[self vImageEnd];
-    
+    PDF_POINT *pt_cur = &m_rects[m_rects_cnt<<1];
+    pt_cur[1].x = point.x * m_scale_pix;
+    pt_cur[1].y = point.y * m_scale_pix;
+    m_rects_cnt++;
+    if( m_rects_drawing )
+    {
+        m_rects_drawing = false;
+        [self ProRedrawOS];
+    }
     return true;
-}
-
-- (NSData *)rotateImage:(UIImage *)img
-{
-    UIGraphicsBeginImageContext(img.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextRotateCTM(context, lastAngle);
-    [img drawAtPoint:CGPointMake(0, 0)];
-    UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return UIImagePNGRepresentation(result) ;
 }
 
 -(bool)OnEditboxTouchBegin:(CGPoint)point
@@ -3281,15 +3820,17 @@
     if( !page ) return true;//shall not happen
     m_annot_idx = [page annotCount] - 1;
     m_annot = [page annotAtIndex:m_annot_idx];
-    m_status = sta_annot;
     self.scrollEnabled = false;
     m_status = sta_annot;
+    m_aop_attached = false;
     [m_annot getRect:&m_annot_rect];
     m_annot_rect.left = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.left];
     m_annot_rect.right = [vpage x] - self.contentOffset.x * m_scale_pix + [vpage ToDIBX:m_annot_rect.right];
     float tmp = m_annot_rect.top;
     m_annot_rect.top = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:m_annot_rect.bottom];
     m_annot_rect.bottom = [vpage y] - self.contentOffset.y * m_scale_pix + [vpage ToDIBY:tmp];
+    m_aop_rect = m_annot_rect;
+    m_aop_type = 0;
     [self ProRedrawOS];
 
     if (m_del) {
@@ -3385,16 +3926,13 @@
         pt.x = pos.pdfx ;
         pt.y = pos.pdfy ;
         [page addAnnotNote:&pt];
-        
-        //Action Stack Manger
-        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
-        
         RDPDFAnnot *annot = [page annotAtIndex: [page annotCount] - 1];
         [annot setPopupSubject:subject];
         [annot setPopupText:text];
-        
-        // Set Author and Modify date
-        [self updateLastAnnotInfoAtPage:page];
+        [self setModifyDateForAnnot:annot];
+
+        //Action Stack Manger
+        [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
         
         [self ProUpdatePage:pos.pageno];
         [self autoSave];
@@ -3409,7 +3947,7 @@
     if(pos.pageno>=0)
     {
         RDPDFPage *page = [m_doc page:pos.pageno];
-        [page objsStart];
+        [page objsStart:GLOBAL.g_sel_rtol];
         if( !page ) return NULL;
         annot = [page annotAtPoint:pos.pdfx: pos.pdfy];
         
@@ -3426,29 +3964,25 @@
     
     // Create the RDPDFPage instance of the current page
     RDPDFPage *page = [m_doc page:m_cur_page];
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     
     // Create the CGImageRef of the image
     CGImageRef ref = [image CGImage];
     
     // Get RDPDFDocImage instance from CGImageRef (keeping alpha channel)
-    RDPDFDocImage *i = [m_doc newImage:ref :YES];
+    RDPDFDocImage *dimg = [m_doc newImage:ref :YES];
     
     // Add the image
-    [page addAnnotBitmap:i :&rect];
-    
+    [page addAnnotBitmap:dimg :&rect];
+    [self setModifyDateForAnnot:[page annotAtIndex:(page.annotCount - 1)]];
+
     //Action Stack Manger
     [actionManger push:[[ASAdd alloc] initWithPage:m_cur_page page:page index:(page.annotCount - 1)]];
     
     // Re-render the current page
     [m_layout vRenderSync:m_cur_page];
     [self refresh];
-    
     [self setModified:YES force:NO];
-    
-    // Set Author and Modify date
-    [self updateLastAnnotInfoAtPage:page];
-    
     [self autoSave];
 }
 
@@ -3619,25 +4153,6 @@
     doubleTapZoomMode = mode;
 }
 
-- (BOOL)useTempImage
-{
-    // Create path.
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:TEMP_SIGNATURE];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-        tmpImage = [filePath stringByAppendingString:@".tmp"];
-        [[NSFileManager defaultManager] removeItemAtPath:tmpImage error:nil];
-        [[NSFileManager defaultManager] copyItemAtPath:filePath toPath:tmpImage error:nil];
-        UIImage *image = [UIImage imageWithContentsOfFile:tmpImage];
-        imgAnnot = [[UIImageView alloc] initWithImage:image];
-        
-        return YES;
-    }
-    
-    return NO;
-}
-
 - (BOOL)isReadOnlyAnnotEnabled:(RDPDFAnnot *)annot
 {
     int pageno = [m_annot getDest];
@@ -3728,8 +4243,6 @@
     return true;
 }
 
-
-
 -(void)vAnnotPerform
 {
     if( m_status != sta_annot ) return;
@@ -3769,6 +4282,15 @@
         [self vAnnotEnd];
         return;
     }
+    nuri = [m_annot getRendition];
+    if( nuri )
+    {
+        nuri = [[NSTemporaryDirectory() stringByAppendingString:@"/"] stringByAppendingString:nuri];
+        [m_annot getRenditionData:nuri];
+        if(m_del) [m_del OnAnnotRendition:nuri];
+        [self vAnnotEnd];
+        return;
+    }
     if ([self canSaveDocument] && m_annot.fieldType == 4 && m_annot.getSignStatus == 0){
         if (m_del && GLOBAL.g_hand_signature) {
             [m_del OnAnnotSignature :[m_layout vGetPage:m_annot_pos.pageno] :m_annot];
@@ -3785,9 +4307,9 @@
         [self vAnnotEnd];
         return;
     }
-    if( m_status != sta_annot ) return;
+    if (m_status != sta_annot) return;
     
-    if ([m_annot isAnnotLocked]) return;
+    if (GLOBAL.g_annot_lock && [m_annot isLocked]) return;
     
     [self setModified:YES force:NO];
     
@@ -3916,9 +4438,7 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
         RDPDFPage *page = [vpage GetPage];
         [mat transformInk:m_ink];
         [page addAnnotInk:m_ink];
-        // Set Author and Modify date
-        [self updateLastAnnotInfoAtPage:page];
-
+        [self setModifyDateForAnnot:[page annotAtIndex:(page.annotCount - 1)]];
         //Action Stack Manger
         [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
         
@@ -3972,9 +4492,7 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
         RDPDFPage *page = [vpage GetPage];
         [mat transformPath:m_polygon];
         [page addAnnotPolygon:m_polygon :GLOBAL.g_line_annot_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_annot_width * m_scale_pix / [vpage scale]];
-        // Set Author and Modify date
-        [self updateLastAnnotInfoAtPage:page];
-        
+        [self setModifyDateForAnnot:[page annotAtIndex:(page.annotCount - 1)]];
         //Action Stack Manger
         [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
         
@@ -4029,8 +4547,7 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
         RDPDFPage *page = [vpage GetPage];
         [mat transformPath:m_polygon];
         [page addAnnotPolyline:m_polygon :0 :0 :GLOBAL.g_line_annot_color :GLOBAL.g_line_annot_fill_color :GLOBAL.g_line_annot_width * m_scale_pix / [vpage scale]];
-        // Set Author and Modify date
-        [self updateLastAnnotInfoAtPage:page];
+        [self setModifyDateForAnnot:[page annotAtIndex:(page.annotCount - 1)]];
 
         //Action Stack Manger
         [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
@@ -4125,12 +4642,10 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
                 [mat transformPoint:pt_cur];
                 [mat transformPoint:&pt_cur[1]];
                 [page addAnnotLine:pt_cur :&pt_cur[1] :GLOBAL.g_line_annot_width :GLOBAL.g_line_annot_style1 :GLOBAL.g_line_annot_style2 :GLOBAL.g_line_annot_color :GLOBAL.g_line_annot_fill_color];
-                
+                [self setModifyDateForAnnot:[page annotAtIndex:(page.annotCount - 1)]];
+
                 //Action Stack Manger
                 [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
-                
-                // Set Author and Modify date
-                [self updateLastAnnotInfoAtPage:page];
             }
             pt_cur += 2;
         }
@@ -4366,32 +4881,7 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     {
         self.scrollEnabled = false;
         m_status = sta_image;
-        
-        if(!imgAnnot)
-            imgAnnot = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"btn_annot_stamp"]];
-        
-        if (![imgAnnot isDescendantOfView:self]) {
-            
-            RDVPage *page = [m_layout vGetPage:m_cur_page];
-            CGFloat pageWidth = [page GetWidth] / m_scale_pix;
-            
-            if (pageWidth < imgAnnot.frame.size.width) {
-                CGFloat ratio = imgAnnot.frame.size.width / imgAnnot.frame.size.height;
-                [imgAnnot setFrame:CGRectMake(0, 0, pageWidth / 2 , (pageWidth / 2) / ratio)];
-            } else {
-                [imgAnnot setFrame:CGRectMake(0, 0, (imgAnnot.frame.size.width / m_scale_pix) * [page GetScale], (imgAnnot.frame.size.height / m_scale_pix) * [page GetScale])];
-            }
-            
-            CGPoint center = self.center;
-            center.x += self.contentOffset.x;
-            center.y += self.contentOffset.y;
-            
-            imgAnnot.center = center;
-            imgAnnot.layer.borderWidth = 1;
-            imgAnnot.layer.borderColor = [[UIColor blueColor] CGColor];
-            [self addSubview:imgAnnot];
-        }
-        
+        m_rects_drawing = false;
         return true;
     }
     
@@ -4403,12 +4893,11 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     if( m_status == sta_image )
     {
         self.scrollEnabled = true;
+        m_rects_cnt = 0;
+        m_rects_drawing = false;
         m_status = sta_none;
-        
-        [imgAnnot removeFromSuperview];
-        imgAnnot = nil;
-        
-        [self refresh];
+        [self setNeedsDisplay];
+        [m_canvas setNeedsDisplay];
     }
 }
 - (void)vImageEnd
@@ -4417,28 +4906,83 @@ int NotePageFind(const int *pages, int pages_cnt, int pageno)
     {
         m_modified = true;
         m_status = sta_none;
+
+        RDVPage *pages[128];
+        int cur;
+        int end;
+        int pages_cnt = 0;
+        PDF_POINT *pt_cur = m_rects;
+        PDF_POINT *pt_end = pt_cur + (m_rects_cnt<<1);
+        while( pt_cur < pt_end )
+        {
+            PDF_RECT rect;
+            RDVPos pos;
+            [m_layout vGetPos :pt_cur->x :pt_cur->y :&pos];
+            if( pos.pageno >= 0 )
+            {
+                RDVPage *vpage = [m_layout vGetPage:pos.pageno];
+                cur = 0;
+                end = pages_cnt;
+                while( cur < end )
+                {
+                    if( pages[cur] == vpage ) break;
+                    cur++;
+                }
+                if( cur >= end )
+                {
+                    pages[cur] = vpage;
+                    pages_cnt++;
+                }
+                if( pt_cur->x > pt_cur[1].x )
+                {
+                    rect.right = pt_cur->x;
+                    rect.left = pt_cur[1].x;
+                }
+                else
+                {
+                    rect.left = pt_cur->x;
+                    rect.right = pt_cur[1].x;
+                }
+                if( pt_cur->y > pt_cur[1].y )
+                {
+                    rect.bottom = pt_cur->y;
+                    rect.top = pt_cur[1].y;
+                }
+                else
+                {
+                    rect.top = pt_cur->y;
+                    rect.bottom = pt_cur[1].y;
+                }
+                RDPDFPage *page = [vpage GetPage];
+                RDPDFMatrix *mat = [vpage CreateInvertMatrix:self.contentOffset.x * m_scale_pix
+                                                          :self.contentOffset.y * m_scale_pix];
+                [mat transformRect:&rect];
+                if (!m_dimg) m_dimg = [m_doc newImage:m_aimg.CGImage :YES];
+                [page addAnnotBitmap:m_dimg :&rect];
+                
+                //Action Stack Manger
+                [actionManger push:[[ASAdd alloc] initWithPage:pos.pageno page:page index:(page.annotCount - 1)]];
+            }
+            pt_cur += 2;
+        }
+        [self setModified:(m_rects_cnt != 0) force:NO];
+        m_rects_cnt = 0;
+        m_rects_drawing = false;
+        m_status = sta_none;
         
-        RDVPos pos1;
-        RDVPos pos2;
-        
-        [m_layout vGetPos:(imgAnnot.frame.origin.x - self.contentOffset.x) * m_scale_pix :(imgAnnot.frame.origin.y - self.contentOffset.y) * m_scale_pix: &pos1];
-        [m_layout vGetPos:(imgAnnot.frame.origin.x - self.contentOffset.x + imgAnnot.frame.size.width) * m_scale_pix :(imgAnnot.frame.origin.y - self.contentOffset.y + imgAnnot.frame.size.height) * m_scale_pix :&pos2];
-        
-        PDF_RECT rect;
-        
-        rect.left = pos1.pdfx;
-        rect.right = pos2.pdfx;
-        rect.top = pos2.pdfy;
-        rect.bottom = pos1.pdfy;
-        
-        [self vAddImageWithImage:imgAnnot.image withRect:rect];
-        
-        [imgAnnot removeFromSuperview];
-        imgAnnot = nil;
-        
+        cur = 0;
+        end = pages_cnt;
+        while( cur < end )
+        {
+            [self ProUpdatePage :[pages[cur] pageno]];
+            cur++;
+        }
+        [self setNeedsDisplay];
+        [m_canvas setNeedsDisplay];
+      
         [self refresh];
-        
         self.scrollEnabled = true;
+        [self autoSave];
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 #import "ActionStackManager.h"
+#import "../PDFLayout/RDVGlobal.h"
 
 @implementation ASItem
 
@@ -43,7 +44,7 @@
 - (void)undo:(RDPDFDoc *)doc
 {
     RDPDFPage *page = [doc page:self.m_pageno];
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     self.m_idx = [page annotCount];
     [page addAnnot:self.hand :self.m_idx];
     page = nil;
@@ -52,7 +53,7 @@
 - (void)redo:(RDPDFDoc *)doc
 {
     RDPDFPage *page = [doc page:self.m_pageno];
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
     [annot removeFromPage];
     page = nil;
@@ -74,7 +75,7 @@
 - (void)undo:(RDPDFDoc *)doc
 {
     RDPDFPage *page = [doc page:self.m_pageno];
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
     [annot removeFromPage];
     page = nil;
@@ -83,7 +84,7 @@
 - (void)redo:(RDPDFDoc *)doc
 {
     RDPDFPage *page = [doc page:self.m_pageno];
-    [page objsStart];
+    [page objsStart:GLOBAL.g_sel_rtol];
     self.m_idx = [page annotCount];
     [page addAnnot:self.hand :self.m_idx];
     page = nil;
@@ -114,15 +115,15 @@
     self.m_pageno = self.m_pageno0;
     if (self.m_pageno == self.m_pageno1) {
         RDPDFPage *page = [doc page:self.m_pageno];
-        [page objsStart];
+        [page objsStart:GLOBAL.g_sel_rtol];
         RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
         [annot setRect:&m_rect0];
         page = nil;
     } else {
         RDPDFPage *page0 = [doc page:self.m_pageno0];
         RDPDFPage *page1 = [doc page:self.m_pageno1];
-        [page0 objsStart];
-        [page1 objsStart];
+        [page0 objsStart:GLOBAL.g_sel_rtol];
+        [page1 objsStart:GLOBAL.g_sel_rtol];
         RDPDFAnnot *annot = [page1 annotAtIndex:self.m_idx];
         [annot MoveToPage:page0 :&m_rect0];
         self.m_idx = page0.annotCount - 1;
@@ -138,15 +139,15 @@
     self.m_pageno = self.m_pageno1;
     if (self.m_pageno == self.m_pageno0) {
         RDPDFPage *page = [doc page:self.m_pageno];
-        [page objsStart];
+        [page objsStart:GLOBAL.g_sel_rtol];
         RDPDFAnnot *annot = [page annotAtIndex:self.m_idx];
         [annot setRect:&m_rect1];
         page = nil;
     } else {
         RDPDFPage *page0 = [doc page:self.m_pageno0];
         RDPDFPage *page1 = [doc page:self.m_pageno1];
-        [page0 objsStart];
-        [page1 objsStart];
+        [page0 objsStart:GLOBAL.g_sel_rtol];
+        [page1 objsStart:GLOBAL.g_sel_rtol];
         RDPDFAnnot *annot = [page0 annotAtIndex:self.m_idx];
         [annot MoveToPage:page1 :&m_rect1];
         self.m_idx = page1.annotCount - 1;

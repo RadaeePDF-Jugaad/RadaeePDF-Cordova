@@ -7,6 +7,7 @@
 
 #import "RDPopupTextViewController.h"
 #import "PDFObjc.h"
+#import "../PDFLayout/RDVGlobal.h"
 
 @interface RDPopupTextViewController ()
 
@@ -21,7 +22,7 @@
     _textView.text = [_annot getPopupText];
     _subjectLabel.text = NSLocalizedString(@"Subject", nil);
     _textLabel.text = NSLocalizedString(@"Text", nil);
-    _subjectTextField.userInteractionEnabled = _textView.userInteractionEnabled = ![_annot isAnnotReadOnly];
+    _subjectTextField.userInteractionEnabled = _textView.userInteractionEnabled = !(GLOBAL.g_annot_readonly && [_annot isReadonly]);
     
     if (@available(iOS 13.0, *)) {
         _textView.layer.borderColor = [UIColor systemGray4Color].CGColor;
@@ -42,7 +43,7 @@
 - (IBAction)dismissView:(id)sender
 {
     BOOL edited = NO;
-    if (![_annot isAnnotReadOnly]) {
+    if (!!(GLOBAL.g_annot_readonly && [_annot isReadonly])) {
         edited = (![[_annot getPopupSubject] isEqualToString:_subjectTextField.text] || ![[_annot getPopupText]isEqualToString:_textView.text]);
         [_annot setPopupSubject:_subjectTextField.text];
         [_annot setPopupText:_textView.text];
