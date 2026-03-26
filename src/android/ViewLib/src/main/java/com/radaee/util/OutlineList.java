@@ -69,6 +69,12 @@ public class OutlineList extends ListView
 					return m_outline.GetDest();
 				else return -1;
 			}
+			public int[] GetDest()
+			{
+				if(m_outline != null)
+					return m_outline.GetDestFull();
+				else return null;
+			}
 
 			@Override
 			public void onClick(View view)

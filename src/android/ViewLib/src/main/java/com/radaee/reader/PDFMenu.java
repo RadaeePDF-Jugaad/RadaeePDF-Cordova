@@ -15,7 +15,7 @@ public class PDFMenu implements PopupWindow.OnDismissListener {
     private View m_parent = null;
     private View m_view = null;
 
-    PDFMenu(RelativeLayout parent, int resource, int width, int height) {
+    PDFMenu(RelativeLayout parent, int resource, int width) {
         m_view = LayoutInflater.from(parent.getContext()).inflate(resource, null);
         m_popup = new PopupWindow(m_view);
         m_popup.setOnDismissListener(this);

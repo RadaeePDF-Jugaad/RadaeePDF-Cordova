@@ -28,10 +28,10 @@ public class GLReflowCanvas
         int y = 0;
         for(blk_cur = 0; blk_cur < blk_cnt - 1; blk_cur++)
         {
-            m_blks[blk_cur] = new GLReflowBlock(m_page, y, m_w, m_cell_h, m_gap);
+            m_blks[blk_cur] = new GLReflowBlock(m_page, pageno, y, m_w, m_cell_h, m_gap);
             y += m_cell_h;
         }
-        m_blks[blk_cur] = new GLReflowBlock(m_page, y, m_w, m_h - y, m_gap);//last block
+        m_blks[blk_cur] = new GLReflowBlock(m_page, pageno, y, m_w, m_h - y, m_gap);//last block
     }
     public void gl_draw(GL10 gl10, GLThread thread, int def_text, int vy, int vh)
     {

@@ -6,13 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.radaee.pdf.Global;
@@ -30,7 +28,7 @@ public class RDRecentView extends ListView
     private static class RDRecentThread extends Thread
     {
         private Handler m_hand = null;
-        private Handler m_handUI = null;
+        private Handler m_handUI;
         private boolean is_notified = false;
         private boolean is_waitting = false;
         private synchronized void wait_init()
@@ -103,10 +101,10 @@ public class RDRecentView extends ListView
             item.start_render();
             m_hand.sendMessage(m_hand.obtainMessage(0, item));
         }
-        protected void clear_tasks()
-        {
-            m_hand.removeMessages(0);
-        }
+        //protected void clear_tasks()
+        //{
+        //    m_hand.removeMessages(0);
+        //}
         public synchronized void destroy()
         {
             try
@@ -185,9 +183,31 @@ public class RDRecentView extends ListView
             if (m_items == null) return true;
             return (m_items.length <= 0);
         }
-        public boolean CanUpdate()
+        //public boolean CanUpdate()
+        //{
+        //    return (m_dset != null);
+        //}
+        private int getIndex(RDRecentItem[] items, String path)
         {
-            return (m_dset != null);
+            if (items == null || path == null) return -1;
+            int cnt = items.length;
+            for (int cur = 0; cur < cnt; cur++)
+            {
+                RDRecentItem item = items[cur];
+                if (item.m_file.getAbsolutePath().compareTo(path) == 0)
+                    return cur;
+            }
+            return -1;
+        }
+        private int getIndex(RDRecentItem[] items, RDRecentItem item)
+        {
+            if (items == null || item== null) return -1;
+            int cnt = items.length;
+            for (int cur = 0; cur < cnt; cur++)
+            {
+                if (items[cur] == item) return cur;
+            }
+            return -1;
         }
         public void Update(Context ctx)
         {
@@ -200,21 +220,40 @@ public class RDRecentView extends ListView
                     return;
                 }
             }
-            if (m_items != null)
-            {
-                for (RDRecentItem item : m_items) item.RDCancel();
-                m_thread.clear_tasks();
-            }
             RDRecent recent = new RDRecent(ctx);
             int cnt = recent.GetCount();
+            if (cnt <= 0)
+            {
+                recent.Close();
+                m_items = null;
+                return;
+            }
+            RDRecentItem[] items = m_items;
             m_items = new RDRecentItem[cnt];
             for(int cur = 0; cur < cnt; cur++)
             {
-                RDRecentItem item = new RDRecentItem(ctx, m_lset);
-                item.m_file = new File(recent.get_path(cnt - cur - 1));
-                item.m_pageno = recent.get_page(cnt - cur - 1);
-                item.m_view_type = recent.get_vtype(cnt - cur - 1);
-
+                int idxo = getIndex(items, recent.get_path(cnt - cur - 1));
+                final RDRecentItem item;
+                if (idxo >= 0)
+                {
+                    //item = items[idxo];
+                    item = new RDRecentItem(items[idxo]);
+                    if (item.m_thumb == null)
+                    {
+                        items[idxo].RDCancel();
+                        m_thread.start_render(item);
+                    }
+                }
+                else
+                {
+                    item = new RDRecentItem(ctx, m_lset);
+                    item.m_file = new File(recent.get_path(cnt - cur - 1));
+                    item.m_pageno = recent.get_page(cnt - cur - 1);
+                    item.m_view_type = recent.get_vtype(cnt - cur - 1);
+                    TextView tview = item.m_view.findViewById(R.id.txt_name);
+                    tview.setText(item.m_file.getName());
+                    m_thread.start_render(item);
+                }
                 ImageView imgv = item.m_view.findViewById(R.id.img_more);
                 imgv.setColorFilter(Global.gridview_icon_color);
                 final int idx = cur;
@@ -226,15 +265,19 @@ public class RDRecentView extends ListView
                     @Override
                     public void onClick(View v) { if (m_listener != null) m_listener.OnItemClick(item, idx); }
                 });
-
-                TextView tview = item.m_view.findViewById(R.id.txt_name);
-                tview.setText(item.m_file.getName());
-
                 m_items[cur] = item;
-                m_thread.start_render(item);
             }
             recent.Close();
-
+            if (items != null)
+            {
+                for (RDRecentItem item : items)
+                {
+                    if (getIndex(m_items, item) < 0)
+                        item.RDCancel();
+                }
+                m_items[0].RDCancel();
+                m_thread.start_render(m_items[0]);
+            }
             if (m_dset != null) m_dset.onChanged();
             else m_dirty = true;
         }

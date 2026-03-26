@@ -21,6 +21,7 @@ public class PageContent
 	static private native void setStrokeJoin(long hand, int join);
 	static private native void setStrokeWidth(long hand, float w);
 	static private native void setStrokeMiter(long hand, float miter);
+	static private native void setStrokeDash(long hand, float[] dash, float phase);
 
 	static private native void drawText( long hand, String text );
 	static private native int drawText2(long content, String text, int align, float width);
@@ -180,6 +181,10 @@ public class PageContent
 	final public void SetStrokeMiter(float miter)
 	{
 		setStrokeMiter(hand, miter);
+	}
+	final public void SetStrokeDash(float[] dash, float phase)
+	{
+		setStrokeDash(hand, dash, phase);
 	}
 	/**
 	 * show text

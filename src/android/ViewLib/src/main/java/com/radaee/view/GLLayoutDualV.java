@@ -50,7 +50,7 @@ public class GLLayoutDualV extends GLLayout {
             else if (vy >= pmid.bottom + hg)
                 pt = mid + 1;
             else {
-                Log.e("CELL:", String.format("%d|%d", pmid.page_left, pmid.page_right));
+                //Log.e("CELL:", String.format("%d|%d", pmid.page_left, pmid.page_right));
                 GLPage page = m_pages[pmid.page_left];
                 if (vx >= page.GetRight() && pmid.page_right >= 0) return pmid.page_right;
                 else return pmid.page_left;
@@ -59,7 +59,7 @@ public class GLLayoutDualV extends GLLayout {
         int mid = (pb < 0) ? 0 : pb;
         PDFCell pmid = m_cells[mid];
         GLPage page = m_pages[pmid.page_left];
-        Log.e("CELL:", String.format("%d|%d", pmid.page_left, pmid.page_right));
+        //Log.e("CELL:", String.format("%d|%d", pmid.page_left, pmid.page_right));
         if (vx >= page.GetRight() && pmid.page_right >= 0) return pmid.page_right;
         else return pmid.page_left;
     }
@@ -146,10 +146,10 @@ public class GLLayoutDualV extends GLLayout {
                 case ALIGN_LEFT:
                     break;
                 case ALIGN_RIGHT:
-                    x = (m_layw - cellw) - (m_page_gap >> 1);
+                    x += (m_layw - cellw);
                     break;
                 default:
-                    x = (m_layw - cellw) >> 1;
+                    x = (m_layw - cellw + m_page_gap) >> 1;
                     break;
             }
             cell.bottom = cell.top + cellh;

@@ -6,10 +6,12 @@ import android.os.Bundle;
 import com.radaee.pdf.adv.Obj;
 import com.radaee.pdf.adv.Ref;
 
+import java.io.OutputStream;
+
 /**
  class for PDF Document.
  @author Radaee
- @version 1.1
+ @version 1.1O
  */
 public class Document
 {
@@ -110,6 +112,13 @@ public class Document
 		 * @return position from begin of the stream
 		 */
 		public int tell();
+
+		/**
+		 * save to java OutputStream in thread safe mode.
+		 * @param dst OutputStream object
+		 * @return true or false.
+		 */
+		boolean save(OutputStream dst);
 	}
 	static public class ImportContext
 	{
@@ -194,6 +203,31 @@ public class Document
 		public int GetDest()
 		{
 			return Document.getOutlineDest(hand_val, hand);
+		}
+
+		/**
+		 * get jumping page NO. and all other parameters.
+		 * @return array of parameters.<br/>
+		 * arr[0]: page NO to jump<br/>
+		 * arr[1]: fit mode:<br/>
+		 *   0: only pageno<br/>
+		 *   1: [page /XYZ left top zoom]<br/>
+		 *   2: [page /Fit]<br/>
+		 *   3: [page /FitH top]<br/>
+		 *   4: [page /FitV left]<br/>
+		 *   5: [page /FitR left bottom right top]<br/>
+		 *   6: [page /FitB]<br/>
+		 *   7: [page /FitBH top]<br/>
+		 *   8: [page /FitBV left]<br/>
+		 * arr[2]: left * 256<br/>
+		 * arr[3]: top * 256<br/>
+		 * arr[4]: right * 256<br/>
+		 * arr[5]: bottom * 256<br/>
+		 * arr[6]: zoom value
+		 */
+		public int[] GetDestFull()
+		{
+			return Document.getOutlineDest2(hand_val, hand);
 		}
 		/**
 		 * get url string of Outline
@@ -285,6 +319,7 @@ public class Document
 	private static native String getOutlineTitle( long hand, long outline );
 	private static native boolean setOutlineTitle( long hand, long outline, String title );
 	private static native int getOutlineDest( long hand, long outline );
+	private static native int[] getOutlineDest2( long hand, long outline );
 	private static native String getOutlineURI( long hand, long outline );
 	private static native String getOutlineFileLink( long hand, long outline );
 	private static native long getOutlineNext( long hand, long outline );
@@ -432,7 +467,7 @@ public class Document
 		advReload(hand_val);
 	}
 
-	public class DocFont
+	public static class DocFont
 	{
 		protected long hand;
 		Document doc;
@@ -453,7 +488,7 @@ public class Document
 			return getFontDescent(doc.hand_val, hand);
 		}
 	}
-	public class DocGState
+	public static class DocGState
 	{
 		protected long hand;
 		Document doc;
@@ -514,11 +549,11 @@ public class Document
 			return setGStateBlendMode(doc.hand_val, hand, bmode);
 		}
 	}
-	public class DocImage
+	public static class DocImage
 	{
 		protected long hand;
 	}
-	public class DocForm
+	public static class DocForm
 	{
 		protected Document m_doc;
 		protected long hand;
@@ -1118,14 +1153,7 @@ public class Document
 	/**
 	 * get label of page
 	 * @param pageno 0 based page index number
-	 * @return json string or pure text. for json: name is style name of number.<br/>
-	 * for example:<br/>
-	 * {"D":2} is "2"<br/>
-	 * {"R":3} is "III"<br/>
-	 * {"r":4} is "iv"<br/>
-	 * {"A":5} is "E"<br/>
-	 * {"a":6} is "f"<br/>
-	 * for pure text: the text is the label.
+	 * @return page label, null if handle value is 0, or related document object is null;
 	 */
 	public String GetPageLabel(int pageno)
 	{

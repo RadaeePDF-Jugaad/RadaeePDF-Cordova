@@ -1,6 +1,7 @@
 package com.radaee.util;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
 import javax.crypto.Cipher;
@@ -300,6 +301,12 @@ public class PDFAESStream implements PDFStream
 	{
 		return m_dec_pos;
 	}
+
+	@Override
+	public boolean save(OutputStream dst) {
+		return false;
+	}
+
 	/**
 	 * clear all datas, and import PDF file, then save it as encrypted PDF file.
 	 * @param path PDF file to encrypt.

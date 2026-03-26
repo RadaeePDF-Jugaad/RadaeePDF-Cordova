@@ -31,6 +31,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.radaee.annotui.UIAnnotDlgPopup;
 import com.radaee.annotui.UIAnnotDlgSign;
 import com.radaee.annotui.UIAnnotDlgSignProp;
 import com.radaee.annotui.UIAnnotMenu;
@@ -45,11 +46,15 @@ import com.radaee.pdf.Path;
 import com.radaee.util.ComboList;
 import com.radaee.util.CommonUtil;
 import com.radaee.util.PopupEditAct;
+import com.radaee.view.GLLayout;
+import com.radaee.view.GLLayoutDual;
+import com.radaee.view.GLLayoutDualV;
 import com.radaee.view.ILayoutView;
 import com.radaee.view.PDFLayout;
 import com.radaee.view.PDFLayout.LayoutListener;
 import com.radaee.view.PDFLayout.PDFPos;
 import com.radaee.view.PDFLayoutDual;
+import com.radaee.view.PDFLayoutDualV;
 import com.radaee.view.PDFLayoutHorz;
 import com.radaee.view.PDFLayoutVert;
 import com.radaee.view.VPage;
@@ -60,7 +65,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
-
     static final protected int STA_NONE = 0;
     static final protected int STA_ZOOM = 1;
     static final protected int STA_SELECT = 2;
@@ -111,7 +115,747 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     private Bitmap m_sel_icon2 = null;
     private PDFLayoutOPStack m_opstack = new PDFLayoutOPStack();
 
-    class PDFGestureListener extends GestureDetector.SimpleOnGestureListener {
+    private interface IAnnotOP
+    {
+        void onDraw(Canvas canvas);
+        void onTouch(MotionEvent event);
+    }
+    static private Paint NewPaintBorder()
+    {
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2);
+        paint.setColor(0x80000000);
+        return paint;
+    }
+    static private Paint NewPaintLine()
+    {
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2);
+        paint.setColor(0x400000FF);
+        return paint;
+    }
+    static private Paint NewPaintFill()
+    {
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(0x80FFFFFF);
+        return paint;
+    }
+    private void MovRect(float dx, float dy)
+    {
+        m_annot_rect[0] = m_annot_rect0[0] + dx;
+        m_annot_rect[1] = m_annot_rect0[1] + dy;
+        m_annot_rect[2] = m_annot_rect0[2] + dx;
+        m_annot_rect[3] = m_annot_rect0[3] + dy;
+    }
+    private final IAnnotOP m_annot_op_normal = new IAnnotOP() {
+        private final Paint m_paint = NewPaintBorder();
+        @Override
+        public void onDraw(Canvas canvas) {
+            canvas.drawRect(m_annot_rect[0], m_annot_rect[1],
+                    m_annot_rect[2], m_annot_rect[3], m_paint);
+        }
+
+        @Override
+        public void onTouch(MotionEvent event) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    m_annot_x0 = event.getX();
+                    m_annot_y0 = event.getY();
+                    if (m_annot_x0 > m_annot_rect[0] && m_annot_y0 > m_annot_rect[1] &&
+                            m_annot_x0 < m_annot_rect[2] && m_annot_y0 < m_annot_rect[3]) {
+                        m_annot_rect0 = new float[4];
+                        m_annot_rect0[0] = m_annot_rect[0];
+                        m_annot_rect0[1] = m_annot_rect[1];
+                        m_annot_rect0[2] = m_annot_rect[2];
+                        m_annot_rect0[3] = m_annot_rect[3];
+                    } else
+                        m_annot_rect0 = null;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (m_annot_rect0 != null) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        MovRect(x - m_annot_x0, y - m_annot_y0);
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (m_annot_rect0 != null) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        PDFPos pos = m_layout.vGetPos((int) x, (int) y);
+                        MovRect(x - m_annot_x0, y - m_annot_y0);
+                        if (m_annot_page.GetPageNo() == pos.pageno) {
+                            m_annot_rect0[0] = m_annot_page.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                            m_annot_rect0[1] = m_annot_page.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                            m_annot_rect0[2] = m_annot_page.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                            m_annot_rect0[3] = m_annot_page.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                            //add to redo/undo stack.
+                            float[] rect = m_annot.GetRect();
+                            m_opstack.push(new OPMove(pos.pageno, rect, pos.pageno, m_annot.GetIndexInPage(), m_annot_rect0));
+                            m_annot.SetRect(m_annot_rect0[0], m_annot_rect0[1], m_annot_rect0[2], m_annot_rect0[3]);
+                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        } else {
+                            VPage vpage = m_layout.vGetPage(pos.pageno);
+                            Page page = m_doc.GetPage(vpage.GetPageNo());
+                            if (page != null) {
+                                page.ObjsStart();
+                                m_annot_rect0[0] = vpage.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                                m_annot_rect0[1] = vpage.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                                m_annot_rect0[2] = vpage.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                                m_annot_rect0[3] = vpage.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                                //add to redo/undo stack.
+                                float[] rect = m_annot.GetRect();
+                                m_opstack.push(new OPMove(m_annot_page.GetPageNo(), rect, pos.pageno, page.GetAnnotCount(), m_annot_rect0));
+                                m_annot.MoveToPage(page, m_annot_rect0);
+                                m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                                //page.CopyAnnot(m_annot, m_annot_rect0);
+                                page.Close();
+                            }
+                            m_layout.vRenderSync(m_annot_page);
+                            m_layout.vRenderSync(vpage);
+                            if (m_listener != null) {
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                                m_listener.OnPDFPageModified(vpage.GetPageNo());
+                            }
+                        }
+                    }
+                    PDFEndAnnot();
+                    break;
+            }
+        }
+    };
+    private final IAnnotOP m_annot_op_resize = new IAnnotOP() {
+        private final Paint m_paint_s = NewPaintBorder();
+        private final Paint m_paint_f = NewPaintFill();
+        private int m_gap = 0;
+        private int m_node = 0;
+        @Override
+        public void onDraw(Canvas canvas) {
+            if (m_gap == 0) m_gap = dp2px(getContext(), 4);
+            float left = m_annot_rect[0];
+            float top = m_annot_rect[1];
+            float right = m_annot_rect[2];
+            float bot = m_annot_rect[3];
+            float xmid = (left + right) * 0.5f;
+            float ymid = (top + bot) * 0.5f;
+
+            canvas.drawRect(left, top, right, bot, m_paint_s);
+
+            canvas.drawRect(left - m_gap, top - m_gap, left + m_gap, top + m_gap, m_paint_f);
+            canvas.drawRect(left - m_gap, top - m_gap, left + m_gap, top + m_gap, m_paint_s);
+
+            canvas.drawRect(xmid - m_gap, top - m_gap, xmid + m_gap, top + m_gap, m_paint_f);
+            canvas.drawRect(xmid - m_gap, top - m_gap, xmid + m_gap, top + m_gap, m_paint_s);
+
+            canvas.drawRect(right - m_gap, top - m_gap, right + m_gap, top + m_gap, m_paint_f);
+            canvas.drawRect(right - m_gap, top - m_gap, right + m_gap, top + m_gap, m_paint_s);
+
+            canvas.drawRect(right - m_gap, ymid - m_gap, right + m_gap, ymid + m_gap, m_paint_f);
+            canvas.drawRect(right - m_gap, ymid - m_gap, right + m_gap, ymid + m_gap, m_paint_s);
+
+            canvas.drawRect(right - m_gap, bot - m_gap, right + m_gap, bot + m_gap, m_paint_f);
+            canvas.drawRect(right - m_gap, bot - m_gap, right + m_gap, bot + m_gap, m_paint_s);
+
+            canvas.drawRect(xmid - m_gap, bot - m_gap, xmid + m_gap, bot + m_gap, m_paint_f);
+            canvas.drawRect(xmid - m_gap, bot - m_gap, xmid + m_gap, bot + m_gap, m_paint_s);
+
+            canvas.drawRect(left - m_gap, bot - m_gap, left + m_gap, bot + m_gap, m_paint_f);
+            canvas.drawRect(left - m_gap, bot - m_gap, left + m_gap, bot + m_gap, m_paint_s);
+
+            canvas.drawRect(left - m_gap, ymid - m_gap, left + m_gap, ymid + m_gap, m_paint_f);
+            canvas.drawRect(left - m_gap, ymid - m_gap, left + m_gap, ymid + m_gap, m_paint_s);
+        }
+
+        @Override
+        public void onTouch(MotionEvent event) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN: {
+                    if (m_gap == 0) m_gap = dp2px(getContext(), 4);
+                    float left = m_annot_rect[0];
+                    float top = m_annot_rect[1];
+                    float right = m_annot_rect[2];
+                    float bot = m_annot_rect[3];
+                    float xmid = (left + right) * 0.5f;
+                    float ymid = (top + bot) * 0.5f;
+
+                    m_annot_x0 = event.getX();
+                    m_annot_y0 = event.getY();
+                    m_annot_rect0 = new float[4];
+                    m_annot_rect0[0] = m_annot_rect[0];
+                    m_annot_rect0[1] = m_annot_rect[1];
+                    m_annot_rect0[2] = m_annot_rect[2];
+                    m_annot_rect0[3] = m_annot_rect[3];
+                    if (m_annot_y0 >= top - m_gap && m_annot_y0 <= top + m_gap) {
+                        if (m_annot_x0 >= left - m_gap && m_annot_x0 <= left + m_gap) m_node = 1;
+                        else if (m_annot_x0 >= xmid - m_gap && m_annot_x0 <= xmid + m_gap) m_node = 2;
+                        else if (m_annot_x0 >= right - m_gap && m_annot_x0 <= right + m_gap) m_node = 3;
+                        else m_node = 0;
+                    }
+                    else if (m_annot_y0 >= ymid - m_gap && m_annot_y0 <= ymid + m_gap)
+                    {
+                        if (m_annot_x0 >= left - m_gap && m_annot_x0 <= left + m_gap) m_node = 8;
+                        else if (m_annot_x0 >= right - m_gap && m_annot_x0 <= right + m_gap) m_node = 4;
+                        else m_node = 0;
+                    }
+                    else if (m_annot_y0 >= bot - m_gap && m_annot_y0 <= bot + m_gap)
+                    {
+                        if (m_annot_x0 >= left - m_gap && m_annot_x0 <= left + m_gap) m_node = 7;
+                        else if (m_annot_x0 >= xmid - m_gap && m_annot_x0 <= xmid + m_gap) m_node = 6;
+                        else if (m_annot_x0 >= right - m_gap && m_annot_x0 <= right + m_gap) m_node = 5;
+                        else m_node = 0;
+                    }
+                    else if (m_annot_x0 > m_annot_rect[0] && m_annot_y0 > m_annot_rect[1] &&
+                            m_annot_x0 < m_annot_rect[2] && m_annot_y0 < m_annot_rect[3]) {
+                        m_node = 9;
+                    } else
+                    {
+                        m_node = 0;
+                        m_annot_rect0 = null;
+                    }
+                }
+                break;
+                case MotionEvent.ACTION_MOVE:
+                    if (m_node > 0) {
+                        float x = event.getX();
+                        float y = event.getY();
+
+                        switch(m_node)
+                        {
+                            case 1://left,top
+                                m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
+                                m_annot_rect[1] = m_annot_rect0[1] + y - m_annot_y0;
+                                break;
+                            case 2://xmid,top
+                                m_annot_rect[1] = m_annot_rect0[1] + y - m_annot_y0;
+                                break;
+                            case 3://right,top
+                                m_annot_rect[1] = m_annot_rect0[1] + y - m_annot_y0;
+                                m_annot_rect[2] = m_annot_rect0[2] + x - m_annot_x0;
+                                break;
+                            case 4://right,ymid
+                                m_annot_rect[2] = m_annot_rect0[2] + x - m_annot_x0;
+                                break;
+                            case 5://right,bottom
+                                m_annot_rect[2] = m_annot_rect0[2] + x - m_annot_x0;
+                                m_annot_rect[3] = m_annot_rect0[3] + y - m_annot_y0;
+                                break;
+                            case 6://xmid,bottom
+                                m_annot_rect[3] = m_annot_rect0[3] + y - m_annot_y0;
+                                break;
+                            case 7://left,bottom
+                                m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
+                                m_annot_rect[3] = m_annot_rect0[3] + y - m_annot_y0;
+                                break;
+                            case 8://left,ymid
+                                m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
+                                break;
+                            default:
+                                MovRect(x - m_annot_x0, y - m_annot_y0);
+                                break;
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (m_node > 0) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        PDFPos pos = m_layout.vGetPos((int) x, (int) y);
+                        if (m_node != 9 || m_annot_page.GetPageNo() == pos.pageno) {
+                            m_annot_rect0[0] = m_annot_page.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                            m_annot_rect0[1] = m_annot_page.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                            m_annot_rect0[2] = m_annot_page.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                            m_annot_rect0[3] = m_annot_page.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                            //add to redo/undo stack.
+                            float[] rect = m_annot.GetRect();
+                            m_opstack.push(new OPMove(pos.pageno, rect, pos.pageno, m_annot.GetIndexInPage(), m_annot_rect0));
+                            m_annot.SetRect(m_annot_rect0[0], m_annot_rect0[1], m_annot_rect0[2], m_annot_rect0[3]);
+                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        } else {
+                            VPage vpage = m_layout.vGetPage(pos.pageno);
+                            Page page = m_doc.GetPage(vpage.GetPageNo());
+                            if (page != null) {
+                                page.ObjsStart();
+                                m_annot_rect0[0] = vpage.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                                m_annot_rect0[1] = vpage.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                                m_annot_rect0[2] = vpage.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                                m_annot_rect0[3] = vpage.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                                //add to redo/undo stack.
+                                float[] rect = m_annot.GetRect();
+                                m_opstack.push(new OPMove(m_annot_page.GetPageNo(), rect, pos.pageno, page.GetAnnotCount(), m_annot_rect0));
+                                m_annot.MoveToPage(page, m_annot_rect0);
+                                m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                                //page.CopyAnnot(m_annot, m_annot_rect0);
+                                page.Close();
+                            }
+                            m_layout.vRenderSync(m_annot_page);
+                            m_layout.vRenderSync(vpage);
+                            if (m_listener != null) {
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                                m_listener.OnPDFPageModified(vpage.GetPageNo());
+                            }
+                        }
+                    }
+                    PDFEndAnnot();
+                    break;
+            }
+        }
+    };
+    private final IAnnotOP m_annot_op_line = new IAnnotOP() {
+        private final Paint m_paint_s = NewPaintBorder();
+        private final Paint m_paint_l = NewPaintLine();
+        private final Paint m_paint_f = NewPaintFill();
+        private int m_gap = 0;
+        private int m_node = 0;
+        private float[] m_pts0;
+        private float[] m_pte0;
+        private float[] m_pts;
+        private float[] m_pte;
+        @Override
+        public void onDraw(Canvas canvas) {
+            if (m_gap == 0) m_gap = dp2px(getContext(), 4);
+            canvas.drawRect(m_annot_rect[0], m_annot_rect[1], m_annot_rect[2], m_annot_rect[3], m_paint_s);
+
+            if (m_pts == null)
+            {
+                m_pts = m_annot.GetLinePoint(0);
+                m_pts[0] = m_annot_page.GetVX(m_pts[0]) - m_layout.vGetX();
+                m_pts[1] = m_annot_page.GetVY(m_pts[1]) - m_layout.vGetY();
+            }
+            if (m_pte == null)
+            {
+                m_pte = m_annot.GetLinePoint(1);
+                m_pte[0] = m_annot_page.GetVX(m_pte[0]) - m_layout.vGetX();
+                m_pte[1] = m_annot_page.GetVY(m_pte[1]) - m_layout.vGetY();
+            }
+            canvas.drawLine(m_pts[0], m_pts[1], m_pte[0], m_pte[1], m_paint_l);
+
+            canvas.drawRect(m_pts[0] - m_gap, m_pts[1] - m_gap, m_pts[0] + m_gap, m_pts[1] + m_gap, m_paint_f);
+            canvas.drawRect(m_pts[0] - m_gap, m_pts[1] - m_gap, m_pts[0] + m_gap, m_pts[1] + m_gap, m_paint_s);
+
+            canvas.drawRect(m_pte[0] - m_gap, m_pte[1] - m_gap, m_pte[0] + m_gap, m_pte[1] + m_gap, m_paint_f);
+            canvas.drawRect(m_pte[0] - m_gap, m_pte[1] - m_gap, m_pte[0] + m_gap, m_pte[1] + m_gap, m_paint_s);
+        }
+
+        @Override
+        public void onTouch(MotionEvent event) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (m_gap == 0) m_gap = dp2px(getContext(), 4);
+                    if (m_pts0 == null)
+                    {
+                        m_pts0 = m_annot.GetLinePoint(0);
+                        m_pts0[0] = m_annot_page.GetVX(m_pts0[0]) - m_layout.vGetX();
+                        m_pts0[1] = m_annot_page.GetVY(m_pts0[1]) - m_layout.vGetY();
+                        m_pts = new float[2];
+                        m_pts[0] = m_pts0[0];
+                        m_pts[1] = m_pts0[1];
+                    }
+                    if (m_pte0 == null)
+                    {
+                        m_pte0 = m_annot.GetLinePoint(1);
+                        m_pte0[0] = m_annot_page.GetVX(m_pte0[0]) - m_layout.vGetX();
+                        m_pte0[1] = m_annot_page.GetVY(m_pte0[1]) - m_layout.vGetY();
+                        m_pte = new float[2];
+                        m_pte[0] = m_pte0[0];
+                        m_pte[1] = m_pte0[1];
+                    }
+
+                    m_annot_x0 = event.getX();
+                    m_annot_y0 = event.getY();
+                    m_annot_rect0 = new float[4];
+                    m_annot_rect0[0] = m_annot_rect[0];
+                    m_annot_rect0[1] = m_annot_rect[1];
+                    m_annot_rect0[2] = m_annot_rect[2];
+                    m_annot_rect0[3] = m_annot_rect[3];
+                    if (m_annot_x0 >= m_pts[0] - m_gap && m_annot_x0 <= m_pts[0] + m_gap &&
+                        m_annot_y0 >= m_pts[1] - m_gap && m_annot_y0 <= m_pts[1] + m_gap)
+                        m_node = 1;
+                    else if (m_annot_x0 >= m_pte[0] - m_gap && m_annot_x0 <= m_pte[0] + m_gap &&
+                            m_annot_y0 >= m_pte[1] - m_gap && m_annot_y0 <= m_pte[1] + m_gap)
+                        m_node = 2;
+                    else if (m_annot_x0 > m_annot_rect[0] && m_annot_y0 > m_annot_rect[1] &&
+                            m_annot_x0 < m_annot_rect[2] && m_annot_y0 < m_annot_rect[3])
+                        m_node = 3;
+                    else
+                    {
+                        m_node = 0;
+                        m_annot_rect0 = null;
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (m_node > 0) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        switch(m_node)
+                        {
+                            case 1://start point
+                                m_pts[0] = m_pts0[0] + x - m_annot_x0;
+                                m_pts[1] = m_pts0[1] + y - m_annot_y0;
+                                if (m_pts[0] > m_pte[0])
+                                {
+                                    m_annot_rect[0] = m_pte[0];
+                                    m_annot_rect[2] = m_pts[0];
+                                }
+                                else
+                                {
+                                    m_annot_rect[0] = m_pts[0];
+                                    m_annot_rect[2] = m_pte[0];
+                                }
+                                if (m_pts[1] > m_pte[1])
+                                {
+                                    m_annot_rect[1] = m_pte[1];
+                                    m_annot_rect[3] = m_pts[1];
+                                }
+                                else
+                                {
+                                    m_annot_rect[1] = m_pts[1];
+                                    m_annot_rect[3] = m_pte[1];
+                                }
+                                break;
+                            case 2://end point
+                                m_pte[0] = m_pte0[0] + x - m_annot_x0;
+                                m_pte[1] = m_pte0[1] + y - m_annot_y0;
+                                if (m_pts[0] > m_pte[0])
+                                {
+                                    m_annot_rect[0] = m_pte[0];
+                                    m_annot_rect[2] = m_pts[0];
+                                }
+                                else
+                                {
+                                    m_annot_rect[0] = m_pts[0];
+                                    m_annot_rect[2] = m_pte[0];
+                                }
+                                if (m_pts[1] > m_pte[1])
+                                {
+                                    m_annot_rect[1] = m_pte[1];
+                                    m_annot_rect[3] = m_pts[1];
+                                }
+                                else
+                                {
+                                    m_annot_rect[1] = m_pts[1];
+                                    m_annot_rect[3] = m_pte[1];
+                                }
+                                break;
+                           default:
+                               MovRect(x - m_annot_x0, y - m_annot_y0);
+                                break;
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (m_node > 0) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        PDFPos pos = m_layout.vGetPos((int) x, (int) y);
+                        if (m_node != 3)
+                        {
+                            m_pts[0] = m_annot_page.ToPDFX(m_pts[0], m_layout.vGetX());
+                            m_pts[1] = m_annot_page.ToPDFY(m_pts[1], m_layout.vGetY());
+                            m_pte[0] = m_annot_page.ToPDFX(m_pte[0], m_layout.vGetX());
+                            m_pte[1] = m_annot_page.ToPDFY(m_pte[1], m_layout.vGetY());
+                            m_annot.SetLinePoint(m_pts[0], m_pts[1], m_pte[0], m_pte[1]);
+                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        }
+                        else if (m_annot_page.GetPageNo() == pos.pageno) {
+                            m_annot_rect0[0] = m_annot_page.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                            m_annot_rect0[1] = m_annot_page.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                            m_annot_rect0[2] = m_annot_page.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                            m_annot_rect0[3] = m_annot_page.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                            if (m_annot_rect0[0] > m_annot_rect0[2])
+                            {
+                                float tmp = m_annot_rect0[0];
+                                m_annot_rect0[0] = m_annot_rect0[2];
+                                m_annot_rect0[2] = tmp;
+                            }
+                            if (m_annot_rect0[1] > m_annot_rect0[3])
+                            {
+                                float tmp = m_annot_rect0[1];
+                                m_annot_rect0[1] = m_annot_rect0[3];
+                                m_annot_rect0[3] = tmp;
+                            }
+                            //add to redo/undo stack.
+                            float[] rect = m_annot.GetRect();
+                            m_opstack.push(new OPMove(pos.pageno, rect, pos.pageno, m_annot.GetIndexInPage(), m_annot_rect0));
+                            m_annot.SetRect(m_annot_rect0[0], m_annot_rect0[1], m_annot_rect0[2], m_annot_rect0[3]);
+                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        } else {
+                            VPage vpage = m_layout.vGetPage(pos.pageno);
+                            Page page = m_doc.GetPage(vpage.GetPageNo());
+                            if (page != null) {
+                                page.ObjsStart();
+                                m_annot_rect0[0] = vpage.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                                m_annot_rect0[1] = vpage.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                                m_annot_rect0[2] = vpage.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                                m_annot_rect0[3] = vpage.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                                //add to redo/undo stack.
+                                float[] rect = m_annot.GetRect();
+                                m_opstack.push(new OPMove(m_annot_page.GetPageNo(), rect, pos.pageno, page.GetAnnotCount(), m_annot_rect0));
+                                m_annot.MoveToPage(page, m_annot_rect0);
+                                m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                                //page.CopyAnnot(m_annot, m_annot_rect0);
+                                page.Close();
+                            }
+                            m_layout.vRenderSync(m_annot_page);
+                            m_layout.vRenderSync(vpage);
+                            if (m_listener != null) {
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                                m_listener.OnPDFPageModified(vpage.GetPageNo());
+                            }
+                        }
+                    }
+                    PDFEndAnnot();
+                    m_pts = null;
+                    m_pte = null;
+                    m_pts0 = null;
+                    m_pte0 = null;
+                    m_node = 0;
+                    break;
+            }
+        }
+    };
+    private final IAnnotOP m_annot_op_poly = new IAnnotOP() {
+        private final Paint m_paint_s = NewPaintBorder();
+        private final Paint m_paint_l = NewPaintLine();
+        private final Paint m_paint_f = NewPaintFill();
+        private float[] m_pts;
+        private float[] m_pts0;
+        private int m_atype;
+        private int m_gap;
+        private int m_node = -1;
+        private final android.graphics.Path m_path = new android.graphics.Path();
+        private float[] getPoints()
+        {
+            m_atype = m_annot.GetType();
+            Path path = null;
+            int cnt = 0;
+            if (m_atype == 7) {
+                path = m_annot.GetPolygonPath();
+                cnt = path.GetNodeCount() - 1;
+            }
+            else if (m_atype == 8) {
+                path = m_annot.GetPolylinePath();
+                cnt = path.GetNodeCount();
+            }
+            if (path == null) return null;
+            float[] pts = new float[cnt * 2];
+            float[] pt1 = new float[2];
+            int idx = 0;
+            for (int ipt = 0; ipt < cnt; ipt++)
+            {
+                path.GetNode(ipt, pt1);
+                pt1[0] = m_annot_page.GetVX(pt1[0]) - m_layout.vGetX();
+                pt1[1] = m_annot_page.GetVY(pt1[1]) - m_layout.vGetY();
+                pts[idx] = pt1[0];
+                pts[idx + 1] = pt1[1];
+                idx += 2;
+            }
+            return pts;
+        }
+        private void drawPts(Canvas canvas)
+        {
+            int cnt = m_pts.length;
+            m_path.reset();
+            m_path.moveTo(m_pts[0], m_pts[1]);
+            for (int ipt = 2; ipt < cnt; ipt += 2)
+                m_path.lineTo(m_pts[ipt], m_pts[ipt + 1]);
+            canvas.drawPath(m_path, m_paint_l);
+            for (int ipt = 0; ipt < cnt; ipt += 2)
+            {
+                canvas.drawRect(m_pts[ipt] - m_gap, m_pts[ipt + 1] - m_gap,
+                        m_pts[ipt] + m_gap, m_pts[ipt + 1] + m_gap, m_paint_f);
+                canvas.drawRect(m_pts[ipt] - m_gap, m_pts[ipt + 1] - m_gap,
+                        m_pts[ipt] + m_gap, m_pts[ipt + 1] + m_gap, m_paint_s);
+            }
+        }
+        private int getNode(float x, float y)
+        {
+            int cnt = m_pts.length;
+            for (int ipt = 0; ipt < cnt; ipt += 2)
+            {
+                if (x >= m_pts[ipt] - m_gap && x < m_pts[ipt] + m_gap && y >= m_pts[ipt + 1] - m_gap && y < m_pts[ipt + 1] + m_gap)
+                    return (ipt >> 1);
+            }
+            return -1;
+        }
+        private Path getPath()
+        {
+            int cnt = m_pts.length;
+            Path path = new Path();
+            path.MoveTo(m_annot_page.ToPDFX(m_pts[0], m_layout.vGetX()),
+                    m_annot_page.ToPDFY(m_pts[1], m_layout.vGetY()));
+            for (int ipt = 2; ipt < cnt; ipt += 2)
+            {
+                path.LineTo(m_annot_page.ToPDFX(m_pts[ipt], m_layout.vGetX()),
+                        m_annot_page.ToPDFY(m_pts[ipt + 1], m_layout.vGetY()));
+            }
+            return path;
+        }
+        private void updateRect()
+        {
+            int cnt = m_pts.length;
+            m_annot_rect[0] = m_pts[0];
+            m_annot_rect[1] = m_pts[1];
+            m_annot_rect[2] = m_pts[0];
+            m_annot_rect[3] = m_pts[1];
+            for (int ipt = 2; ipt < cnt; ipt += 2)
+            {
+                if (m_annot_rect[0] > m_pts[ipt]) m_annot_rect[0] = m_pts[ipt];
+                else if(m_annot_rect[2] < m_pts[ipt]) m_annot_rect[2] = m_pts[ipt];
+
+                if (m_annot_rect[1] > m_pts[ipt + 1]) m_annot_rect[1] = m_pts[ipt + 1];
+                else if(m_annot_rect[3] < m_pts[ipt + 1]) m_annot_rect[3] = m_pts[ipt + 1];
+            }
+        }
+        @Override
+        public void onDraw(Canvas canvas) {
+            if (m_gap == 0) m_gap = dp2px(getContext(), 4);
+            if (m_pts == null) m_pts = getPoints();
+            canvas.drawRect(m_annot_rect[0], m_annot_rect[1], m_annot_rect[2], m_annot_rect[3], m_paint_s);
+            drawPts(canvas);
+        }
+
+        @Override
+        public void onTouch(MotionEvent event) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (m_gap == 0) m_gap = dp2px(getContext(), 4);
+                    if (m_pts == null) m_pts = getPoints();
+
+                    m_annot_x0 = event.getX();
+                    m_annot_y0 = event.getY();
+                    m_annot_rect0 = new float[4];
+                    m_annot_rect0[0] = m_annot_rect[0];
+                    m_annot_rect0[1] = m_annot_rect[1];
+                    m_annot_rect0[2] = m_annot_rect[2];
+                    m_annot_rect0[3] = m_annot_rect[3];
+                    m_node = getNode(m_annot_x0, m_annot_y0);
+                    if (m_node >= 0) {
+                        m_pts0 = new float[m_pts.length];
+                        System.arraycopy(m_pts, 0, m_pts0, 0, m_pts.length);
+                    }
+                    else
+                    {
+                        if (m_annot_x0 > m_annot_rect[0] && m_annot_y0 > m_annot_rect[1] &&
+                                m_annot_x0 < m_annot_rect[2] && m_annot_y0 < m_annot_rect[3])
+                            m_node = 0;
+                        else m_node = -1;
+                        m_pts0 = null;
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (m_pts != null) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        if (m_pts0 != null)
+                        {
+                            m_pts[m_node << 1] = m_pts0[m_node << 1] + x - m_annot_x0;
+                            m_pts[(m_node << 1) + 1] = m_pts0[(m_node << 1) + 1] + y - m_annot_y0;
+                            updateRect();
+                        }
+                        else
+                            MovRect(x - m_annot_x0, y - m_annot_y0);
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    if (m_node >= 0) {
+                        float x = event.getX();
+                        float y = event.getY();
+                        PDFPos pos = m_layout.vGetPos((int) x, (int) y);
+                        if (m_pts0 != null)
+                        {
+                            Path path = getPath();
+                            if (m_atype == 7)
+                            {
+                                path.ClosePath();
+                                m_annot.SetPolygonPath(path);
+                            }
+                            else if(m_atype == 8)
+                                m_annot.SetPolylinePath(path);
+                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        }
+                        else if (m_annot_page.GetPageNo() == pos.pageno) {
+                            m_annot_rect0[0] = m_annot_page.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                            m_annot_rect0[1] = m_annot_page.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                            m_annot_rect0[2] = m_annot_page.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                            m_annot_rect0[3] = m_annot_page.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                            if (m_annot_rect0[0] > m_annot_rect0[2])
+                            {
+                                float tmp = m_annot_rect0[0];
+                                m_annot_rect0[0] = m_annot_rect0[2];
+                                m_annot_rect0[2] = tmp;
+                            }
+                            if (m_annot_rect0[1] > m_annot_rect0[3])
+                            {
+                                float tmp = m_annot_rect0[1];
+                                m_annot_rect0[1] = m_annot_rect0[3];
+                                m_annot_rect0[3] = tmp;
+                            }
+                            //add to redo/undo stack.
+                            float[] rect = m_annot.GetRect();
+                            m_opstack.push(new OPMove(pos.pageno, rect, pos.pageno, m_annot.GetIndexInPage(), m_annot_rect0));
+                            m_annot.SetRect(m_annot_rect0[0], m_annot_rect0[1], m_annot_rect0[2], m_annot_rect0[3]);
+                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                            m_layout.vRenderSync(m_annot_page);
+                            if (m_listener != null)
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                        } else {
+                            VPage vpage = m_layout.vGetPage(pos.pageno);
+                            Page page = m_doc.GetPage(vpage.GetPageNo());
+                            if (page != null) {
+                                page.ObjsStart();
+                                m_annot_rect0[0] = vpage.ToPDFX(m_annot_rect[0], m_layout.vGetX());
+                                m_annot_rect0[1] = vpage.ToPDFY(m_annot_rect[3], m_layout.vGetY());
+                                m_annot_rect0[2] = vpage.ToPDFX(m_annot_rect[2], m_layout.vGetX());
+                                m_annot_rect0[3] = vpage.ToPDFY(m_annot_rect[1], m_layout.vGetY());
+                                //add to redo/undo stack.
+                                float[] rect = m_annot.GetRect();
+                                m_opstack.push(new OPMove(m_annot_page.GetPageNo(), rect, pos.pageno, page.GetAnnotCount(), m_annot_rect0));
+                                m_annot.MoveToPage(page, m_annot_rect0);
+                                m_annot.SetModifyDate(CommonUtil.getCurrentDate());
+                                //page.CopyAnnot(m_annot, m_annot_rect0);
+                                page.Close();
+                            }
+                            m_layout.vRenderSync(m_annot_page);
+                            m_layout.vRenderSync(vpage);
+                            if (m_listener != null) {
+                                m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
+                                m_listener.OnPDFPageModified(vpage.GetPageNo());
+                            }
+                        }
+                    }
+                    PDFEndAnnot();
+                    m_pts = null;
+                    m_pts0 = null;
+                    m_node = 0;
+                    break;
+            }
+        }
+    };
+    private IAnnotOP m_annot_op;
+
+    private class PDFGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (m_layout == null) return false;
@@ -135,9 +879,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 float x = e.getX();
                 float y = e.getY();
                 int pageno = m_layout.vGetPage((int)x, (int)y);
-                if (m_listener == null || !m_listener.OnPDFDoubleTapped(pageno, x, y))
-                    return false;
-                return true;
+                return (m_listener != null && m_listener.OnPDFDoubleTapped(pageno, x, y));
             }
             return false;
         }
@@ -150,6 +892,23 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         @Override
         public void onLongPress(MotionEvent e) {
             if (m_layout == null) return;
+            if(m_status != STA_NONE) return;
+            /*
+            m_sel_icon1 = BitmapFactory.decodeResource(PDFLayoutView.this.getResources(), R.drawable.pt_start);
+            m_sel_icon2 = BitmapFactory.decodeResource(PDFLayoutView.this.getResources(), R.drawable.pt_end);
+            m_status = STA_SELECT;
+            m_hold_x = e.getX();
+            m_hold_y = e.getY();
+            if (m_sel != null) {
+                m_sel.Clear();
+                m_sel = null;
+            }
+            m_annot_pos = m_layout.vGetPos((int) m_hold_x, (int) m_hold_y);
+            m_annot_page = m_layout.vGetPage(m_annot_pos.pageno);
+            m_sel = new VSel(m_doc.GetPage(m_annot_pos.pageno));
+            invalidate();
+            */
+
             if (m_status == STA_NONE && m_listener != null)
             {
                 float x = e.getX();
@@ -298,11 +1057,21 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 m_annot_rect[2] = m_annot_page.GetVX(m_annot_rect[2]) - m_layout.vGetX();
                 m_annot_rect[3] = m_annot_page.GetVY(tmp) - m_layout.vGetY();
                 m_status = STA_ANNOT;
+                int atype = m_annot.GetType();
+                if (atype == 5 || atype == 6 || atype == 15)//it can resize
+                    m_annot_op = m_annot_op_resize;
+                else if (atype == 4)//it is line annotation
+                    m_annot_op = m_annot_op_line;
+                else if (atype == 7 || atype == 8)//it is polygon or polyline annotation
+                    m_annot_op = m_annot_op_poly;
+                else
+                    m_annot_op = m_annot_op_normal;
+
                 int check = m_annot.GetCheckStatus();
                 if(Global.g_annot_readonly && m_annot.IsReadOnly()) {
                     Toast.makeText(getContext(), "Readonly annotation", Toast.LENGTH_SHORT).show();
                     if(m_listener != null) m_listener.OnPDFAnnotTapped(m_annot_pos.pageno, m_annot);
-                } else if (PDFCanSave() && check >= 0) {
+                } else if (PDFCanSave() && check >= 0) {//it is checkbox or radio box
                     switch (check) {
                         case 0:
                             m_annot.SetCheckValue(true);
@@ -437,17 +1206,13 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 UIAnnotDlgSignProp dlg = new UIAnnotDlgSignProp(getContext());
                 dlg.show(m_annot, m_doc, new UIAnnotMenu.IMemnuCallback() {
                     @Override
-                    public void onUpdate() {
-                    }
+                    public void onUpdate() { }
                     @Override
-                    public void onRemove() {
-                    }
+                    public void onRemove() { }
                     @Override
-                    public void onPerform() {
-                    }
+                    public void onPerform() { }
                     @Override
-                    public void onCancel() {
-                    }
+                    public void onCancel() { }
                 });
             }
             else
@@ -462,40 +1227,13 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                         PDFEndAnnot();
                     }
                     @Override
-                    public void onRemove() {
-                    }
+                    public void onRemove() { }
                     @Override
-                    public void onPerform() {
-                    }
+                    public void onPerform() { }
                     @Override
-                    public void onCancel() {
-                    }
+                    public void onCancel() { }
                 });
             }
-            /*
-            if (CommonUtil.isFieldGraphicallySigned(m_annot)) {
-                new AlertDialog.Builder(getContext()).setTitle(R.string.warning).setMessage(R.string.delete_signature_message)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                updateSignature(null, true);
-                            }
-                        })
-                        .setNegativeButton(R.string.no, null)
-                        .show();
-            } else {
-                CaptureSignature.CaptureSignatureListener.setListener(new CaptureSignature.CaptureSignatureListener.OnSignatureCapturedListener() {
-                    @Override
-                    public void OnSignatureCaptured(Bitmap signature) {
-                        updateSignature(signature, false);
-                    }
-                });
-                Intent intent = new Intent(getContext(), CaptureSignature.class);
-                intent.putExtra(CaptureSignature.SIGNATURE_PAD_DESCR, Global.sSignPadDescr);
-                intent.putExtra(CaptureSignature.FIT_SIGNATURE_BITMAP, Global.sFitSignatureToField);
-                getContext().startActivity(intent);
-            }
-            */
         }
 
         private void updateSignature(Bitmap signature, boolean remove) {
@@ -571,6 +1309,8 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        if (m_status == STA_ANNOT)
+            PDFEndAnnot();
         if (m_layout != null && m_status != STA_ANNOT && w > 0 && h > 0) {
             m_layout.vResize(w, h);
 
@@ -604,14 +1344,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
 
     private void onDrawAnnot(Canvas canvas) {
         if (m_status == STA_ANNOT && Global.g_highlight_annotation) {
-            Paint paint = new Paint();
-            paint.setStyle(Style.STROKE);
-            paint.setStrokeWidth(2);
-            paint.setColor(0x80000000);
-            canvas.drawRect(m_annot_rect[0],
-                    m_annot_rect[1],
-                    m_annot_rect[2],
-                    m_annot_rect[3], paint);
+            m_annot_op.onDraw(canvas);
         }
     }
 
@@ -884,6 +1617,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                 if(m_listener != null)
                     m_listener.OnPDFAnnotTapped(m_annot_page.GetPageNo(), m_annot);
                 m_status = STA_ANNOT;
+                m_annot_op = m_annot_op_normal;
                 if (m_pEdit == null) m_pEdit = new UIAnnotPopEdit(this);
                 m_pEdit.update(m_annot, m_annot_rect, m_annot_page.vGetScale());
                 m_edit_type = 1;
@@ -1184,81 +1918,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             PDFEndAnnot();
             return false;
         }
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                m_annot_x0 = event.getX();
-                m_annot_y0 = event.getY();
-                if (m_annot_x0 > m_annot_rect[0] && m_annot_y0 > m_annot_rect[1] &&
-                        m_annot_x0 < m_annot_rect[2] && m_annot_y0 < m_annot_rect[3]) {
-                    m_annot_rect0 = new float[4];
-                    m_annot_rect0[0] = m_annot_rect[0];
-                    m_annot_rect0[1] = m_annot_rect[1];
-                    m_annot_rect0[2] = m_annot_rect[2];
-                    m_annot_rect0[3] = m_annot_rect[3];
-                } else
-                    m_annot_rect0 = null;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (m_annot_rect0 != null) {
-                    float x = event.getX();
-                    float y = event.getY();
-                    m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
-                    m_annot_rect[1] = m_annot_rect0[1] + y - m_annot_y0;
-                    m_annot_rect[2] = m_annot_rect0[2] + x - m_annot_x0;
-                    m_annot_rect[3] = m_annot_rect0[3] + y - m_annot_y0;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if (m_annot_rect0 != null) {
-                    float x = event.getX();
-                    float y = event.getY();
-                    PDFPos pos = m_layout.vGetPos((int) x, (int) y);
-                    m_annot_rect[0] = m_annot_rect0[0] + x - m_annot_x0;
-                    m_annot_rect[1] = m_annot_rect0[1] + y - m_annot_y0;
-                    m_annot_rect[2] = m_annot_rect0[2] + x - m_annot_x0;
-                    m_annot_rect[3] = m_annot_rect0[3] + y - m_annot_y0;
-                    if (m_annot_page.GetPageNo() == pos.pageno) {
-                        m_annot_rect0[0] = m_annot_page.ToPDFX(m_annot_rect[0], m_layout.vGetX());
-                        m_annot_rect0[1] = m_annot_page.ToPDFY(m_annot_rect[3], m_layout.vGetY());
-                        m_annot_rect0[2] = m_annot_page.ToPDFX(m_annot_rect[2], m_layout.vGetX());
-                        m_annot_rect0[3] = m_annot_page.ToPDFY(m_annot_rect[1], m_layout.vGetY());
-                        //add to redo/undo stack.
-                        float[] rect = m_annot.GetRect();
-                        m_opstack.push(new OPMove(pos.pageno, rect, pos.pageno, m_annot.GetIndexInPage(), m_annot_rect0));
-                        m_annot.SetRect(m_annot_rect0[0], m_annot_rect0[1], m_annot_rect0[2], m_annot_rect0[3]);
-                        m_annot.SetModifyDate(CommonUtil.getCurrentDate());
-                        m_layout.vRenderSync(m_annot_page);
-                        if (m_listener != null)
-                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                    } else {
-                        VPage vpage = m_layout.vGetPage(pos.pageno);
-                        Page page = m_doc.GetPage(vpage.GetPageNo());
-                        if (page != null) {
-                            page.ObjsStart();
-                            m_annot_rect0[0] = vpage.ToPDFX(m_annot_rect[0], m_layout.vGetX());
-                            m_annot_rect0[1] = vpage.ToPDFY(m_annot_rect[3], m_layout.vGetY());
-                            m_annot_rect0[2] = vpage.ToPDFX(m_annot_rect[2], m_layout.vGetX());
-                            m_annot_rect0[3] = vpage.ToPDFY(m_annot_rect[1], m_layout.vGetY());
-                            //add to redo/undo stack.
-                            float[] rect = m_annot.GetRect();
-                            m_opstack.push(new OPMove(m_annot_page.GetPageNo(), rect, pos.pageno, page.GetAnnotCount(), m_annot_rect0));
-                            m_annot.MoveToPage(page, m_annot_rect0);
-                            m_annot.SetModifyDate(CommonUtil.getCurrentDate());
-                            //page.CopyAnnot(m_annot, m_annot_rect0);
-                            page.Close();
-                        }
-                        m_layout.vRenderSync(m_annot_page);
-                        m_layout.vRenderSync(vpage);
-                        if (m_listener != null) {
-                            m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
-                            m_listener.OnPDFPageModified(vpage.GetPageNo());
-                        }
-                    }
-                }
-                PDFEndAnnot();
-                break;
-        }
+        m_annot_op.onTouch(event);
         invalidate();
         return true;
     }
@@ -1374,7 +2034,8 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                     if(m_listener != null)
                         m_listener.OnPDFAnnotTapped(m_annot_page.GetPageNo(), m_annot);
                     m_status = STA_ANNOT;
-                    PDFEditAnnot();
+                    m_annot_op = m_annot_op_normal;
+                    onEditPopup();
                     if (m_listener != null)
                         m_listener.OnPDFPageModified(vpage.GetPageNo());
                 }
@@ -1430,11 +2091,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             case 3: {
                 PDFLayoutDual layout = new PDFLayoutDual(getContext());
                 boolean[] paras = new boolean[m_doc.GetPageCount()];
-                int cur = 0;
-                while (cur < paras.length) {
-                    paras[cur] = false;
-                    cur++;
-                }
+                for (int cur = 0; cur < paras.length; cur++)  paras[cur] = false;
                 layout.vSetLayoutPara(null, paras, Global.g_layout_rtol, false);
                 m_layout = layout;
             }
@@ -1442,24 +2099,31 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             case 4: {
                 PDFLayoutDual layout = new PDFLayoutDual(getContext());
                 boolean[] paras = new boolean[m_doc.GetPageCount()];
-                int cur = 0;
-                while (cur < paras.length) {
+                paras[0] = false;//first page is cover, display as single page.
+                for (int cur = 1; cur < paras.length; cur++)
                     paras[cur] = true;
-                    cur++;
-                }
                 layout.vSetLayoutPara(null, paras, Global.g_layout_rtol, false);
                 m_layout = layout;
             }
             break;
             case 6: {
                 PDFLayoutDual layout = new PDFLayoutDual(getContext());
-                layout.vSetLayoutPara(null, null, Global.g_layout_rtol, false);
+                boolean[] paras = new boolean[m_doc.GetPageCount()];
+                paras[0] = false;//first page is cover, display as single page.
+                for (int cur = 1; cur < paras.length; cur++)
+                    paras[cur] = true;
+                layout.vSetLayoutPara(null, paras, Global.g_layout_rtol, false);
                 m_layout = layout;
             }
             break;
+            case 7:
+                m_layout = new PDFLayoutDualV(getContext(), GLLayoutDual.ALIGN_CENTER, Global.g_layout_rtol, true, false);
+                break;
+            case 8:
+                m_layout = new PDFLayoutDualV(getContext(), GLLayoutDual.ALIGN_CENTER, Global.g_layout_rtol, false, false);
+                break;
             default: {
-                PDFLayoutVert layout = new PDFLayoutVert(getContext());
-                m_layout = layout;
+                m_layout = new PDFLayoutVert(getContext());
             }
             break;
         }
@@ -1510,11 +2174,7 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             case 3: {
                 PDFLayoutDual layout = new PDFLayoutDual(getContext());
                 boolean[] paras = new boolean[m_doc.GetPageCount()];
-                int cur = 0;
-                while (cur < paras.length) {
-                    paras[cur] = false;
-                    cur++;
-                }
+                for (int cur = 0; cur < paras.length; cur++)  paras[cur] = false;
                 layout.vSetLayoutPara(null, paras, Global.g_layout_rtol, false);
                 m_layout = layout;
             }
@@ -1522,24 +2182,31 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             case 4: {
                 PDFLayoutDual layout = new PDFLayoutDual(getContext());
                 boolean[] paras = new boolean[m_doc.GetPageCount()];
-                int cur = 0;
-                while (cur < paras.length) {
+                paras[0] = false;//first page is cover, display as single page.
+                for (int cur = 1; cur < paras.length; cur++)
                     paras[cur] = true;
-                    cur++;
-                }
                 layout.vSetLayoutPara(null, paras, Global.g_layout_rtol, false);
                 m_layout = layout;
             }
             break;
             case 6: {
                 PDFLayoutDual layout = new PDFLayoutDual(getContext());
+                boolean[] paras = new boolean[m_doc.GetPageCount()];
+                paras[0] = false;//first page is cover, display as single page.
+                for (int cur = 1; cur < paras.length; cur++)
+                    paras[cur] = true;
                 layout.vSetLayoutPara(null, null, Global.g_layout_rtol, false);
                 m_layout = layout;
             }
             break;
+            case 7:
+                m_layout = new PDFLayoutDualV(getContext(), GLLayoutDual.ALIGN_CENTER, Global.g_layout_rtol, true, false);
+                break;
+            case 8:
+                m_layout = new PDFLayoutDualV(getContext(), GLLayoutDual.ALIGN_CENTER, Global.g_layout_rtol, false, false);
+                break;
             default: {
-                PDFLayoutVert layout = new PDFLayoutVert(getContext());
-                m_layout = layout;
+                m_layout = new PDFLayoutVert(getContext());
             }
             break;
         }
@@ -1597,6 +2264,26 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             invalidate();
         }
     }
+
+    @Override
+    public void PDFGotoDest(int[] vals) {
+        if (m_layout == null) return;
+        PDFPos pos = new PDFPos();
+        pos.pageno = vals[0];
+        pos.x = 0;
+        if (vals[1] == 1 || vals[1] == 3 || vals[1] == 5 || vals[1] == 7)
+            pos.y = vals[2] / 256.0f;
+        else
+            pos.y = m_doc.GetPageHeight(vals[0]) + 1;
+        if (m_layout.vGetHeight() <= 0 || m_layout.vGetWidth() <= 0) {
+            m_goto_pos = pos;
+        } else {
+            m_layout.vSetPos(0, 0, pos);
+            //m_layout.vGotoPage(vals[0]);
+            invalidate();
+        }
+    }
+
     public void PDFScrolltoPage(int pageno)
     {
         if (m_layout == null) return;
@@ -2146,10 +2833,13 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
                         mat.TransformRect(rect);
                         if(rect[2] - rect[0] < 80) rect[2] = rect[0] + 80;
                         if(rect[3] - rect[1] < 16) rect[1] = rect[3] - 16;
-                        page.AddAnnotEditbox(rect, 0xFFFF0000, vpage.ToPDFSize(3), 0, 12, 0xFFFF0000);
+                        boolean bret = page.AddAnnotEditbox(rect, 0xFFFF0000, vpage.ToPDFSize(3), 0, 12, 0xFFFF0000);
                         mat.Destroy();
                         //add to redo/undo stack.
-                        m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
+                        if (!bret)
+                            Toast.makeText(getContext(), "Free Text Annotation(Editbox) available only with premium license.", Toast.LENGTH_LONG).show();
+                        else
+                            m_opstack.push(new OPAdd(pos.pageno, page, page.GetAnnotCount() - 1));
                         pset.Insert(vpage);
                         page.Close();
                     }
@@ -2180,6 +2870,8 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
         if (m_status == STA_STAMP) PDFSetStamp(2);
         if (m_status == STA_ELLIPSE) PDFSetEllipse(2);
         if (m_status == STA_EDITBOX) PDFSetEditbox(2);
+        if (m_status == STA_POLYGON) PDFSetPolygon(2);
+        if (m_status == STA_POLYLINE) PDFSetPolyline(2);
         if (m_status == STA_ANNOT) PDFEndAnnot();
         invalidate();
     }
@@ -2226,46 +2918,31 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             m_listener.OnPDFAnnotTapped(-1, null);
     }
 
-    public void PDFEditAnnot() {
+    public void onEditPopup() {
         if (m_status != STA_ANNOT) return;
         if(!PDFCanSave()) {
             Toast.makeText(getContext(), R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
             PDFEndAnnot();
             return;
         }
-        RelativeLayout layout = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.dlg_note, null);
-        final EditText subj = layout.findViewById(R.id.txt_subj);
-        final EditText content = layout.findViewById(R.id.txt_content);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                String str_subj = subj.getText().toString();
-                String str_content = content.getText().toString();
-                m_annot.SetPopupSubject(str_subj);
-                m_annot.SetPopupText(str_content);
-                m_annot.SetModifyDate(CommonUtil.getCurrentDate());
-                dialog.dismiss();
+        new UIAnnotDlgPopup(getContext()).show(m_annot, new UIAnnotMenu.IMemnuCallback() {
+            @Override
+            public void onUpdate() {
                 if (m_listener != null)
                     m_listener.OnPDFPageModified(m_annot_page.GetPageNo());
                 PDFEndAnnot();
             }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            @Override
+            public void onRemove() {
+            }
+            @Override
+            public void onPerform() {
+            }
+            @Override
+            public void onCancel() {
                 PDFEndAnnot();
             }
         });
-        builder.setTitle(R.string.note_content);
-        builder.setCancelable(false);
-        builder.setView(layout);
-
-        subj.setText(m_annot.GetPopupSubject());
-        content.setText(m_annot.GetPopupText());
-        subj.setEnabled(!(Global.g_annot_readonly && m_annot.IsReadOnly()));
-        content.setEnabled(!(Global.g_annot_readonly && m_annot.IsReadOnly()));
-        AlertDialog dlg = builder.create();
-        dlg.show();
     }
 
     public void PDFPerformAnnot() {
@@ -2318,7 +2995,6 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             if (m_listener != null)
                 m_listener.OnPDFOpenAttachment(save_file);
         }
-        /*
         String rend = m_annot.GetRendition();
         if (rend != null) {
             index = rend.lastIndexOf('\\');
@@ -2329,7 +3005,6 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             if (m_listener != null)
                 m_listener.OnPDFOpenRendition(save_file);
         }
-         */
         String f3d = m_annot.Get3D();
         if (f3d != null) {
             index = f3d.lastIndexOf('\\');
@@ -2560,32 +3235,6 @@ public class PDFLayoutView extends View implements ILayoutView, LayoutListener {
             e.printStackTrace();
         }
     }
-    /*
-    @Override
-    public void PDFAddAnnotRect(float x, float y, float width, float height, int p)
-    {
-        // init the page
-        VPage vpage = m_layout.vGetPage(p);
-        Page page = m_doc.GetPage(p);
-
-        // init objects
-        page.ObjsStart();
-
-        // create the annotation rect
-        float[] rect = new float[4];
-        rect[0] = x;            //left
-        rect[1] = y;            //top
-        rect[2] = x + width;    //right
-        rect[3] = y + height;   //bottom
-
-        // add the annotation
-        boolean res = page.AddAnnotRect(rect, vpage.ToPDFSize(Global.rect_annot_width), Global.rect_annot_color, Global.rect_annot_fill_color);
-        page.Close();
-
-        // reload the page
-        if (res) m_layout.vRenderSync(vpage);
-    }
-    */
     @Override
     public int GetScreenX(float pdfX, int pageno) {
         VPage vPage = m_layout.vGetPage(pageno);

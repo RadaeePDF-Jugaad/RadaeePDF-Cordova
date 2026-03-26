@@ -114,7 +114,24 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
             m_view.PDFOpen(m_doc, PDFViewAct.this);
             m_view.setAnnotMenu(new UIAnnotMenu(m_layout));
             m_view.setReadOnly(getIntent().getBooleanExtra("READ_ONLY", false));
-            m_controller = new PDFViewController(m_layout, m_view, m_path,m_asset_stream != null || m_http_stream != null);
+            m_controller = new PDFViewController(m_layout, m_view, new PDFViewController.PDFViewControllerCallback(){
+                @Override
+                public Document.PDFStream getStream() {
+                    if (m_asset_stream != null) return m_asset_stream;
+                    if (m_http_stream != null) return m_http_stream;
+                    return null;
+                }
+
+                @Override
+                public String getPath() {
+                    return m_path;
+                }
+
+                @Override
+                public void onClose() {
+                    onBackPressed();
+                }
+            });
             m_controller.SetPagesListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -247,8 +264,26 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
         super.onRestoreInstanceState(savedInstanceState);
         if (m_doc == null) {
             m_doc = Document.BundleRestore(savedInstanceState);//restore Document object
+            if (m_doc == null) return;
             m_view.PDFOpen(m_doc, this);
-            m_controller = new PDFViewController(m_layout, m_view, m_path,m_asset_stream != null || m_http_stream != null);
+            m_controller = new PDFViewController(m_layout, m_view, new PDFViewController.PDFViewControllerCallback(){
+                @Override
+                public Document.PDFStream getStream() {
+                    if (m_asset_stream != null) return m_asset_stream;
+                    if (m_http_stream != null) return m_http_stream;
+                    return null;
+                }
+
+                @Override
+                public String getPath() {
+                    return m_path;
+                }
+
+                @Override
+                public void onClose() {
+                    onBackPressed();
+                }
+            });
             m_controller.SetPagesListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -401,47 +436,8 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
     @Override
     public void OnPDFSelectEnd(String text) {
-        LinearLayout layout = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.dlg_text, null);
-        final RadioGroup rad_group = (RadioGroup) layout.findViewById(R.id.rad_group);
-        final String sel_text = text;
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (rad_group.getCheckedRadioButtonId() == R.id.rad_copy) {
-                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    android.content.ClipData clip = android.content.ClipData.newPlainText("Radaee", sel_text);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(PDFViewAct.this, getString(R.string.copy_text, sel_text), Toast.LENGTH_SHORT).show();
-                } else if (m_view.PDFCanSave()) {
-                    boolean ret = false;
-                    if (rad_group.getCheckedRadioButtonId() == R.id.rad_highlight)
-                        ret = m_view.PDFSetSelMarkup(0);
-                    else if (rad_group.getCheckedRadioButtonId() == R.id.rad_underline)
-                        ret = m_view.PDFSetSelMarkup(1);
-                    else if (rad_group.getCheckedRadioButtonId() == R.id.rad_strikeout)
-                        ret = m_view.PDFSetSelMarkup(2);
-                    else if (rad_group.getCheckedRadioButtonId() == R.id.rad_squiggly)
-                        ret = m_view.PDFSetSelMarkup(4);
-                    if (!ret)
-                        Toast.makeText(PDFViewAct.this, R.string.annotation_failed, Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(PDFViewAct.this, R.string.cannot_write_or_encrypted, Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-                if (m_controller != null)
-                    m_controller.OnSelectEnd();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setTitle(R.string.process_selected_text);
-        builder.setCancelable(false);
-        builder.setView(layout);
-        AlertDialog dlg = builder.create();
-        dlg.show();
+        if (m_controller != null)
+            m_controller.OnSelectEnd(text);
     }
 
     @Override
@@ -536,18 +532,6 @@ public class PDFViewAct extends Activity implements ILayoutView.PDFLayoutListene
 
     @Override
     public void OnPDFPageDisplayed(Canvas canvas, ILayoutView.IVPage vpage) {
-    }
-
-    /**
-     * To get the current file state.
-     *
-     * @return a string that contains one of the following values:
-     * Not modified
-     * Modified but not saved
-     * Modified and saved
-     */
-    public static int getFileState() {
-        return PDFViewController.getFileState();
     }
 
     /**

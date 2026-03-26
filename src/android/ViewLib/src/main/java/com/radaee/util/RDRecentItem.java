@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.radaee.pdf.Document;
 import com.radaee.pdf.Global;
@@ -23,6 +24,7 @@ public class RDRecentItem
     protected int m_view_type;
     private int m_iw;
     private int m_ih;
+    private int m_status;
     private Page m_page;
     private final RDLockerSet m_lset;
     public File RDGetFile() { return m_file; }
@@ -31,11 +33,40 @@ public class RDRecentItem
     }
     public RDRecentItem(Context ctx, RDLockerSet lset)
     {
+        m_status = 0;
         m_lset = lset;
         m_view = (RelativeLayout) LayoutInflater.from(ctx).inflate(R.layout.item_file_list, null);
         ImageView imgv = m_view.findViewById(R.id.img_thumb);
         imgv.setImageBitmap(RDGridView.m_def_pdf_icon);
         imgv.setColorFilter(Global.gridview_icon_color);
+    }
+    public RDRecentItem(RDRecentItem src)
+    {
+        m_lset = src.m_lset;
+        m_file = src.m_file;
+        m_pageno = src.m_pageno;
+        m_view_type = src.m_view_type;
+        m_view = (RelativeLayout) LayoutInflater.from(src.m_view.getContext()).inflate(R.layout.item_file_list, null);
+        m_page = null;
+        m_status = 0;
+        ImageView imgv = m_view.findViewById(R.id.img_thumb);
+        if (src.m_thumb == null)
+        {
+            m_iw = 0;
+            m_ih = 0;
+            imgv.setColorFilter(Global.gridview_icon_color);
+            imgv.setImageBitmap(RDGridView.m_def_pdf_icon);
+        }
+        else
+        {
+            m_thumb = src.m_thumb;
+            m_iw = src.m_iw;
+            m_ih = src.m_ih;
+            imgv.setColorFilter(0);
+            imgv.setImageBitmap(m_thumb);
+        }
+        TextView tview = m_view.findViewById(R.id.txt_name);
+        tview.setText(m_file.getName());
     }
     private synchronized void set_page(Page page)
     {
@@ -44,9 +75,11 @@ public class RDRecentItem
     protected void start_render()
     {
         m_iw = m_ih = dp2px(m_view.getContext(), 60);
+        m_status = 1;
     }
     protected boolean render()
     {
+        if (m_status < 0) return false;
         String key = m_file.getAbsolutePath();
         Object locker = m_lset.Lock(key);
         Bitmap bmp = null;
@@ -86,6 +119,7 @@ public class RDRecentItem
             doc.Close();
             if (bmp != null) m_thumb = bmp;
         }
+        m_status = 2;
         m_lset.Unlock(key, locker);
         return bmp != null;
     }
@@ -107,6 +141,7 @@ public class RDRecentItem
     public synchronized void RDCancel()
     {
         if (m_page != null) m_page.RenderCancel();
+        m_status = -1;
     }
     public void UpdateThumb()
     {

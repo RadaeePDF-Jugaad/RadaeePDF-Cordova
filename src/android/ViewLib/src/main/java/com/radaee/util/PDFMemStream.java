@@ -2,6 +2,8 @@ package com.radaee.util;
 
 import com.radaee.pdf.Document.PDFStream;
 
+import java.io.OutputStream;
+
 public class PDFMemStream implements PDFStream
 {
 	private byte[] m_data;
@@ -79,5 +81,19 @@ public class PDFMemStream implements PDFStream
 	public int tell()
 	{
 		return m_pos;
+	}
+
+	@Override
+	public boolean save(OutputStream dst)
+	{
+		try
+		{
+			dst.write(m_data, 0, m_len);
+			return true;
+		}
+		catch (Exception ex)
+		{
+			return false;
+		}
 	}
 }

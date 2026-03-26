@@ -86,7 +86,7 @@ abstract public class PDFLayout {
     protected Handler m_hand_ui = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
-            if(m_thread == null) return;
+            if (m_thread == null) return;
             switch (msg.what) {
                 case 0: //render finished.
                     long cache = (((long) msg.arg1) << 32) | (((long) msg.arg2) & 0xffffffffL);
@@ -179,8 +179,7 @@ abstract public class PDFLayout {
         int pageno0 = m_disp_page1;
         int pageno1 = m_disp_page2;
         if (Global.g_dark_mode) {
-            if (m_bmp.getConfig() == Config.ARGB_8888)
-            {
+            if (m_bmp.getConfig() == Config.ARGB_8888) {
                 //for ARGB_8888, using SIMD to enhance speed.
                 m_dbmp.Create(m_bmp);
                 if (((m_back_color >> 24) & 255) == 0)
@@ -188,9 +187,7 @@ abstract public class PDFLayout {
                 else
                     m_dbmp.DrawRect(m_back_color, 0, 0, m_w, m_h, 1);
                 m_dbmp.Free(m_bmp);
-            }
-            else
-            {
+            } else {
                 if (((m_back_color >> 24) & 255) == 0)
                     m_bmp.eraseColor(-1);
                 else
@@ -295,7 +292,7 @@ abstract public class PDFLayout {
      * @param zooming zooming status.
      */
     public void vDraw(Canvas canvas, boolean zooming) {
-        if(m_doc == null) return;
+        if (m_doc == null) return;
         vFlushRange();
         int pageno0 = m_disp_page1;
         int pageno1 = m_disp_page2;
@@ -353,8 +350,9 @@ abstract public class PDFLayout {
     abstract public int vGetPage(int vx, int vy);
 
     public final VPage vGetPage(int pageno) {
-        if (pageno < 0) pageno = 0;
-        if (pageno > m_pages.length - 1) pageno = m_pages.length - 1;
+        /*if (pageno < 0) pageno = 0;
+        if (pageno > m_pages.length - 1) pageno = m_pages.length - 1;*/
+        if (pageno < 0 || pageno >= m_pages.length) return null;
         return m_pages[pageno];
     }
 
@@ -407,7 +405,7 @@ abstract public class PDFLayout {
         if (y < 0) y = 0;
         float oldx = m_scroller.getCurrX();
         float oldy = m_scroller.getCurrY();
-        m_scroller.startScroll((int)oldx, (int)oldy, (int)(x - oldx), (int)(y - oldy));
+        m_scroller.startScroll((int) oldx, (int) oldy, (int) (x - oldx), (int) (y - oldy));
         m_scroller.computeScrollOffset();
     }
 
@@ -550,12 +548,12 @@ abstract public class PDFLayout {
 
     public void vZoomSet(int vx, int vy, PDFPos pos, float zoom) {
         m_scale = zoom * m_scale_min;
-        if(Global.g_auto_scale) {
+        if (Global.g_auto_scale) {
             int cnt = m_doc.GetPageCount();
-            for(int i = 0; i < cnt; i++) {
+            for (int i = 0; i < cnt; i++) {
                 float newScale = zoom * m_scales_min[i];
-                if(newScale < m_scales_min[i]) newScale = m_scales_min[i];
-                if(newScale > vGetMaxScale()) newScale = vGetMaxScale();
+                if (newScale < m_scales_min[i]) newScale = m_scales_min[i];
+                if (newScale > vGetMaxScale()) newScale = vGetMaxScale();
                 m_scales[i] = newScale;
             }
         }

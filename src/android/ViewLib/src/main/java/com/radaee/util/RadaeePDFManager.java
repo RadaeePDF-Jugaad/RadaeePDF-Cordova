@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.Toast;
 
@@ -65,11 +66,11 @@ public class RadaeePDFManager implements RadaeePluginCallback.PDFReaderListener 
      * @param key the license activation key
      * @return true if the license was activated correctly, false otherwise
      */
-    public boolean activateLicense(Context context, String company, String email, String key) {
-        //Global.mSerial = key;
-        Global.mCompany = company;
-        Global.mEmail = email;
-        Global.mKey = key;
+    public boolean activateLicense(Context context, String key) {
+        Global.mSerial = key;
+        //Global.mCompany = company;
+        //Global.mEmail = email;
+        //Global.mKey = key;
         return Global.Init((ContextWrapper)context);
     }
 

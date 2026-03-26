@@ -69,7 +69,12 @@ public class UISignView extends View {
         draw(new Canvas(bmp));
         return bmp;
     }
-
+    public void SignReset()
+    {
+        m_path_r = new com.radaee.pdf.Path();
+        m_path_a = new android.graphics.Path();
+        invalidate();
+    }
     public Document.DocForm SignMakeForm(Document doc, Page.Annotation annot)
     {
         if (m_path_a.isEmpty()) return null;

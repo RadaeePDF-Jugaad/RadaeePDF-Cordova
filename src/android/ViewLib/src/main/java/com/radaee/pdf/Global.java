@@ -6,20 +6,23 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.StrictMode;
+import android.util.Log;
 
 import com.radaee.util.CommonUtil;
 import com.radaee.viewlib.R;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * class for Global setting.
  * 
  * @author RadaeePDF.com
- * @version 3.65.28
+ * @version 3.65.8
  */
 public class Global
 {
@@ -27,13 +30,9 @@ public class Global
 	//public static String mEmail = "radaeepdf@gmail.com";
 	//public static String mKey = "LNJFDN-C89QFX-9ZOU9E-OQ31K2-5R5V9L-KM0Y1L";
 
-	public static String mCompany = "radaee";
-	public static String mEmail = "radaee_com@yahoo.cn";
-	public static String mKey = "LNJFDN-C89QFX-9ZOU9E-OQ31K2-FADG6Z-XEBCAO";
-
-	//binding to app ID "com.radaee.reader", can avtive version before "20220910".
+	//binding to app ID "com.radaee.reader", can avtive version before "20241219".
 	//the version string can be retrieved by Global.getVersion().
-	//public static String mSerial = "8ABE22CCD8FFABCDAA323CE341437435030398E5EDBE968602CD531F4247D0F8131969A90E859A058BBEF59DD79526C8";
+	public static String mSerial = "EAF277864564C5D2DC65AFA2B241774DFF865D07845BC08AC7A6D85A1D41639EC086EC8F15B7E08FAC9C220B62CF17CA";
 
 	/**
 	 * get version string from library.
@@ -48,6 +47,9 @@ public class Global
 	private static native void loadStdFont( int index, String path );
     private static native int recommandedRenderMode();
     public static native float sqrtf(float v);
+	public static native boolean setDither16Grays(int[] vals);
+	public static native boolean dither16Grays(Bitmap bitmap);
+	public static native boolean invertBmp(Bitmap bitmap);
 
 	/**
 	 * map a face name to another name.<br/>
@@ -62,8 +64,7 @@ public class Global
 	 */
 	private static native boolean fontfileMapping(String map_name, String name);
 
-	private static native boolean setDefaultFont(String collection,
-			String fontname, boolean fixed);
+	private static native boolean setDefaultFont(String collection, String fontname, boolean fixed);
 
 	private static native boolean setAnnotFont(String fontname);
 
@@ -79,12 +80,12 @@ public class Global
 	 * 1: standard license
 	 * 2: professional license
 	 * 3: premium license
-	 * others: failed.
+	 * others: failed.s
 	 */
-	//private static native int active(ContextWrapper context, String serial);
-	private static native boolean activeStandard(Context context, String company, String email, String serial);
-	private static native boolean activeProfessional(Context context, String company, String email, String serial);
-	private static native boolean activePremium(Context context, String company, String email, String serial);
+	private static native int active(ContextWrapper context, String serial);
+	//private static native boolean activeStandard(ContextWrapper context, String company, String email, String serial);
+	//private static native boolean activeProfessional(ContextWrapper context, String company, String email, String serial);
+	//private static native boolean activePremium(ContextWrapper context, String company, String email, String serial);
 	/**
 	 * hide all annotations when render pages?
 	 * 
@@ -128,15 +129,15 @@ public class Global
 	 * default value: 0x200040FF
 	 * 
 	 * @param color
-	 *            formated as 0xAARRGGBB
+	 *            formated as 0xAARRGGBBin
 	 */
 	public static native void setAnnotTransparency(int color);
 
 	public static boolean g_display_pageno_on_thumbnail = true;
 	/**
-	 * color for ink annotation
+	 * color for ink annotation, fully opaque color can support PDF/A1
 	 */
-	public static int g_ink_color = 0x80404040;
+	public static int g_ink_color = 0xff404040;//0x80404040;
 	/**
 	 * width for ink lines.
 	 */
@@ -240,16 +241,16 @@ public class Global
     public static boolean g_cache_enable = true; //double DIB cache for layout, only works for CPU mode.
 	//public static boolean trustAllHttpsHosts = false; removed as it causes a security vulnerability.
     public static int g_annot_highlight_clr = 0xFFFFFF00;//yellow
-    public static int g_annot_underline_clr = 0xFF0000C0;//black blue
-    public static int g_annot_strikeout_clr = 0xFFC00000;//black red
-    public static int g_annot_squiggle_clr = 0xFF00C000;//black green
+    public static int g_annot_underline_clr = 0xFF0000C0;//dark blue
+    public static int g_annot_strikeout_clr = 0xFFC00000;//dark red
+    public static int g_annot_squiggle_clr = 0xFF00C000;//dark green
 
 	public static int gridview_icon_color = 0xFFFF9040;
 	public static int toolbar_icon_color = 0xFFFF9040;
 	public static int toolbar_bg_color = 0xFF202020;
 
 	public static boolean g_hand_signature = true;
-	public static boolean g_fake_sign = true;		// if true, the signature doesn't require the p12/pfx certificate file. Only the image is set to the form field.
+	public static boolean g_fake_sign = false;		// if true, the signature doesn't require the p12/pfx certificate file. Only the image is set to the form field.
 														// signature without certificate are out of standard and some PDF Reader shall refuse to show the bitmap.
 
 	public static boolean g_exec_js = true;
@@ -262,27 +263,27 @@ public class Global
 	public static boolean g_auto_launch_link = true;
 
 	/**
-	 *Annot Rect params
+	 *Annot Rect params, fully opaque color can support PDF/A1
 	 */
 	public static float g_rect_annot_width = 3;
-	public static int g_rect_annot_color = 0x80FF0000;
-	public static int g_rect_annot_fill_color = 0x800000FF;
+	public static int g_rect_annot_color = 0xFFFF0000;//0x80FF0000;
+	public static int g_rect_annot_fill_color = 0xFF0000FF;//0x800000FF;
 
     /**
-     *Annot Ellipse params
+     *Annot Ellipse params, fully opaque color can support PDF/A1
      */
     public static float g_oval_annot_width = 3;
-    public static int g_oval_annot_color = 0x80FF0000;
-    public static int g_oval_annot_fill_color = 0x800000FF;
+    public static int g_oval_annot_color = 0xFFFF0000;//0x80FF0000;
+    public static int g_oval_annot_fill_color = 0xFF0000FF;//0x800000FF;
 
     /**
-     * Annot Line params
+     * Annot Line params, fully opaque color can support PDF/A1
      */
     public static float g_line_annot_width = 3;
     public static int g_line_annot_style1 = 1;
     public static int g_line_annot_style2 = 0;
-    public static int g_line_annot_color = 0x80FF0000;
-    public static int g_line_annot_fill_color = 0x800000FF;
+    public static int g_line_annot_color = 0xFFFF0000;//0x80FF0000;
+    public static int g_line_annot_fill_color = 0xFF0000FF;//0x800000FF;
 
     //true: calculate scale of each page, false: calculate scale based on the dimensions of the largest page
 	//this flag only works on CPU mode, opengl layout implement different scale page by parameters of derived GLLayout constructor.
@@ -364,18 +365,53 @@ public class Global
 			ex.printStackTrace();
 		}
 	}
+	private static boolean support_neon() {
+		boolean has_neon = false;
+		try {
+			InputStream is = new FileInputStream("/proc/cpuinfo");
+			InputStreamReader ir = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(ir);
+			try {
+				String nameFeatures = "Features";
+				while (true) {
+					String line = br.readLine();
+					if (line == null)
+						break;
+					String[] pair = line.split(":");
+					if (pair.length != 2) continue;
+					String key = pair[0].trim();
+					String val = pair[1].trim();
+					if (key.compareToIgnoreCase(nameFeatures) == 0) {
+						if (val.contains("neon")) {
+							has_neon = true;
+							break;
+						}
+					}
+				}
+			} finally {
+				br.close();
+				ir.close();
+				is.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return has_neon;
+	}
 	static private boolean ms_init = false;
+	private static native void setSupportNeon(boolean support);
 	/**
 	 * global initialize function. it load JNI library and write some data to memory.
 	 * @param act Context object must derived from CoontextWrapper, native get package name from this Activity, and then check package name.
 	 * @return true or false
 	 */
-	public static boolean Init(Context act)
+	public static boolean Init(ContextWrapper act)
 	{
 		if(ms_init) return true;
 		if( act == null ) return false;
  		// load library
 		System.loadLibrary("rdpdf");
+		setSupportNeon(support_neon());
 		// save resource to sand-box for application.
 		File files = new File(act.getFilesDir(), "rdres");
 		if (!files.exists())// not exist? make it!
@@ -397,11 +433,14 @@ public class Global
             ftmp.mkdir();
 		tmp_path = ftmp.getPath();
 
-		//int licenseType = active(act, mSerial);
-		int licenseType = 0;
-		if (activeStandard(act, mCompany, mEmail, mKey)) licenseType = 1;
-		else if (activeProfessional(act, mCompany, mEmail, mKey)) licenseType = 2;
-		else if (activePremium(act, mCompany, mEmail, mKey)) licenseType = 3;
+		String sver = getVersion();//check version number, plz reference comment of mSerial.
+		int licenseType = active(act, mSerial);
+		if (licenseType < 1)
+			Log.e("radaee license error", "the license active failed, plz check is it expired for version " + sver + "?");
+		//int licenseType = 0;
+		//if (activeStandard(act, mCompany, mEmail, mKey)) licenseType = 1;
+		//else if (activeProfessional(act, mCompany, mEmail, mKey)) licenseType = 2;
+		//else if (activePremium(act, mCompany, mEmail, mKey)) licenseType = 3;
 		ms_init = (licenseType > 0);
 		//this code need to be added, that support share on higher Android version.
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -631,7 +670,7 @@ public class Global
 			!setDefaultFont("GB1", "DroidSansFallback", true) && face_name != null)
 			setDefaultFont("GB1", face_name, true);
 		if (!setDefaultFont("GB1", "Noto Sans CJK SC Regular", false) &&
-			!setDefaultFont("GB1", "Noto Sans CJK SC", true) &&
+			!setDefaultFont("GB1", "Noto Sans CJK SC", false) &&
             !setDefaultFont("GB1", "Noto Sans SC Regular", false) &&
 			!setDefaultFont("GB1", "DroidSansFallback", false) && face_name != null)
 			setDefaultFont("GB1", face_name, false);
@@ -643,7 +682,7 @@ public class Global
 			!setDefaultFont("CNS1", "DroidSansFallback", true) && face_name != null)
 			setDefaultFont("CNS1", face_name, true);
 		if (!setDefaultFont("CNS1", "Noto Sans CJK TC Regular", false) &&
-			!setDefaultFont("CNS1", "Noto Sans CJK TC", true) &&
+			!setDefaultFont("CNS1", "Noto Sans CJK TC", false) &&
             !setDefaultFont("CNS1", "Noto Sans TC Regular", false) &&
 			!setDefaultFont("CNS1", "DroidSansFallback", false) && face_name != null)
 			setDefaultFont("CNS1", face_name, false);
@@ -655,7 +694,7 @@ public class Global
 			!setDefaultFont("Japan1", "DroidSansFallback", true) && face_name != null)
 			setDefaultFont("Japan1", face_name, true);
 		if (!setDefaultFont("Japan1", "Noto Sans CJK JP Regular", false) &&
-			!setDefaultFont("Japan1", "Noto Sans CJK JP", true) &&
+			!setDefaultFont("Japan1", "Noto Sans CJK JP", false) &&
             !setDefaultFont("Japan1", "Noto Sans JP Regular", false) &&
 			!setDefaultFont("Japan1", "DroidSansFallback", false) && face_name != null)
 			setDefaultFont("Japan1", face_name, false);
@@ -667,7 +706,7 @@ public class Global
 			!setDefaultFont("Korea1", "DroidSansFallback", true) && face_name != null)
 			setDefaultFont("Korea1", face_name, true);
 		if (!setDefaultFont("Korea1", "Noto Sans CJK KR Regular", false) &&
-			!setDefaultFont("Korea1", "Noto Sans CJK KR", true) &&
+			!setDefaultFont("Korea1", "Noto Sans CJK KR", false) &&
             !setDefaultFont("Korea1", "Noto Sans KR Regular", false) &&
 			!setDefaultFont("Korea1", "DroidSansFallback", false) && face_name != null)
 			setDefaultFont("Korea1", face_name, false);
@@ -870,9 +909,5 @@ public class Global
 		catch(Exception ignored)
 		{
 		}
-	}
-
-	public static boolean isLicenseActivated() {
-		return ms_init;
 	}
 }

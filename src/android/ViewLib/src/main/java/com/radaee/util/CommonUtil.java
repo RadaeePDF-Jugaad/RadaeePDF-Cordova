@@ -2,6 +2,7 @@ package com.radaee.util;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -14,8 +15,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.ColorRes;
@@ -355,12 +359,86 @@ public class CommonUtil {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     OutlineList.OutlineListAdt.outline_ui_item item = mOutlineList.GetItem(i);
-                    mPdfLayoutView.PDFGotoPage(item.GetPageNO());
+                    int[] vals = item.GetDest();
+                    if (vals != null)
+                        mPdfLayoutView.PDFGotoDest(vals);
+                    else
+                        mPdfLayoutView.PDFGotoPage(item.GetPageNO());
                     mAlertDialog.dismiss();
                 }
             };
             mOutlineList.setOnItemClickListener(item_clk);
         }
+    }
+    public interface PDFMetaCallback
+    {
+        void onModified();
+    }
+    public static void showPDFMeta(final ILayoutView mPdfLayoutView, Context mContext, PDFMetaCallback callback)
+    {
+        Document doc = mPdfLayoutView.PDFGetDoc();
+        if (doc == null) return;
+        final RelativeLayout layout = (RelativeLayout)LayoutInflater.from(mContext).inflate(R.layout.dlg_meta, null, false);
+        EditText edit;
+        edit = layout.findViewById(R.id.txt_title);
+        edit.setText(doc.GetMeta("Title"));
+        edit = layout.findViewById(R.id.txt_author);
+        edit.setText(doc.GetMeta("Author"));
+        edit = layout.findViewById(R.id.txt_subject);
+        edit.setText(doc.GetMeta("Subject"));
+        edit = layout.findViewById(R.id.txt_keywords);
+        edit.setText(doc.GetMeta("Keywords"));
+        edit = layout.findViewById(R.id.txt_creator);
+        edit.setText(doc.GetMeta("Creator"));
+        edit = layout.findViewById(R.id.txt_producer);
+        edit.setText(doc.GetMeta("Producer"));
+        TextView txtv;
+        txtv = layout.findViewById(R.id.txt_pdfa);
+        String spdfa = doc.GetMeta("pdf/a");
+        if (spdfa == null || spdfa.isEmpty())
+            txtv.setText("None");
+        else
+            txtv.setText(spdfa);
+        txtv = layout.findViewById(R.id.txt_create);
+        txtv.setText(doc.GetMeta("CreationDate"));
+        txtv = layout.findViewById(R.id.txt_modify);
+        txtv.setText(doc.GetMeta("ModDate"));
+
+        final AlertDialog mAlertDialog = new AlertDialog.Builder(mContext)
+                .setTitle("PDF Meta Data")
+                .setPositiveButton(R.string.ok, new AlertDialog.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText edit;
+                        edit = layout.findViewById(R.id.txt_title);
+                        if (!doc.SetMeta("Title", edit.getText().toString()))
+                        {
+                            dialog.dismiss();
+                            Toast.makeText(mContext,"Can't set meta data to document.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        edit = layout.findViewById(R.id.txt_author);
+                        doc.SetMeta("Author", edit.getText().toString());
+                        edit = layout.findViewById(R.id.txt_subject);
+                        doc.SetMeta("Subject", edit.getText().toString());
+                        edit = layout.findViewById(R.id.txt_keywords);
+                        doc.SetMeta("Keywords", edit.getText().toString());
+                        edit = layout.findViewById(R.id.txt_creator);
+                        doc.SetMeta("Creator", edit.getText().toString());
+                        edit = layout.findViewById(R.id.txt_producer);
+                        doc.SetMeta("Producer", edit.getText().toString());
+                        callback.onModified();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new AlertDialog.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setView(layout)
+                .show();
     }
 
     static private String m_types[] = new String[]{"null", "boolean", "int", "real", "string", "name", "array", "dictionary", "reference", "stream"};

@@ -51,6 +51,7 @@ public class DIB
 	private static native void drawToBmp2(long dib, long bmp, int x, int y, int w, int h);
 	private static native void drawRect(long dib, int color, int x, int y, int width, int height, int mode);
 	private static native int glGenTexture(long dib, boolean linear);
+	private static native int glGenInvTex(long dib, boolean linear);
 	private static native boolean saveRaw( long bmp, String path );
 	private static native long restoreRaw( long bmp, String path, int[] info );
 	private static native void makeGray(long hand);
@@ -107,6 +108,10 @@ public class DIB
 	public int GLGenTexture()
 	{
 		return glGenTexture(hand, true);
+	}
+	public int GLGenInvTex()
+	{
+		return glGenInvTex(hand, true);
 	}
 	public int GetWidth()
 	{

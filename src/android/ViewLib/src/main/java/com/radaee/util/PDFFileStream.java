@@ -3,6 +3,8 @@ package com.radaee.util;
 import android.util.Log;
 
 import com.radaee.pdf.Document.PDFStream;
+
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
 /**
@@ -111,7 +113,13 @@ public class PDFFileStream implements PDFStream
 			return 0;
 		}
 	}
-    @Override
+
+	@Override
+	public boolean save(OutputStream dst) {
+		return false;
+	}
+
+	@Override
     protected void finalize() throws Throwable
     {
         close();

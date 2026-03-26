@@ -2,6 +2,7 @@ package com.radaee.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -472,7 +473,30 @@ public class PDFHttpStream implements PDFStream
 		if( m_cache == null ) return 0;
 		return m_pos;
 	}
-    @Override
+
+	@Override
+	public boolean save(OutputStream dst) {
+		byte data[] = new byte[m_total];
+		int bstart = 0;
+		int bend = (m_total + BLOCK_SIZE - 1)/BLOCK_SIZE;
+		if( bend > m_blocks_flag.length ) bend = m_blocks_flag.length;
+
+		try
+		{
+			int times = 3;
+			while( times > 0 && !download_blocks(bstart, bend)) times--;
+			if( times == 0 ) return false;
+			int ret = read_cache(0, data);
+			dst.write(data);
+			return true;
+		}
+		catch (Exception ex)
+		{
+			return false;
+		}
+	}
+
+	@Override
     protected void finalize() throws Throwable
     {
         close();

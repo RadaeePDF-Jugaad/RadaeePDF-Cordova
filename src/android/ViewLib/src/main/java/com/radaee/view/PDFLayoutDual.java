@@ -273,7 +273,7 @@ public class PDFLayoutDual extends PDFLayout
         {
             while( pcur < pcnt )
             {
-                if( (m_horz_dual == null || ccnt >= m_horz_dual.length || (m_horz_dual[ccnt]) && pcur < pcnt - 1) )
+                if( (m_horz_dual == null || ccnt >= m_horz_dual.length || m_horz_dual[ccnt]) && pcur < pcnt - 1 )
                 {
                     float w = m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1);
                     if( max_w < w ) max_w = w;
@@ -335,6 +335,7 @@ public class PDFLayoutDual extends PDFLayout
             pcur = 0;
             ccur = 0;
             int left = 0;
+            boolean[] duals = (m_h > m_w) ? m_vert_dual : m_horz_dual;
             while( ccur < ccnt )
             {
                 PDFCell cell = new PDFCell();
@@ -342,29 +343,11 @@ public class PDFLayoutDual extends PDFLayout
                 int cw = 0;
                 boolean clipPage = Global.g_auto_scale ? m_scales[pcur] / m_scales_min[pcur] > m_zoom_level_clip : clip;
                 float pageScale = Global.g_auto_scale ? m_scales[pcur] : m_scale;
-                if ((m_horz_dual == null || ccur >= m_horz_dual.length ) && pcur == 0 )
-                {
-                    w = (int)( m_doc.GetPageWidth(pcur) * pageScale );
-                    if( w + m_page_gap < m_w ) cw = m_w;
-                    else cw = w + m_page_gap;
-                    cell.page_left = pcur;
-                    cell.page_right = -1;
-                    cell.left = left;
-                    cell.right = left + cw;
-                    if(m_page_align_top)
-                    {
-                        m_pages[pcur].vLayout(left + (cw - w) / 2, m_page_gap / 2, pageScale, clipPage);
-                    }
-                    else {
-                        m_pages[pcur].vLayout(left + (cw - w) / 2, (int) (m_th - m_doc.GetPageHeight(pcur) * pageScale) / 2, pageScale, clipPage);
-                    }
-                    pcur++;
-                }
-                else if( (m_horz_dual == null || ccur >= m_horz_dual.length || m_horz_dual[ccur]) && pcur < pcnt - 1 )
+                if( (duals == null || ccur >= duals.length || duals[ccur]) && pcur < pcnt - 1 )
                 {
                     float pageScale2 = Global.g_auto_scale ? m_scales[pcur + 1] : m_scale;
-                    w = Global.g_auto_scale ? (int)( (m_doc.GetPageWidth(pcur) * pageScale) + (m_doc.GetPageWidth(pcur + 1)
-                            * pageScale2)) : (int)( (m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1)) * pageScale);
+                    w = Global.g_auto_scale ? (int)((m_doc.GetPageWidth(pcur) * pageScale) + (m_doc.GetPageWidth(pcur + 1) * pageScale2)) :
+                            (int)((m_doc.GetPageWidth(pcur) + m_doc.GetPageWidth(pcur + 1)) * pageScale);
                     if( w + m_page_gap < m_w ) cw = m_w;
                     else cw = w + m_page_gap;
                     cell.page_left = pcur;
@@ -627,7 +610,8 @@ public class PDFLayoutDual extends PDFLayout
         
         vScrollAbort();
         int ccur = 0;
-        while( ccur < m_cells.length )
+        int ccnt = m_cells.length;
+        while (ccur < ccnt)
         {
             PDFCell cell = m_cells[ccur];
             if( pageno == cell.page_left || pageno == cell.page_right )

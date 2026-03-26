@@ -37,7 +37,15 @@ public class Path
 	private static native void closePath( long hand );
 	private static native int getNodeCount(long hand);
 	private static native int getNode( long hand, int index, float[]pt );
-	protected long m_hand = create();
+	protected long m_hand;
+	public Path()
+	{
+		m_hand = create();
+	}
+	protected Path(long hand)
+	{
+		m_hand = hand;
+	}
 	/**
 	 * move to operation
 	 * @param x

@@ -36,7 +36,7 @@ public class UIAnnotDlgPopup extends UIAnnotDlg {
             }
         });
     }
-    void show(Page.Annotation annot, UIAnnotMenu.IMemnuCallback callback)
+    public void show(Page.Annotation annot, UIAnnotMenu.IMemnuCallback callback)
     {
         m_annot = annot;
         m_callback = callback;

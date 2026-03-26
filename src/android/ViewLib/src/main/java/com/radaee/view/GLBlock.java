@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.radaee.pdf.DIB;
 import com.radaee.pdf.Document;
+import com.radaee.pdf.Global;
 import com.radaee.pdf.Matrix;
 import com.radaee.pdf.Page;
 
@@ -171,7 +172,7 @@ public class GLBlock {
             {
                 if(m_texture_tmp != 0)
                     gl10.glDeleteTextures(1, new int[]{m_texture_tmp}, 0);
-                m_texture_tmp = dib.GLGenTexture();
+                m_texture_tmp = (Global.g_dark_mode) ? dib.GLGenInvTex() : dib.GLGenTexture();
             }
             texture = m_texture_tmp;
             if(texture == 0 && def_text >= 0) texture = def_text;
@@ -1030,7 +1031,7 @@ public class GLBlock {
         DIB dib = m_dib;
         if(dib == null) return false;
         m_dib = null;
-        m_texture = dib.GLGenTexture();
+        m_texture = (Global.g_dark_mode) ? dib.GLGenInvTex() : dib.GLGenTexture();
         dib.Free();
         return true;
     }

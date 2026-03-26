@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.util.Log;
 import com.radaee.pdf.Document.PDFStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 
 /**
@@ -52,9 +53,9 @@ public class PDFAssetStream implements PDFStream
 		if(len + m_pos > m_len) len = m_len - m_pos;
 		if(len <= 0) return 0;
 		System.arraycopy(m_buf, m_pos, data, 0, len);
-				m_pos += len;
-				return len;
-			}
+		m_pos += len;
+		return len;
+}
 
 	public int write(byte[] data)
 	{
@@ -72,7 +73,21 @@ public class PDFAssetStream implements PDFStream
 	{
 	    return m_pos;
 	}
-    @Override
+
+	@Override
+	public boolean save(OutputStream dst) {
+		try
+		{
+			dst.write(m_buf);
+			return true;
+		}
+		catch (Exception ex)
+		{
+			return false;
+		}
+	}
+
+	@Override
     protected void finalize() throws Throwable
     {
         close();

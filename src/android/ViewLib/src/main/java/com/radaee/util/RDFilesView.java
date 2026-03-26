@@ -113,12 +113,13 @@ public class RDFilesView extends ListView
             }
             if (cnt > 0)
             {
-                File[] tmp2 = new File[cnt];
+                final File[] tmp2 = new File[cnt];
+                final File fdir = dir;
                 System.arraycopy(tmp, 0, tmp2, 0, cnt);
                 post(new Runnable() {
                     @Override
                     public void run() {
-                        m_items.add(new RDFilesItem(getContext(), m_root.length(), m_root_disp_name, m_lset, dir, tmp2, m_listener));
+                        m_items.add(new RDFilesItem(getContext(), m_root.length(), m_root_disp_name, m_lset, fdir, tmp2, m_listener));
                         m_dset.onChanged();
                         if (m_listener != null) m_listener.OnItemAdded();
                     }

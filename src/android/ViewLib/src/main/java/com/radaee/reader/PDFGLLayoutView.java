@@ -108,10 +108,6 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
         m_view.PDFEndAnnot();
     }
 
-    public void PDFEditAnnot() {
-        m_view.PDFEditAnnot();
-    }
-
     public void PDFPerformAnnot() {
         m_view.PDFPerformAnnot();
     }
@@ -148,6 +144,12 @@ public class PDFGLLayoutView extends RelativeLayout implements ILayoutView {
     public void PDFGotoPage(int pageno) {
         m_view.PDFGotoPage(pageno);
     }
+
+    @Override
+    public void PDFGotoDest(int[] para) {
+        m_view.PDFGotoDest(para);
+    }
+
     public void PDFScrolltoPage(int pageno) {
         m_view.PDFScrolltoPage(pageno);
     }

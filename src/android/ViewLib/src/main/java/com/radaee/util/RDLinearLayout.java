@@ -11,7 +11,7 @@ import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
+//import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 
 public class RDLinearLayout extends LinearLayout {
     public RDLinearLayout(Context context, @Nullable AttributeSet attrs) {
@@ -50,24 +50,36 @@ public class RDLinearLayout extends LinearLayout {
         }
         measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         final int viewHeight = getMeasuredHeight();
-        getLayoutParams().height = 0;
+        LayoutParams lp = (LayoutParams) getLayoutParams();
         setVisibility(VISIBLE);
 
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 if (interpolatedTime == 1) {
-                    getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 } else {
-                    getLayoutParams().height = (int) (viewHeight * interpolatedTime);
+                    lp.height = (int) (viewHeight * interpolatedTime);
                 }
-                requestLayout();
+                setLayoutParams(lp);
             }
         };
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                requestLayout();
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
         if (cnt < 6) cnt = 6;
         if (cnt > 60) cnt = 60;
         animation.setDuration(cnt * 15);
-        animation.setInterpolator(new FastOutLinearInInterpolator());
+        //animation.setInterpolator(new FastOutLinearInInterpolator());
         startAnimation(animation);
     }
 
@@ -91,7 +103,7 @@ public class RDLinearLayout extends LinearLayout {
         if (cnt < 6) cnt = 6;
         if (cnt > 60) cnt = 60;
         animation.setDuration(cnt * 15);
-        animation.setInterpolator(new FastOutLinearInInterpolator());
+        //animation.setInterpolator(new FastOutLinearInInterpolator());
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {

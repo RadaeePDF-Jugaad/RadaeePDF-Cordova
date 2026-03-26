@@ -48,6 +48,9 @@ abstract public class GLLayout {
                     m_listener.OnBlockRendered(((GLBlock)msg.obj).GetPageNo());
                     msg.obj = null;
                     break;
+                case 1://reflow rendered
+                    m_listener.OnBlockRendered(((GLReflowBlock)msg.obj).GetPageNo());
+                    break;
                 case 2://find operation returned.
                     if( msg.arg1 == 1 )//succeeded
                     {

@@ -16,10 +16,19 @@ class for PDF Page.
 */
 public class Page
 {
+	static public abstract class AnnotCallback
+	{
+		public abstract long OnAnnotRendering(long hand);
+	}
 	static public class Annotation
 	{
 		protected long hand;
 		protected Page page;
+		protected Annotation(Page annot_page, long annot_hand)
+		{
+			page = annot_page;
+			hand = annot_hand;
+		}
         /**
          * advanced function to get reference of annotation object.<br/>
          * this method require premium license.
@@ -306,10 +315,7 @@ public class Page
             long ret = Page.getAnnotPopup(page.hand, hand);
             if(ret != 0)
             {
-                Annotation annot = new Annotation();
-                annot.hand = ret;
-                annot.page = page;
-                return annot;
+                return new Annotation(page, ret);
             }
             else
                 return null;
@@ -335,6 +341,15 @@ public class Page
         {
             return Page.setAnnotPopupOpen(page.hand, hand, open);
         }
+		public int GetReplyCount()
+		{
+			return Page.getAnnotReplyCount(page.hand, hand);
+		}
+		public Annotation GetReply(int idx)
+		{
+			long rhand = Page.getAnnotReply(page.hand, hand, idx);
+			return new Annotation(page, rhand);
+		}
         /**
          * get annotation's popup text.<br/>
          * if this annotation is popup annotation, it get parent annotation's text.<br/>
@@ -519,12 +534,10 @@ public class Page
 		{
 			return Page.getAnnotAttachment(page.hand, hand);
 		}
-		/*
 		final public String GetRendition()
 		{
 			return Page.getAnnotRendition(page.hand, hand);
 		}
-		*/
 		/**
 		 * get annotation's 3D data. must be *.u3d format.<br/>
 		 * this method require professional or premium license
@@ -1022,6 +1035,16 @@ public class Page
 		{
 			return Page.getAnnotCheckStatus(page.hand, hand);
 		}
+
+		/**
+		 * get export value of check-box or radio-box
+		 * this method require premium license
+		 * @return string value.
+		 */
+		final public String GetCheckValue()
+		{
+			return Page.getAnnotCheckValue(page.hand, hand);
+		}
 		/**
 		 * set value to check-box.<br/>
 		 * you should re-render page to display modified data.<br/>
@@ -1188,9 +1211,7 @@ public class Page
 		{
 			long ret = Page.getAnnotInkPath(page.hand, hand);
 			if( ret == 0 ) return null;
-			Path path = new Path();
-			path.m_hand = ret;
-			return path;
+			return new Path(ret);
 		}
 		/**
 		 * set Path to Ink annotation.<br/>
@@ -1213,9 +1234,7 @@ public class Page
 		{
 			long ret = Page.getAnnotPolygonPath(page.hand, hand);
 			if( ret == 0 ) return null;
-			Path path = new Path();
-			path.m_hand = ret;
-			return path;
+			return new Path(ret);
 		}
 		/**
 		 * set Path to Polygon annotation.<br/>
@@ -1238,9 +1257,7 @@ public class Page
 		{
 			long ret = Page.getAnnotPolylinePath(page.hand, hand);
 			if( ret == 0 ) return null;
-			Path path = new Path();
-			path.m_hand = ret;
-			return path;
+			return new Path(ret);
 		}
 		/**
 		 * set Path to Polyline annotation.<br/>
@@ -1264,6 +1281,10 @@ public class Page
 		final public float[] GetLinePoint(int idx)
 		{
 			return Page.getAnnotLinePoint(page.hand, hand, idx);
+		}
+		final public boolean SetLinePoint(float x1, float y1, float x2, float y2)
+		{
+			return Page.setAnnotLinePoint(page.hand, hand, x1, y1, x2, y2);
 		}
 
 		/**
@@ -1510,10 +1531,14 @@ public class Page
 
     static private native float[] getCropBox( long hand );
 	static private native float[] getMediaBox( long hand );
+	static private native float[] getBox(int type,  long hand);
+	static private native float[] getContentBox( long hand );
 	static private native void close( long hand );
 	static private native void renderPrepare( long hand, long dib );
 	static private native boolean render( long hand, long dib, long matrix, int quality );
+	static private native boolean render1( long hand, long dib, long matrix, int quality, AnnotCallback callback );
 	static private native boolean renderToBmp( long hand, Bitmap bitmap, long matrix, int quality );
+	static private native boolean renderToGray(long hand, Bitmap bitmap, long matrix, int quality);
 	static private native boolean renderToBuf( long hand, int[] data, int w, int h, long matrix, int quality);
 	static private native void renderCancel(long hand);
 	static private native boolean renderThumb(long hand, Bitmap bmp);
@@ -1521,6 +1546,7 @@ public class Page
 	static private native boolean renderThumbToBuf( long hand, int[] data, int w, int h);
 	static private native boolean renderIsFinished(long hand);
 	static private native float reflowStart( long hand, float width, float scale, boolean enable_images );
+	static private native float reflowStart2( long hand, float width, float scale, boolean enable_images, String font_name );
 	static private native boolean reflow( long hand, long dib, float orgx, float orgy );
 	static private native boolean reflowToBmp( long hand, Bitmap bitmap, float orgx, float orgy );
 	static private native int reflowGetParaCount( long hand );
@@ -1530,7 +1556,7 @@ public class Page
 	static private native int reflowGetCharColor( long hand, int iparagraph, int ichar );
 	static private native int reflowGetCharUnicode( long hand, int iparagraph, int ichar );
 	static private native String reflowGetCharFont( long hand, int iparagraph, int ichar );
-	static private native void reflowGetCharRect(long hand, int iparagraph, int ichar, float[] rect);
+	static private native void reflowGetCharRect(long hand, int iparagraph, int ichar, int orgx, int orgy, float[] rect);
 	static private native String reflowGetText( long hand, int iparagraph1, int ichar1, int iparagraph2, int ichar2 );
 
     static private native boolean flate(long hand);
@@ -1560,6 +1586,8 @@ public class Page
     static private native long getAnnotPopup(long page, long annot);
     static private native boolean getAnnotPopupOpen(long page, long annot);
     static private native boolean setAnnotPopupOpen(long page, long annot, boolean open);
+	static private native int getAnnotReplyCount(long page, long annot);
+	static private native long getAnnotReply(long page, long annot, int idx);
 	static private native boolean setAnnotName( long hand, long annot, String name);
 	static private native int getAnnotFieldType( long hand, long annot );
     static private native int getAnnotFieldFlag( long hand, long annot );
@@ -1595,7 +1623,7 @@ public class Page
 	static private native String getAnnotMovie( long hand, long annot );
 	static private native String getAnnotSound( long hand, long annot );
 	static private native String getAnnotAttachment( long hand, long annot );
-	//static private native String getAnnotRendition( long hand, long annot );
+	static private native String getAnnotRendition( long hand, long annot );
 	static private native boolean getAnnot3DData( long hand, long annot, String save_file );
 	static private native boolean getAnnotMovieData( long hand, long annot, String save_file );
 	static private native boolean getAnnotSoundData(long hand, long annot, int[] paras, String save_file );
@@ -1644,6 +1672,7 @@ public class Page
     static private native void setAnnotReadOnly( long hand, long annot, boolean lock);
 
 	static private native int getAnnotCheckStatus( long hand, long annot );
+	static private native String getAnnotCheckValue( long hand, long annot );
 	static private native boolean setAnnotCheckValue( long hand, long annot, boolean check );
 	static private native boolean setAnnotRadio( long hand, long annot );
 	static private native int getAnnotSignStatus( long hand, long annot );
@@ -1667,6 +1696,7 @@ public class Page
 	static private native long getAnnotPolylinePath( long hand, long annot );
 	static private native boolean setAnnotPolylinePath( long hand, long annot, long path );
 	static private native float[] getAnnotLinePoint(long hand, long annot, int idx);
+	static private native boolean setAnnotLinePoint(long hand, long annot, float x1, float y1, float x2, float y2);
 	static private native int getAnnotLineStyle(long page, long annot);
 	static private native boolean setAnnotLineStyle(long page, long annot, int style);
 
@@ -1747,6 +1777,25 @@ public class Page
     final public float[] GetMediaBox()
 	{
 		return getMediaBox( hand );
+	}
+	/**
+	 * get rotated Box, this method need an any type of license.
+	 * @param type 0: crop box, 1: media box, 2: bleed box, 3: trim box, 4: art box.
+	 * @return float array as [left, top, right, bottom] in PDF coordinate.
+	 */
+	final public float[] GetBox(int type)
+	{
+		return getBox(type, hand);
+	}
+
+	/**
+	 * get content box of page.
+	 * this method will render whole page, and then scan pixels to get box of page content.
+	 * @return float array as [left, top, right, bottom] in PDF coordinate, or null if failed.
+	 */
+	final public float[] GetContentBox()
+	{
+		return getContentBox( hand );
 	}
     final public boolean AddAnnot(long ref)
     {
@@ -1829,6 +1878,21 @@ public class Page
         if(dib == null || mat == null) return  false;
         try {
             return render(hand, dib.hand, mat.hand, Global.g_render_quality);
+			/*
+			return render1(hand, dib.hand, mat.hand, Global.g_render_quality, new AnnotCallback() {
+				@Override
+				public long OnAnnotRendering(long hval) {
+					int type = getAnnotType(Page.this.hand, hval);
+					if (type == 2) return 0x100000000L;//do not display link annoataion
+					if (type == 20)
+					{
+						int sta = getAnnotCheckStatus(Page.this.hand, hval);
+						if (sta <= 0) return 0;//fully transparency.
+					}
+					return 0x200000ff;//blue transparency.
+				}
+			});
+			 */
         }
         catch (Exception e)
         {
@@ -1846,14 +1910,19 @@ public class Page
     final public boolean RenderToBmp( Bitmap bitmap, Matrix mat )
 	{
         if(bitmap == null || mat == null) return  false;
-        try {
-            return renderToBmp(hand, bitmap, mat.hand, Global.g_render_quality);
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+		return renderToBmp(hand, bitmap, mat.hand, Global.g_render_quality);
+	}
+
+	/**
+	 * render page to ALPHA_8 Bitmap object
+	 * @param bitmap Bitmap object with ALPHA_8 format.
+	 * @param mat Matrix object define scale, rotate, translate operations.
+	 * @return true or false.
+	 */
+	final public boolean RenderToGrayBmp( Bitmap bitmap, Matrix mat )
+	{
+		if(bitmap == null || mat == null) return  false;
+		return renderToGray(hand, bitmap, mat.hand, Global.g_render_quality);
 	}
 	/**
 	 * render page to int array directly. this function returned for cancelled or finished.<br/>
@@ -2081,10 +2150,7 @@ public class Page
 	{
 		long ret = getAnnot( hand, index );
 		if( ret == 0 ) return null;
-		Annotation annot = new Annotation();
-		annot.hand = ret;
-		annot.page = this;
-		return annot;
+		return new Annotation(this, ret);
 	}
 	/**
 	 * get annotation by PDF point.<br/>
@@ -2098,10 +2164,7 @@ public class Page
 	{
 		long ret = getAnnotFromPoint( hand, x, y );
 		if( ret == 0 ) return null;
-		Annotation annot = new Annotation();
-		annot.hand = ret;
-		annot.page = this;
-		return annot;
+		return new Annotation(this, ret);
 	}
 	/**
 	 * get annotation by name.<br/>
@@ -2114,10 +2177,7 @@ public class Page
 	{
 		long ret = getAnnotByName( hand, name );
 		if( ret == 0 ) return null;
-		Annotation annot = new Annotation();
-		annot.hand = ret;
-		annot.page = this;
-		return annot;
+		return new Annotation(this, ret);
 	}
 	/**
 	 * add goto-page link to page.<br/>
@@ -2701,10 +2761,10 @@ public class Page
 	 * @param ichar char index range[0, ReflowGetCharCount()]
 	 * @param rect output: 4 element as [left, top, right, bottom].
 	 */
-    final public void ReflowGetCharRect(int iparagraph, int ichar, float[] rect)
+    final public void ReflowGetCharRect(int iparagraph, int ichar, int orgx, int orgy, float[] rect)
 	{
 		if( ichar < 0 || ichar >= ReflowGetCharCount(iparagraph) ) return;
-		reflowGetCharRect( hand, iparagraph, ichar, rect );
+		reflowGetCharRect( hand, iparagraph, ichar, orgx, orgy, rect );
 	}
 	/**
 	 * get text from range.<br/>

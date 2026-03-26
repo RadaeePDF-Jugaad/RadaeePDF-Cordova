@@ -77,6 +77,8 @@ public class GLThread extends Thread {
                 else if(msg.what == 3)
                 {
                     ((GLReflowBlock)msg.obj).render();
+                    if(m_hand_gl != null)
+                        m_hand_gl.sendMessage( m_hand_gl.obtainMessage(1, 0, 0, msg.obj) );
                 }
                 else if(msg.what == 4)
                 {

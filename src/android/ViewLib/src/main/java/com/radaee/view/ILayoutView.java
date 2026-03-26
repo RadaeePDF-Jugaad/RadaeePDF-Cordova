@@ -187,7 +187,6 @@ public interface ILayoutView {
     void PDFCancelAnnot();
     void PDFRemoveAnnot();
     void PDFEndAnnot();
-    void PDFEditAnnot();
     void PDFPerformAnnot();
     void PDFFindStart(String key, boolean match_case, boolean whole_word);
     void PDFFind(int dir);
@@ -198,6 +197,7 @@ public interface ILayoutView {
     void BundleSavePos(Bundle bundle);
     void BundleRestorePos(Bundle bundle);
     void PDFGotoPage(int pageno);
+    void PDFGotoDest(int[] para);
     void PDFScrolltoPage(int pageno);
     void PDFUndo();
     void PDFRedo();

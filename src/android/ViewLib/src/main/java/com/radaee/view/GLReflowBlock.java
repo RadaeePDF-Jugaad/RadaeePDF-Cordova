@@ -17,16 +17,21 @@ public class GLReflowBlock {
     private int m_h;
     private int m_gap;
     private int m_status;
+    private int m_pageno;
 
-    public GLReflowBlock(Page page, int y, int w, int h, int gap) {
+    public GLReflowBlock(Page page, int pageno, int y, int w, int h, int gap) {
         m_page = page;
         m_y = y;
         m_w = w;
         m_h = h;
         m_gap = gap;
+        m_pageno = pageno;
         m_status = 0;
     }
-
+    public int GetPageNo()
+    {
+        return m_pageno;
+    }
     public boolean render_cancel() {
         if (m_status == 1) {
 			m_page.RenderCancel();
@@ -101,7 +106,8 @@ public class GLReflowBlock {
         int texture = m_texture;
         if (texture == 0 && m_dib != null) {
             DIB dib = m_dib;
-            m_texture = dib.GLGenTexture();
+            texture = dib.GLGenTexture();
+            m_texture = texture;
         }
         if (texture <= 0) texture = def_text;
         int left = 0;
