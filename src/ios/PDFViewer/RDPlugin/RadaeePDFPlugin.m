@@ -204,7 +204,7 @@
 }
 
 
-- (void)activateLicenseWithBundleId:(NSString *)key
+- (void)activateLicenseWithSerialKey:(NSString *)key
 {
     [self pluginInitialize];
     g_serial = key;
