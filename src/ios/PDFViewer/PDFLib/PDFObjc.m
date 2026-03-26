@@ -11,6 +11,19 @@ extern uint annotHighlightColor;
 extern uint annotUnderlineColor;
 extern uint annotStrikeoutColor;
 
+long long AnnotCallback(void* user, PDF_ANNOT annot)
+{
+    PDF_PAGE page = (PDF_PAGE)user;
+    int type = Page_getAnnotType(page, annot);
+    if (type == 2) return 0x100000000L;//hidden annotation.
+    if (type == 20)
+    {
+        int sta = Page_getAnnotCheckStatus(page, annot);
+        if (sta <= 0) return 0;//fully transparency.
+    }
+    return 0x200000ff;//blue transparency box.
+}
+
 @implementation RDPDFSign
 @synthesize handle = m_sign;
 -(id)init:(PDF_SIGN)sign
@@ -1442,6 +1455,10 @@ extern uint annotStrikeoutColor;
 {
     return Page_render(m_page, [dib handle], [mat handle], true, quality);
 }
+-(bool)render1:(RDPDFDIB *)dib :(RDPDFMatrix *)mat :(func_annot_callback)callback :(void *)user :(int)mode
+{
+    return Page_render1(m_page, [dib handle], [mat handle], callback, user, mode);
+}
 -(void)renderCancel
 {
     return Page_renderCancel(m_page);
@@ -1462,6 +1479,22 @@ extern uint annotStrikeoutColor;
 {
 	return Page_getRotate(m_page);
 }
+
+-(bool)getCropBox : (PDF_RECT *)rect
+{
+	return Page_getCropBox(m_page, rect);
+}
+
+-(bool)getMediaBox : (PDF_RECT *)rect
+{
+	return Page_getMediaBox(m_page, rect);
+}
+
+-(bool)getContentBox : (PDF_RECT *)rect
+{
+	return Page_getContentBox(m_page, rect);
+}
+
 -(bool)flatAnnots
 {
 	return Page_flate(m_page);

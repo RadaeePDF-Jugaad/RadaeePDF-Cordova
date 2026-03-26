@@ -25,7 +25,7 @@
     [[UIImageView appearance] setTintColor:[RDUtils radaeeIconColor]];
     [[UITableViewCell appearance] setTintColor:[RDUtils radaeeIconColor]];
 
-    g_serial = @"CA70EB5DDD2FFC67E6630B2F411875C0621366DE8732CEEE594770237EEEAE030910966E24891181C5DA63AC4A4C77EF";
+    g_serial = @"E5B660E7CAB3F9B4313FF4349D51CF2BC762FE621A702A243477450A656F0517BD22E36885B052EAC932D0687EE097D6";
     //the key can active version before 2025
     //you may using Global_getVerString to get version string to comnpare the key time.
     //char sver[32];

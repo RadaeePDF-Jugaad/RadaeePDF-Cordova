@@ -1884,6 +1884,18 @@ typedef struct _PDF_TEXT_RET_
  */
 -(bool)render:(RDPDFDIB *)dib :(RDPDFMatrix *)mat :(int)quality;
 /**
+ * @brief render page to dib object with annotation callback for controlling each annotation's transparency and color.
+ * same as render but with a callback invoked for each annotation during rendering.
+ * before render, you need invoke RenderPrePare.
+ * @param dib DIB object to render. obtained by Global.dibGet().
+ * @param mat Matrix object define scale, rotate, translate operations.
+ * @param callback callback function invoked for each annotation. return value controls transparency and color. pass NULL to render all annotations normally.
+ * @param user user defined context pointer passed to callback.
+ * @param mode render mode.
+ * @return true or false.
+ */
+-(bool)render1:(RDPDFDIB *)dib :(RDPDFMatrix *)mat :(func_annot_callback)callback :(void *)user :(int)mode;
+/**
  * @brief set page status to cancelled and cancel render function.
  */
 -(void)renderCancel;
@@ -1914,6 +1926,27 @@ typedef struct _PDF_TEXT_RET_
  * @return rotate degree for page
  */
 -(int)getRotate;
+/**
+ * @brief get rotated CropBox of the page.
+ * this method need an any type of license.
+ * @param rect PDF_RECT pointer to receive the crop box as [left, top, right, bottom] in PDF coordinate.
+ * @return true or false
+ */
+-(bool)getCropBox : (PDF_RECT*)rect;
+/**
+ * @brief get rotated MediaBox of the page.
+ * this method need an any type of license.
+ * @param rect PDF_RECT pointer to receive the media box as [left, top, right, bottom] in PDF coordinate.
+ * @return true or false
+ */
+-(bool)getMediaBox : (PDF_RECT*)rect;
+/**
+ * @brief get rotated ContentBox of the page, which is the bounding box of actual content.
+ * this method need an any type of license.
+ * @param rect PDF_RECT pointer to receive the content box as [left, top, right, bottom] in PDF coordinate.
+ * @return true or false
+ */
+-(bool)getContentBox : (PDF_RECT*)rect;
 /**
  * @brief remove all annotations and display it as normal content on page.
  * this method require premium license.
